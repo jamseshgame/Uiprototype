@@ -1,0 +1,5107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1920, height=1920, initial-scale=1.0, user-scalable=no">
+<title>Jamsesh</title>
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700;800&family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  button, a, input, select, .nav-item, .topbar-main, .xp-bar-full,
+  .play-layout, .play-picker, .content > *, .page > *,
+  .play-go-bar, .play-mode-tabs, .play-body, .play-main {
+    position: relative;
+    z-index: 2;
+  }
+
+  :root {
+    /* Colour scheme */
+    --pink: #c0206a;
+    --cyan: #067a96;
+    --orange: #c94a08;
+    --mint: #16a368;
+    --gold: #d48c10;
+    --purple: #6535a0;
+    --bg-body: #e8e8f0;
+    --bg-panel: #f8f8fc;
+    --bg-surface: #eeeef4;
+    --bg-surface-hover: #e2e2ec;
+    --text-primary: #1a1a2e;
+    --text-secondary: rgba(26,26,46,0.5);
+    --text-muted: rgba(0,0,0,0.45);
+    --border-strong: rgba(0,0,0,0.12);
+    --border-subtle: rgba(0,0,0,0.06);
+    --overlay-light: rgba(0,0,0,0.05);
+    --overlay-swap: rgba(0,0,0,0.12);
+    --scrollbar-color: rgba(0,0,0,0.15);
+
+    --pad: 20px;
+    --panel-gap: 12px;
+    --panel-radius: 24px;
+    --grid-gap: 12px;
+
+    /*
+      No header row now — full grid height.
+      1920 = pad*8 + panel-gap*2 + grid-gap*4 + tile-h*6
+    */
+    --tile-h: calc((1920px - var(--pad)*8 - var(--panel-gap)*2 - var(--grid-gap)*4) / 6);
+    --nav-btn-h: calc(var(--tile-h) / 2);
+    --nav-btn-w: calc((1920px - var(--pad)*4 - var(--grid-gap)*6) / 7);
+    --navbar-h: calc(var(--nav-btn-h) + var(--pad)*2);
+    --topbar-h: var(--navbar-h);
+  }
+
+  html { background: var(--bg-body); }
+
+  body {
+    height: 1920px;
+    overflow: hidden;
+    background: var(--bg-body);
+    color: var(--text-primary);
+    font-family: 'Google Sans', 'DM Sans', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    display: flex;
+    flex-direction: row;
+    gap: var(--panel-gap);
+  }
+
+  .viewport {
+    width: 1920px;
+    height: 1920px;
+    flex-shrink: 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: var(--topbar-h) 1fr var(--navbar-h);
+    padding: var(--pad);
+    gap: var(--panel-gap);
+    position: relative;
+  }
+  .topbar::after,
+  .page.active::after,
+  .navbar::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: var(--bg-image, none);
+    background-size: 1920px 1920px;
+    opacity: var(--bg-image-opacity, 0);
+    pointer-events: none;
+    z-index: 1;
+    border-radius: inherit;
+  }
+
+  /* ── Top Bar ──────────────────────────────────────── */
+  .topbar {
+    height: var(--topbar-h);
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-panel);
+    border-radius: var(--panel-radius);
+    border: 1px solid var(--border-subtle);
+    overflow: hidden;
+    position: relative;
+  }
+  .topbar::after {
+    background-position: calc(-1 * var(--pad)) calc(-1 * var(--pad));
+  }
+
+  .topbar-main {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    padding: var(--pad);
+    gap: var(--pad);
+    min-height: 0;
+  }
+
+  .profile-avatar {
+    position: relative;
+    height: 100%;
+    aspect-ratio: 1;
+    flex-shrink: 0;
+    min-height: 0;
+  }
+
+  .profile-avatar img {
+    width: 100%;
+    height: 100%;
+    border-radius: calc(var(--panel-radius) / 2);
+    object-fit: cover;
+  }
+
+  .profile-avatar .level-badge {
+    position: absolute;
+    bottom: -4px;
+    right: -4px;
+    background: var(--pink);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 800;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--bg-panel);
+  }
+
+  .profile-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2px;
+  }
+
+  .profile-name {
+    font-size: 48px;
+    font-weight: 800;
+    color: var(--text-primary);
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .xp-text {
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .profile-info-right { text-align: right; align-items: flex-end; padding-right: var(--pad); }
+
+  .topbar-spacer { flex: 1; }
+
+  .xp-bar-full {
+    height: 6px;
+    background: var(--overlay-light);
+    margin: 0;
+    flex-shrink: 0;
+  }
+
+  .xp-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--pink), var(--cyan));
+    transition: width 0.6s ease;
+  }
+
+  /* ── Main Content ─────────────────────────────────── */
+  .content {
+    flex: 1;
+    overflow: hidden;
+    padding: var(--pad);
+    background: var(--bg-panel);
+    border-radius: var(--panel-radius);
+    border: none;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .page { display: none; flex: 1; flex-direction: column; overflow-y: auto; overflow-x: hidden; position: relative; }
+  .page.active::after {
+    background-position: calc(-1 * var(--pad)) calc(-1 * (var(--pad) + var(--topbar-h) + var(--panel-gap)));
+  }
+  .page.active { display: flex; }
+
+  .section-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 18px;
+  }
+
+  /* ── Side Pagination Panel ────────────────────────── */
+  .grid-nav {
+    display: none;
+    flex-direction: column;
+    gap: var(--grid-gap);
+    flex-shrink: 0;
+    width: 80px;
+  }
+
+  .grid-nav-btn {
+    flex: 1;
+    width: 100%;
+    border-radius: calc(var(--panel-radius) / 2);
+    border: 1px solid var(--border-strong);
+    background: var(--bg-surface);
+    color: var(--text-secondary);
+    font-size: 28px;
+    line-height: 0.7;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 20px;
+    transition: background 0.2s, color 0.2s;
+    font-family: inherit;
+  }
+
+  .grid-nav-btn:hover {
+    background: var(--bg-surface-hover);
+    color: var(--text-primary);
+  }
+
+  .grid-nav-btn:disabled {
+    opacity: 0.2;
+    cursor: default;
+  }
+
+  .grid-nav-btn.active {
+    background: var(--cyan);
+    color: #fff;
+    border-color: var(--cyan);
+  }
+
+  .grid-viewport {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .grid-track {
+    width: 100%;
+    transition: transform 0.4s ease;
+  }
+
+  .grid-page {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    align-content: start;
+    gap: var(--grid-gap);
+  }
+
+  .song-tile {
+    aspect-ratio: 1;
+    border-radius: calc(var(--panel-radius) / 2);
+    overflow: hidden;
+    cursor: pointer;
+    position: relative;
+    background: var(--bg-surface);
+    border: 1px solid transparent;
+    transition: box-shadow 0.15s, filter 0.15s, border-color 0.15s;
+  }
+
+  .song-tile:hover {
+    box-shadow: 0 0 0 3px var(--pink), 0 0 20px rgba(219,39,119,0.4);
+    border-color: var(--pink);
+  }
+
+  .song-tile.active {
+    box-shadow: 0 0 0 3px var(--cyan), 0 0 24px rgba(0,200,255,0.5);
+    border-color: var(--cyan);
+  }
+
+  .song-tile.active img {
+    transform: scale(1.05);
+  }
+
+  .song-tile img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.2s ease;
+  }
+
+  .song-tile:hover img {
+    transform: scale(1.1);
+  }
+
+  .song-tile .tile-info {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 28px 10px 10px;
+    background: linear-gradient(0deg, rgba(0,0,0,0.85) 0%, transparent 100%);
+  }
+
+  .song-tile .tile-rank {
+    position: absolute;
+    top: 6px;
+    left: 8px;
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--text-muted);
+  }
+
+  .song-tile .tile-title {
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.2;
+  }
+
+  .song-tile .tile-artist {
+    font-size: 11px;
+    color: var(--text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* ── Play Panel ──────────────────────────────────── */
+  .play-layout {
+    flex: 1;
+    display: flex;
+    gap: var(--grid-gap);
+    min-height: 0;
+  }
+
+  .play-panel {
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: calc(var(--panel-radius) / 2);
+    overflow: hidden;
+  }
+
+  .play-panel-header {
+    padding: var(--pad) var(--pad) 12px;
+    font-size: 18px;
+    font-weight: 700;
+    flex-shrink: 0;
+    color: var(--text-secondary);
+  }
+
+  /* Panel 1 — Song Picker */
+  .play-songs { flex: 2; }
+
+  .play-song-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 var(--pad) var(--pad);
+  }
+
+  .play-song-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: calc(var(--panel-radius) / 3);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .play-song-row:hover { background: var(--bg-surface-hover); }
+  .play-song-row.selected {
+    background: rgba(219,39,119,0.15);
+    border: 1px solid var(--pink);
+  }
+
+  .play-song-art {
+    width: 48px;
+    height: 48px;
+    border-radius: 6px;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+
+  .play-song-info { flex: 1; min-width: 0; }
+
+  .play-song-title {
+    font-size: 15px;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .play-song-artist {
+    font-size: 12px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .play-song-rank {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    flex-shrink: 0;
+  }
+
+  /* Panel 2 — Options */
+  .play-opt-label { font-size: 36px; font-weight: 800; }
+
+  /* Panel 3 — Leaderboard */
+  .play-leaderboard { flex: 1; }
+
+  .play-lb-list {
+    flex: 1;
+    overflow: hidden;
+    padding: var(--pad);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .play-lb-row {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 0;
+    min-width: 0;
+  }
+
+  .play-lb-pos {
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--text-secondary);
+    width: 64px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .play-lb-row:nth-child(-n+3) .play-lb-pos { color: var(--gold); }
+
+  .play-lb-tile {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 0 20px;
+    border-radius: calc(var(--panel-radius) / 3);
+    border: 1px solid var(--border-subtle);
+    background: var(--bg-surface);
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .play-lb-avatar {
+    height: 80%;
+    aspect-ratio: 1;
+    border-radius: calc(var(--panel-radius) / 2);
+    background: var(--bg-surface-hover);
+    flex-shrink: 0;
+    object-fit: cover;
+  }
+
+  .play-lb-info { flex: 1; min-width: 0; }
+
+  .play-lb-stars {
+    display: flex;
+    gap: 2px;
+    font-size: 16px;
+    line-height: 1;
+    color: var(--gold);
+  }
+
+  .play-lb-name {
+    font-size: 22px;
+    font-weight: 800;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.2;
+    color: var(--text-primary);
+  }
+
+  .play-lb-score {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--cyan);
+    line-height: 1.2;
+  }
+
+  .play-lb-row.lb-you .play-lb-tile {
+    border: 2px solid var(--pink);
+    box-shadow: 0 0 12px rgba(219,39,119,0.4);
+  }
+
+  .play-lb-row.lb-you .play-lb-name { color: var(--pink); }
+  .play-lb-row.lb-you .play-lb-pos  { color: var(--pink); }
+
+  @keyframes plateScrollH {
+    0%   { background-position: 0% 50%; }
+    100% { background-position: 200% 50%; }
+  }
+
+  .plate-holo {
+    background: repeating-linear-gradient(
+      90deg,
+      #ff0080, #ff8c00 14%, #ffff00 28%, #00ff88 42%,
+      #00cfff 57%, #8000ff 71%, #ff0080 85%, #ff8c00 100%
+    ) !important;
+    background-size: 200% 100% !important;
+    animation: plateScrollH 3s linear infinite;
+  }
+
+  @keyframes plateRadiate {
+    0%   { background-size: 100% 100%; }
+    50%  { background-size: 350% 350%; }
+    100% { background-size: 100% 100%; }
+  }
+
+  .plate-radiate {
+    background: radial-gradient(
+      ellipse at center,
+      #ffd700, #daa520 20%, #b8860b 40%, #8b6914 60%, #4a3000 80%, #1a1000
+    ) !important;
+    background-position: center !important;
+    animation: plateRadiate 3s ease-in-out infinite;
+  }
+
+  .lb-type-btn {
+    width: 100%;
+    height: var(--nav-btn-h);
+    border-radius: calc(var(--panel-radius) / 2);
+    border: 1px solid var(--border-strong);
+    background: var(--bg-surface);
+    color: var(--text-primary);
+    font-size: 28px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: background 0.15s;
+  }
+
+  .lb-type-btn:hover { background: var(--bg-surface-hover); }
+
+  /* ── Play Grid Layout ─────────────────────────────── */
+  .play-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 0;
+  }
+
+  .play-section-header {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    padding: 0 4px;
+    flex-shrink: 0;
+  }
+
+  /* ── Mode Tabs ─────────────────────────────────────── */
+  .play-mode-tabs {
+    display: flex;
+    gap: var(--grid-gap);
+    flex-shrink: 0;
+  }
+
+  .play-mode-tab {
+    flex: 1;
+    height: var(--nav-btn-h);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: calc(var(--panel-radius) / 2);
+    border: 1px solid var(--border-strong);
+    background: var(--bg-surface);
+    color: var(--text-secondary);
+    font-size: 28px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+  }
+
+  .play-mode-tab:hover {
+    background: var(--bg-surface-hover);
+    color: var(--text-primary);
+  }
+
+  .play-mode-tab.active {
+    background: rgba(219,39,119,0.15);
+    color: var(--pink);
+    border-color: var(--pink);
+  }
+
+  /* ── Play Body (song col + right panel) ──────────── */
+  .play-body {
+    display: flex;
+    gap: var(--grid-gap);
+    flex: 1;
+    min-height: 0;
+  }
+
+  .play-song-col {
+    display: flex;
+    flex-direction: column;
+    gap: var(--grid-gap);
+    flex-shrink: 0;
+    width: var(--tile-h);
+    overflow-y: auto;
+    min-height: 0;
+  }
+
+  .play-song-slot {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .play-song-pos {
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--text-secondary);
+    width: 40px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .play-song-slot .play-tile {
+    width: calc(var(--tile-h) - 48px);
+    aspect-ratio: 1;
+    flex-shrink: 0;
+  }
+
+  .play-right-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--grid-gap);
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  /* ── Solo Panel (row-based layout) ──────────────── */
+  .play-solo-wrapper {
+    flex: 1;
+    display: flex;
+    gap: var(--grid-gap);
+    min-height: 0;
+  }
+
+  .play-solo-rows {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--grid-gap) * 2);
+    padding: var(--grid-gap) 0;
+    overflow: hidden;
+  }
+
+  .play-solo-nav {
+    display: flex;
+    flex-direction: column;
+    gap: var(--grid-gap);
+    width: 64px;
+    flex-shrink: 0;
+    padding: var(--grid-gap) 0;
+  }
+
+  .play-solo-nav-btn {
+    flex: 1;
+    width: 100%;
+    border-radius: calc(var(--panel-radius) / 2);
+    border: 1px solid var(--border-strong);
+    background: var(--bg-surface);
+    color: var(--text-secondary);
+    font-size: 24px;
+    line-height: 0.7;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, color 0.2s;
+    font-family: inherit;
+    padding: 0;
+  }
+
+  .play-solo-nav-btn:hover {
+    background: var(--bg-surface-hover);
+    color: var(--text-primary);
+  }
+
+  .play-solo-nav-btn:disabled {
+    opacity: 0.2;
+    cursor: default;
+  }
+
+  .play-solo-row {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: calc(var(--grid-gap) * 2);
+    min-height: 0;
+  }
+
+  .play-solo-btn.empty {
+    opacity: 0.25;
+    pointer-events: none;
+  }
+
+  .play-solo-num {
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--text-secondary);
+    width: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .play-solo-cover {
+    aspect-ratio: 1;
+    height: 80%;
+    border-radius: calc(var(--panel-radius) / 2);
+    overflow: hidden;
+    flex-shrink: 0;
+    position: relative;
+    background: var(--bg-surface);
+  }
+
+  .play-solo-cover img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .play-solo-cover-add {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 64px;
+    color: var(--text-secondary);
+    transition: box-shadow 0.15s, color 0.15s, border-color 0.15s;
+    border: 2px solid transparent;
+  }
+
+  .play-solo-cover-add:hover {
+    box-shadow: 0 0 0 3px var(--pink), 0 0 20px rgba(219,39,119,0.4);
+    border-color: var(--pink);
+    color: var(--text-primary);
+  }
+
+  .play-solo-btn {
+    aspect-ratio: 1;
+    height: 80%;
+    border-radius: calc(var(--panel-radius) / 2);
+    cursor: pointer;
+    border: 2px solid transparent;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: inherit;
+    font-size: 22px;
+    font-weight: 800;
+    color: #fff;
+    transition: box-shadow 0.15s, border-color 0.15s;
+    user-select: none;
+    position: relative;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .play-solo-btn:hover {
+    box-shadow: 0 0 0 3px var(--pink), 0 0 20px rgba(219,39,119,0.4);
+    border-color: var(--pink);
+  }
+
+  .play-solo-btn .solo-btn-label {
+    position: relative;
+    z-index: 1;
+  }
+
+  .play-solo-btn .solo-btn-icon {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    height: 80%;
+    opacity: 0.3;
+    pointer-events: none;
+    object-fit: contain;
+  }
+
+  .play-solo-add {
+    aspect-ratio: 1;
+    height: 80%;
+    border-radius: calc(var(--panel-radius) / 2);
+    background: var(--bg-surface);
+    border: 2px solid transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 64px;
+    color: var(--text-secondary);
+    transition: box-shadow 0.15s, color 0.15s, border-color 0.15s;
+  }
+
+  .play-solo-add:hover {
+    box-shadow: 0 0 0 3px var(--pink), 0 0 20px rgba(219,39,119,0.4);
+    border-color: var(--pink);
+    color: var(--text-primary);
+  }
+
+  /* ── Solo Selection Popup ─────────────────────────── */
+  .solo-popup-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 999;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .solo-popup-overlay.active {
+    display: flex;
+  }
+
+  .solo-popup {
+    background: var(--bg-panel);
+    border: 2px solid var(--border-strong);
+    border-radius: var(--panel-radius);
+    padding: 48px 60px;
+    width: 1600px;
+    max-width: 92%;
+    max-height: 95%;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+
+  .solo-popup-title {
+    font-size: 52px;
+    font-weight: 800;
+    color: #fff;
+    text-align: center;
+  }
+
+  .solo-popup-option {
+    border-radius: calc(var(--panel-radius) / 2);
+    padding: 36px 40px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: box-shadow 0.15s, border-color 0.15s;
+    border: 2px solid transparent;
+  }
+
+  .solo-popup-option:hover {
+    box-shadow: 0 0 0 3px var(--pink), 0 0 20px rgba(219,39,119,0.4);
+    border-color: var(--pink);
+  }
+
+  .solo-popup-option-label {
+    font-size: 38px;
+    font-weight: 800;
+    color: #fff;
+  }
+
+  .solo-popup-option-desc {
+    font-size: 28px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.7);
+  }
+
+  /* ── Space Popup ──────────────────────────────────── */
+  .space-popup {
+    background: var(--bg-panel);
+    border: 2px solid var(--border-strong);
+    border-radius: var(--panel-radius);
+    padding: 48px 60px;
+    width: 1600px;
+    max-width: 92%;
+    max-height: 95%;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-color) transparent;
+  }
+
+  .space-popup-title {
+    font-size: 52px;
+    font-weight: 800;
+    color: #fff;
+    text-align: center;
+  }
+
+  .space-popup-category {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .space-popup-cat-label {
+    font-size: 30px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    padding: 0 4px;
+  }
+
+  .space-popup-cat-options {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+
+  .space-popup-opt {
+    border-radius: calc(var(--panel-radius) / 2);
+    padding: 28px 20px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    text-align: center;
+    background: var(--bg-surface);
+    border: 2px solid transparent;
+    transition: box-shadow 0.15s, border-color 0.15s;
+  }
+
+  .space-popup-opt:hover {
+    box-shadow: 0 0 0 3px var(--pink), 0 0 20px rgba(219,39,119,0.4);
+    border-color: var(--pink);
+  }
+
+  .space-popup-opt.selected {
+    border-color: var(--pink);
+    box-shadow: 0 0 0 3px var(--pink), 0 0 20px rgba(219,39,119,0.4);
+  }
+
+  .space-popup-opt-label {
+    font-size: 30px;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .space-popup-opt-desc {
+    font-size: 22px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.5);
+  }
+
+  /* ── Loadout Popup ─────────────────────────────────── */
+  .loadout-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 999;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .loadout-overlay.active { display: flex; }
+
+  .loadout-popup {
+    background: var(--bg-panel);
+    border: 2px solid var(--border-strong);
+    border-radius: var(--panel-radius);
+    padding: 48px 60px;
+    width: 1600px;
+    max-width: 92%;
+    max-height: 95%;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-color) transparent;
+  }
+
+  .loadout-popup-title {
+    font-size: 52px;
+    font-weight: 800;
+    color: var(--text-primary);
+    text-align: center;
+    margin: 0;
+  }
+
+  .loadout-category {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .loadout-cat-label {
+    font-size: 30px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    padding: 0 4px;
+  }
+
+  .loadout-cat-options {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+
+  .loadout-opt {
+    aspect-ratio: 2 / 1;
+    border-radius: calc(var(--panel-radius) / 2);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 0 28px;
+    gap: 4px;
+    border: 2px solid transparent;
+    transition: box-shadow 0.15s, border-color 0.15s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .loadout-opt:hover {
+    box-shadow: 0 0 0 3px var(--pink), 0 0 20px rgba(219,39,119,0.4);
+    border-color: var(--pink);
+  }
+
+  .loadout-opt.selected {
+    border-color: var(--pink);
+    box-shadow: 0 0 0 3px var(--pink), 0 0 20px rgba(219,39,119,0.4);
+  }
+
+  .loadout-opt-label {
+    font-size: 28px;
+    font-weight: 700;
+    color: #fff;
+    position: relative;
+    z-index: 1;
+  }
+
+  .loadout-opt-desc {
+    font-size: 20px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.6);
+    position: relative;
+    z-index: 1;
+  }
+
+  .loadout-opt-icon {
+    position: absolute;
+    right: -10%;
+    bottom: -20%;
+    height: 130%;
+    opacity: 0.25;
+    pointer-events: none;
+    object-fit: contain;
+  }
+
+  .loadout-opt-symbol {
+    position: absolute;
+    right: 10px;
+    bottom: -10%;
+    font-size: 120px;
+    line-height: 1;
+    opacity: 0.15;
+    pointer-events: none;
+  }
+
+  .loadout-close-btn {
+    align-self: center;
+    padding: 24px 80px;
+    border-radius: calc(var(--panel-radius) / 2);
+    border: none;
+    background: var(--bg-surface);
+    color: var(--text-primary);
+    font-size: 32px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: filter 0.15s;
+  }
+
+  .loadout-close-btn:hover { filter: brightness(1.15); }
+
+  /* ── Co-op / Battle Panel ───────────────────────── */
+  .play-coop-section-header {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    padding: 4px 4px 0;
+    flex-shrink: 0;
+  }
+
+  .play-coop-row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: var(--grid-gap);
+    flex-shrink: 0;
+  }
+
+  .play-coop-tile {
+    border-radius: calc(var(--panel-radius) / 2);
+    overflow: hidden;
+    cursor: pointer;
+    position: relative;
+    background: var(--bg-surface);
+    border: 2px solid transparent;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: box-shadow 0.15s, border-color 0.15s;
+    font-family: inherit;
+    padding: 16px 8px;
+  }
+
+  .play-coop-tile:hover {
+    box-shadow: 0 0 0 3px var(--pink), 0 0 20px rgba(219,39,119,0.4);
+    border-color: var(--pink);
+  }
+
+  .play-coop-tile.selected {
+    border-color: var(--pink);
+    box-shadow: 0 0 0 3px var(--pink), 0 0 20px rgba(219,39,119,0.4);
+  }
+
+  .play-coop-tile .play-opt-label {
+    font-size: 24px;
+    font-weight: 800;
+    position: relative;
+    z-index: 1;
+  }
+
+  .play-coop-tile img {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    height: 80%;
+    opacity: 0.3;
+    pointer-events: none;
+    object-fit: contain;
+  }
+
+  /* ── Players Grid ───────────────────────────────── */
+  .play-players-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: var(--grid-gap);
+    flex: 1;
+    min-height: 0;
+  }
+
+  .play-nameplate {
+    border-radius: calc(var(--panel-radius) / 2);
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 16px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+  }
+
+  .play-nameplate::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .play-nameplate.plate-img {
+    background-size: cover !important;
+    background-position: center !important;
+  }
+
+  .play-nameplate > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .play-np-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--bg-surface-hover);
+    flex-shrink: 0;
+    object-fit: cover;
+  }
+
+  .play-np-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .play-np-name {
+    font-size: 18px;
+    font-weight: 800;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.2;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.9);
+  }
+
+  .play-np-badges {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    margin-top: 2px;
+  }
+
+  .play-np-badge {
+    font-size: 13px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: rgba(255,255,255,0.12);
+    color: var(--text-secondary);
+    line-height: 1;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+  }
+
+  .play-np-hourglass {
+    font-size: 18px;
+    color: var(--text-secondary);
+    margin-top: 2px;
+  }
+
+  .play-go-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    flex-shrink: 0;
+    padding: 12px 0;
+  }
+
+  .play-go-btn {
+    padding: 28px 80px;
+    border-radius: calc(var(--panel-radius) / 2);
+    border: none;
+    background: var(--pink);
+    color: #fff;
+    font-size: 36px;
+    font-weight: 800;
+    cursor: pointer;
+    font-family: inherit;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+
+  .play-go-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 30px rgba(219,39,119,0.5);
+  }
+
+  .play-duration {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    min-width: 80px;
+    text-align: center;
+  }
+
+  .play-tile {
+    border-radius: calc(var(--panel-radius) / 2);
+    overflow: hidden;
+    cursor: pointer;
+    position: relative;
+    background: var(--bg-surface);
+    border: 2px solid transparent;
+    aspect-ratio: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: box-shadow 0.15s, filter 0.15s, border-color 0.15s;
+  }
+
+  .play-tile:hover {
+    box-shadow: 0 0 0 3px var(--pink), 0 0 20px rgba(219,39,119,0.4);
+    border-color: var(--pink);
+  }
+
+  .play-tile.selected {
+    border-color: var(--pink);
+    box-shadow: 0 0 0 3px var(--pink), 0 0 20px rgba(219,39,119,0.4);
+  }
+
+
+
+
+  .play-tile img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    position: absolute;
+    transition: transform 0.2s ease;
+    top: 0; left: 0;
+  }
+
+  .play-tile:hover img {
+    transform: scale(1.1);
+  }
+
+  .play-tile .tile-info {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    padding: 28px 10px 10px;
+    background: linear-gradient(0deg, rgba(0,0,0,0.85) 0%, transparent 100%);
+  }
+
+  .play-tile .tile-title {
+    font-size: 15px;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .play-tile .tile-artist {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .play-add-tile {
+    font-size: 64px;
+    color: var(--text-secondary);
+    transition: transform 0.15s, color 0.15s;
+  }
+
+  .play-add-tile:hover { color: var(--text-primary); }
+
+  .setlist-actions {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    display: flex;
+    gap: 6px;
+    padding: 8px;
+    background: linear-gradient(0deg, rgba(0,0,0,0.85) 0%, transparent 100%);
+    opacity: 0;
+    transition: opacity 0.15s;
+    z-index: 3;
+  }
+
+  .play-tile:hover .setlist-actions { opacity: 1; }
+
+  .setlist-btn {
+    flex: 1;
+    padding: 10px 0;
+    border-radius: calc(var(--panel-radius) / 3);
+    border: none;
+    background: rgba(255,255,255,0.15);
+    color: #fff;
+    font-size: 20px;
+    font-weight: 800;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+    font-family: inherit;
+  }
+
+  .setlist-btn:hover {
+    background: var(--pink);
+  }
+
+  .setlist-btn-remove { }
+  .setlist-btn-swap { }
+
+  .setlist-btn-preview { }
+
+  .play-solo-cover:hover .setlist-actions { opacity: 1; }
+
+  .play-picker {
+    display: none;
+    flex: 1;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .play-picker.active { display: flex; }
+
+  .play-picker-body {
+    flex: 1;
+    display: flex;
+    gap: var(--grid-gap);
+    min-height: 0;
+  }
+
+  .picker-songs-col {
+    flex: 3;
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--grid-gap) * 2);
+    min-height: 0;
+  }
+
+  .picker-grid-row {
+    flex: 1;
+    display: flex;
+    gap: var(--grid-gap);
+    min-height: 0;
+  }
+
+  .play-picker-lb {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--grid-gap);
+    min-height: 0;
+    min-width: 0;
+  }
+
+  .song-tile-actions {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    display: flex;
+    gap: 6px;
+    padding: 8px;
+    background: linear-gradient(0deg, rgba(0,0,0,0.85) 0%, transparent 100%);
+    opacity: 0;
+    transition: opacity 0.15s;
+    z-index: 3;
+  }
+
+  .song-tile:hover .song-tile-actions { opacity: 1; }
+
+  .song-tile-btn {
+    flex: 1;
+    padding: 10px 0;
+    border-radius: calc(var(--panel-radius) / 3);
+    border: none;
+    background: rgba(255,255,255,0.15);
+    color: #fff;
+    font-size: 20px;
+    font-weight: 800;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+    font-family: inherit;
+  }
+
+  .song-tile-btn:hover {
+    background: var(--pink);
+  }
+
+  .picker-setlist {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  .picker-setlist-header {
+    display: flex;
+    align-items: center;
+    gap: var(--grid-gap);
+  }
+
+  .picker-setlist-header > .play-section-header {
+    flex-shrink: 0;
+    font-size: 22px;
+  }
+
+  .picker-setlist-tiles {
+    display: flex;
+    gap: var(--grid-gap);
+    min-width: 0;
+    align-items: center;
+  }
+
+  .picker-setlist-nav {
+    display: flex;
+    justify-content: center;
+    gap: var(--grid-gap);
+  }
+
+  .picker-setlist-tile {
+    flex: 1;
+    aspect-ratio: 1;
+    border-radius: calc(var(--panel-radius) / 3);
+    overflow: hidden;
+    position: relative;
+    background: rgba(219,39,119,0.15);
+    border: 2px solid rgba(219,39,119,0.3);
+  }
+
+  .picker-setlist-tile img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .picker-setlist-remove {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(220,38,38,0.85);
+    color: #fff;
+    font-size: 36px;
+    font-weight: 800;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.15s;
+    z-index: 3;
+  }
+
+  .picker-setlist-tile:hover .picker-setlist-remove { opacity: 1; }
+
+  .picker-setlist-tile.picker-setlist-empty {
+    border-style: dashed;
+    opacity: 0.35;
+  }
+
+  .picker-setlist-arrow {
+    padding: 4px 24px;
+    border-radius: calc(var(--panel-radius) / 3);
+    border: none;
+    background: var(--bg-surface);
+    color: var(--text-secondary);
+    font-size: 20px;
+    font-weight: 800;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+    font-family: inherit;
+  }
+
+  .picker-setlist-arrow:hover {
+    background: var(--bg-surface-hover);
+    color: var(--text-primary);
+  }
+
+  .picker-setlist-arrow:disabled {
+    opacity: 0.25;
+    pointer-events: none;
+  }
+
+  .picker-filters {
+    display: flex;
+    gap: calc(var(--grid-gap) * 2);
+    flex-shrink: 0;
+    align-items: center;
+  }
+
+  .picker-filter {
+    flex: 1;
+    height: var(--nav-btn-h);
+    border-radius: calc(var(--panel-radius) / 2);
+    border: 1px solid var(--border-strong);
+    background: var(--bg-surface);
+    color: var(--text-primary);
+    font-size: 28px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    padding: 0 42px 0 20px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9'%3E%3Cpath d='M1 1l6 6 6-6' stroke='%23888' stroke-width='2' fill='none'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+  }
+
+  .picker-filter:focus {
+    outline: none;
+    border-color: var(--pink);
+    box-shadow: 0 0 0 2px rgba(219,39,119,0.3);
+  }
+
+  /* ── Spaces Grid ─────────────────────────────────── */
+  .spaces-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: repeat(5, 1fr);
+    gap: var(--grid-gap);
+    flex: 1;
+    min-height: 0;
+  }
+
+  .space-tile {
+    border-radius: calc(var(--panel-radius) / 2);
+    overflow: hidden;
+    cursor: pointer;
+    position: relative;
+    background: var(--bg-surface);
+    border: 1px solid transparent;
+    transition: box-shadow 0.15s, filter 0.15s, border-color 0.15s;
+  }
+
+  .space-tile:hover {
+    box-shadow: 0 0 0 3px var(--pink), 0 0 20px rgba(219,39,119,0.4);
+    border-color: var(--pink);
+  }
+
+  .space-tile img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.2s ease;
+  }
+
+  .space-tile:hover img {
+    transform: scale(1.1);
+  }
+
+  .space-tile .tile-info {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 28px 10px 10px;
+    background: linear-gradient(0deg, rgba(0,0,0,0.85) 0%, transparent 100%);
+  }
+
+  .space-tile .tile-title {
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.2;
+  }
+
+  .space-tile .tile-artist {
+    font-size: 11px;
+    color: var(--text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* ── Vault Grid ──────────────────────────────────── */
+  .vault-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: repeat(5, 1fr);
+    gap: var(--grid-gap);
+    flex: 1;
+    min-height: 0;
+  }
+
+  .vault-tile {
+    border-radius: calc(var(--panel-radius) / 2);
+    overflow: hidden;
+    cursor: pointer;
+    position: relative;
+    background: var(--bg-surface);
+    border: 1px solid transparent;
+    opacity: 0.55;
+    transition: box-shadow 0.15s, filter 0.15s, border-color 0.15s, opacity 0.15s;
+  }
+
+  .vault-tile:hover {
+    opacity: 1;
+    box-shadow: 0 0 0 3px var(--pink), 0 0 20px rgba(219,39,119,0.4);
+    border-color: var(--pink);
+  }
+
+  .vault-tile img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.3s ease;
+  }
+
+  .vault-tile:hover img {
+    transform: scale(1.1);
+  }
+
+  .vault-tile .tile-info {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.5);
+  }
+
+  .vault-tile .tile-title {
+    font-size: 22px;
+    font-weight: 800;
+    text-align: center;
+    line-height: 1.2;
+  }
+
+  .vault-tile .tile-cat {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--cyan);
+    text-align: center;
+    margin-bottom: 4px;
+  }
+
+  /* ── Bottom Nav ───────────────────────────────────── */
+  .navbar {
+    height: var(--navbar-h);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--grid-gap);
+    background: var(--bg-panel);
+    border-radius: var(--panel-radius);
+    border: 1px solid var(--border-subtle);
+    padding: 0 var(--pad);
+    position: relative;
+  }
+  .navbar::after {
+    background-position: calc(-1 * var(--pad)) calc(-1 * (1920px - var(--pad) - var(--navbar-h)));
+  }
+
+  .nav-item {
+    flex: 1;
+    height: var(--nav-btn-h);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border-radius: calc(var(--panel-radius) / 2);
+    cursor: pointer;
+    transition: background 0.2s;
+    position: relative;
+    background: var(--bg-surface);
+    border: 1px solid transparent;
+  }
+
+  .nav-item:hover {
+    background: var(--bg-surface-hover);
+  }
+
+  .nav-item.active {
+    background: rgba(219,39,119,0.15);
+    border-color: var(--pink);
+  }
+
+  .nav-icon {
+    font-size: 56px;
+    line-height: 1;
+    color: var(--text-secondary);
+    transition: color 0.2s;
+  }
+
+  .nav-item.active .nav-icon { color: var(--pink); }
+
+  .nav-label {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    transition: color 0.2s;
+  }
+
+  .nav-item.active .nav-label { color: var(--pink); }
+
+  /* ── Back Button ─────────────────────────────────────── */
+  .back-btn {
+    width: calc((100% - var(--grid-gap) * 4) / 5);
+    height: var(--nav-btn-h);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-radius: calc(var(--panel-radius) / 2);
+    border: 1px solid var(--border-strong);
+    background: var(--bg-surface);
+    color: var(--text-secondary);
+    font-size: 28px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    font-family: inherit;
+    margin-bottom: var(--grid-gap);
+  }
+
+  .back-btn:hover {
+    background: var(--bg-surface-hover);
+    color: var(--text-primary);
+  }
+
+  /* ── Settings ──────────────────────────────────────── */
+  .settings-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: repeat(5, 1fr);
+    gap: var(--grid-gap);
+    flex: 1;
+    min-height: 0;
+  }
+
+  .settings-tile {
+    border-radius: calc(var(--panel-radius) / 2);
+    overflow: hidden;
+    cursor: pointer;
+    position: relative;
+    background: var(--bg-surface);
+    border: 1px solid transparent;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.55;
+    transition: box-shadow 0.15s, filter 0.15s, border-color 0.15s, opacity 0.15s;
+  }
+
+  .settings-tile:hover {
+    opacity: 1;
+    box-shadow: 0 0 0 3px var(--pink), 0 0 20px rgba(219,39,119,0.4);
+    border-color: var(--pink);
+  }
+
+  .settings-tile .tile-info {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.5);
+  }
+
+  .settings-tile .tile-title {
+    font-size: 22px;
+    font-weight: 800;
+    text-align: center;
+  }
+
+  /* Theme picker */
+  .theme-section {
+    display: none;
+    flex: 1;
+    flex-direction: column;
+    gap: var(--grid-gap);
+    min-height: 0;
+  }
+
+  .theme-section.active { display: flex; }
+
+  .theme-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: repeat(5, 1fr);
+    gap: var(--grid-gap);
+    flex: 1;
+    min-height: 0;
+  }
+
+  .theme-card {
+    border-radius: calc(var(--panel-radius) / 2);
+    border: 2px solid transparent;
+    cursor: pointer;
+    overflow: hidden;
+    position: relative;
+    opacity: 0.55;
+    transition: border-color 0.2s, transform 0.15s, opacity 0.15s;
+  }
+
+  .theme-card:hover {
+    opacity: 1;
+    box-shadow: 0 0 0 3px var(--pink), 0 0 20px rgba(219,39,119,0.4);
+    border-color: var(--pink);
+  }
+
+  .theme-card.selected {
+    opacity: 1;
+    border-color: var(--pink);
+    box-shadow: 0 0 0 3px var(--pink), 0 0 20px rgba(219,39,119,0.4);
+  }
+
+  .theme-card .tile-info {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.45);
+  }
+
+  .theme-card .tile-title {
+    font-size: 22px;
+    font-weight: 800;
+    text-align: center;
+  }
+
+  /* ── Season Grid ──────────────────────────────────────── */
+  .season-grid {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 0;
+  }
+
+  .season-category {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .season-label {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    padding: 0 4px;
+  }
+
+  .season-row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: var(--grid-gap);
+  }
+
+  .season-tile {
+    aspect-ratio: 1;
+    border-radius: calc(var(--panel-radius) / 2);
+    overflow: hidden;
+    position: relative;
+    background: var(--bg-surface);
+    border: 2px solid transparent;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: box-shadow 0.15s, border-color 0.15s;
+  }
+
+  .season-tile:hover {
+    box-shadow: 0 0 0 3px var(--pink), 0 0 20px rgba(219,39,119,0.4);
+    border-color: var(--pink);
+  }
+
+  .season-tile.unlocked {
+    border-color: var(--mint);
+    background: rgba(52,211,153,0.1);
+  }
+
+  .season-tile.unlocked::before {
+    content: '\2713';
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--mint);
+    z-index: 2;
+  }
+
+  .season-tile.locked {
+    opacity: 0.45;
+  }
+
+  .season-tile.locked::before {
+    content: '\1F512';
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    font-size: 14px;
+    z-index: 2;
+  }
+
+  .season-reward {
+    font-size: 28px;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .season-reward-name {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-primary);
+    text-align: center;
+    padding: 0 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+  }
+
+  .season-xp {
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  .season-xp-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: rgba(0,0,0,0.3);
+  }
+
+  .season-xp-fill {
+    height: 100%;
+    background: var(--mint);
+    transition: width 0.3s ease;
+  }
+
+  /* ── Legal Sections ─────────────────────────────────── */
+  .legal-section {
+    display: none;
+    flex: 1;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .legal-section.active { display: flex; }
+
+  .legal-content {
+    flex: 1;
+    overflow-y: auto;
+    font-size: 18px;
+    line-height: 1.7;
+    color: var(--text-secondary);
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-color) transparent;
+  }
+
+  .legal-content h2 {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin: 32px 0 12px;
+  }
+
+  .legal-content h2:first-child { margin-top: 0; }
+
+  .legal-content h3 {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 20px 0 8px;
+  }
+
+  .legal-content p {
+    margin: 0 0 14px;
+  }
+
+  .legal-content ul {
+    margin: 0 0 14px;
+    padding-left: 28px;
+  }
+
+  .legal-content li {
+    margin-bottom: 6px;
+  }
+
+  .legal-content .legal-version {
+    font-size: 15px;
+    color: var(--text-secondary);
+    margin-bottom: 24px;
+    font-style: italic;
+  }
+
+  .legal-content .legal-caps {
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  /* ── Theme Lock Banner ─────────────────────────────── */
+  .theme-lock-banner {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    padding: 10px 0;
+    background: rgba(0,0,0,0.75);
+    color: #fff;
+    font-size: 24px;
+    font-weight: 800;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    z-index: 2;
+  }
+
+  .theme-card.locked .tile-info {
+    background: rgba(0,0,0,0.6);
+  }
+
+  .theme-card.locked::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 8px,
+      rgba(0,0,0,0.1) 8px,
+      rgba(0,0,0,0.1) 10px
+    );
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* ── Purchase Confirm Popup ────────────────────────── */
+  .purchase-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 999;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .purchase-overlay.active {
+    display: flex;
+  }
+
+  .purchase-popup {
+    background: var(--bg-panel);
+    border: 2px solid var(--border-strong);
+    border-radius: var(--panel-radius);
+    padding: 48px 60px;
+    width: 1600px;
+    max-width: 92%;
+    max-height: 95%;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+
+  .purchase-preview {
+    height: 200px;
+    border-radius: calc(var(--panel-radius) / 2);
+    overflow: hidden;
+  }
+
+  .purchase-title {
+    font-size: 52px;
+    font-weight: 800;
+    color: var(--text-primary);
+  }
+
+  .purchase-cost {
+    font-size: 40px;
+    font-weight: 700;
+    color: var(--gold);
+  }
+
+  .purchase-balance {
+    font-size: 28px;
+    color: var(--text-secondary);
+  }
+
+  .purchase-balance.insufficient {
+    color: #dc2626;
+  }
+
+  .purchase-buttons {
+    display: flex;
+    gap: 24px;
+    justify-content: center;
+    margin-top: 8px;
+  }
+
+  .purchase-btn {
+    flex: 1;
+    max-width: 500px;
+    padding: 28px 0;
+    border-radius: calc(var(--panel-radius) / 2);
+    border: none;
+    font-size: 36px;
+    font-weight: 800;
+    cursor: pointer;
+    font-family: inherit;
+    transition: filter 0.15s;
+  }
+
+  .purchase-btn:hover { filter: brightness(1.15); }
+
+  .purchase-btn-confirm {
+    background: var(--pink);
+    color: #fff;
+  }
+
+  .purchase-btn-confirm:disabled {
+    background: var(--bg-surface);
+    color: var(--text-secondary);
+    cursor: not-allowed;
+    filter: none;
+  }
+
+  .purchase-btn-cancel {
+    background: var(--bg-surface);
+    color: var(--text-primary);
+  }
+
+  /* ── Save/Load Bar Buttons ─────────────────────────── */
+  .play-bar-btn {
+    padding: 28px 80px;
+    border-radius: calc(var(--panel-radius) / 2);
+    border: none;
+    background: var(--bg-surface);
+    color: var(--text-primary);
+    font-size: 36px;
+    font-weight: 800;
+    cursor: pointer;
+    font-family: inherit;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .play-bar-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(255,255,255,0.1);
+  }
+
+  /* ── Save Setlist Overlay ──────────────────────────── */
+  .save-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 999;
+    align-items: center;
+    justify-content: center;
+  }
+  .save-overlay.active { display: flex; }
+
+  .save-popup {
+    background: var(--bg-panel);
+    border: 2px solid var(--border-strong);
+    border-radius: var(--panel-radius);
+    padding: 48px 60px;
+    width: 1600px;
+    max-width: 92%;
+    max-height: 95%;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    justify-content: center;
+  }
+  .save-popup h2 {
+    font-size: 52px;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin: 0;
+  }
+
+  .save-input {
+    width: 100%;
+    padding: 28px 32px;
+    border-radius: calc(var(--panel-radius) / 2);
+    border: 3px solid var(--border-strong);
+    background: var(--bg-surface);
+    color: var(--text-primary);
+    font-size: 38px;
+    font-weight: 600;
+    font-family: inherit;
+    text-align: center;
+    box-sizing: border-box;
+    outline: none;
+  }
+  .save-input:focus {
+    border-color: var(--pink);
+  }
+
+  .keyboard {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 16px 0;
+  }
+  .keyboard-row {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+  }
+  .key {
+    min-width: 100px;
+    height: 100px;
+    border-radius: 16px;
+    border: none;
+    background: var(--bg-surface);
+    color: var(--text-primary);
+    font-size: 36px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.1s;
+  }
+  .key:hover { background: var(--border-strong); }
+  .key-wide {
+    min-width: 200px;
+    padding: 0 32px;
+    font-size: 30px;
+  }
+
+  .save-buttons {
+    display: flex;
+    gap: 24px;
+    justify-content: center;
+    margin-top: 8px;
+  }
+  .save-buttons button {
+    flex: 1;
+    max-width: 400px;
+    padding: 28px 0;
+    border-radius: calc(var(--panel-radius) / 2);
+    border: none;
+    font-size: 36px;
+    font-weight: 800;
+    cursor: pointer;
+    font-family: inherit;
+    transition: filter 0.15s;
+  }
+  .save-buttons button:hover { filter: brightness(1.15); }
+  .save-btn-confirm { background: var(--pink); color: #fff; }
+  .save-btn-cancel { background: var(--bg-surface); color: var(--text-primary); }
+
+  /* ── Load Setlist Overlay ──────────────────────────── */
+  .load-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 999;
+    align-items: center;
+    justify-content: center;
+  }
+  .load-overlay.active { display: flex; }
+
+  .load-popup {
+    background: var(--bg-panel);
+    border: 2px solid var(--border-strong);
+    border-radius: var(--panel-radius);
+    padding: 48px 60px;
+    width: 1600px;
+    max-width: 92%;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    max-height: 95%;
+  }
+  .load-popup h2 {
+    font-size: 52px;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin: 0;
+  }
+
+  .load-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+    padding: 4px;
+  }
+
+  .load-item {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    background: var(--bg-surface);
+    border-radius: calc(var(--panel-radius) / 2);
+    padding: 20px 28px;
+    text-align: left;
+  }
+
+  .load-art-grid {
+    width: 140px;
+    height: 140px;
+    flex-shrink: 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 4px;
+    border-radius: 14px;
+    overflow: hidden;
+    background: var(--bg-panel);
+  }
+  .load-art-grid img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .load-art-grid .art-empty {
+    background: var(--bg-surface);
+  }
+
+  .load-item-info {
+    flex: 1;
+    min-width: 0;
+  }
+  .load-item-info .load-item-name {
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .load-item-info .load-item-count {
+    font-size: 26px;
+    color: var(--text-secondary);
+    margin-top: 4px;
+  }
+
+  .load-item-btn {
+    padding: 18px 36px;
+    border-radius: 14px;
+    border: none;
+    font-size: 28px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: filter 0.15s;
+    flex-shrink: 0;
+  }
+  .load-item-btn:hover { filter: brightness(1.15); }
+  .load-item-btn-load { background: var(--pink); color: #fff; }
+  .load-item-btn-delete { background: var(--bg-panel); color: var(--text-secondary); }
+
+  .load-empty {
+    padding: 80px 0;
+    color: var(--text-secondary);
+    font-size: 36px;
+    font-weight: 600;
+  }
+
+  .load-close-btn {
+    align-self: center;
+    padding: 24px 80px;
+    border-radius: calc(var(--panel-radius) / 2);
+    border: none;
+    background: var(--bg-surface);
+    color: var(--text-primary);
+    font-size: 32px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: filter 0.15s;
+  }
+  .load-close-btn:hover { filter: brightness(1.15); }
+</style>
+</head>
+<body>
+
+<div class="viewport">
+
+<!-- ══════════════ TOP BAR ══════════════ -->
+<header class="topbar" onclick="navigateTo('career')" style="cursor:pointer">
+    <div class="topbar-main">
+      <div class="profile-avatar">
+        <img src="rael.jpg" alt="Rael">
+      </div>
+      <div class="profile-info">
+        <div class="profile-name">Rael</div>
+      </div>
+      <div class="topbar-spacer"></div>
+      <div class="profile-info profile-info-right">
+        <div class="xp-text">Level 24</div>
+        <div class="xp-text">6,500 / 10,000 XP</div>
+      </div>
+    </div>
+    <div class="xp-bar-full"><div class="xp-bar-fill" style="width:65%"></div></div>
+  </header>
+
+  <main class="content">
+    <div class="page active" id="page-home">
+    </div>
+
+    <div class="page" id="page-play">
+      <div class="play-layout" id="play-main-layout">
+        <div class="play-main">
+          <div class="play-mode-tabs" id="play-mode-tabs"></div>
+          <div class="play-body">
+            <div class="play-song-col" id="play-song-col"></div>
+            <div class="play-right-panel" id="play-right-panel"></div>
+          </div>
+          <div class="play-go-bar">
+            <div class="play-duration" id="play-duration">0:00</div>
+            <button class="play-bar-btn" onclick="openSaveSetlist()">Save</button>
+            <button class="play-go-btn" id="play-go-btn" onclick="startGame()">Start</button>
+            <button class="play-bar-btn" onclick="openLoadSetlist()">Load</button>
+            <div class="play-duration" id="play-song-count">0 songs</div>
+          </div>
+        </div>
+      </div>
+      <div class="play-picker" id="play-picker">
+        <div class="play-picker-body">
+          <div class="picker-songs-col">
+            <div class="picker-filters">
+              <select class="picker-filter" id="filter-genre" onchange="applyPickerFilters()">
+                <option value="">All Genres</option>
+                <option value="Pop">Pop</option>
+                <option value="Hip-Hop">Hip-Hop</option>
+                <option value="Rock">Rock</option>
+                <option value="R&amp;B">R&amp;B</option>
+                <option value="Country">Country</option>
+                <option value="Electronic">Electronic</option>
+                <option value="Latin">Latin</option>
+                <option value="Indie">Indie</option>
+              </select>
+              <select class="picker-filter" id="filter-decade" onchange="applyPickerFilters()">
+                <option value="">All Decades</option>
+                <option value="2020s">2020s</option>
+                <option value="2010s">2010s</option>
+                <option value="2000s">2000s</option>
+                <option value="90s">90s</option>
+                <option value="80s">80s</option>
+                <option value="Classic">Classic</option>
+              </select>
+              <select class="picker-filter" id="filter-duration" onchange="applyPickerFilters()">
+                <option value="">Any Length</option>
+                <option value="short">Under 3 min</option>
+                <option value="medium">3–4 min</option>
+                <option value="long">Over 4 min</option>
+              </select>
+              <select class="picker-filter" id="filter-sort" onchange="applyPickerFilters()">
+                <option value="rank">Popularity</option>
+                <option value="title">Title A–Z</option>
+                <option value="artist">Artist A–Z</option>
+                <option value="duration">Duration</option>
+                <option value="recent">Recently Added</option>
+              </select>
+            </div>
+            <div class="picker-grid-row">
+              <div class="grid-viewport">
+                <div class="grid-track" id="grid-track"></div>
+              </div>
+              <div class="grid-nav" id="grid-nav-right"></div>
+            </div>
+            <div class="picker-setlist">
+              <div class="picker-setlist-header">
+                <div class="play-section-header">Setlist</div>
+              </div>
+              <div class="picker-setlist-tiles" id="picker-setlist-tiles"></div>
+              <div class="picker-setlist-nav" id="picker-setlist-nav"></div>
+            </div>
+          </div>
+          <div class="play-picker-lb">
+            <button class="lb-type-btn" id="picker-inst-btn" onclick="rotatePickerInstrument()">&#127928; Guitar</button>
+            <button class="lb-type-btn" id="picker-diff-btn" onclick="rotatePickerDifficulty()">&#127922; Medium</button>
+            <button class="lb-type-btn" id="lb-type-btn" onclick="rotateLbType()"><span>&#127757;</span> Worldwide</button>
+            <div class="play-panel play-leaderboard">
+              <div class="play-lb-list" id="play-lb-list"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="page" id="page-career">
+      <button class="back-btn" onclick="navigateTo('home')">&#9664; Home</button>
+      <div class="settings-grid">
+        <div class="settings-tile"><div class="tile-info"><div class="tile-title">Name</div></div></div>
+        <div class="settings-tile"><div class="tile-info"><div class="tile-title">Picture</div></div></div>
+        <div class="settings-tile"><div class="tile-info"><div class="tile-title">Avatar</div></div></div>
+        <div class="settings-tile"><div class="tile-info"><div class="tile-title">Coins</div></div></div>
+        <div class="settings-tile" onclick="navigateTo('settings')" style="cursor:pointer"><div class="tile-info"><div class="tile-title">&#9881; Settings</div></div></div>
+      </div>
+    </div>
+    <div class="page" id="page-season">
+      <button class="back-btn" onclick="navigateTo('home')">&#9664; Home</button>
+      <div class="season-grid" id="season-grid"></div>
+    </div>
+    <div class="page" id="page-social"><button class="back-btn" onclick="navigateTo('home')">&#9664; Home</button><div class="section-title">Social</div></div>
+    <div class="page" id="page-spaces"><button class="back-btn" onclick="navigateTo('home')">&#9664; Home</button><div class="spaces-grid" id="spaces-grid"></div></div>
+    <div class="page" id="page-vault"><button class="back-btn" onclick="navigateTo('home')">&#9664; Home</button><div class="vault-grid" id="vault-grid"></div></div>
+    <div class="page" id="page-store"><button class="back-btn" onclick="navigateTo('home')">&#9664; Home</button><div class="section-title">Store</div></div>
+    <div class="page" id="page-settings">
+      <div id="settings-main" style="display:flex;flex-direction:column;flex:1;min-height:0">
+        <button class="back-btn" onclick="navigateTo('home')">&#9664; Home</button>
+        <div class="settings-grid">
+          <div class="settings-tile" onclick="showThemes()">
+            <div class="tile-info"><div class="tile-title">Themes</div></div>
+          </div>
+          <div class="settings-tile" onclick="showTos()">
+            <div class="tile-info"><div class="tile-title">Terms of Service</div></div>
+          </div>
+          <div class="settings-tile" onclick="showPrivacy()">
+            <div class="tile-info"><div class="tile-title">Privacy Policy</div></div>
+          </div>
+          <div class="settings-tile">
+            <div class="tile-info"><div class="tile-title">Volume Mixer</div></div>
+          </div>
+          <div class="settings-tile">
+            <div class="tile-info"><div class="tile-title">Language</div></div>
+          </div>
+          <div class="settings-tile">
+            <div class="tile-info"><div class="tile-title">Gameplay</div></div>
+          </div>
+          <div class="settings-tile">
+            <div class="tile-info"><div class="tile-title">Rate Us</div></div>
+          </div>
+          <div class="settings-tile">
+            <div class="tile-info"><div class="tile-title">Report a Bug</div></div>
+          </div>
+          <div class="settings-tile">
+            <div class="tile-info"><div class="tile-title">Send Feedback</div></div>
+          </div>
+          <div class="settings-tile">
+            <div class="tile-info"><div class="tile-title">Meet the Team</div></div>
+          </div>
+          <div class="settings-tile" style="cursor:default">
+            <div class="tile-info"><div class="tile-title" style="font-size:16px;line-height:1.4">Backstage Pass<br>0.1.0 (508)</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="theme-section" id="theme-section">
+        <button class="back-btn" onclick="hideSettingsSub()">&#9664; Settings</button>
+        <div class="theme-grid" id="theme-grid"></div>
+      </div>
+      <div class="legal-section" id="tos-section">
+        <button class="back-btn" onclick="hideSettingsSub()">&#9664; Settings</button>
+        <div class="legal-content" id="tos-content">
+          <h2>Terms of Service</h2>
+          <p class="legal-version">Version 1 &mdash; Effective date: 1 November 2025 | Last update: 1 November 2025</p>
+          <p>If you are a user of any of our games, platforms or services (&ldquo;Services&rdquo;), these terms of service (&ldquo;Terms&rdquo;) apply between you (&ldquo;you&rdquo; or &ldquo;User&rdquo;) and us, Jamsesh Limited (&ldquo;Jamsesh&rdquo;, &ldquo;we&rdquo;, &ldquo;us&rdquo;, or &ldquo;our&rdquo;).</p>
+          <p>By downloading, installing, accessing, or using the Services, you agree to be bound by these Terms. If you do not agree to these terms, do not use the Services.</p>
+
+          <h2>1. Age Requirements and Parental Consent</h2>
+          <h3>1.1 Age Restrictions</h3>
+          <p>The Services are intended for users aged 13 and over. Users under the age of 16 require parental or guardian consent to use the Services.</p>
+          <h3>1.2 Parental Consent for Users Under 16</h3>
+          <p>If you are under 16 years of age:</p>
+          <ul>
+            <li>You must have your parent or legal guardian read and agree to these Terms on your behalf</li>
+            <li>Your parent or guardian must create or authorise your account</li>
+            <li>Your parent or guardian is responsible for your use of the Services</li>
+            <li>Your parent or guardian may contact us at any time to request access to, modification of, or deletion of your personal information</li>
+          </ul>
+          <h3>1.3 Verification</h3>
+          <p>We reserve the right to request proof of age and/or parental consent at any time. Failure to provide such proof may result in immediate suspension or termination of your account.</p>
+
+          <h2>2. Licence Grant</h2>
+          <h3>2.1 Limited Licence</h3>
+          <p>Subject to your compliance with these Terms, Jamsesh grants you a limited, non-exclusive, non-transferable, non-sublicensable, revocable license to:</p>
+          <ul>
+            <li>Download and install the Services on compatible devices</li>
+            <li>Access and use the Services for personal, non-commercial entertainment purposes</li>
+          </ul>
+          <h3>2.2 License Restrictions</h3>
+          <p>You may NOT:</p>
+          <ul>
+            <li>Copy, modify, adapt, translate, or create derivative works of the Services</li>
+            <li>Reverse engineer, decompile, disassemble, or attempt to discover the source code</li>
+            <li>Rent, lease, sell, sublicense, distribute, or transfer the Services</li>
+            <li>Remove, alter, or obscure any proprietary notices</li>
+            <li>Use the Services for any commercial purpose without our express written consent</li>
+            <li>Use automated systems (bots, scripts, crawlers) to access the Services</li>
+            <li>Circumvent any technical limitations or security measures in the Services</li>
+          </ul>
+
+          <h2>3. User Generated Content</h2>
+          <h3>3.1 Types of User Generated Content</h3>
+          <p>The Services allow you to create, upload, share, and interact with various forms of content, including but not limited to:</p>
+          <ul>
+            <li>Custom band designs and avatars</li>
+            <li>Performance recordings</li>
+            <li>Sketches and drawings created using the Band Creator feature</li>
+            <li>Chat messages and voice communications</li>
+            <li>User profiles and customisations</li>
+            <li>Any other content you create or share through the Service (collectively, &ldquo;UGC&rdquo;)</li>
+          </ul>
+          <h3>3.2 Ownership of UGC</h3>
+          <p>You retain ownership of any intellectual property rights that you hold in your UGC. However, by creating or sharing UGC through the Services, you grant Jamsesh the licenses described below.</p>
+          <h3>3.3 License Grant to Jamsesh</h3>
+          <p>By using the Services to generate UGC, or submitting UGC to the Services, you grant Jamsesh a worldwide, non-exclusive, royalty-free, perpetual, irrevocable, sublicensable, and transferable license to:</p>
+          <ul>
+            <li>Use, reproduce, distribute, modify, adapt, publicly display, and publicly perform your UGC</li>
+            <li>Create derivative works from your UGC</li>
+            <li>Incorporate your UGC into the Services (now or in the future) and other Jamsesh products</li>
+            <li>Use your UGC for promotional, marketing, and advertising purposes</li>
+          </ul>
+          <p>This license continues even if you stop using the Services.</p>
+          <h3>3.4 UGC Representations and Warranties</h3>
+          <p>By creating and/or submitting UGC, you represent and warrant that:</p>
+          <ul>
+            <li>You own or have obtained all necessary rights, licenses, and permissions for the UGC</li>
+            <li>Your UGC does not infringe any third-party intellectual property rights</li>
+            <li>Your UGC complies with all applicable laws and this Agreement</li>
+            <li>If you are under 18, your parent or guardian has reviewed and approved your UGC</li>
+          </ul>
+          <h3>3.5 Prohibited Content</h3>
+          <p>You agree NOT to create, upload, or share UGC that:</p>
+          <ul>
+            <li>Infringes intellectual property rights of others</li>
+            <li>Contains unlicensed copyrighted music (outside of the licensed tracks we provide)</li>
+            <li>Is illegal, harmful, threatening, abusive, harassing, defamatory, vulgar, obscene, or hateful</li>
+            <li>Contains nudity, sexual content, or is otherwise inappropriate for minors</li>
+            <li>Promotes violence, discrimination, or harm against individuals or groups</li>
+            <li>Contains malware, viruses, or malicious code</li>
+            <li>Impersonates any person or entity</li>
+            <li>Violates anyone&rsquo;s privacy or publicity rights</li>
+            <li>Constitutes spam or unsolicited advertising</li>
+            <li>Encourages illegal activity or violates any laws</li>
+          </ul>
+          <h3>3.6 Content Moderation</h3>
+          <p>Jamsesh reserves the right, but has no obligation, to:</p>
+          <ul>
+            <li>Monitor, review, and moderate all UGC</li>
+            <li>Remove or refuse to publish any UGC that violates these Terms</li>
+            <li>Restrict or terminate access to the Services for users who violate these content policies</li>
+            <li>Cooperate with law enforcement regarding illegal content</li>
+          </ul>
+          <p>You use the Services at your own risk. We may record, temporarily store, and reserve the right to monitor player activities, including player voice chat, in playing Jamsesh in order to help us with player moderation. This allows us to help ensure community guidelines are being met and no inappropriate behaviour is being committed by players. Voice recordings used for moderation are retained only as long as needed to investigate and enforce our community guidelines, then deleted or de-identified.</p>
+          <h3>3.7 Reporting Inappropriate Content</h3>
+          <p>If you encounter UGC that violates these Terms, please report it immediately through our in-app reporting tools or by contacting team@jamsesh.co.</p>
+          <h3>3.8 Special Provisions for Users Under 18</h3>
+          <p>If you are under 18 years of age:</p>
+          <ul>
+            <li>All UGC you create or submit may be reviewed by our moderation team</li>
+            <li>We may implement additional restrictions on your ability to share content publicly</li>
+            <li>Your parent or guardian may request copies of or deletion of your UGC</li>
+            <li>You agree not to share personal information in UGC (name, address, school, etc.)</li>
+          </ul>
+
+          <h2>4. Account Responsibilities</h2>
+          <h3>4.1 Account Security</h3>
+          <p>You are responsible for:</p>
+          <ul>
+            <li>Maintaining the confidentiality of your account credentials</li>
+            <li>All activities that occur under your account</li>
+            <li>Notifying us immediately of any unauthorised use</li>
+          </ul>
+          <h3>4.2 Accurate Information</h3>
+          <p>You agree to provide accurate, current, and complete information when creating your account and to update it as necessary.</p>
+          <h3>4.3 Parental Supervision for Minors</h3>
+          <p>Parents and guardians of users under 16 are responsible for:</p>
+          <ul>
+            <li>Monitoring their child&rsquo;s use of the Service</li>
+            <li>Ensuring compliance with these Terms</li>
+            <li>Any charges or purchases made through the account</li>
+          </ul>
+
+          <h2>5. Virtual Items and Purchases</h2>
+          <h3>5.1 Virtual Currency and Items</h3>
+          <p>The Service may include virtual currency, items, or content available for purchase (&ldquo;Virtual Items&rdquo;). Virtual Items:</p>
+          <ul>
+            <li>Have no monetary value and cannot be redeemed for cash</li>
+            <li>Are licensed, not sold, and remain the property of Jamsesh</li>
+            <li>May expire and are subject to terms specified at time of purchase</li>
+            <li>Are non-refundable except as required by law. Please review Meta&rsquo;s refund policies as Jamsesh may not be able to process refunds.</li>
+          </ul>
+          <h3>5.2 Purchases by Minors</h3>
+          <p>Users under 18 must obtain parental consent before making any purchases.</p>
+
+          <h2>6. Intellectual Property</h2>
+          <h3>6.1 Jamsesh Ownership</h3>
+          <p>The Service, including all content, features, functionality, software, designs, graphics, text, and trademarks (excluding User Content) are owned by Jamsesh and protected by copyright, trademark, and other intellectual property laws.</p>
+          <h3>6.2 Licensed Music Content</h3>
+          <p>Music tracks available in the Services are licensed from third-party rights holders. Your use of this music is limited to performance within the Services and may not be recorded or distributed outside the Services without authorisation.</p>
+          <h3>6.3 Feedback</h3>
+          <p>If you provide feedback, suggestions, or ideas about the Services, you grant Jamsesh an unrestricted, perpetual right to use such feedback without compensation or attribution.</p>
+
+          <h2>7. Privacy Policy and Data Protection</h2>
+          <h3>7.1 Privacy Policy</h3>
+          <p>Your use of the Service is also governed by our Privacy Policy, which is incorporated into these Terms by reference. Please review our Privacy Policy to understand how we collect and use your information.</p>
+          <h3>7.2 Special Protections for Children</h3>
+          <p>For users under 16, we:</p>
+          <ul>
+            <li>Collect only the minimum necessary personal information</li>
+            <li>Require verifiable parental consent for data processing</li>
+            <li>Provide parents with access to their child&rsquo;s data</li>
+            <li>Implement enhanced safety and privacy measures</li>
+            <li>Comply with the UK General Data Protection Regulation (UK GDPR) and Children&rsquo;s Code</li>
+          </ul>
+
+          <h2>8. Code of Conduct</h2>
+          <h3>8.1 Acceptable Behavior</h3>
+          <p>You agree to:</p>
+          <ul>
+            <li>Treat other users with respect</li>
+            <li>Comply with instructions from Jamsesh moderators</li>
+            <li>Follow performance and community guidelines</li>
+            <li>Report violations of these Terms</li>
+          </ul>
+          <h3>8.2 Prohibited Behaviour</h3>
+          <p>You may NOT:</p>
+          <ul>
+            <li>Harass, bully, threaten, or intimidate other users</li>
+            <li>Use offensive, discriminatory, or inappropriate language</li>
+            <li>Engage in cheating or exploiting bugs</li>
+            <li>Share personal information of others</li>
+            <li>Disrupt the Service or other users&rsquo; experience</li>
+            <li>Attempt to scam or defraud other users</li>
+          </ul>
+          <h3>8.3 Enforcement</h3>
+          <p>Violations may result in:</p>
+          <ul>
+            <li>Warning or temporary suspension</li>
+            <li>Content removal</li>
+            <li>Permanent account termination</li>
+            <li>Legal action where appropriate</li>
+          </ul>
+
+          <h2>9. Disclaimers and Limitation of Liability</h2>
+          <h3>9.1 &ldquo;As Is&rdquo; Service</h3>
+          <p class="legal-caps">THE SERVICES ARE PROVIDED &ldquo;AS IS&rdquo; AND &ldquo;AS AVAILABLE&rdquo; WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT.</p>
+          <h3>9.2 No Warranty</h3>
+          <p>Jamsesh does not warrant that:</p>
+          <ul>
+            <li>The Services will be uninterrupted, secure, or error-free</li>
+            <li>Defects will be corrected</li>
+            <li>The Services are free from viruses or harmful components</li>
+            <li>Results obtained from the Services will be accurate or reliable</li>
+          </ul>
+          <h3>9.3 Limitation of Liability</h3>
+          <p class="legal-caps">TO THE MAXIMUM EXTENT PERMITTED BY LAW, JAMSESH SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, OR ANY LOSS OF PROFITS, REVENUE, DATA, OR USE, WHETHER ARISING FROM:</p>
+          <ul>
+            <li>Use or inability to use the Services</li>
+            <li>UGC or conduct of other users</li>
+            <li>Unauthorised access to your account or data</li>
+            <li>Any other matter relating to the Services</li>
+          </ul>
+          <p class="legal-caps">IN NO EVENT SHALL JAMSESH&rsquo;S TOTAL LIABILITY EXCEED THE AMOUNT YOU PAID TO JAMSESH IN THE 12 MONTHS PRECEDING THE CLAIM, OR &pound;100, WHICHEVER IS GREATER.</p>
+          <h3>9.4 UK Consumer Rights</h3>
+          <p>Nothing in these Terms excludes or limits our liability for:</p>
+          <ul>
+            <li>Death or personal injury caused by our negligence</li>
+            <li>Fraud or fraudulent misrepresentation</li>
+            <li>Any other liability that cannot be excluded under English law</li>
+          </ul>
+          <p>If you are a consumer in the UK, you have certain legal rights. Nothing in these Terms affects those statutory rights.</p>
+
+          <h2>10. Indemnification</h2>
+          <p>You agree to indemnify, defend, and hold harmless Jamsesh, its affiliates, officers, directors, employees, and agents from any claims, liabilities, damages, losses, and expenses (including legal fees) arising from:</p>
+          <ul>
+            <li>Your use of the Services</li>
+            <li>Your UGC</li>
+            <li>Your violation of these Terms</li>
+            <li>Your violation of any rights of another party</li>
+            <li>Any activity under your account</li>
+          </ul>
+          <p>If you are a consumer in the UK, this indemnification provision applies only to the extent permitted by law.</p>
+
+          <h2>11. Termination</h2>
+          <h3>11.1 Termination by You</h3>
+          <p>You may stop using the Services and delete your account at any time by contacting team@jamsesh.co or using in-app account deletion features.</p>
+          <h3>11.2 Termination by Jamsesh</h3>
+          <p>We may suspend or terminate your access to the Services immediately, without notice, for:</p>
+          <ul>
+            <li>Violation of these Terms</li>
+            <li>Illegal activity</li>
+            <li>Fraudulent conduct</li>
+            <li>Inappropriate conduct or any potential or actual harm caused to other users</li>
+            <li>Extended periods of inactivity</li>
+            <li>At our discretion for any other reason</li>
+          </ul>
+          <h3>11.3 Effects of Termination</h3>
+          <p>Upon termination:</p>
+          <ul>
+            <li>Your license to use the Services immediately ends</li>
+            <li>You must cease all use of the Services</li>
+            <li>Your UGC may be deleted (subject to our data retention obligations)</li>
+            <li>Provisions of these Terms that by their nature should survive will continue (including ownership, disclaimers, limitations of liability, and governing law)</li>
+          </ul>
+
+          <h2>12. Modifications to the Services and these Terms</h2>
+          <h3>12.1 Service Changes</h3>
+          <p>Jamsesh reserves the right to modify, suspend, or discontinue the Services (or any part thereof) at any time, with or without notice. We shall not be liable to you or any third party for any such modification, suspension, or discontinuation.</p>
+          <h3>12.2 Agreement Changes</h3>
+          <p>We may update these Terms from time to time. We will notify you of material changes by:</p>
+          <ul>
+            <li>Posting the updated Terms in the Services</li>
+            <li>Sending an email notification (if you have provided an email address)</li>
+            <li>Displaying a prominent notice in the Services</li>
+          </ul>
+          <p>Your continued use of the Services after such notice constitutes acceptance of the updated Terms.</p>
+
+          <h2>13. Dispute Resolution</h2>
+          <h3>13.1 Informal Resolution</h3>
+          <p>If you have a concern or dispute, please contact us first at team@jamsesh.co. We will attempt to resolve disputes informally.</p>
+          <h3>13.2 Governing Law</h3>
+          <p>This Agreement shall be governed by and construed in accordance with the laws of England and Wales, without regard to conflict of law principles.</p>
+          <h3>13.3 Jurisdiction</h3>
+          <p>You agree that any dispute arising from these Terms or your use of the Services shall be subject to the exclusive jurisdiction of the courts of England and Wales.</p>
+          <h3>13.4 Consumer Rights</h3>
+          <p>If you are a consumer residing in the UK, nothing in this section affects your rights to rely on mandatory provisions of consumer protection law in your country of residence.</p>
+
+          <h2>14. General Provisions</h2>
+          <p>These Terms, together with our Privacy Policy, constitutes the entire agreement between you and Jamsesh regarding the Services.</p>
+          <p>If any provision of these Terms is held to be invalid or unenforceable, the remaining provisions shall continue in full force and effect.</p>
+          <p>No waiver of any provision of these Terms shall be deemed a further or continuing waiver of such term or any other term.</p>
+          <p>You may not assign or transfer these Terms or any rights hereunder. Jamsesh may assign these Terms without restriction.</p>
+          <p>These Terms do not confer any rights on third parties, except that third-party licensors of music content and platform providers (e.g., Meta) are intended beneficiaries with respect to provisions protecting their rights.</p>
+          <p>Jamsesh shall not be liable for any failure to perform due to circumstances beyond its reasonable control.</p>
+          <h3>14.7 Contact Information</h3>
+          <p>For questions about these Terms or to exercise your rights, contact us on Discord or via email at:</p>
+          <p>Jamsesh<br>Email: team@jamsesh.co</p>
+
+          <h2>15. Special Notice for Parents and Guardians</h2>
+          <p>We take the safety and privacy of young users seriously. Parents and guardians of users under 16 should:</p>
+          <ul>
+            <li>Review these Terms and our Privacy Policy carefully</li>
+            <li>Discuss online safety with their children</li>
+            <li>Monitor their child&rsquo;s use of the Services</li>
+            <li>Use parental control features available in VR platforms</li>
+            <li>Contact us immediately with any concerns</li>
+          </ul>
+          <p>Parents may request:</p>
+          <ul>
+            <li>Access to their child&rsquo;s account information</li>
+            <li>Deletion of their child&rsquo;s account and data</li>
+            <li>Restrictions on their child&rsquo;s account features</li>
+            <li>Information about data we collect from their child</li>
+          </ul>
+          <p>To make such requests, contact us at team@jamsesh.co with proof of parental authority.</p>
+          <p class="legal-caps">BY USING THE SERVICE, YOU ACKNOWLEDGE THAT YOU HAVE READ, UNDERSTOOD, AND AGREE TO BE BOUND BY THIS AGREEMENT.</p>
+          <p class="legal-caps">IF YOU ARE UNDER 16, YOUR PARENT OR GUARDIAN MUST ALSO AGREE TO THIS AGREEMENT ON YOUR BEHALF.</p>
+        </div>
+      </div>
+      <div class="legal-section" id="pp-section">
+        <button class="back-btn" onclick="hideSettingsSub()">&#9664; Settings</button>
+        <div class="legal-content" id="pp-content">
+          <h2>Privacy Policy</h2>
+          <p class="legal-version">Version 1 &mdash; Effective date: 4 September 2025 | Last update: 4 September 2025</p>
+
+          <h2>1. Introduction</h2>
+          <p>This Privacy Policy (&ldquo;Policy&rdquo;) explains how we collect, use, share, and protect personal information when you play Jamsesh games or use any of our services. &ldquo;Personal information&rdquo; is any information that relates to and is capable of being used to identify you, and includes any user-generated content (&ldquo;UGC&rdquo;) that you create on Jamsesh. This Policy applies to all players of our games and services.</p>
+          <p>Jamsesh Limited is a company based in the UK.</p>
+          <p>If you are under 18 years old, you can take a look at how we handle your personal information in Section 9.</p>
+
+          <h2>2. What We Collect</h2>
+          <h3>Account Information</h3>
+          <p>Identifying details in relation to the account that you create when you play any of our games, such as full name, username, email address, password, profile details, date of birth.</p>
+          <h3>Gameplay Data</h3>
+          <p>Scores, progress, achievements, and in-game preferences; game session info, levels played or created, time spent, preferences, crash reports.</p>
+          <h3>Device Information</h3>
+          <p>Hardware identifiers, operating system, VR headset type, crash reports, performance logs.</p>
+          <h3>Payment Information</h3>
+          <p>If applicable, billing details and purchase history (processed securely via third-party payment providers).</p>
+          <h3>Support Requests and Surveys</h3>
+          <p>Messages or inquiries you send to us (e.g., via customer support or feedback forms); details you share when leaving feedback or responding to research or surveys.</p>
+          <h3>User Generated Content</h3>
+          <p>Any content you generate, develop or upload (like player-created content, player performances, text/chat, voice recordings, images, audio, video, game mods, avatars, messages).</p>
+          <h3>Third Party Information</h3>
+          <p>If you link a third-party account (e.g., Steam, Discord), we receive data permitted under that platform&rsquo;s policy.</p>
+
+          <h2>3. How We Use Your Information</h2>
+          <h3>Provide and Improve Our Games and Services</h3>
+          <p>Deliver gameplay experiences, manage accounts, provide customer support, and enhance our games based on user feedback and data.</p>
+          <h3>Personalise Experiences</h3>
+          <p>Customise content, recommend features, and tailor experiences to your preferences and gameplay style.</p>
+          <h3>Communication</h3>
+          <p>Send updates about our games, respond to inquiries, and provide customer support.</p>
+          <h3>Safety and Security</h3>
+          <p>Detect and prevent fraud, abuse, and other harmful activities; enforce our terms of service.</p>
+          <h3>Analytics and Research</h3>
+          <p>Understand how our games are used, identify trends, and improve our services through data analysis.</p>
+          <h3>Legal, Regulatory and Compliance</h3>
+          <p>Comply with applicable laws, regulations, and legal processes.</p>
+
+          <h2>4. How We Share Your Information</h2>
+          <p>We may share your personal information in the following circumstances:</p>
+          <ul>
+            <li><strong>Service providers:</strong> Third-party companies that help us provide our services (e.g., cloud hosting, payment processing, analytics).</li>
+            <li><strong>Business partners:</strong> Platform holders (e.g., Steam, Meta) where our games are distributed, subject to their privacy policies.</li>
+            <li><strong>Legal requirements:</strong> When required by law, court order, or to protect our rights and safety.</li>
+            <li><strong>Business transfers:</strong> In connection with mergers, acquisitions, or asset sales.</li>
+            <li><strong>With your consent:</strong> When you explicitly agree to share your information for specific purposes.</li>
+          </ul>
+
+          <h2>5. Data Retention</h2>
+          <p>We retain your personal information for as long as necessary to provide our services and fulfill the purposes outlined in this Policy. Specific retention periods depend on the type of information and our legal obligations. You can request deletion of your account and associated data at any time.</p>
+
+          <h2>6. Your Rights and Choices</h2>
+          <p>Depending on your location, you may have the following rights:</p>
+          <ul>
+            <li><strong>Access:</strong> Request a copy of the personal information we hold about you.</li>
+            <li><strong>Correction:</strong> Ask us to correct inaccurate or incomplete information.</li>
+            <li><strong>Deletion:</strong> Request deletion of your personal information.</li>
+            <li><strong>Portability:</strong> Request a copy of your data in a structured format.</li>
+            <li><strong>Objection:</strong> Object to certain types of processing.</li>
+            <li><strong>Restriction:</strong> Request that we limit how we use your information.</li>
+          </ul>
+          <p>To exercise these rights, please contact us at team@jamsesh.co</p>
+
+          <h2>7. Security</h2>
+          <p>We implement appropriate technical and organisational measures to protect your personal information against unauthorised access, alteration, disclosure, or destruction. However, no method of transmission over the internet or electronic storage is completely secure.</p>
+
+          <h2>8. International Transfers</h2>
+          <p>Your personal information may be processed and stored in countries outside your country of residence. We ensure appropriate safeguards are in place to protect your information in accordance with this Policy and applicable data protection laws.</p>
+
+          <h2>9. Children&rsquo;s Privacy</h2>
+          <p>We take special care to protect children&rsquo;s privacy. If you are under 18, we may collect limited information with parental consent where required by law. Parents can review, modify, or delete their child&rsquo;s information by contacting us.</p>
+
+          <h2>10. Changes to This Policy</h2>
+          <p>We may update this Privacy Policy from time to time. We will notify you of significant changes by posting the updated Policy on our website and updating the effective date. Your continued use of our services constitutes acceptance of the updated Policy.</p>
+
+          <h2>11. Contact Us</h2>
+          <p>If you have questions about this Privacy Policy or our privacy practices, please contact us at:</p>
+          <p>Email: team@jamsesh.co<br>Company: Jamsesh Limited<br>Location: London, United Kingdom</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <nav class="navbar">
+    <div class="nav-item active" data-page="home" onclick="navigateTo('home')">
+      <span class="nav-icon">&#8962;</span>
+      <span class="nav-label">Home</span>
+    </div>
+    <div class="nav-item" data-page="social" onclick="navigateTo('social')">
+      <span class="nav-icon">&#9734;</span>
+      <span class="nav-label">Social</span>
+    </div>
+    <div class="nav-item" data-page="spaces" onclick="navigateTo('spaces')">
+      <span class="nav-icon">&#9678;</span>
+      <span class="nav-label">Spaces</span>
+    </div>
+    <div class="nav-item" data-page="play" onclick="navigateTo('play')">
+      <span class="nav-icon">&#9654;</span>
+      <span class="nav-label">Play</span>
+    </div>
+    <div class="nav-item" data-page="vault" onclick="navigateTo('vault')">
+      <span class="nav-icon">&#9830;</span>
+      <span class="nav-label">Vault</span>
+    </div>
+    <div class="nav-item" data-page="store" onclick="navigateTo('store')">
+      <span class="nav-icon">&#9733;</span>
+      <span class="nav-label">Store</span>
+    </div>
+    <div class="nav-item" data-page="season" onclick="navigateTo('season')">
+      <span class="nav-icon">&#127942;</span>
+      <span class="nav-label">Season</span>
+    </div>
+  </nav>
+
+</div><!-- /viewport -->
+
+<script>
+// ── Vuplex Bridge ──────────────────────────────────────
+function sendToUnity(type, data) {
+  var msg = JSON.stringify({ type: type, data: data });
+  if (window.vuplex) {
+    window.vuplex.postMessage(msg);
+  } else {
+    console.log('[Jamsesh→Unity]', msg);
+  }
+}
+
+function initVuplexListener() {
+  function attach() {
+    window.vuplex.addEventListener('message', function(event) {
+      try { handleUnityMessage(JSON.parse(event.data)); }
+      catch(e) { console.warn('Failed to parse Unity message:', e); }
+    });
+  }
+  if (window.vuplex) attach();
+  else window.addEventListener('vuplexready', attach);
+}
+
+function handleUnityMessage(msg) {
+  switch(msg.type) {
+    case 'updateProfile': updateProfile(msg.data); break;
+    case 'navigate': navigateTo(msg.data); break;
+    default: console.log('[Unity→Jamsesh] Unhandled:', msg);
+  }
+}
+
+function updateProfile(data) {
+  if (data.name) document.querySelector('.profile-name').textContent = data.name;
+  if (data.level != null) document.querySelector('.level-badge').textContent = data.level;
+  if (data.xp != null && data.xpMax != null) {
+    var pct = Math.min(100, Math.round((data.xp / data.xpMax) * 100));
+    document.querySelector('.xp-bar-fill').style.width = pct + '%';
+  }
+  if (data.notes != null) document.querySelectorAll('.currency')[0].querySelector('span').textContent = data.notes.toLocaleString();
+  if (data.coins != null) document.querySelectorAll('.currency')[1].querySelector('span').textContent = data.coins.toLocaleString();
+}
+
+// ── Navigation ─────────────────────────────────────────
+function navigateTo(pageName) {
+  var pages = document.querySelectorAll('.page');
+  for (var i = 0; i < pages.length; i++) pages[i].classList.remove('active');
+  var target = document.getElementById('page-' + pageName);
+  if (target) target.classList.add('active');
+
+  var navItems = document.querySelectorAll('.nav-item');
+  for (var i = 0; i < navItems.length; i++) {
+    navItems[i].classList.remove('active');
+    if (navItems[i].getAttribute('data-page') === pageName) navItems[i].classList.add('active');
+  }
+
+  // Reset sub-sections
+  hideSettingsSub();
+  resetPlayPicker();
+
+  // Grid nav always hidden by default (sub-sections show it as needed)
+  var gridNavs = document.querySelectorAll('.grid-nav');
+  for (var i = 0; i < gridNavs.length; i++) gridNavs[i].style.display = 'none';
+
+  sendToUnity('navigate', pageName);
+}
+
+// ── Song Grid ──────────────────────────────────────────
+var currentPage = 0;
+var totalPages = 0;
+var SONGS_PER_PAGE = 20;
+var pageHeight = 0;
+
+function buildNavButtons(container, id) {
+  container.innerHTML = '';
+
+  // Top of list
+  var top = document.createElement('button');
+  top.className = 'grid-nav-btn';
+  top.innerHTML = '<span>&#9650;</span><span>&#9650;</span>';
+  top.onclick = function() { goToPage(0); };
+  top.id = id + '-top';
+  container.appendChild(top);
+
+  // Up one page
+  var prev = document.createElement('button');
+  prev.className = 'grid-nav-btn';
+  prev.innerHTML = '&#9650;';
+  prev.onclick = function() { gridPage(-1); };
+  prev.id = id + '-prev';
+  container.appendChild(prev);
+
+  // Down one page
+  var next = document.createElement('button');
+  next.className = 'grid-nav-btn';
+  next.innerHTML = '&#9660;';
+  next.onclick = function() { gridPage(1); };
+  next.id = id + '-next';
+  container.appendChild(next);
+
+  // Bottom of list
+  var bottom = document.createElement('button');
+  bottom.className = 'grid-nav-btn';
+  bottom.innerHTML = '<span>&#9660;</span><span>&#9660;</span>';
+  bottom.onclick = function() { goToPage(totalPages - 1); };
+  bottom.id = id + '-bottom';
+  container.appendChild(bottom);
+}
+
+function buildGrid(songs) {
+  var track = document.getElementById('grid-track');
+  track.innerHTML = '';
+  totalPages = Math.ceil(songs.length / SONGS_PER_PAGE);
+
+  for (var p = 0; p < totalPages; p++) {
+    var page = document.createElement('div');
+    page.className = 'grid-page';
+    var start = p * SONGS_PER_PAGE;
+    var end = Math.min(start + SONGS_PER_PAGE, songs.length);
+
+    for (var i = start; i < end; i++) {
+      var song = songs[i];
+      var tile = document.createElement('div');
+      tile.className = 'song-tile';
+      tile.onclick = (function(s) {
+        return function() { selectPickerSong(s, this); };
+      })(song);
+      tile.innerHTML =
+        '<img src="' + song.file + '" alt="" loading="lazy">' +
+        '<span class="tile-rank">#' + song.rank + '</span>' +
+        '<div class="tile-info">' +
+          '<div class="tile-title">' + song.title + '</div>' +
+          '<div class="tile-artist">' + song.artist + '</div>' +
+        '</div>' +
+        '<div class="song-tile-actions">' +
+          '<button class="song-tile-btn song-tile-preview">&#9654;</button>' +
+          '<button class="song-tile-btn song-tile-add">+</button>' +
+        '</div>';
+      (function(s, t) {
+        t.querySelector('.song-tile-preview').onclick = function(e) {
+          e.stopPropagation();
+          sendToUnity('previewSong', s.title);
+        };
+        t.querySelector('.song-tile-add').onclick = function(e) {
+          e.stopPropagation();
+          addSongToSetlist(s);
+        };
+      })(song, tile);
+      page.appendChild(tile);
+    }
+    track.appendChild(page);
+  }
+
+  // Page height will be measured when picker is first opened
+  buildNavButtons(document.getElementById('grid-nav-right'), 'right');
+  updateNavState();
+}
+
+function goToPage(idx) {
+  if (idx < 0 || idx >= totalPages) return;
+  currentPage = idx;
+  document.getElementById('grid-track').style.transform = 'translateY(-' + (currentPage * pageHeight) + 'px)';
+  updateNavState();
+}
+
+function gridPage(dir) { goToPage(currentPage + dir); }
+
+function updateNavState() {
+  var navs = document.querySelectorAll('.grid-nav');
+  for (var n = 0; n < navs.length; n++) {
+    var atTop = (currentPage === 0);
+    var atBottom = (currentPage === totalPages - 1);
+    var top = navs[n].querySelector('[id$="-top"]');
+    var prev = navs[n].querySelector('[id$="-prev"]');
+    var next = navs[n].querySelector('[id$="-next"]');
+    var bottom = navs[n].querySelector('[id$="-bottom"]');
+    if (top) top.disabled = atTop;
+    if (prev) prev.disabled = atTop;
+    if (next) next.disabled = atBottom;
+    if (bottom) bottom.disabled = atBottom;
+  }
+}
+
+// ── Spaces Grid ─────────────────────────────────────────
+var spaces = [
+  {name:'Neon Stadium',     desc:'80,000 capacity arena',   file:'spaces/001.jpg'},
+  {name:'Desert Festival',  desc:'Open air desert stage',   file:'spaces/002.jpg'},
+  {name:'Underground Club', desc:'Intimate basement venue',  file:'spaces/003.jpg'},
+  {name:'Rooftop Lounge',   desc:'City skyline views',      file:'spaces/004.jpg'},
+  {name:'Jazz Basement',    desc:'Smoky speakeasy vibe',    file:'spaces/005.jpg'},
+  {name:'Beach Stage',      desc:'Sunset oceanfront',       file:'spaces/006.jpg'},
+  {name:'Arena Bowl',       desc:'Championship venue',      file:'spaces/007.jpg'},
+  {name:'Forest Rave',      desc:'Deep woods party',        file:'spaces/008.jpg'},
+  {name:'Vinyl Cafe',       desc:'Cozy record bar',         file:'spaces/009.jpg'},
+  {name:'Warehouse Party',  desc:'Raw industrial space',    file:'spaces/010.jpg'},
+  {name:'Opera House',      desc:'Grand classical hall',    file:'spaces/011.jpg'},
+  {name:'Street Corner',    desc:'Open mic busking spot',   file:'spaces/012.jpg'},
+  {name:'Skyline Terrace',  desc:'Penthouse party deck',    file:'spaces/013.jpg'},
+  {name:'Retro Arcade',     desc:'80s synthwave den',       file:'spaces/014.jpg'},
+  {name:'Ice Palace',       desc:'Frozen crystal stage',    file:'spaces/015.jpg'},
+  {name:'Tropical Resort',  desc:'Poolside paradise',       file:'spaces/016.jpg'},
+  {name:'Gothic Cathedral', desc:'Reverb-soaked stone',     file:'spaces/017.jpg'},
+  {name:'Cyberpunk Alley',  desc:'Neon-lit back street',    file:'spaces/018.jpg'},
+  {name:'Mountain Amp',     desc:'Alpine amphitheater',     file:'spaces/019.jpg'},
+  {name:'Submarine Lounge', desc:'Deep sea listening room', file:'spaces/020.jpg'},
+  {name:'Space Station',    desc:'Zero gravity club',       file:'spaces/021.jpg'},
+  {name:'Pirate Ship',      desc:'High seas shanty deck',   file:'spaces/022.jpg'},
+  {name:'Enchanted Garden', desc:'Fairy-lit grove',         file:'spaces/023.jpg'},
+  {name:'Volcano Stage',    desc:'Molten rock arena',       file:'spaces/024.jpg'},
+  {name:'Crystal Cavern',   desc:'Glowing gem grotto',      file:'spaces/025.jpg'}
+];
+
+function buildSpacesGrid() {
+  var grid = document.getElementById('spaces-grid');
+  grid.innerHTML = '';
+  for (var i = 0; i < spaces.length; i++) {
+    var s = spaces[i];
+    var tile = document.createElement('div');
+    tile.className = 'space-tile';
+    tile.onclick = (function(space) {
+      return function() { sendToUnity('selectSpace', space.name); };
+    })(s);
+    tile.innerHTML =
+      '<img src="' + s.file + '" alt="" loading="lazy">' +
+      '<div class="tile-info">' +
+        '<div class="tile-title">' + s.name + '</div>' +
+        '<div class="tile-artist">' + s.desc + '</div>' +
+      '</div>';
+    grid.appendChild(tile);
+  }
+}
+
+// ── Play Panel ──────────────────────────────────────────
+var allSongs = [];
+var setlist = [];
+var selectedInstrument = 'guitar';
+var selectedDifficulty = 'medium';
+var playMode = 'solo';
+var songInstruments = {};
+var songDiffs = {};
+var songSpaces = {};
+var savedSetlists = [];
+var setlistCounter = 1;
+
+var spaceCategories = [
+  {id:'stage', label:'Stage', options:[
+    {id:'classic',   label:'Classic',   desc:'Traditional concert stage',  bg:'#1e3a5f'},
+    {id:'arena',     label:'Arena',     desc:'Massive stadium platform',   bg:'#4a1942'},
+    {id:'intimate',  label:'Intimate',  desc:'Small club feel',            bg:'#2d1b4e'},
+    {id:'festival',  label:'Festival',  desc:'Open air main stage',        bg:'#1b4332'}
+  ]},
+  {id:'environment', label:'Environment', options:[
+    {id:'city',      label:'City',      desc:'Urban skyline backdrop',     bg:'#1a1a3e'},
+    {id:'nature',    label:'Nature',    desc:'Forests and mountains',      bg:'#14532d'},
+    {id:'space',     label:'Space',     desc:'Cosmic starfield',           bg:'#0f172a'},
+    {id:'fantasy',   label:'Fantasy',   desc:'Otherworldly dreamscape',    bg:'#4a1d6a'}
+  ]},
+  {id:'crowd', label:'Crowd', options:[
+    {id:'packed',    label:'Packed',    desc:'Sold-out wall to wall',      bg:'#7c2d12'},
+    {id:'moderate',  label:'Moderate',  desc:'Lively but room to move',    bg:'#713f12'},
+    {id:'sparse',    label:'Sparse',    desc:'Small dedicated fans',       bg:'#1c4532'},
+    {id:'none',      label:'Empty',     desc:'Just you and the music',     bg:'#1e293b'}
+  ]},
+  {id:'effects', label:'Stage Effects', options:[
+    {id:'pyro',      label:'Pyro',      desc:'Flames and fireworks',       bg:'#9a3412'},
+    {id:'lasers',    label:'Lasers',    desc:'Beams and light show',       bg:'#1e40af'},
+    {id:'fog',       label:'Fog',       desc:'Haze and atmosphere',        bg:'#374151'},
+    {id:'minimal',   label:'Minimal',   desc:'Clean and simple',           bg:'#1e293b'}
+  ]}
+];
+
+var spaceDefaults = {stage:'classic', environment:'city', crowd:'packed', effects:'pyro'};
+
+var instruments = [
+  {id:'guitar', label:'Guitar', bg:'#b45309', desc:'Lead melodies and riffs', icon:'instruments/guitar.png', iconStyle:'position:absolute;bottom:-20%;right:-25%;height:160%;opacity:0.3;pointer-events:none;object-fit:contain;transform:rotate(-30deg)'},
+  {id:'keys',   label:'Keys',   bg:'#1a1a4e', desc:'Chords, synths and piano', icon:'instruments/keys.png'},
+  {id:'drums',  label:'Drums',  bg:'#991b1b', desc:'Keep the rhythm going', icon:'instruments/drums.png', iconStyle:'position:absolute;bottom:-60%;right:-15%;height:120%;opacity:0.3;pointer-events:none;object-fit:contain'},
+  {id:'vocals', label:'Vocals', bg:'#6b21a8', desc:'Sing along to the lyrics', icon:'instruments/vocals.png', iconStyle:'position:absolute;bottom:-85%;right:-25%;height:150%;opacity:0.3;pointer-events:none;object-fit:contain'},
+  {id:'bass',   label:'Bass',   bg:'#0e7490', desc:'Hold down the low end', icon:'instruments/bass.png', iconStyle:'position:absolute;bottom:-20%;right:-20%;height:160%;opacity:0.3;pointer-events:none;object-fit:contain;transform:rotate(-30deg)'}
+];
+
+// lobbyPlayers uses np plates defined below (initialized in initLobbyPlates)
+var lobbyPlayers = [
+  {name:'xShredMaster',  avatar:'art/001.jpg', plate:null, plateClass:null,            instrument:'guitar', difficulty:'expert', ready:true},
+  {name:'BeatDropQueen', avatar:'art/002.jpg', plate:null, plateClass:'plate-holo',    instrument:'drums',  difficulty:'hard',   ready:true},
+  {name:'NeonRiff',      avatar:'art/003.jpg', plate:null, plateClass:null,            instrument:'guitar', difficulty:'medium', ready:false},
+  {name:'AxelStorm',     avatar:'art/004.jpg', plate:null, plateClass:null,            instrument:'keys',   difficulty:'expert', ready:true},
+  {name:'VoxHunter',     avatar:'art/006.jpg', plate:null, plateClass:null,            instrument:'vocals', difficulty:'hard',   ready:true},
+  {name:'FretBoss',      avatar:'art/007.jpg', plate:null, plateClass:'plate-radiate', instrument:'guitar', difficulty:'expert', ready:true},
+  {name:'SynthWave99',   avatar:'art/008.jpg', plate:null, plateClass:null,            instrument:'keys',   difficulty:'medium', ready:false},
+  {name:'PickSlinger',   avatar:'art/009.jpg', plate:null, plateClass:null,            instrument:'guitar', difficulty:'easy',   ready:true},
+  {name:'CrashKid',      avatar:'art/011.jpg', plate:null, plateClass:null,            instrument:'drums',  difficulty:'hard',   ready:false}
+];
+
+var difficulties = [
+  {id:'easy',   label:'Easy',   bg:'linear-gradient(135deg, #064e3b 0%, #059669 50%, #34d399 100%)', desc:'Relaxed pace, fewer notes'},
+  {id:'medium', label:'Medium', bg:'linear-gradient(135deg, #713f12 0%, #ca8a04 50%, #facc15 100%)', desc:'A balanced challenge'},
+  {id:'hard',   label:'Hard',   bg:'linear-gradient(135deg, #7c2d12 0%, #ea580c 50%, #fb923c 100%)', desc:'Fast patterns, more notes'},
+  {id:'expert', label:'Expert', bg:'linear-gradient(135deg, #450a0a 0%, #dc2626 50%, #f87171 100%)', desc:'Full song, no mercy'}
+];
+
+function plateImg(file) {
+  return 'linear-gradient(rgba(0,0,0,0.3),rgba(0,0,0,0.3)),url(plates/' + file + ')';
+}
+
+var np = {
+  galaxy:     plateImg('galaxy.jpg'),
+  bamboo:     plateImg('bamboo.jpg'),
+  garden:     plateImg('garden.jpg'),
+  flames:     plateImg('flames.jpg'),
+  drums:      plateImg('drums.jpg'),
+  microphone: plateImg('microphone.jpg'),
+  kpop:       plateImg('kpop.jpg'),
+  sakura:
+    'radial-gradient(8px 8px at 15% 30%, rgba(255,150,200,0.3), transparent),' +
+    'radial-gradient(6px 6px at 45% 70%, rgba(255,160,210,0.25), transparent),' +
+    'radial-gradient(10px 10px at 75% 25%, rgba(255,140,190,0.3), transparent),' +
+    'radial-gradient(7px 7px at 90% 60%, rgba(255,170,220,0.2), transparent),' +
+    'linear-gradient(135deg, #1a0815 0%, #2a1025 30%, #3a1535 50%, #2a1025 70%, #1a0815 100%)'
+};
+
+var swapTargetIdx = -1;
+
+var diffLevels = ['easy','medium','hard','expert'];
+var diffColors = {easy:'#059669', medium:'#ca8a04', hard:'#ea580c', expert:'#dc2626'};
+
+// ── Mode Tabs ──────────────────────────────────────────
+function buildModeTabs() {
+  var container = document.getElementById('play-mode-tabs');
+  container.innerHTML = '';
+  var modes = ['Solo', 'Co-op', 'Battle'];
+  var modeIds = ['solo', 'coop', 'battle'];
+  for (var i = 0; i < modes.length; i++) {
+    var btn = document.createElement('button');
+    btn.className = 'play-mode-tab' + (modeIds[i] === playMode ? ' active' : '');
+    btn.textContent = modes[i];
+    btn.onclick = (function(id) { return function() { setPlayMode(id); }; })(modeIds[i]);
+    container.appendChild(btn);
+  }
+}
+
+function setPlayMode(mode) {
+  playMode = mode;
+  buildModeTabs();
+  buildRightPanel();
+  sendToUnity('playMode', mode);
+}
+
+// ── Song Column ────────────────────────────────────────
+function buildSongColumn() {
+  var col = document.getElementById('play-song-col');
+  col.innerHTML = '';
+  for (var i = 0; i < setlist.length; i++) {
+    if (!setlist[i]) continue;
+    var slot = document.createElement('div');
+    slot.className = 'play-song-slot';
+    var pos = document.createElement('div');
+    pos.className = 'play-song-pos';
+    pos.textContent = (i + 1);
+    slot.appendChild(pos);
+
+    var tile = document.createElement('div');
+    tile.className = 'play-tile';
+    tile.innerHTML =
+      '<img src="' + setlist[i].file + '" alt="">' +
+      '<div class="tile-info">' +
+        '<div class="tile-title">' + setlist[i].title + '</div>' +
+        '<div class="tile-artist">' + setlist[i].artist + '</div>' +
+      '</div>' +
+      '<div class="setlist-actions">' +
+        '<button class="setlist-btn setlist-btn-swap" data-idx="' + i + '">&#8635;</button>' +
+        '<button class="setlist-btn setlist-btn-remove" data-idx="' + i + '">&#10005;</button>' +
+      '</div>';
+    (function(idx) {
+      tile.querySelector('.setlist-btn-swap').onclick = function(e) { e.stopPropagation(); swapSetlistSong(idx); };
+      tile.querySelector('.setlist-btn-remove').onclick = function(e) { e.stopPropagation(); removeFromSetlist(idx); };
+    })(i);
+    slot.appendChild(tile);
+    col.appendChild(slot);
+  }
+  // Always show a + tile at the end
+  var addSlot = document.createElement('div');
+  addSlot.className = 'play-song-slot';
+  var spacer = document.createElement('div');
+  spacer.className = 'play-song-pos';
+  spacer.textContent = (setlist.length + 1);
+  addSlot.appendChild(spacer);
+  var addTile = document.createElement('div');
+  addTile.className = 'play-tile play-add-tile';
+  addTile.innerHTML = '+';
+  addTile.onclick = showPlayPicker;
+  addSlot.appendChild(addTile);
+  col.appendChild(addSlot);
+  updateDuration();
+}
+
+// ── Right Panel Dispatch ───────────────────────────────
+function buildRightPanel() {
+  var panel = document.getElementById('play-right-panel');
+  var songCol = document.getElementById('play-song-col');
+  panel.innerHTML = '';
+  if (playMode === 'solo') {
+    songCol.style.display = 'none';
+    buildSoloPanel(panel);
+  } else {
+    songCol.style.display = '';
+    buildCoopPanel(panel);
+  }
+}
+
+// ── Solo Panel (row-based, paginated) ──────────────────
+var soloPage = 0;
+var SOLO_PER_PAGE = 3;
+
+function soloTotalPages() {
+  var count = Math.max(setlist.length, 1);
+  return Math.max(1, Math.ceil(count / SOLO_PER_PAGE));
+}
+
+function buildSoloPanel(panel) {
+  var wrapper = document.createElement('div');
+  wrapper.className = 'play-solo-wrapper';
+
+  var container = document.createElement('div');
+  container.className = 'play-solo-rows';
+
+  // Clamp soloPage if songs were removed
+  var tp = soloTotalPages();
+  if (soloPage >= tp) soloPage = tp - 1;
+
+  var start = soloPage * SOLO_PER_PAGE;
+  var end = Math.min(start + SOLO_PER_PAGE, Math.max(setlist.length, SOLO_PER_PAGE));
+
+  for (var i = start; i < end; i++) {
+    var row = document.createElement('div');
+    var isEmpty = !setlist[i];
+    row.className = 'play-solo-row';
+
+    // Number
+    var num = document.createElement('div');
+    num.className = 'play-solo-num';
+    num.textContent = (i + 1);
+    row.appendChild(num);
+
+    // Cover art / add button
+    var cover = document.createElement('div');
+    cover.className = 'play-solo-cover';
+    if (setlist[i]) {
+      cover.innerHTML =
+        '<img src="' + setlist[i].file + '" alt="">' +
+        '<div class="setlist-actions">' +
+          '<button class="setlist-btn setlist-btn-preview" data-idx="' + i + '">' + (previewIdx === i ? '&#9646;&#9646;' : '&#9654;') + '</button>' +
+          '<button class="setlist-btn setlist-btn-swap" data-idx="' + i + '">&#8635;</button>' +
+          '<button class="setlist-btn setlist-btn-remove" data-idx="' + i + '">&#10005;</button>' +
+        '</div>';
+      (function(idx) {
+        cover.querySelector('.setlist-btn-preview').onclick = function(e) { e.stopPropagation(); togglePreview(idx); };
+        cover.querySelector('.setlist-btn-swap').onclick = function(e) { e.stopPropagation(); swapSetlistSong(idx); };
+        cover.querySelector('.setlist-btn-remove').onclick = function(e) { e.stopPropagation(); removeFromSetlist(idx); };
+      })(i);
+    } else {
+      cover.className = 'play-solo-cover play-solo-cover-add';
+      cover.innerHTML = '+';
+      cover.onclick = showPlayPicker;
+    }
+    row.appendChild(cover);
+
+    // Instrument button
+    var selInst = songInstruments[i] || 'guitar';
+    var instObj = null;
+    for (var j = 0; j < instruments.length; j++) {
+      if (instruments[j].id === selInst) { instObj = instruments[j]; break; }
+    }
+    if (!instObj) instObj = instruments[0];
+
+    var instBtn = document.createElement('div');
+    instBtn.className = 'play-solo-btn' + (isEmpty ? ' empty' : '');
+    instBtn.style.background = instObj.bg;
+    var defaultIconStyle = 'position:absolute;bottom:0;right:0;height:80%;opacity:0.3;pointer-events:none;object-fit:contain';
+    var iconHtml = instObj.icon ? '<img class="solo-btn-icon" src="' + instObj.icon + '" style="' + (instObj.iconStyle || defaultIconStyle) + '">' : '';
+    instBtn.innerHTML = '<span class="solo-btn-label">' + instObj.label + '</span>' + iconHtml;
+    instBtn.onclick = (function(songIdx) {
+      return function() { openSoloPopup(songIdx, 'instrument'); };
+    })(i);
+    row.appendChild(instBtn);
+
+    // Difficulty button
+    var selDiff = songDiffs[i] || 'medium';
+    var diffObj = null;
+    for (var d = 0; d < difficulties.length; d++) {
+      if (difficulties[d].id === selDiff) { diffObj = difficulties[d]; break; }
+    }
+    if (!diffObj) diffObj = difficulties[0];
+
+    var diffBtn = document.createElement('div');
+    diffBtn.className = 'play-solo-btn' + (isEmpty ? ' empty' : '');
+    diffBtn.style.background = diffObj.bg;
+    diffBtn.innerHTML = '<span class="solo-btn-label">' + diffObj.label + '</span>';
+    diffBtn.onclick = (function(songIdx) {
+      return function() { openSoloPopup(songIdx, 'difficulty'); };
+    })(i);
+    row.appendChild(diffBtn);
+
+    // Space button
+    var spaceBtn = document.createElement('div');
+    spaceBtn.className = 'play-solo-btn' + (isEmpty ? ' empty' : '');
+    spaceBtn.style.background = '#1a1a3e';
+    var spaceConf = songSpaces[i] || {};
+    var stageName = getSpaceOptionLabel('stage', spaceConf.stage || spaceDefaults.stage);
+    spaceBtn.innerHTML = '<span class="solo-btn-label">' + stageName + '</span>';
+    spaceBtn.onclick = (function(songIdx) {
+      return function() { openSpacePopup(songIdx); };
+    })(i);
+    row.appendChild(spaceBtn);
+
+    // Loadout button
+    var loadBtn = document.createElement('div');
+    loadBtn.className = 'play-solo-btn' + (isEmpty ? ' empty' : '');
+    loadBtn.style.background = '#374151';
+    loadBtn.innerHTML = '<span class="solo-btn-label">Loadout</span>';
+    loadBtn.onclick = (function(songIdx) {
+      return function() { openLoadoutPopup(songIdx); };
+    })(i);
+    row.appendChild(loadBtn);
+
+    container.appendChild(row);
+  }
+
+  wrapper.appendChild(container);
+
+  // Navigation arrows
+  var nav = document.createElement('div');
+  nav.className = 'play-solo-nav';
+  var onlyOnePage = (tp <= 1);
+
+  var btnTop = document.createElement('button');
+  btnTop.className = 'play-solo-nav-btn';
+  btnTop.innerHTML = '<span>&#9650;</span><span>&#9650;</span>';
+  btnTop.disabled = onlyOnePage || (soloPage === 0);
+  btnTop.onclick = function() { soloPage = 0; buildRightPanel(); };
+  nav.appendChild(btnTop);
+
+  var btnUp = document.createElement('button');
+  btnUp.className = 'play-solo-nav-btn';
+  btnUp.innerHTML = '&#9650;';
+  btnUp.disabled = onlyOnePage || (soloPage === 0);
+  btnUp.onclick = function() { if (soloPage > 0) { soloPage--; buildRightPanel(); } };
+  nav.appendChild(btnUp);
+
+  var btnDown = document.createElement('button');
+  btnDown.className = 'play-solo-nav-btn';
+  btnDown.innerHTML = '&#9660;';
+  btnDown.disabled = onlyOnePage || (soloPage >= tp - 1);
+  btnDown.onclick = function() { if (soloPage < tp - 1) { soloPage++; buildRightPanel(); } };
+  nav.appendChild(btnDown);
+
+  var btnBottom = document.createElement('button');
+  btnBottom.className = 'play-solo-nav-btn';
+  btnBottom.innerHTML = '<span>&#9660;</span><span>&#9660;</span>';
+  btnBottom.disabled = onlyOnePage || (soloPage >= tp - 1);
+  btnBottom.onclick = function() { soloPage = tp - 1; buildRightPanel(); };
+  nav.appendChild(btnBottom);
+
+  wrapper.appendChild(nav);
+  panel.appendChild(wrapper);
+}
+
+function openSoloPopup(songIdx, type) {
+  var overlay = document.getElementById('solo-popup-overlay');
+  var popup = document.getElementById('solo-popup');
+
+  popup.className = 'solo-popup';
+  popup.innerHTML = '';
+
+  var title = document.createElement('div');
+  title.className = 'solo-popup-title';
+  title.textContent = type === 'instrument' ? 'Choose Instrument' : 'Choose Difficulty';
+  popup.appendChild(title);
+
+  var options = type === 'instrument' ? instruments : difficulties;
+  for (var i = 0; i < options.length; i++) {
+    var opt = options[i];
+    var card = document.createElement('div');
+    card.className = 'solo-popup-option';
+    card.style.background = opt.bg;
+    card.innerHTML = '<div class="solo-popup-option-label">' + opt.label + '</div>' +
+                     '<div class="solo-popup-option-desc">' + (opt.desc || '') + '</div>';
+    card.onclick = (function(sIdx, t, optId) {
+      return function() { selectSoloOption(sIdx, t, optId); };
+    })(songIdx, type, opt.id);
+    popup.appendChild(card);
+  }
+
+  overlay.className = 'solo-popup-overlay active';
+}
+
+function closeSoloPopup() {
+  document.getElementById('solo-popup-overlay').className = 'solo-popup-overlay';
+  document.getElementById('solo-popup').className = 'solo-popup';
+}
+
+function selectSoloOption(songIdx, type, optionId) {
+  if (type === 'instrument') {
+    songInstruments[songIdx] = optionId;
+    sendToUnity('songInstrument', songIdx + ':' + optionId);
+  } else {
+    songDiffs[songIdx] = optionId;
+    sendToUnity('songDifficulty', songIdx + ':' + optionId);
+  }
+  closeSoloPopup();
+  buildRightPanel();
+}
+
+// ── Space Popup ────────────────────────────────────────
+function getSpaceOptionLabel(catId, optId) {
+  for (var c = 0; c < spaceCategories.length; c++) {
+    if (spaceCategories[c].id === catId) {
+      for (var o = 0; o < spaceCategories[c].options.length; o++) {
+        if (spaceCategories[c].options[o].id === optId) return spaceCategories[c].options[o].label;
+      }
+    }
+  }
+  return '';
+}
+
+function openSpacePopup(songIdx) {
+  var overlay = document.getElementById('solo-popup-overlay');
+  var popup = document.getElementById('solo-popup');
+
+  var spaceConf = songSpaces[songIdx] || {};
+
+  popup.innerHTML = '';
+  var title = document.createElement('div');
+  title.className = 'space-popup-title';
+  title.textContent = 'Customise Space';
+  popup.appendChild(title);
+
+  for (var c = 0; c < spaceCategories.length; c++) {
+    var cat = spaceCategories[c];
+    var section = document.createElement('div');
+    section.className = 'space-popup-category';
+
+    var catLabel = document.createElement('div');
+    catLabel.className = 'space-popup-cat-label';
+    catLabel.textContent = cat.label;
+    section.appendChild(catLabel);
+
+    var optGrid = document.createElement('div');
+    optGrid.className = 'space-popup-cat-options';
+
+    var currentSel = spaceConf[cat.id] || spaceDefaults[cat.id];
+    for (var o = 0; o < cat.options.length; o++) {
+      var opt = cat.options[o];
+      var card = document.createElement('div');
+      card.className = 'space-popup-opt' + (opt.id === currentSel ? ' selected' : '');
+      card.style.background = opt.bg;
+      card.innerHTML = '<div class="space-popup-opt-label">' + opt.label + '</div>' +
+                       '<div class="space-popup-opt-desc">' + opt.desc + '</div>';
+      card.onclick = (function(sIdx, catId, optId) {
+        return function() { selectSpaceOption(sIdx, catId, optId); };
+      })(songIdx, cat.id, opt.id);
+      optGrid.appendChild(card);
+    }
+    section.appendChild(optGrid);
+    popup.appendChild(section);
+  }
+
+  popup.className = 'space-popup';
+  overlay.className = 'solo-popup-overlay active';
+}
+
+function selectSpaceOption(songIdx, catId, optId) {
+  if (!songSpaces[songIdx]) songSpaces[songIdx] = {};
+  songSpaces[songIdx][catId] = optId;
+  sendToUnity('songSpace', songIdx + ':' + catId + ':' + optId);
+  openSpacePopup(songIdx);
+}
+
+// ── Loadout Popup ──────────────────────────────────────
+var songLoadouts = {};
+
+var loadoutSkins = {
+  guitar: [
+    {id:'classic',  label:'Classic Strat',  desc:'The timeless original',       bg:'#b45309'},
+    {id:'fire',     label:'Fire Burst',     desc:'Blazing sunburst finish',     bg:'#991b1b'},
+    {id:'neon',     label:'Neon Pulse',     desc:'Glowing electric vibes',      bg:'#6b21a8'},
+    {id:'ice',      label:'Ice Crystal',    desc:'Cool translucent body',       bg:'#0e7490'}
+  ],
+  bass: [
+    {id:'classic',  label:'Jazz Bass',      desc:'Deep warm tone',              bg:'#0e7490'},
+    {id:'thunder',  label:'Thunder',        desc:'Heavy rumbling power',        bg:'#991b1b'},
+    {id:'midnight', label:'Midnight',       desc:'Sleek matte black',           bg:'#1a1a4e'},
+    {id:'slap',     label:'Funk Slap',      desc:'Bright snappy punch',         bg:'#b45309'}
+  ],
+  keys: [
+    {id:'grand',    label:'Grand Piano',    desc:'Concert hall classic',        bg:'#1a1a4e'},
+    {id:'synth',    label:'Synth Board',    desc:'Retro analog waves',          bg:'#6b21a8'},
+    {id:'organ',    label:'Retro Organ',    desc:'Warm vintage tones',          bg:'#b45309'},
+    {id:'electric', label:'Electric Piano',  desc:'Smooth Rhodes sound',        bg:'#0e7490'}
+  ],
+  drums: [
+    {id:'pearl',    label:'Pearl Kit',      desc:'Crisp acoustic shells',       bg:'#991b1b'},
+    {id:'rock',     label:'Rock Kit',       desc:'Punchy stadium sound',        bg:'#b45309'},
+    {id:'electric', label:'Electronic',     desc:'Synthetic drum machine',      bg:'#6b21a8'},
+    {id:'jazz',     label:'Jazz Brushes',   desc:'Soft brush technique',        bg:'#1a1a4e'}
+  ],
+  vocals: [
+    {id:'classic',  label:'Classic Mic',    desc:'Studio condenser',            bg:'#6b21a8'},
+    {id:'gold',     label:'Gold Mic',       desc:'Premium vintage finish',      bg:'#b45309'},
+    {id:'neon',     label:'Neon Mic',       desc:'Light-up stage mic',          bg:'#0e7490'},
+    {id:'retro',    label:'50s Chrome',     desc:'Old school crooner style',    bg:'#991b1b'}
+  ]
+};
+
+var loadoutHighways = [
+  {id:'neon',     label:'Neon',       desc:'Glowing neon rails',      bg:'#6b21a8', symbol:'\u2261'},
+  {id:'classic',  label:'Classic',    desc:'Clean standard lane',     bg:'#1a1a4e', symbol:'\u2503'},
+  {id:'holo',     label:'Hologram',   desc:'Translucent light beams', bg:'#0e7490', symbol:'\u25C7'},
+  {id:'minimal',  label:'Minimal',    desc:'Stripped back design',    bg:'#374151', symbol:'\u2500'}
+];
+
+var loadoutGems = [
+  {id:'standard', label:'Standard',   desc:'Default gem shapes',      bg:'#0e7490', symbol:'\u25C6'},
+  {id:'crystal',  label:'Crystal',    desc:'Faceted gem stones',      bg:'#6b21a8', symbol:'\u2666'},
+  {id:'fire',     label:'Fire',       desc:'Burning ember notes',     bg:'#991b1b', symbol:'\u2738'},
+  {id:'neon',     label:'Neon',       desc:'Bright glow orbs',        bg:'#b45309', symbol:'\u25CF'}
+];
+
+var loadoutEffects = [
+  {id:'sparks',   label:'Sparks',     desc:'Electric spark bursts',   bg:'#b45309', symbol:'\u2607'},
+  {id:'fireworks',label:'Fireworks',  desc:'Colourful explosions',    bg:'#991b1b', symbol:'\u2734'},
+  {id:'shatter',  label:'Shatter',    desc:'Glass break particles',   bg:'#0e7490', symbol:'\u2756'},
+  {id:'glow',     label:'Glow',       desc:'Soft radiant pulses',     bg:'#6b21a8', symbol:'\u2600'}
+];
+
+var loadoutDefaults = {skin:'classic', highway:'neon', gems:'standard', effects:'sparks'};
+var currentLoadoutSongIdx = -1;
+
+function openLoadoutPopup(songIdx) {
+  currentLoadoutSongIdx = songIdx;
+  var overlay = document.getElementById('loadout-overlay');
+  var popup = document.getElementById('loadout-popup');
+  popup.innerHTML = '';
+
+  var instId = songInstruments[songIdx] || 'guitar';
+  var instObj = null;
+  for (var j = 0; j < instruments.length; j++) {
+    if (instruments[j].id === instId) { instObj = instruments[j]; break; }
+  }
+  if (!instObj) instObj = instruments[0];
+
+  var title = document.createElement('div');
+  title.className = 'loadout-popup-title';
+  title.textContent = instObj.label + ' Loadout';
+  popup.appendChild(title);
+
+  var loadout = songLoadouts[songIdx] || {};
+  var skins = loadoutSkins[instId] || loadoutSkins.guitar;
+
+  var categories = [
+    {id:'skin',    label:'Instrument Skin', options: skins,            icon: instObj.icon},
+    {id:'highway', label:'Highway',         options: loadoutHighways,  icon: null},
+    {id:'gems',    label:'Gems',            options: loadoutGems,      icon: null},
+    {id:'effects', label:'Hit Effects',     options: loadoutEffects,   icon: null}
+  ];
+
+  for (var c = 0; c < categories.length; c++) {
+    var cat = categories[c];
+    var section = document.createElement('div');
+    section.className = 'loadout-category';
+
+    var catLabel = document.createElement('div');
+    catLabel.className = 'loadout-cat-label';
+    catLabel.textContent = cat.label;
+    section.appendChild(catLabel);
+
+    var optGrid = document.createElement('div');
+    optGrid.className = 'loadout-cat-options';
+
+    var currentSel = loadout[cat.id] || loadoutDefaults[cat.id];
+    for (var o = 0; o < cat.options.length; o++) {
+      var opt = cat.options[o];
+      var card = document.createElement('div');
+      card.className = 'loadout-opt' + (opt.id === currentSel ? ' selected' : '');
+      card.style.background = opt.bg;
+      var graphicHtml = '';
+      if (cat.icon) {
+        graphicHtml = '<img class="loadout-opt-icon" src="' + cat.icon + '" alt="">';
+      } else if (opt.symbol) {
+        graphicHtml = '<span class="loadout-opt-symbol">' + opt.symbol + '</span>';
+      }
+      card.innerHTML = '<div class="loadout-opt-label">' + opt.label + '</div>' +
+                       '<div class="loadout-opt-desc">' + opt.desc + '</div>' +
+                       graphicHtml;
+      card.onclick = (function(catId, optId) {
+        return function() { selectLoadoutOption(catId, optId); };
+      })(cat.id, opt.id);
+      optGrid.appendChild(card);
+    }
+    section.appendChild(optGrid);
+    popup.appendChild(section);
+  }
+
+  var closeBtn = document.createElement('button');
+  closeBtn.className = 'loadout-close-btn';
+  closeBtn.textContent = 'Done';
+  closeBtn.onclick = closeLoadoutPopup;
+  popup.appendChild(closeBtn);
+
+  overlay.className = 'loadout-overlay active';
+}
+
+function selectLoadoutOption(catId, optId) {
+  var idx = currentLoadoutSongIdx;
+  if (!songLoadouts[idx]) songLoadouts[idx] = {};
+  songLoadouts[idx][catId] = optId;
+  sendToUnity('loadout', idx + ':' + catId + ':' + optId);
+  openLoadoutPopup(idx);
+}
+
+function closeLoadoutPopup(e) {
+  if (e && e.target !== document.getElementById('loadout-overlay')) return;
+  document.getElementById('loadout-overlay').className = 'loadout-overlay';
+}
+
+// ── Co-op / Battle Panel ───────────────────────────────
+function buildCoopPanel(panel) {
+  // Instrument section
+  var instHeader = document.createElement('div');
+  instHeader.className = 'play-coop-section-header';
+  instHeader.textContent = 'Instrument';
+  panel.appendChild(instHeader);
+  buildCoopOptionRow(panel, instruments, selectedInstrument, function(id) {
+    selectedInstrument = id;
+    buildRightPanel();
+    sendToUnity('selectInstrument', id);
+  });
+
+  // Difficulty section
+  var diffHeader = document.createElement('div');
+  diffHeader.className = 'play-coop-section-header';
+  diffHeader.textContent = 'Difficulty';
+  panel.appendChild(diffHeader);
+  buildCoopOptionRow(panel, difficulties, selectedDifficulty, function(id) {
+    selectedDifficulty = id;
+    buildRightPanel();
+    sendToUnity('selectDifficulty', id);
+  });
+
+  // Players section
+  var playersHeader = document.createElement('div');
+  playersHeader.className = 'play-coop-section-header';
+  playersHeader.textContent = 'Players';
+  panel.appendChild(playersHeader);
+
+  var grid = document.createElement('div');
+  grid.className = 'play-players-grid';
+  for (var i = 0; i < 9; i++) {
+    var player = lobbyPlayers[i];
+    if (player) {
+      grid.appendChild(buildNameplate(player));
+    }
+  }
+  panel.appendChild(grid);
+}
+
+function buildCoopOptionRow(container, options, selectedId, onSelect) {
+  var row = document.createElement('div');
+  row.className = 'play-coop-row';
+  for (var i = 0; i < options.length; i++) {
+    var o = options[i];
+    var tile = document.createElement('div');
+    tile.className = 'play-coop-tile' + (o.id === selectedId ? ' selected' : '');
+    tile.style.background = o.bg;
+    var defaultIconStyle = 'position:absolute;bottom:0;right:0;height:80%;opacity:0.3;pointer-events:none;object-fit:contain';
+    var iconHtml = o.icon ? '<img src="' + o.icon + '" style="' + (o.iconStyle || defaultIconStyle) + '">' : '';
+    tile.innerHTML = '<span class="play-opt-label">' + o.label + '</span>' + iconHtml;
+    tile.onclick = (function(opt) {
+      return function() { onSelect(opt.id); };
+    })(o);
+    row.appendChild(tile);
+  }
+  container.appendChild(row);
+}
+
+function buildNameplate(player) {
+  var plate = document.createElement('div');
+  plate.className = 'play-nameplate';
+  if (player.plateClass) {
+    plate.classList.add(player.plateClass);
+  } else if (player.plate) {
+    plate.style.background = player.plate;
+    if (player.plate.indexOf('url(') !== -1) plate.classList.add('plate-img');
+  }
+
+  var avatar = document.createElement('img');
+  avatar.className = 'play-np-avatar';
+  avatar.src = player.avatar;
+  avatar.alt = '';
+  plate.appendChild(avatar);
+
+  var info = document.createElement('div');
+  info.className = 'play-np-info';
+
+  var name = document.createElement('div');
+  name.className = 'play-np-name';
+  name.textContent = player.name;
+  info.appendChild(name);
+
+  if (player.ready) {
+    var badges = document.createElement('div');
+    badges.className = 'play-np-badges';
+    var instBadge = document.createElement('span');
+    instBadge.className = 'play-np-badge';
+    instBadge.textContent = (player.instrument || 'guitar').charAt(0).toUpperCase() + (player.instrument || 'guitar').slice(1, 3);
+    badges.appendChild(instBadge);
+    var diffBadge = document.createElement('span');
+    diffBadge.className = 'play-np-badge';
+    diffBadge.textContent = (player.difficulty || 'medium').charAt(0).toUpperCase();
+    badges.appendChild(diffBadge);
+    info.appendChild(badges);
+  } else {
+    var hg = document.createElement('div');
+    hg.className = 'play-np-hourglass';
+    hg.innerHTML = '&#9203;';
+    info.appendChild(hg);
+  }
+
+  plate.appendChild(info);
+  return plate;
+}
+
+var songDurations = {};
+
+function getSongDuration(song) {
+  if (!songDurations[song.title]) {
+    songDurations[song.title] = 180 + Math.floor(Math.random() * 120);
+  }
+  return songDurations[song.title];
+}
+
+function updateDuration() {
+  var total = 0;
+  var count = 0;
+  for (var i = 0; i < setlist.length; i++) {
+    if (setlist[i]) {
+      total += getSongDuration(setlist[i]);
+      count++;
+    }
+  }
+  var mins = Math.floor(total / 60);
+  var secs = total % 60;
+  document.getElementById('play-duration').textContent = mins + ':' + (secs < 10 ? '0' : '') + secs;
+  document.getElementById('play-song-count').textContent = count + ' song' + (count !== 1 ? 's' : '');
+}
+
+function startGame() {
+  sendToUnity('startGame', selectedInstrument);
+}
+
+// ── Save/Load Setlist ──────────────────────────────────
+function openSaveSetlist() {
+  var input = document.getElementById('save-setlist-input');
+  input.value = 'My Playlist #' + setlistCounter;
+  document.getElementById('save-overlay').className = 'save-overlay active';
+}
+
+function closeSaveOverlay(e) {
+  if (e && e.target !== document.getElementById('save-overlay')) return;
+  document.getElementById('save-overlay').className = 'save-overlay';
+}
+
+function confirmSaveSetlist() {
+  var name = document.getElementById('save-setlist-input').value.trim();
+  if (!name) name = 'My Playlist #' + setlistCounter;
+  savedSetlists.push({
+    name: name,
+    songs: setlist.map(function(s) { return s ? {title: s.title, artist: s.artist, file: s.file, duration: s.duration} : null; }).filter(Boolean)
+  });
+  setlistCounter++;
+  document.getElementById('save-overlay').className = 'save-overlay';
+}
+
+function openLoadSetlist() {
+  buildLoadList();
+  document.getElementById('load-overlay').className = 'load-overlay active';
+}
+
+function closeLoadOverlay(e) {
+  if (e && e.target !== document.getElementById('load-overlay')) return;
+  document.getElementById('load-overlay').className = 'load-overlay';
+}
+
+function buildLoadList() {
+  var list = document.getElementById('load-list');
+  list.innerHTML = '';
+  if (savedSetlists.length === 0) {
+    list.innerHTML = '<div class="load-empty">No saved setlists</div>';
+    return;
+  }
+  for (var i = 0; i < savedSetlists.length; i++) {
+    var sl = savedSetlists[i];
+    var item = document.createElement('div');
+    item.className = 'load-item';
+
+    var grid = document.createElement('div');
+    grid.className = 'load-art-grid';
+    buildArtGrid(sl.songs, grid);
+    item.appendChild(grid);
+
+    var info = document.createElement('div');
+    info.className = 'load-item-info';
+    info.innerHTML = '<div class="load-item-name">' + sl.name + '</div>' +
+      '<div class="load-item-count">' + sl.songs.length + ' song' + (sl.songs.length !== 1 ? 's' : '') + '</div>';
+    item.appendChild(info);
+
+    var loadBtn = document.createElement('button');
+    loadBtn.className = 'load-item-btn load-item-btn-load';
+    loadBtn.textContent = 'Load';
+    (function(idx) { loadBtn.onclick = function() { loadSetlist(idx); }; })(i);
+    item.appendChild(loadBtn);
+
+    var delBtn = document.createElement('button');
+    delBtn.className = 'load-item-btn load-item-btn-delete';
+    delBtn.textContent = 'Delete';
+    (function(idx) { delBtn.onclick = function() { deleteSetlist(idx); }; })(i);
+    item.appendChild(delBtn);
+
+    list.appendChild(item);
+  }
+}
+
+function buildArtGrid(songs, container) {
+  for (var i = 0; i < 4; i++) {
+    if (songs[i] && songs[i].file) {
+      var img = document.createElement('img');
+      img.src = songs[i].file;
+      img.alt = '';
+      container.appendChild(img);
+    } else {
+      var empty = document.createElement('div');
+      empty.className = 'art-empty';
+      container.appendChild(empty);
+    }
+  }
+}
+
+function loadSetlist(idx) {
+  var sl = savedSetlists[idx];
+  setlist = [];
+  songInstruments = {};
+  songDiffs = {};
+  songSpaces = {};
+  for (var i = 0; i < sl.songs.length; i++) {
+    var saved = sl.songs[i];
+    var match = null;
+    for (var j = 0; j < allSongs.length; j++) {
+      if (allSongs[j].title === saved.title && allSongs[j].artist === saved.artist) {
+        match = allSongs[j];
+        break;
+      }
+    }
+    if (match) {
+      setlist.push(match);
+      songInstruments[i] = selectedInstrument;
+      songDiffs[i] = selectedDifficulty;
+    }
+  }
+  document.getElementById('load-overlay').className = 'load-overlay';
+  buildSongColumn();
+  buildRightPanel();
+  sendToUnity('setlistUpdated', setlist.length);
+}
+
+function deleteSetlist(idx) {
+  savedSetlists.splice(idx, 1);
+  buildLoadList();
+}
+
+function onScreenKey(char) {
+  var input = document.getElementById('save-setlist-input');
+  if (char === 'backspace') {
+    input.value = input.value.slice(0, -1);
+  } else if (char === 'clear') {
+    input.value = '';
+  } else if (char === ' ') {
+    input.value += ' ';
+  } else {
+    input.value += char;
+  }
+}
+
+function removeFromSetlist(idx) {
+  setlist.splice(idx, 1);
+  // Shift per-song instruments, difficulties and spaces
+  var newInst = {};
+  var newDiff = {};
+  var newSpace = {};
+  for (var i = 0; i < setlist.length + 1; i++) {
+    if (i < idx) {
+      newInst[i] = songInstruments[i];
+      newDiff[i] = songDiffs[i];
+      newSpace[i] = songSpaces[i];
+    } else {
+      newInst[i] = songInstruments[i + 1];
+      newDiff[i] = songDiffs[i + 1];
+      newSpace[i] = songSpaces[i + 1];
+    }
+  }
+  songInstruments = newInst;
+  songDiffs = newDiff;
+  songSpaces = newSpace;
+  buildSongColumn();
+  buildRightPanel();
+  sendToUnity('setlistUpdated', setlist.length);
+}
+
+function swapSetlistSong(idx) {
+  swapTargetIdx = idx;
+  showPlayPicker();
+}
+
+// ── Preview Audio ──────────────────────────────────────
+var previewAudio = null;
+var previewIdx = -1;
+
+function togglePreview(idx) {
+  if (previewIdx === idx && previewAudio && !previewAudio.paused) {
+    previewAudio.pause();
+    previewIdx = -1;
+    buildRightPanel();
+    return;
+  }
+  if (previewAudio) { previewAudio.pause(); }
+  var song = setlist[idx];
+  if (!song || !song.file) return;
+  var audioSrc = song.file.replace(/\.[^.]+$/, '.mp3');
+  previewAudio = new Audio(audioSrc);
+  previewAudio.volume = 0.5;
+  previewAudio.play().catch(function() {});
+  previewIdx = idx;
+  previewAudio.onended = function() { previewIdx = -1; buildRightPanel(); };
+  buildRightPanel();
+}
+
+var lbTypes = [
+  {label: 'Worldwide', icon: '\u{1F30D}'},
+  {label: 'Local',     icon: '\u{1F4CD}'},
+  {label: 'Friends',   icon: '\u{1F465}'}
+];
+var currentLbType = 0;
+
+var pickerSelectedSong = null;
+
+var lbNamePool = [
+  'xShredMaster','BeatDropQueen','NeonRiff','AxelStorm','VoxHunter',
+  'FretBoss','SynthWave99','PickSlinger','CrashKid','LoopMachine',
+  'WahPedal','TrebleMaker','RiffRider','BassCanon','TempoTitan',
+  'ChordCrusher','MelodyMaven','GrooveGuru','HarmonyHero','SonicBlaze',
+  'VibeCheck','EchoStrike','PulseRider','WaveBreaker','ToneShifter',
+  'AmpliFire','DropZone','MixMaster','ClefKing','OctaveOwl'
+];
+var lbPlatePool = [np.galaxy, np.bamboo, np.garden, np.flames, np.drums, np.microphone, np.kpop, np.sakura];
+var lbPlateClasses = ['plate-holo', 'plate-radiate'];
+
+function lbHash(str) {
+  var h = 5381;
+  for (var i = 0; i < str.length; i++) h = ((h << 5) + h + str.charCodeAt(i)) | 0;
+  return Math.abs(h);
+}
+
+function generateLeaderboard(songTitle, instId, diffId, lbType) {
+  var seed = lbHash(songTitle + '|' + instId + '|' + diffId + '|' + lbType);
+  function rng() {
+    seed = (seed * 1103515245 + 12345) & 0x7fffffff;
+    return seed / 0x7fffffff;
+  }
+  var names = lbNamePool.slice();
+  for (var i = names.length - 1; i > 0; i--) {
+    var j = Math.floor(rng() * (i + 1));
+    var tmp = names[i]; names[i] = names[j]; names[j] = tmp;
+  }
+  var entries = [];
+  var baseScore = Math.floor(rng() * 200000) + 800000;
+  for (var i = 0; i < 8; i++) {
+    var score = baseScore - Math.floor(rng() * 12000 + 3000) * i;
+    if (score < 100000) score = 100000 + Math.floor(rng() * 50000);
+    var avatarNum = String(Math.floor(rng() * 40) + 1).padStart(3, '0');
+    var entry = {
+      pos: i + 1,
+      name: names[i],
+      score: score,
+      avatar: 'art/' + avatarNum + '.jpg'
+    };
+    if (rng() > 0.7) {
+      entry.plateClass = lbPlateClasses[Math.floor(rng() * lbPlateClasses.length)];
+    } else {
+      entry.plate = lbPlatePool[Math.floor(rng() * lbPlatePool.length)];
+    }
+    entries.push(entry);
+  }
+  entries.sort(function(a, b) { return b.score - a.score; });
+  // Insert Jooleeno at a random position
+  var jooleenoScore = entries.length > 0 ? entries[Math.floor(rng() * entries.length)].score + Math.floor(rng() * 5000) - 2500 : 500000;
+  var jooleenoIdx = Math.floor(rng() * (entries.length + 1));
+  entries.splice(jooleenoIdx, 0, {
+    pos: 0,
+    name: 'Jooleeno',
+    score: jooleenoScore,
+    avatar: 'julie.jpg'
+  });
+  // Insert A_Peach at a random position
+  var peachScore = entries.length > 0 ? entries[Math.floor(rng() * entries.length)].score + Math.floor(rng() * 5000) - 2500 : 500000;
+  var peachIdx = Math.floor(rng() * (entries.length + 1));
+  entries.splice(peachIdx, 0, {
+    pos: 0,
+    name: 'A_Peach',
+    score: peachScore,
+    avatar: 'peach.png'
+  });
+  entries.sort(function(a, b) { return b.score - a.score; });
+  if (lbType === 'Worldwide') {
+    var startPos = Math.floor(rng() * 500) + 1;
+    for (var i = 0; i < entries.length; i++) entries[i].pos = startPos + i;
+  } else {
+    for (var i = 0; i < entries.length; i++) entries[i].pos = i + 1;
+  }
+  return entries;
+}
+
+function rotateLbType() {
+  currentLbType = (currentLbType + 1) % lbTypes.length;
+  var t = lbTypes[currentLbType];
+  document.getElementById('lb-type-btn').innerHTML = '<span>' + t.icon + '</span> ' + t.label;
+  buildLeaderboard();
+  sendToUnity('leaderboardType', t.label);
+}
+
+var pickerInstIdx = 0;
+var pickerDiffIdx = 1; // default Medium
+
+var instIcons = {guitar:'&#127928;', keys:'&#127929;', drums:'&#129345;', vocals:'&#127908;', bass:'&#127928;'};
+var diffIcons = {easy:'&#127922;', medium:'&#127919;', hard:'&#128293;', expert:'&#128128;'};
+
+function rotatePickerInstrument() {
+  pickerInstIdx = (pickerInstIdx + 1) % instruments.length;
+  var inst = instruments[pickerInstIdx];
+  selectedInstrument = inst.id;
+  document.getElementById('picker-inst-btn').innerHTML = (instIcons[inst.id] || '') + ' ' + inst.label;
+  buildLeaderboard();
+  sendToUnity('selectInstrument', inst.id);
+}
+
+function rotatePickerDifficulty() {
+  pickerDiffIdx = (pickerDiffIdx + 1) % difficulties.length;
+  var diff = difficulties[pickerDiffIdx];
+  selectedDifficulty = diff.id;
+  document.getElementById('picker-diff-btn').innerHTML = (diffIcons[diff.id] || '') + ' ' + diff.label;
+  buildLeaderboard();
+  sendToUnity('selectDifficulty', diff.id);
+}
+
+function shortPos(n) {
+  if (n >= 1000000) return (n / 1000000).toFixed(1).replace('.0', '') + 'M';
+  if (n >= 1000) return (n / 1000).toFixed(1).replace('.0', '') + 'K';
+  return '' + n;
+}
+
+function buildLeaderboard() {
+  var list = document.getElementById('play-lb-list');
+  list.innerHTML = '';
+  var typeName = lbTypes[currentLbType].label;
+  var songTitle = pickerSelectedSong ? pickerSelectedSong.title : 'default';
+  var instId = instruments[pickerInstIdx].id;
+  var diffId = difficulties[pickerDiffIdx].id;
+  var entries = generateLeaderboard(songTitle, instId, diffId, typeName);
+  var starHtml = '<div class="play-lb-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>';
+  for (var i = 0; i < 8 && i < entries.length; i++) {
+    var lb = entries[i];
+    var row = document.createElement('div');
+    row.className = 'play-lb-row';
+    var tile = document.createElement('div');
+    tile.className = 'play-lb-tile';
+    row.innerHTML = '<span class="play-lb-pos">' + shortPos(lb.pos) + '</span>';
+    tile.innerHTML =
+      '<img class="play-lb-avatar" src="' + lb.avatar + '" alt="">' +
+      '<div class="play-lb-info">' +
+        starHtml +
+        '<div class="play-lb-name">' + lb.name + '</div>' +
+        '<div class="play-lb-score">' + lb.score.toLocaleString() + '</div>' +
+      '</div>';
+    row.appendChild(tile);
+    list.appendChild(row);
+  }
+}
+
+function selectPickerSong(song, tileEl) {
+  pickerSelectedSong = song;
+  var tiles = document.querySelectorAll('.song-tile');
+  for (var i = 0; i < tiles.length; i++) tiles[i].classList.remove('active');
+  if (tileEl) tileEl.classList.add('active');
+  buildLeaderboard();
+}
+
+function addSongToSetlist(song) {
+  if (swapTargetIdx >= 0) {
+    setlist[swapTargetIdx] = song;
+    swapTargetIdx = -1;
+  } else {
+    setlist.push(song);
+  }
+  buildSongColumn();
+  buildRightPanel();
+  buildPickerSetlist();
+  sendToUnity('selectSong', song.title);
+}
+
+var PICKER_SETLIST_SLOTS = 6;
+var pickerSetlistPage = 0;
+
+function buildPickerSetlist() {
+  var container = document.getElementById('picker-setlist-tiles');
+  var nav = document.getElementById('picker-setlist-nav');
+  if (!container) return;
+  container.innerHTML = '';
+  if (nav) nav.innerHTML = '';
+  var total = setlist.length;
+  var maxPage = Math.max(0, Math.ceil(total / PICKER_SETLIST_SLOTS) - 1);
+  if (pickerSetlistPage > maxPage) pickerSetlistPage = maxPage;
+  var startIdx = pickerSetlistPage * PICKER_SETLIST_SLOTS;
+  var needsPaging = total > PICKER_SETLIST_SLOTS;
+
+  for (var i = 0; i < PICKER_SETLIST_SLOTS; i++) {
+    var songIdx = startIdx + i;
+    var tile = document.createElement('div');
+    if (songIdx < total) {
+      tile.className = 'picker-setlist-tile';
+      tile.innerHTML =
+        '<img src="' + setlist[songIdx].file + '" alt="">' +
+        '<div class="picker-setlist-remove">&#10005;</div>';
+      (function(idx) {
+        tile.querySelector('.picker-setlist-remove').onclick = function(e) {
+          e.stopPropagation();
+          removeFromSetlist(idx);
+          buildPickerSetlist();
+        };
+      })(songIdx);
+    } else {
+      tile.className = 'picker-setlist-tile picker-setlist-empty';
+    }
+    container.appendChild(tile);
+  }
+
+  // Pagination arrows below tiles
+  if (needsPaging && nav) {
+    var left = document.createElement('button');
+    left.className = 'picker-setlist-arrow';
+    left.innerHTML = '&#9664;';
+    left.disabled = pickerSetlistPage === 0;
+    left.onclick = function() { pickerSetlistPage--; buildPickerSetlist(); };
+    nav.appendChild(left);
+
+    var right = document.createElement('button');
+    right.className = 'picker-setlist-arrow';
+    right.innerHTML = '&#9654;';
+    right.disabled = pickerSetlistPage >= maxPage;
+    right.onclick = function() { pickerSetlistPage++; buildPickerSetlist(); };
+    nav.appendChild(right);
+  }
+}
+
+function constrainGridNav() {
+  var tile = document.querySelector('.song-tile');
+  var navEl = document.getElementById('grid-nav-right');
+  if (tile && navEl) {
+    var tileH = tile.offsetHeight;
+    var page = document.querySelector('.grid-page');
+    var gap = page ? parseFloat(getComputedStyle(page).gap) || 10 : 10;
+    var contentH = Math.ceil(4 * tileH + 3 * gap);
+    navEl.style.maxHeight = contentH + 'px';
+  }
+}
+
+function showPlayPicker() {
+  document.getElementById('play-main-layout').style.display = 'none';
+  document.getElementById('play-picker').className = 'play-picker active';
+  // Reset filters
+  document.getElementById('filter-genre').value = '';
+  document.getElementById('filter-decade').value = '';
+  document.getElementById('filter-duration').value = '';
+  document.getElementById('filter-sort').value = 'rank';
+  pickerSetlistPage = 0;
+  // Rebuild grid with all songs
+  buildGrid(allSongs);
+  // Measure page height now that picker is visible
+  var vp = document.querySelector('.grid-viewport');
+  if (vp) {
+    pageHeight = vp.clientHeight;
+    var gridPages = document.querySelectorAll('.grid-page');
+    for (var i = 0; i < gridPages.length; i++) {
+      gridPages[i].style.height = pageHeight + 'px';
+    }
+  }
+  constrainGridNav();
+  currentPage = 0;
+  goToPage(0);
+  if (totalPages > 0) {
+    buildNavButtons(document.getElementById('grid-nav-right'), 'right');
+    updateNavState();
+  }
+  var gridNavs = document.querySelectorAll('.grid-nav');
+  for (var i = 0; i < gridNavs.length; i++) gridNavs[i].style.display = 'flex';
+  // Auto-select first song tile
+  pickerSelectedSong = null;
+  var firstTile = document.querySelector('.song-tile');
+  if (firstTile) firstTile.click();
+  buildPickerSetlist();
+}
+
+function hidePlayPicker() {
+  document.getElementById('play-main-layout').style.display = 'flex';
+  document.getElementById('play-picker').className = 'play-picker';
+  swapTargetIdx = -1;
+  pickerSelectedSong = null;
+  var gridNavs = document.querySelectorAll('.grid-nav');
+  for (var i = 0; i < gridNavs.length; i++) gridNavs[i].style.display = 'none';
+}
+
+function resetPlayPicker() {
+  var picker = document.getElementById('play-picker');
+  if (picker) picker.className = 'play-picker';
+  var layout = document.getElementById('play-main-layout');
+  if (layout) layout.style.display = 'flex';
+  swapTargetIdx = -1;
+  pickerSelectedSong = null;
+  var gridNavs = document.querySelectorAll('.grid-nav');
+  for (var i = 0; i < gridNavs.length; i++) gridNavs[i].style.display = 'none';
+}
+
+function initLobbyPlates() {
+  lobbyPlayers[0].plate = np.flames;
+  lobbyPlayers[2].plate = np.galaxy;
+  lobbyPlayers[3].plate = np.kpop;
+  lobbyPlayers[4].plate = np.bamboo;
+  lobbyPlayers[6].plate = np.microphone;
+  lobbyPlayers[7].plate = np.garden;
+  lobbyPlayers[8].plate = np.drums;
+}
+
+var songGenres = ['Pop','Hip-Hop','Rock','R&B','Country','Electronic','Latin','Indie'];
+var songDecades = ['2020s','2010s','2000s','90s','80s','Classic'];
+
+function enrichSongs(songs) {
+  var seed = 42;
+  function rng() {
+    seed = (seed * 1103515245 + 12345) & 0x7fffffff;
+    return seed / 0x7fffffff;
+  }
+  for (var i = 0; i < songs.length; i++) {
+    var s = songs[i];
+    s.genre = songGenres[Math.floor(rng() * songGenres.length)];
+    s.decade = songDecades[Math.floor(rng() * songDecades.length)];
+    s.duration = 120 + Math.floor(rng() * 180);
+    s.dateAdded = Date.now() - Math.floor(rng() * 365 * 24 * 3600 * 1000);
+  }
+}
+
+function applyPickerFilters() {
+  var genre = document.getElementById('filter-genre').value;
+  var decade = document.getElementById('filter-decade').value;
+  var dur = document.getElementById('filter-duration').value;
+  var sort = document.getElementById('filter-sort').value;
+  var filtered = allSongs.filter(function(s) {
+    if (genre && s.genre !== genre) return false;
+    if (decade && s.decade !== decade) return false;
+    if (dur === 'short' && s.duration >= 180) return false;
+    if (dur === 'medium' && (s.duration < 180 || s.duration > 240)) return false;
+    if (dur === 'long' && s.duration <= 240) return false;
+    return true;
+  });
+  if (sort === 'title') {
+    filtered.sort(function(a, b) { return a.title.localeCompare(b.title); });
+  } else if (sort === 'artist') {
+    filtered.sort(function(a, b) { return a.artist.localeCompare(b.artist); });
+  } else if (sort === 'duration') {
+    filtered.sort(function(a, b) { return a.duration - b.duration; });
+  } else if (sort === 'recent') {
+    filtered.sort(function(a, b) { return b.dateAdded - a.dateAdded; });
+  } else {
+    filtered.sort(function(a, b) { return a.rank - b.rank; });
+  }
+  buildGrid(filtered);
+  // Re-measure page heights and reset
+  var vp = document.querySelector('.grid-viewport');
+  if (vp) {
+    pageHeight = vp.clientHeight;
+    var gridPages = document.querySelectorAll('.grid-page');
+    for (var i = 0; i < gridPages.length; i++) gridPages[i].style.height = pageHeight + 'px';
+  }
+  constrainGridNav();
+  currentPage = 0;
+  goToPage(0);
+  updateNavState();
+  // Auto-select first tile
+  pickerSelectedSong = null;
+  var firstTile = document.querySelector('.song-tile');
+  if (firstTile) firstTile.click();
+}
+
+function buildPlayPanel(songs) {
+  allSongs = songs;
+  enrichSongs(allSongs);
+  setlist = songs.slice(0, 6);
+  generateDefaultSetlists();
+  initLobbyPlates();
+  buildModeTabs();
+  buildSongColumn();
+  buildRightPanel();
+  buildLeaderboard();
+}
+
+function generateDefaultSetlists() {
+  var names = ['Rock Classics', 'Chill Vibes', 'Party Mix', 'Throwbacks', 'Hot Hits'];
+  var shuffled = allSongs.slice();
+  for (var n = 0; n < 5; n++) {
+    // Shuffle
+    for (var i = shuffled.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = shuffled[i]; shuffled[i] = shuffled[j]; shuffled[j] = tmp;
+    }
+    var count = 3 + Math.floor(Math.random() * 4); // 3-6 songs
+    var picked = shuffled.slice(0, count).map(function(s) {
+      return {title: s.title, artist: s.artist, file: s.file, duration: s.duration};
+    });
+    savedSetlists.push({name: names[n], songs: picked});
+  }
+  setlistCounter = 6;
+}
+
+// ── Vault Grid ──────────────────────────────────────────
+var vaultItems = [
+  {name:'Neon Arena',      cat:'Spaces',      file:'vault/001.jpg'},
+  {name:'Desert Stage',    cat:'Spaces',      file:'vault/002.jpg'},
+  {name:'Club Basement',   cat:'Spaces',      file:'vault/003.jpg'},
+  {name:'Beach Party',     cat:'Spaces',      file:'vault/004.jpg'},
+  {name:'Crystal Platform',cat:'Stages',      file:'vault/005.jpg'},
+  {name:'Fire Stage',      cat:'Stages',      file:'vault/006.jpg'},
+  {name:'Ice Rink',        cat:'Stages',      file:'vault/007.jpg'},
+  {name:'Cloud Stage',     cat:'Stages',      file:'vault/008.jpg'},
+  {name:'Avatar',          cat:'Avatar',      file:'vault/009.jpg'},
+  {name:'Electric Guitar', cat:'Instruments', file:'vault/010.jpg'},
+  {name:'Synthesizer',     cat:'Instruments', file:'vault/011.jpg'},
+  {name:'Drum Kit',        cat:'Instruments', file:'vault/012.jpg'},
+  {name:'Gold Mic',        cat:'Instruments', file:'vault/013.jpg'},
+  {name:'Ruby',            cat:'Gem',         file:'vault/014.jpg'},
+  {name:'Sapphire',        cat:'Gem',         file:'vault/015.jpg'},
+  {name:'Emerald',         cat:'Gem',         file:'vault/016.jpg'},
+  {name:'Diamond',         cat:'Gem',         file:'vault/017.jpg'},
+  {name:'Neon Highway',    cat:'Highway',     file:'vault/018.jpg'},
+  {name:'Rainbow Road',    cat:'Highway',     file:'vault/019.jpg'},
+  {name:'Dark Highway',    cat:'Highway',     file:'vault/020.jpg'},
+  {name:'Lava Highway',    cat:'Highway',     file:'vault/021.jpg'},
+  {name:'Sunset',          cat:'Skybox',      file:'vault/022.jpg'},
+  {name:'Galaxy',          cat:'Skybox',      file:'vault/023.jpg'},
+  {name:'Northern Lights', cat:'Skybox',      file:'vault/024.jpg'},
+  {name:'Storm',           cat:'Skybox',      file:'vault/025.jpg'}
+];
+
+function buildVaultGrid() {
+  var grid = document.getElementById('vault-grid');
+  grid.innerHTML = '';
+  for (var i = 0; i < vaultItems.length; i++) {
+    var v = vaultItems[i];
+    var tile = document.createElement('div');
+    tile.className = 'vault-tile';
+    tile.onclick = (function(item) {
+      return function() { sendToUnity('selectVaultItem', {name: item.name, cat: item.cat}); };
+    })(v);
+    tile.innerHTML =
+      '<img src="' + v.file + '" alt="" loading="lazy">' +
+      '<div class="tile-info">' +
+        '<div class="tile-cat">' + v.cat + '</div>' +
+        '<div class="tile-title">' + v.name + '</div>' +
+      '</div>';
+    grid.appendChild(tile);
+  }
+}
+
+// ── Themes ──────────────────────────────────────────────
+var themes = [
+  { id: 'neon-pink',    name: 'Neon Pink',    bg: '#0d0d1a', panel: '#1a1a2e', tile: '#222238', tileHover: '#2c2c44', accent: '#db2777' },
+  { id: 'cyber-cyan',   name: 'Cyber Cyan',   bg: '#051a1f', panel: '#0a2a32', tile: '#10343e', tileHover: '#18404c', accent: '#0891b2' },
+  { id: 'sunset-blaze', name: 'Sunset Blaze', bg: '#1a0d08', panel: '#2e1a10', tile: '#3a2218', tileHover: '#482c20', accent: '#ea580c' },
+  { id: 'light-mode',   name: 'Light Mode',   bg: '#e8e8f0', panel: '#f8f8fc', tile: '#eeeef4', tileHover: '#e2e2ec', accent: '#c0206a' },
+  { id: 'rainforest',   name: 'Rainforest',   bg: '#e8e8f0', panel: '#f8f8fc', tile: '#eeeef4', tileHover: '#e2e2ec', accent: '#16a368', bgImage: 'https://images.unsplash.com/photo-1448375240586-882707db888b?w=1920&q=80' },
+  { id: 'dracula',      name: 'Dracula',      bg: '#1e1f29', panel: '#282a36', tile: '#2e3040', tileHover: '#363848', accent: '#ff79c6', locked: true, price: 1000 },
+  { id: 'nord',         name: 'Nord',         bg: '#2e3440', panel: '#3b4252', tile: '#434c5e', tileHover: '#4c566a', accent: '#88c0d0', locked: true, price: 1000 },
+  { id: 'monokai',      name: 'Monokai',      bg: '#1e1f1c', panel: '#272822', tile: '#30302a', tileHover: '#3a3a32', accent: '#f92672', locked: true, price: 1000 },
+  { id: 'gruvbox',      name: 'Gruvbox',      bg: '#1d2021', panel: '#282828', tile: '#323232', tileHover: '#3c3c3c', accent: '#fb4934', locked: true, price: 1000 },
+  { id: 'solarized',    name: 'Solarized',    bg: '#002b36', panel: '#073642', tile: '#0e404e', tileHover: '#164a58', accent: '#2aa198', locked: true, price: 1000 },
+  { id: 'tokyo-night',  name: 'Tokyo Night',  bg: '#16161e', panel: '#1a1b26', tile: '#222330', tileHover: '#2a2b3a', accent: '#f7768e', locked: true, price: 1000 },
+  { id: 'catppuccin',   name: 'Catppuccin',   bg: '#1e1e2e', panel: '#24243e', tile: '#2e2e4a', tileHover: '#383856', accent: '#cba6f7', locked: true, price: 1000 },
+  { id: 'rose-pine',    name: 'Rose Pine',    bg: '#191724', panel: '#1f1d2e', tile: '#28263a', tileHover: '#322f46', accent: '#eb6f92', locked: true, price: 1000 }
+];
+
+var currentTheme = 'light-mode';
+var userCoins = 5000;
+var unlockedThemes = ['neon-pink', 'cyber-cyan', 'sunset-blaze', 'light-mode', 'rainforest'];
+var pendingPurchaseId = null;
+
+function isThemeUnlocked(id) {
+  return unlockedThemes.indexOf(id) >= 0;
+}
+
+function hexLum(hex) {
+  hex = hex.replace('#', '');
+  var r = parseInt(hex.substring(0, 2), 16);
+  var g = parseInt(hex.substring(2, 4), 16);
+  var b = parseInt(hex.substring(4, 6), 16);
+  return (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+}
+
+function themeSwatches(t) {
+  return [t.accent, t.tileHover, t.tile, t.panel, t.bg];
+}
+
+function applyTheme(themeId) {
+  var theme = null;
+  for (var i = 0; i < themes.length; i++) {
+    if (themes[i].id === themeId) { theme = themes[i]; break; }
+  }
+  if (!theme) return;
+  if (theme.locked && !isThemeUnlocked(themeId)) {
+    openPurchasePopup(themeId);
+    return;
+  }
+  currentTheme = themeId;
+  var root = document.documentElement;
+  var light = hexLum(theme.bg) > 0.4;
+
+  root.style.setProperty('--bg-body', theme.bg);
+  root.style.setProperty('--bg-panel', theme.panel);
+  root.style.setProperty('--bg-surface', theme.tile);
+  root.style.setProperty('--bg-surface-hover', theme.tileHover);
+  root.style.setProperty('--pink', theme.accent);
+
+  if (theme.bgImage) {
+    root.style.setProperty('--bg-image', 'url(' + theme.bgImage + ')');
+    root.style.setProperty('--bg-image-opacity', '0.5');
+  } else {
+    root.style.setProperty('--bg-image', 'none');
+    root.style.setProperty('--bg-image-opacity', '0');
+  }
+
+  root.style.setProperty('--cyan', light ? '#067a96' : '#0891b2');
+  root.style.setProperty('--gold', light ? '#d48c10' : '#f5a623');
+  root.style.setProperty('--orange', light ? '#c94a08' : '#ea580c');
+  root.style.setProperty('--mint', light ? '#16a368' : '#34d399');
+  root.style.setProperty('--purple', light ? '#6535a0' : '#7b44bc');
+
+  root.style.setProperty('--text-primary', light ? '#1a1a2e' : '#f8f8fc');
+  root.style.setProperty('--text-secondary', light ? 'rgba(26,26,46,0.5)' : 'rgba(248,248,252,0.5)');
+  root.style.setProperty('--text-muted', light ? 'rgba(0,0,0,0.45)' : 'rgba(255,255,255,0.55)');
+  root.style.setProperty('--border-strong', light ? 'rgba(0,0,0,0.12)' : 'rgba(255,255,255,0.1)');
+  root.style.setProperty('--border-subtle', light ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.06)');
+  root.style.setProperty('--overlay-light', light ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.08)');
+  root.style.setProperty('--overlay-swap', light ? 'rgba(0,0,0,0.12)' : 'rgba(255,255,255,0.2)');
+  root.style.setProperty('--scrollbar-color', light ? 'rgba(0,0,0,0.15)' : 'rgba(255,255,255,0.15)');
+
+  buildThemeGrid();
+  sendToUnity('themeChanged', themeId);
+}
+
+function openPurchasePopup(themeId) {
+  var theme = null;
+  for (var i = 0; i < themes.length; i++) {
+    if (themes[i].id === themeId) { theme = themes[i]; break; }
+  }
+  if (!theme) return;
+  pendingPurchaseId = themeId;
+  document.getElementById('purchase-preview').style.background = buildSlantedGradient(themeSwatches(theme));
+  document.getElementById('purchase-title').textContent = theme.name;
+  document.getElementById('purchase-cost').textContent = theme.price.toLocaleString() + ' Coins';
+  var balEl = document.getElementById('purchase-balance');
+  balEl.textContent = 'Your balance: ' + userCoins.toLocaleString() + ' Coins';
+  var canAfford = userCoins >= theme.price;
+  balEl.className = 'purchase-balance' + (canAfford ? '' : ' insufficient');
+  var btn = document.getElementById('purchase-confirm-btn');
+  btn.disabled = !canAfford;
+  btn.textContent = canAfford ? 'Unlock' : 'Not enough coins';
+  document.getElementById('purchase-overlay').className = 'purchase-overlay active';
+}
+
+function closePurchasePopup(e) {
+  if (e && e.target !== document.getElementById('purchase-overlay')) return;
+  document.getElementById('purchase-overlay').className = 'purchase-overlay';
+  pendingPurchaseId = null;
+}
+
+function confirmPurchase() {
+  if (!pendingPurchaseId) return;
+  var theme = null;
+  for (var i = 0; i < themes.length; i++) {
+    if (themes[i].id === pendingPurchaseId) { theme = themes[i]; break; }
+  }
+  if (!theme || userCoins < theme.price) return;
+  userCoins -= theme.price;
+  unlockedThemes.push(pendingPurchaseId);
+  closePurchasePopup();
+  applyTheme(pendingPurchaseId);
+  buildThemeGrid();
+  sendToUnity('themePurchased', pendingPurchaseId);
+}
+
+function buildSlantedGradient(swatches) {
+  var bandWidth = 100 / swatches.length;
+  var stops = [];
+  for (var i = 0; i < swatches.length; i++) {
+    stops.push(swatches[i] + ' ' + (i * bandWidth) + '%');
+    stops.push(swatches[i] + ' ' + ((i + 1) * bandWidth) + '%');
+  }
+  return 'linear-gradient(135deg, ' + stops.join(', ') + ')';
+}
+
+function buildThemeGrid() {
+  var grid = document.getElementById('theme-grid');
+  grid.innerHTML = '';
+  for (var i = 0; i < themes.length; i++) {
+    var t = themes[i];
+    var isLocked = t.locked && !isThemeUnlocked(t.id);
+    var card = document.createElement('div');
+    card.className = 'theme-card' + (t.id === currentTheme ? ' selected' : '') + (isLocked ? ' locked' : '');
+    card.setAttribute('data-theme', t.id);
+    card.onclick = (function(id) { return function() { applyTheme(id); }; })(t.id);
+    card.style.background = buildSlantedGradient(themeSwatches(t));
+    var html = '<div class="tile-info"><div class="tile-title">' + t.name + '</div></div>';
+    if (isLocked) {
+      html += '<div class="theme-lock-banner">&#128274; Unlock for ' + t.price.toLocaleString() + ' Coins</div>';
+    }
+    card.innerHTML = html;
+    grid.appendChild(card);
+  }
+  // Also set the Themes settings tile background
+  var themesTile = document.querySelector('.settings-tile');
+  if (themesTile) {
+    var active = null;
+    for (var j = 0; j < themes.length; j++) {
+      if (themes[j].id === currentTheme) { active = themes[j]; break; }
+    }
+    if (active) themesTile.style.background = buildSlantedGradient(themeSwatches(active));
+  }
+}
+
+var activeLegalEl = null;
+
+function hideSettingsSub() {
+  document.getElementById('settings-main').style.display = 'flex';
+  document.getElementById('theme-section').className = 'theme-section';
+  document.getElementById('tos-section').className = 'legal-section';
+  document.getElementById('pp-section').className = 'legal-section';
+  activeLegalEl = null;
+  var gridNavs = document.querySelectorAll('.grid-nav');
+  for (var i = 0; i < gridNavs.length; i++) gridNavs[i].style.display = 'none';
+}
+
+function showThemes() {
+  document.getElementById('settings-main').style.display = 'none';
+  document.getElementById('theme-section').className = 'theme-section active';
+}
+
+function showTos() {
+  document.getElementById('settings-main').style.display = 'none';
+  document.getElementById('tos-section').className = 'legal-section active';
+  activeLegalEl = document.getElementById('tos-content');
+  activeLegalEl.scrollTop = 0;
+  buildScrollNav();
+}
+
+function showPrivacy() {
+  document.getElementById('settings-main').style.display = 'none';
+  document.getElementById('pp-section').className = 'legal-section active';
+  activeLegalEl = document.getElementById('pp-content');
+  activeLegalEl.scrollTop = 0;
+  buildScrollNav();
+}
+
+function buildScrollNav() {
+  var nav = document.getElementById('grid-nav-right');
+  nav.innerHTML = '';
+  var up = document.createElement('button');
+  up.className = 'grid-nav-btn';
+  up.id = 'scroll-up';
+  up.innerHTML = '&#9650;';
+  up.onclick = function() { scrollLegal(-1); };
+  nav.appendChild(up);
+
+  var down = document.createElement('button');
+  down.className = 'grid-nav-btn';
+  down.id = 'scroll-down';
+  down.innerHTML = '&#9660;';
+  down.onclick = function() { scrollLegal(1); };
+  nav.appendChild(down);
+
+  nav.style.display = 'flex';
+  updateScrollNavState();
+  if (activeLegalEl) {
+    activeLegalEl.onscroll = updateScrollNavState;
+  }
+}
+
+function scrollLegal(dir) {
+  if (!activeLegalEl) return;
+  var amount = activeLegalEl.clientHeight * 0.8;
+  activeLegalEl.scrollBy({top: dir * amount, behavior: 'smooth'});
+}
+
+function updateScrollNavState() {
+  if (!activeLegalEl) return;
+  var up = document.getElementById('scroll-up');
+  var down = document.getElementById('scroll-down');
+  if (up) up.disabled = (activeLegalEl.scrollTop <= 0);
+  if (down) down.disabled = (activeLegalEl.scrollTop + activeLegalEl.clientHeight >= activeLegalEl.scrollHeight - 5);
+}
+
+// ── Init ───────────────────────────────────────────────
+// ── Season Grid ──────────────────────────────────────────
+var seasonData = [
+  {label: 'Solo', rewards: [
+    {icon: '\uD83C\uDFB8', name: 'Flame Guitar',   xp: 500,  xpEarned: 500,  reward: 'cosmetic', unlocked: true},
+    {icon: '\uD83E\uDE99', name: '200 Coins',       xp: 1200, xpEarned: 1200, reward: 'coins',    unlocked: true},
+    {icon: '\uD83C\uDFB5', name: 'Neon Strings',    xp: 2000, xpEarned: 1650, reward: 'cosmetic', unlocked: false},
+    {icon: '\uD83D\uDC8E', name: 'Crystal Pick',    xp: 3500, xpEarned: 0,    reward: 'cosmetic', unlocked: false},
+    {icon: '\uD83E\uDE99', name: '500 Coins',       xp: 5000, xpEarned: 0,    reward: 'coins',    unlocked: false}
+  ]},
+  {label: 'Band', rewards: [
+    {icon: '\uD83E\uDE99', name: '150 Coins',       xp: 800,  xpEarned: 800,  reward: 'coins',    unlocked: true},
+    {icon: '\uD83C\uDFB6', name: 'Gold Stage',      xp: 1500, xpEarned: 1500, reward: 'cosmetic', unlocked: true},
+    {icon: '\uD83C\uDFC6', name: 'Band Trophy',     xp: 2500, xpEarned: 2500, reward: 'cosmetic', unlocked: true},
+    {icon: '\uD83E\uDE99', name: '400 Coins',       xp: 4000, xpEarned: 2800, reward: 'coins',    unlocked: false},
+    {icon: '\uD83C\uDF1F', name: 'Star Highway',    xp: 6000, xpEarned: 0,    reward: 'cosmetic', unlocked: false}
+  ]},
+  {label: 'Guitar', rewards: [
+    {icon: '\uD83D\uDD25', name: 'Fire Fretboard',  xp: 600,  xpEarned: 600,  reward: 'cosmetic', unlocked: true},
+    {icon: '\uD83E\uDE99', name: '250 Coins',       xp: 1400, xpEarned: 1400, reward: 'coins',    unlocked: true},
+    {icon: '\u26A1',       name: 'Lightning Riff',  xp: 2200, xpEarned: 1900, reward: 'cosmetic', unlocked: false},
+    {icon: '\uD83C\uDFB8', name: 'Holo Guitar',     xp: 3800, xpEarned: 0,    reward: 'cosmetic', unlocked: false},
+    {icon: '\uD83E\uDE99', name: '600 Coins',       xp: 5500, xpEarned: 0,    reward: 'coins',    unlocked: false}
+  ]},
+  {label: 'Drums', rewards: [
+    {icon: '\uD83E\uDD41', name: 'Chrome Sticks',   xp: 700,  xpEarned: 700,  reward: 'cosmetic', unlocked: true},
+    {icon: '\uD83E\uDE99', name: '200 Coins',       xp: 1300, xpEarned: 1300, reward: 'coins',    unlocked: true},
+    {icon: '\uD83E\uDE99', name: '350 Coins',       xp: 2400, xpEarned: 0,    reward: 'coins',    unlocked: false},
+    {icon: '\uD83D\uDCA5', name: 'Shockwave Kit',   xp: 3600, xpEarned: 0,    reward: 'cosmetic', unlocked: false},
+    {icon: '\uD83C\uDF1F', name: 'Platinum Drums',  xp: 5200, xpEarned: 0,    reward: 'cosmetic', unlocked: false}
+  ]},
+  {label: 'Keys', rewards: [
+    {icon: '\uD83C\uDFB9', name: 'Synth Wave',      xp: 500,  xpEarned: 500,  reward: 'cosmetic', unlocked: true},
+    {icon: '\uD83E\uDE99', name: '300 Coins',       xp: 1100, xpEarned: 900,  reward: 'coins',    unlocked: false},
+    {icon: '\uD83C\uDF0C', name: 'Galaxy Keys',     xp: 2100, xpEarned: 0,    reward: 'cosmetic', unlocked: false},
+    {icon: '\uD83E\uDE99', name: '450 Coins',       xp: 3400, xpEarned: 0,    reward: 'coins',    unlocked: false},
+    {icon: '\uD83C\uDFB9', name: 'Crystal Piano',   xp: 5000, xpEarned: 0,    reward: 'cosmetic', unlocked: false}
+  ]},
+  {label: 'Vocals', rewards: [
+    {icon: '\uD83C\uDFA4', name: 'Retro Mic',       xp: 600,  xpEarned: 600,  reward: 'cosmetic', unlocked: true},
+    {icon: '\uD83E\uDE99', name: '200 Coins',       xp: 1200, xpEarned: 1200, reward: 'coins',    unlocked: true},
+    {icon: '\uD83C\uDFA4', name: 'Neon Mic',        xp: 2300, xpEarned: 1800, reward: 'cosmetic', unlocked: false},
+    {icon: '\uD83D\uDC8E', name: 'Diamond Mic',     xp: 3700, xpEarned: 0,    reward: 'cosmetic', unlocked: false},
+    {icon: '\uD83E\uDE99', name: '700 Coins',       xp: 5500, xpEarned: 0,    reward: 'coins',    unlocked: false}
+  ]}
+];
+
+function buildSeasonGrid() {
+  var container = document.getElementById('season-grid');
+  container.innerHTML = '';
+  for (var c = 0; c < seasonData.length; c++) {
+    var cat = seasonData[c];
+    var section = document.createElement('div');
+    section.className = 'season-category';
+
+    var label = document.createElement('div');
+    label.className = 'season-label';
+    label.textContent = cat.label;
+    section.appendChild(label);
+
+    var row = document.createElement('div');
+    row.className = 'season-row';
+    for (var i = 0; i < cat.rewards.length; i++) {
+      var r = cat.rewards[i];
+      var tile = document.createElement('div');
+      tile.className = 'season-tile' + (r.unlocked ? ' unlocked' : ' locked');
+
+      var progress = r.xpEarned > 0 && !r.unlocked ? Math.min(r.xpEarned / r.xp * 100, 100) : (r.unlocked ? 100 : 0);
+
+      tile.innerHTML =
+        '<div class="season-reward">' + r.icon + '</div>' +
+        '<div class="season-reward-name">' + r.name + '</div>' +
+        '<div class="season-xp">' + r.xp.toLocaleString() + ' XP</div>' +
+        '<div class="season-xp-bar"><div class="season-xp-fill" style="width:' + progress + '%"></div></div>';
+      row.appendChild(tile);
+    }
+    section.appendChild(row);
+    container.appendChild(section);
+  }
+}
+
+function init() {
+  // Hide grid nav on start (home is blank, picker shows it when needed)
+  var gridNavs = document.querySelectorAll('.grid-nav');
+  for (var i = 0; i < gridNavs.length; i++) gridNavs[i].style.display = 'none';
+
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', 'songs.json', true);
+  xhr.onload = function() {
+    if (xhr.status === 200) {
+      var songs = JSON.parse(xhr.responseText);
+      buildGrid(songs);
+      buildPlayPanel(songs);
+    }
+  };
+  xhr.send();
+  buildSpacesGrid();
+  buildVaultGrid();
+  buildSeasonGrid();
+  applyTheme(currentTheme);
+  initVuplexListener();
+}
+init();
+</script>
+
+<div class="purchase-overlay" id="purchase-overlay" onclick="closePurchasePopup(event)">
+  <div class="purchase-popup" onclick="event.stopPropagation()">
+    <div class="purchase-preview" id="purchase-preview"></div>
+    <div class="purchase-title" id="purchase-title"></div>
+    <div class="purchase-cost" id="purchase-cost"></div>
+    <div class="purchase-balance" id="purchase-balance"></div>
+    <div class="purchase-buttons">
+      <button class="purchase-btn purchase-btn-cancel" onclick="closePurchasePopup()">Cancel</button>
+      <button class="purchase-btn purchase-btn-confirm" id="purchase-confirm-btn" onclick="confirmPurchase()">Unlock</button>
+    </div>
+  </div>
+</div>
+
+<div class="solo-popup-overlay" id="solo-popup-overlay" onclick="closeSoloPopup()">
+  <div class="solo-popup" id="solo-popup" onclick="event.stopPropagation()"></div>
+</div>
+
+<div class="loadout-overlay" id="loadout-overlay" onclick="closeLoadoutPopup(event)">
+  <div class="loadout-popup" id="loadout-popup" onclick="event.stopPropagation()"></div>
+</div>
+
+<div class="save-overlay" id="save-overlay" onclick="closeSaveOverlay(event)">
+  <div class="save-popup" onclick="event.stopPropagation()">
+    <h2>Save Setlist</h2>
+    <input class="save-input" id="save-setlist-input" type="text" readonly>
+    <div class="keyboard">
+      <div class="keyboard-row">
+        <button class="key" onclick="onScreenKey('Q')">Q</button>
+        <button class="key" onclick="onScreenKey('W')">W</button>
+        <button class="key" onclick="onScreenKey('E')">E</button>
+        <button class="key" onclick="onScreenKey('R')">R</button>
+        <button class="key" onclick="onScreenKey('T')">T</button>
+        <button class="key" onclick="onScreenKey('Y')">Y</button>
+        <button class="key" onclick="onScreenKey('U')">U</button>
+        <button class="key" onclick="onScreenKey('I')">I</button>
+        <button class="key" onclick="onScreenKey('O')">O</button>
+        <button class="key" onclick="onScreenKey('P')">P</button>
+      </div>
+      <div class="keyboard-row">
+        <button class="key" onclick="onScreenKey('A')">A</button>
+        <button class="key" onclick="onScreenKey('S')">S</button>
+        <button class="key" onclick="onScreenKey('D')">D</button>
+        <button class="key" onclick="onScreenKey('F')">F</button>
+        <button class="key" onclick="onScreenKey('G')">G</button>
+        <button class="key" onclick="onScreenKey('H')">H</button>
+        <button class="key" onclick="onScreenKey('J')">J</button>
+        <button class="key" onclick="onScreenKey('K')">K</button>
+        <button class="key" onclick="onScreenKey('L')">L</button>
+      </div>
+      <div class="keyboard-row">
+        <button class="key" onclick="onScreenKey('Z')">Z</button>
+        <button class="key" onclick="onScreenKey('X')">X</button>
+        <button class="key" onclick="onScreenKey('V')">V</button>
+        <button class="key" onclick="onScreenKey('C')">C</button>
+        <button class="key" onclick="onScreenKey('B')">B</button>
+        <button class="key" onclick="onScreenKey('N')">N</button>
+        <button class="key" onclick="onScreenKey('M')">M</button>
+        <button class="key key-wide" onclick="onScreenKey('backspace')">&#9003;</button>
+      </div>
+      <div class="keyboard-row">
+        <button class="key key-wide" onclick="onScreenKey(' ')">Space</button>
+        <button class="key key-wide" onclick="onScreenKey('clear')">Clear</button>
+      </div>
+    </div>
+    <div class="save-buttons">
+      <button class="save-btn-cancel" onclick="closeSaveOverlay()">Cancel</button>
+      <button class="save-btn-confirm" onclick="confirmSaveSetlist()">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="load-overlay" id="load-overlay" onclick="closeLoadOverlay(event)">
+  <div class="load-popup" onclick="event.stopPropagation()">
+    <h2>Load Setlist</h2>
+    <div class="load-list" id="load-list"></div>
+    <button class="load-close-btn" onclick="closeLoadOverlay()">Close</button>
+  </div>
+</div>
+
+</body>
+</html>

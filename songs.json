@@ -1,0 +1,602 @@
+[
+  {
+    "rank": 1,
+    "title": "Die With A Smile",
+    "artist": "Lady Gaga Bruno Mars",
+    "file": "art/001.jpg"
+  },
+  {
+    "rank": 2,
+    "title": "Luther",
+    "artist": "Kendrick Lamar SZA",
+    "file": "art/002.jpg"
+  },
+  {
+    "rank": 3,
+    "title": "A Bar Song Tipsy",
+    "artist": "Shaboozey",
+    "file": "art/003.jpg"
+  },
+  {
+    "rank": 4,
+    "title": "Lose Control",
+    "artist": "Teddy Swims",
+    "file": "art/004.jpg"
+  },
+  {
+    "rank": 5,
+    "title": "Birds Of A Feather",
+    "artist": "Billie Eilish",
+    "file": "art/005.jpg"
+  },
+  {
+    "rank": 6,
+    "title": "Beautiful Things",
+    "artist": "Benson Boone",
+    "file": "art/006.jpg"
+  },
+  {
+    "rank": 7,
+    "title": "Ordinary",
+    "artist": "Alex Warren",
+    "file": "art/007.jpg"
+  },
+  {
+    "rank": 8,
+    "title": "I Had Some Help",
+    "artist": "Post Malone Morgan Wallen",
+    "file": "art/008.jpg"
+  },
+  {
+    "rank": 9,
+    "title": "APT",
+    "artist": "Rose Bruno Mars",
+    "file": "art/009.jpg"
+  },
+  {
+    "rank": 10,
+    "title": "Pink Pony Club",
+    "artist": "Chappell Roan",
+    "file": "art/010.jpg"
+  },
+  {
+    "rank": 11,
+    "title": "Love Somebody",
+    "artist": "Morgan Wallen",
+    "file": "art/011.jpg"
+  },
+  {
+    "rank": 12,
+    "title": "Espresso",
+    "artist": "Sabrina Carpenter",
+    "file": "art/012.jpg"
+  },
+  {
+    "rank": 13,
+    "title": "Im The Problem",
+    "artist": "Morgan Wallen",
+    "file": "art/013.jpg"
+  },
+  {
+    "rank": 14,
+    "title": "Thats So True",
+    "artist": "Gracie Abrams",
+    "file": "art/014.jpg"
+  },
+  {
+    "rank": 15,
+    "title": "TV Off",
+    "artist": "Kendrick Lamar",
+    "file": "art/015.jpg"
+  },
+  {
+    "rank": 16,
+    "title": "Timeless",
+    "artist": "The Weeknd Playboi Carti",
+    "file": "art/016.jpg"
+  },
+  {
+    "rank": 17,
+    "title": "Not Like Us",
+    "artist": "Kendrick Lamar",
+    "file": "art/017.jpg"
+  },
+  {
+    "rank": 18,
+    "title": "Just In Case",
+    "artist": "Morgan Wallen",
+    "file": "art/018.jpg"
+  },
+  {
+    "rank": 19,
+    "title": "Taste",
+    "artist": "Sabrina Carpenter",
+    "file": "art/019.jpg"
+  },
+  {
+    "rank": 20,
+    "title": "Squabble Up",
+    "artist": "Kendrick Lamar",
+    "file": "art/020.jpg"
+  },
+  {
+    "rank": 21,
+    "title": "30 For 30",
+    "artist": "SZA Kendrick Lamar",
+    "file": "art/021.jpg"
+  },
+  {
+    "rank": 22,
+    "title": "Mutt",
+    "artist": "Leon Thomas",
+    "file": "art/022.jpg"
+  },
+  {
+    "rank": 23,
+    "title": "Good News",
+    "artist": "Shaboozey",
+    "file": "art/023.jpg"
+  },
+  {
+    "rank": 24,
+    "title": "Nokia",
+    "artist": "Drake",
+    "file": "art/024.jpg"
+  },
+  {
+    "rank": 25,
+    "title": "Golden",
+    "artist": "HUNTR Kpop Demon Hunters",
+    "file": "art/025.jpg"
+  },
+  {
+    "rank": 26,
+    "title": "Wildflower",
+    "artist": "Billie Eilish",
+    "file": "art/026.jpg"
+  },
+  {
+    "rank": 27,
+    "title": "What I Want",
+    "artist": "Morgan Wallen Tate McRae",
+    "file": "art/027.jpg"
+  },
+  {
+    "rank": 28,
+    "title": "Messy",
+    "artist": "Lola Young",
+    "file": "art/028.jpg"
+  },
+  {
+    "rank": 29,
+    "title": "Stargazing",
+    "artist": "Myles Smith",
+    "file": "art/029.jpg"
+  },
+  {
+    "rank": 30,
+    "title": "Love Me Not",
+    "artist": "Ravyn Lenae",
+    "file": "art/030.jpg"
+  },
+  {
+    "rank": 31,
+    "title": "Good Luck Babe",
+    "artist": "Chappell Roan",
+    "file": "art/031.jpg"
+  },
+  {
+    "rank": 32,
+    "title": "No One Noticed",
+    "artist": "The Marias",
+    "file": "art/032.jpg"
+  },
+  {
+    "rank": 33,
+    "title": "All The Way",
+    "artist": "BigXthaPlug Bailey Zimmerman",
+    "file": "art/033.jpg"
+  },
+  {
+    "rank": 34,
+    "title": "Too Sweet",
+    "artist": "Hozier",
+    "file": "art/034.jpg"
+  },
+  {
+    "rank": 35,
+    "title": "Worst Way",
+    "artist": "Riley Green",
+    "file": "art/035.jpg"
+  },
+  {
+    "rank": 36,
+    "title": "Sailor Song",
+    "artist": "Gigi Perez",
+    "file": "art/036.jpg"
+  },
+  {
+    "rank": 37,
+    "title": "Sorry Im Here For Someone Else",
+    "artist": "Benson Boone",
+    "file": "art/037.jpg"
+  },
+  {
+    "rank": 38,
+    "title": "Manchild",
+    "artist": "Sabrina Carpenter",
+    "file": "art/038.jpg"
+  },
+  {
+    "rank": 39,
+    "title": "Anxiety",
+    "artist": "Doechii",
+    "file": "art/039.jpg"
+  },
+  {
+    "rank": 40,
+    "title": "I Got Better",
+    "artist": "Morgan Wallen",
+    "file": "art/040.jpg"
+  },
+  {
+    "rank": 41,
+    "title": "Sticky",
+    "artist": "Tyler The Creator",
+    "file": "art/041.jpg"
+  },
+  {
+    "rank": 42,
+    "title": "Undressed",
+    "artist": "Sombr",
+    "file": "art/042.jpg"
+  },
+  {
+    "rank": 43,
+    "title": "I Never Lie",
+    "artist": "Zach Top",
+    "file": "art/043.jpg"
+  },
+  {
+    "rank": 44,
+    "title": "Back To Friends",
+    "artist": "Sombr",
+    "file": "art/044.jpg"
+  },
+  {
+    "rank": 45,
+    "title": "Bed Chem",
+    "artist": "Sabrina Carpenter",
+    "file": "art/045.jpg"
+  },
+  {
+    "rank": 46,
+    "title": "Sports Car",
+    "artist": "Tate McRae",
+    "file": "art/046.jpg"
+  },
+  {
+    "rank": 47,
+    "title": "Mystical Magical",
+    "artist": "Benson Boone",
+    "file": "art/047.jpg"
+  },
+  {
+    "rank": 48,
+    "title": "Whatchu Kno About Me",
+    "artist": "GloRilla Sexyy Red",
+    "file": "art/048.jpg"
+  },
+  {
+    "rank": 49,
+    "title": "Indigo",
+    "artist": "Sam Barber Avery Anna",
+    "file": "art/049.jpg"
+  },
+  {
+    "rank": 50,
+    "title": "Please Please Please",
+    "artist": "Sabrina Carpenter",
+    "file": "art/050.jpg"
+  },
+  {
+    "rank": 51,
+    "title": "DTMF",
+    "artist": "Bad Bunny",
+    "file": "art/051.jpg"
+  },
+  {
+    "rank": 52,
+    "title": "Blue Stripes",
+    "artist": "Jessie Murph",
+    "file": "art/052.jpg"
+  },
+  {
+    "rank": 53,
+    "title": "Peekaboo",
+    "artist": "Kendrick Lamar",
+    "file": "art/053.jpg"
+  },
+  {
+    "rank": 54,
+    "title": "Your Idol",
+    "artist": "Saja Boys",
+    "file": "art/054.jpg"
+  },
+  {
+    "rank": 55,
+    "title": "High Road",
+    "artist": "Koe Wetzel Jessie Murph",
+    "file": "art/055.jpg"
+  },
+  {
+    "rank": 56,
+    "title": "Abracadabra",
+    "artist": "Lady Gaga",
+    "file": "art/056.jpg"
+  },
+  {
+    "rank": 57,
+    "title": "Who",
+    "artist": "Jimin",
+    "file": "art/057.jpg"
+  },
+  {
+    "rank": 58,
+    "title": "Burning Blue",
+    "artist": "Mariah The Scientist",
+    "file": "art/058.jpg"
+  },
+  {
+    "rank": 59,
+    "title": "All I Want For Christmas Is You",
+    "artist": "Mariah Carey",
+    "file": "art/059.jpg"
+  },
+  {
+    "rank": 60,
+    "title": "Daisies",
+    "artist": "Justin Bieber",
+    "file": "art/060.jpg"
+  },
+  {
+    "rank": 61,
+    "title": "Soda Pop",
+    "artist": "Saja Boys",
+    "file": "art/061.jpg"
+  },
+  {
+    "rank": 62,
+    "title": "Like Him",
+    "artist": "Tyler The Creator Lola Young",
+    "file": "art/062.jpg"
+  },
+  {
+    "rank": 63,
+    "title": "Residuals",
+    "artist": "Chris Brown",
+    "file": "art/063.jpg"
+  },
+  {
+    "rank": 64,
+    "title": "Smile",
+    "artist": "Morgan Wallen",
+    "file": "art/064.jpg"
+  },
+  {
+    "rank": 65,
+    "title": "Last Christmas",
+    "artist": "Wham",
+    "file": "art/065.jpg"
+  },
+  {
+    "rank": 66,
+    "title": "Am I Okay",
+    "artist": "Megan Moroney",
+    "file": "art/066.jpg"
+  },
+  {
+    "rank": 67,
+    "title": "Rockin Around The Christmas Tree",
+    "artist": "Brenda Lee",
+    "file": "art/067.jpg"
+  },
+  {
+    "rank": 68,
+    "title": "How Its Done",
+    "artist": "HUNTR Kpop Demon Hunters",
+    "file": "art/068.jpg"
+  },
+  {
+    "rank": 69,
+    "title": "Happen To Me",
+    "artist": "Russell Dickerson",
+    "file": "art/069.jpg"
+  },
+  {
+    "rank": 70,
+    "title": "Baile Inolvidable",
+    "artist": "Bad Bunny",
+    "file": "art/070.jpg"
+  },
+  {
+    "rank": 71,
+    "title": "Werent For The Wind",
+    "artist": "Ella Langley",
+    "file": "art/071.jpg"
+  },
+  {
+    "rank": 72,
+    "title": "I Aint Comin Back",
+    "artist": "Morgan Wallen Post Malone",
+    "file": "art/072.jpg"
+  },
+  {
+    "rank": 73,
+    "title": "Cry For Me",
+    "artist": "The Weeknd",
+    "file": "art/073.jpg"
+  },
+  {
+    "rank": 74,
+    "title": "Bad Dreams",
+    "artist": "Teddy Swims",
+    "file": "art/074.jpg"
+  },
+  {
+    "rank": 75,
+    "title": "Denial Is A River",
+    "artist": "Doechii",
+    "file": "art/075.jpg"
+  },
+  {
+    "rank": 76,
+    "title": "BMF",
+    "artist": "SZA",
+    "file": "art/076.jpg"
+  },
+  {
+    "rank": 77,
+    "title": "Eoo",
+    "artist": "Bad Bunny",
+    "file": "art/077.jpg"
+  },
+  {
+    "rank": 78,
+    "title": "Im Gonna Love You",
+    "artist": "Cody Johnson Carrie Underwood",
+    "file": "art/078.jpg"
+  },
+  {
+    "rank": 79,
+    "title": "I Am Not Okay",
+    "artist": "Jelly Roll",
+    "file": "art/079.jpg"
+  },
+  {
+    "rank": 80,
+    "title": "Backup Plan",
+    "artist": "Bailey Zimmerman Luke Combs",
+    "file": "art/080.jpg"
+  },
+  {
+    "rank": 81,
+    "title": "Jingle Bell Rock",
+    "artist": "Bobby Helms",
+    "file": "art/081.jpg"
+  },
+  {
+    "rank": 82,
+    "title": "Revolving Door",
+    "artist": "Tate McRae",
+    "file": "art/082.jpg"
+  },
+  {
+    "rank": 83,
+    "title": "What It Sounds Like",
+    "artist": "HUNTR Kpop Demon Hunters",
+    "file": "art/083.jpg"
+  },
+  {
+    "rank": 84,
+    "title": "Hard Fought Hallelujah",
+    "artist": "Brandon Lake",
+    "file": "art/084.jpg"
+  },
+  {
+    "rank": 85,
+    "title": "Somebody Loves Me",
+    "artist": "PartyNextDoor Drake",
+    "file": "art/085.jpg"
+  },
+  {
+    "rank": 86,
+    "title": "Liar",
+    "artist": "Jelly Roll",
+    "file": "art/086.jpg"
+  },
+  {
+    "rank": 87,
+    "title": "Tu Boda",
+    "artist": "Oscar Maydon Fuerza Regida",
+    "file": "art/087.jpg"
+  },
+  {
+    "rank": 88,
+    "title": "After All The Bars Are Closed",
+    "artist": "Thomas Rhett",
+    "file": "art/088.jpg"
+  },
+  {
+    "rank": 89,
+    "title": "NUEVAYoL",
+    "artist": "Bad Bunny",
+    "file": "art/089.jpg"
+  },
+  {
+    "rank": 90,
+    "title": "20 Cigarettes",
+    "artist": "Morgan Wallen",
+    "file": "art/090.jpg"
+  },
+  {
+    "rank": 91,
+    "title": "Try Me",
+    "artist": "The Weeknd",
+    "file": "art/091.jpg"
+  },
+  {
+    "rank": 92,
+    "title": "Free",
+    "artist": "Kpop Demon Hunters",
+    "file": "art/092.jpg"
+  },
+  {
+    "rank": 93,
+    "title": "Takedown",
+    "artist": "HUNTR Kpop Demon Hunters",
+    "file": "art/093.jpg"
+  },
+  {
+    "rank": 94,
+    "title": "Heart Of A Woman",
+    "artist": "Summer Walker",
+    "file": "art/094.jpg"
+  },
+  {
+    "rank": 95,
+    "title": "House Again",
+    "artist": "Hudson Westbrook",
+    "file": "art/095.jpg"
+  },
+  {
+    "rank": 96,
+    "title": "Dark Thoughts",
+    "artist": "Lil Tecca",
+    "file": "art/096.jpg"
+  },
+  {
+    "rank": 97,
+    "title": "No Pole",
+    "artist": "Don Toliver",
+    "file": "art/097.jpg"
+  },
+  {
+    "rank": 98,
+    "title": "Folded",
+    "artist": "Kehlani",
+    "file": "art/098.jpg"
+  },
+  {
+    "rank": 99,
+    "title": "Superman",
+    "artist": "Morgan Wallen",
+    "file": "art/099.jpg"
+  },
+  {
+    "rank": 100,
+    "title": "Loco",
+    "artist": "Neton Vega",
+    "file": "art/100.jpg"
+  }
+]
