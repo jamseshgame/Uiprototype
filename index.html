@@ -691,6 +691,7 @@
     gap: calc(var(--grid-gap) * 2);
     padding: var(--grid-gap) 0;
     overflow: hidden;
+    justify-content: flex-start;
   }
 
   .play-solo-nav {
@@ -732,7 +733,8 @@
   }
 
   .play-solo-row {
-    flex: 1;
+    flex: 0 1 calc((100% - var(--grid-gap) * 4) / 3);
+    max-height: calc((100% - var(--grid-gap) * 4) / 3);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -3510,7 +3512,7 @@ var soloPage = 0;
 var SOLO_PER_PAGE = 3;
 
 function soloTotalPages() {
-  var count = Math.max(setlist.length, 1);
+  var count = setlist.length + 1; // +1 for the add row
   return Math.max(1, Math.ceil(count / SOLO_PER_PAGE));
 }
 
@@ -3525,12 +3527,14 @@ function buildSoloPanel(panel) {
   var tp = soloTotalPages();
   if (soloPage >= tp) soloPage = tp - 1;
 
+  var totalSlots = setlist.length + 1; // songs + 1 add row
   var start = soloPage * SOLO_PER_PAGE;
-  var end = Math.min(start + SOLO_PER_PAGE, Math.max(setlist.length, SOLO_PER_PAGE));
+  var end = Math.min(start + SOLO_PER_PAGE, totalSlots);
 
   for (var i = start; i < end; i++) {
     var row = document.createElement('div');
-    var isEmpty = !setlist[i];
+    var isAddRow = (i >= setlist.length);
+    var isEmpty = isAddRow;
     row.className = 'play-solo-row';
 
     // Number
@@ -3542,7 +3546,7 @@ function buildSoloPanel(panel) {
     // Cover art / add button
     var cover = document.createElement('div');
     cover.className = 'play-solo-cover';
-    if (setlist[i]) {
+    if (!isAddRow && setlist[i]) {
       cover.innerHTML =
         '<img src="' + setlist[i].file + '" alt="">' +
         '<div class="setlist-actions">' +
