@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Jamsesh is a VR music rhythm game. This repo contains its UI prototype — a **single-file HTML/CSS/JS application** (`index.html`, ~7200 lines) designed to run inside **Vuplex WebView on Meta Quest headsets**. The viewport is a fixed **1920x1920 pixel** panel.
+Jamsesh is a VR music rhythm game. This repo contains its UI prototype — a **single-file HTML/CSS/JS application** (`index.html`, ~8000 lines) designed to run inside **Vuplex WebView on Meta Quest headsets**. The viewport is a fixed **1920x1920 pixel** panel.
 
 There is also a `src/` directory with a Figma Make-exported React/Vite app — this is a separate reference artifact and is **not** the primary working file.
 
@@ -20,11 +20,6 @@ npm run dev      # Vite dev server
 npm run build    # Vite production build
 ```
 
-Playwright is installed for automated screenshot testing:
-```bash
-node screenshot_script.cjs   # Must use .cjs extension (package.json has "type": "module")
-```
-
 ## Critical Constraints
 
 - **Chromium 91 only** (Vuplex WebView on Quest). This means:
@@ -38,20 +33,21 @@ node screenshot_script.cjs   # Must use .cjs extension (package.json has "type":
 ## Architecture of index.html
 
 ### Structure (top to bottom)
-1. **CSS** (lines 1–4500): Global styles, component styles, theme overrides (Arcade, Hunter, Nebula, Liquid Glass, Wireframe), shimmer animations
-2. **HTML** (lines 4500–5160): `.viewport` containing `.topbar`, `.page` elements (home, social, spaces, play, vault, store, season, settings), `.navbar`, and all popup overlays (inside `.viewport` for correct centering)
-3. **JavaScript** (lines 5160–7170): Vuplex bridge, navigation, page builders, theme engine, data
+1. **CSS** (lines 9–4965): Global styles, component styles, theme overrides (Arcade, Hunter, Nebula, Liquid Glass, Wireframe), shimmer animations
+2. **HTML** (lines 4969–5644): `.viewport` containing `.topbar`, `.page` elements (home, play, career, season, social, spaces, vault, store, settings), `.navbar`, and all popup overlays (inside `.viewport` for correct centering)
+3. **JavaScript** (lines 5645–8005): Vuplex bridge, navigation, page builders, theme engine, profile system, data
 
 ### Theme System
-- `var themes = [...]` array defines theme objects with `id`, `bg`, `panel`, `tile`, `tileHover`, `accent`, and optional `cssClass`
+- `var themes = [...]` array (~20 themes) defines theme objects with `id`, `bg`, `panel`, `tile`, `tileHover`, `accent`, and optional `cssClass`, `locked`, `price`
 - `applyTheme(themeId)` takes a **string ID** (not an object), sets CSS custom properties on `:root`, auto-derives light/dark text colors via `hexLum()`
-- Themes with `cssClass` (e.g., `'theme-arcade'`) add a class to `.viewport` enabling scoped CSS overrides
+- Themes with `cssClass` (e.g., `'theme-arcade'`, `'theme-hunter'`, `'theme-nebula'`, `'theme-liquid'`) add a class to `.viewport` enabling scoped CSS overrides
 - Wireframe Light/Dark themes use `cssClass: 'theme-wireframe'` for B&W flow testing (Arial font, no color, no shimmer)
+- Some themes are `locked: true` with a `price` — purchased via in-UI coin system
 
 ### Navigation
 - Pages use `display: none` / `.page.active { display: flex }` — **elements in hidden pages have 0 `offsetHeight`**
 - `navigateTo(pageName)` toggles page visibility and updates navbar
-- Song picker is a sub-panel within the Play page, toggled via `openSongPicker()`/`closeSongPicker()`
+- Song picker is a sub-panel within the Play page, toggled via `showPlayPicker()`/`hidePlayPicker()`
 
 ### Solo Panel & Pagination
 - `SOLO_PER_PAGE = 3` rows per page, paginated with arrow buttons
@@ -62,9 +58,12 @@ node screenshot_script.cjs   # Must use .cjs extension (package.json has "type":
 - All overlays (solo-popup, loadout, purchase, save, load) live **inside `.viewport`** and use `position: absolute` to center relative to the 1920x1920 UI panel
 - Overlays use `z-index: 999`
 
+### Profile System
+- `var profiles = [...]` defines user profiles (Rael, Jooleeno, Ted, Abbie, Arthen) with avatar, level, XP, coins
+- `initStatTicker()` drives the topbar stat ticker rotating through Level, XP, Coins, Season progress
+
 ### Vuplex Bridge
 - `sendToUnity(type, data)` sends JSON messages to the Unity game via `window.vuplex.postMessage()`
-- `initVuplexListener()` listens for incoming Unity messages
 - All user actions (navigation, song selection, theme changes) emit bridge messages
 
 ### CSS Custom Properties
