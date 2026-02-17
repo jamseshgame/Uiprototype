@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=1920, height=1920, initial-scale=1.0, user-scalable=no">
 <title>Jamsesh</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><radialGradient id='g' cx='35%25' cy='35%25'><stop offset='0%25' stop-color='%23ff4444'/><stop offset='100%25' stop-color='%238b0000'/></radialGradient></defs><polygon points='50,5 61,38 97,38 68,59 79,93 50,72 21,93 32,59 3,38 39,38' fill='url(%23g)'/></svg>">
-<link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700;800&family=DM+Sans:wght@400;500;600;700;800&family=Orbitron:wght@400;500;700;800;900&family=Chakra+Petch:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700;800&family=DM+Sans:wght@400;500;600;700;800&family=Orbitron:wght@400;500;700;800;900&family=Chakra+Petch:wght@400;500;600;700&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -61,7 +61,7 @@
     overflow: hidden;
     background: var(--bg-body);
     color: var(--text-primary);
-    font-family: 'Google Sans', 'DM Sans', sans-serif;
+    font-family: 'Oswald', sans-serif;
     -webkit-font-smoothing: antialiased;
     display: flex;
     flex-direction: row;
@@ -80,7 +80,6 @@
     position: relative;
   }
   .topbar::after,
-  .page.active::after,
   .navbar::after {
     content: '';
     position: absolute;
@@ -94,6 +93,11 @@
   }
 
   /* ── Top Bar ──────────────────────────────────────── */
+  @keyframes bannerScroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-1920px); }
+  }
+
   .topbar {
     height: var(--topbar-h);
     flex-shrink: 0;
@@ -104,9 +108,37 @@
     border: 1px solid var(--border-subtle);
     overflow: hidden;
     position: relative;
+    z-index: 0;
   }
+
+  .topbar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-size: auto;
+    background-position: center center;
+    background-repeat: repeat-x;
+    z-index: 1;
+    pointer-events: none;
+    animation: bannerScroll 90s linear infinite;
+    width: 200%;
+  }
+
   .topbar::after {
-    background-position: calc(-1 * var(--pad)) calc(-1 * var(--pad));
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5) !important;
+    background-image: none !important;
+    opacity: 1 !important;
+    z-index: 2;
+    pointer-events: none;
   }
 
   .topbar-main {
@@ -116,6 +148,13 @@
     padding: var(--pad);
     gap: var(--pad);
     min-height: 0;
+    position: relative;
+    z-index: 3;
+  }
+
+  @keyframes frameGlow {
+    0%, 100% { border-color: var(--frame-color-1, var(--pink)); }
+    50% { border-color: var(--frame-color-2, var(--cyan)); }
   }
 
   .profile-avatar {
@@ -123,14 +162,19 @@
     align-self: stretch;
     aspect-ratio: 1;
     flex-shrink: 0;
-    min-height: 0;
-    margin: calc(-1 * var(--pad)) 0 calc(-1 * var(--pad)) calc(-1 * var(--pad));
+    border-radius: 50%;
+    padding: 4px;
+    background: transparent;
+    border: 4px solid var(--frame-color-1, var(--pink));
+    animation: frameGlow 3s ease-in-out infinite;
+    box-shadow: 0 0 20px var(--frame-color-1, var(--pink)),
+                0 0 40px var(--frame-color-2, var(--cyan));
   }
 
   .profile-avatar img {
     width: 100%;
     height: 100%;
-    border-radius: var(--panel-radius) 0 0 var(--panel-radius);
+    border-radius: 50%;
     object-fit: cover;
   }
 
@@ -161,17 +205,19 @@
   .profile-name {
     font-size: 72px;
     font-weight: 400;
-    color: var(--text-primary);
+    color: #ffffff;
     line-height: 1;
     white-space: nowrap;
+    text-shadow: 0 0 20px rgba(0,0,0,0.9), 0 0 40px rgba(0,0,0,0.7), 0 2px 8px rgba(0,0,0,0.8);
   }
 
   .xp-text {
     font-size: 36px;
     font-weight: 700;
-    color: var(--text-secondary);
+    color: #ffffff;
     line-height: 1;
     white-space: nowrap;
+    text-shadow: 0 0 16px rgba(0,0,0,0.9), 0 0 32px rgba(0,0,0,0.7), 0 2px 6px rgba(0,0,0,0.8);
   }
 
   .stat-ticker {
@@ -224,8 +270,8 @@
   }
 
   .coin-scene {
-    width: 104px;
-    height: 104px;
+    align-self: stretch;
+    aspect-ratio: 1;
     perspective: 600px;
     flex-shrink: 0;
     margin-right: var(--pad);
@@ -337,9 +383,37 @@
     border: none;
     display: flex;
     flex-direction: column;
+    position: relative;
+    z-index: 0;
   }
 
-  .page { display: none; flex: 1; flex-direction: column; overflow-y: auto; overflow-x: hidden; position: relative; }
+  .content-banner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-size: auto;
+    background-position: center center;
+    background-repeat: repeat;
+    z-index: 1;
+    pointer-events: none;
+    animation: bannerScroll 90s linear infinite;
+    width: 200%;
+  }
+
+  .content-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  .page { display: none; flex: 1; flex-direction: column; overflow-y: auto; overflow-x: hidden; position: relative; z-index: 3; }
   .page.active::after {
     background-position: calc(-1 * var(--pad)) calc(-1 * (var(--pad) + var(--topbar-h) + var(--panel-gap)));
   }
@@ -1167,8 +1241,15 @@
 
 
   .play-solo-btn .solo-btn-label {
-    position: relative;
+    position: absolute;
+    bottom: 10px;
+    right: 12px;
     z-index: 1;
+    font-family: 'Oswald', sans-serif;
+    font-size: 48px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
   }
 
   .play-solo-btn .solo-btn-icon {
@@ -2105,7 +2186,37 @@
     border: 1px solid var(--border-subtle);
     padding: 0 var(--pad);
     position: relative;
+    overflow: hidden;
+    z-index: 0;
   }
+
+  .navbar-banner {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-size: auto;
+    background-position: center center;
+    background-repeat: repeat-x;
+    z-index: 1;
+    pointer-events: none;
+    animation: bannerScroll 90s linear infinite;
+    width: 200%;
+  }
+
+  .navbar-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 2;
+    pointer-events: none;
+  }
+
   .navbar::after {
     background-position: calc(-1 * var(--pad)) calc(-1 * (1920px - var(--pad) - var(--navbar-h)));
   }
@@ -2122,6 +2233,7 @@
     cursor: pointer;
     transition: background 0.2s;
     position: relative;
+    z-index: 3;
     background: var(--bg-surface);
     border: 1px solid transparent;
   }
@@ -2138,8 +2250,9 @@
   .nav-icon {
     font-size: 52px;
     line-height: 1;
-    color: var(--text-secondary);
+    color: #ffffff;
     transition: color 0.2s;
+    filter: drop-shadow(0 0 8px rgba(0,0,0,0.9)) drop-shadow(0 0 16px rgba(0,0,0,0.7));
     display: flex;
     align-items: center;
     justify-content: center;
@@ -2151,16 +2264,17 @@
     flex-shrink: 0;
   }
 
-  .nav-item.active .nav-icon { color: var(--pink); }
+  .nav-item.active .nav-icon { color: #ffffff; }
 
   .nav-label {
     font-size: 20px;
     font-weight: 700;
-    color: var(--text-secondary);
+    color: #ffffff;
     transition: color 0.2s;
+    text-shadow: 0 0 16px rgba(0,0,0,0.9), 0 0 32px rgba(0,0,0,0.7), 0 2px 6px rgba(0,0,0,0.8);
   }
 
-  .nav-item.active .nav-label { color: var(--pink); }
+  .nav-item.active .nav-label { color: #ffffff; }
 
   /* ── Back Button ─────────────────────────────────────── */
   .back-btn {
@@ -2252,6 +2366,119 @@
   }
 
   .theme-section.active { display: flex; }
+
+  .banner-section {
+    display: none;
+    flex: 1;
+    flex-direction: column;
+    gap: var(--grid-gap);
+    min-height: 0;
+  }
+
+  .banner-section.active { display: flex; }
+
+  .banner-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: var(--grid-gap);
+    flex: 1;
+    min-height: 0;
+  }
+
+  .banner-card {
+    border-radius: calc(var(--panel-radius) / 2);
+    border: 2px solid transparent;
+    cursor: pointer;
+    overflow: hidden;
+    position: relative;
+    opacity: 0.55;
+    transition: border-color 0.2s, transform 0.15s, opacity 0.15s;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  .banner-card.selected {
+    opacity: 1;
+    border-color: var(--pink);
+    box-shadow: var(--glow-pink);
+  }
+
+  .banner-card .tile-info {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.9);
+  }
+
+  .banner-card .tile-title {
+    font-size: 18px;
+    font-weight: 800;
+    text-align: center;
+    color: #ffffff;
+  }
+
+  .banner-card.locked .tile-info {
+    background: rgba(0,0,0,0.75);
+  }
+
+  .frame-section {
+    display: none;
+    flex: 1;
+    flex-direction: column;
+    gap: var(--grid-gap);
+    min-height: 0;
+  }
+
+  .frame-section.active { display: flex; }
+
+  .frame-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 200px);
+    gap: 40px;
+    justify-content: center;
+    align-content: center;
+    flex: 1;
+    min-height: 0;
+    padding: 40px;
+  }
+
+  .frame-card {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    border: 5px solid;
+    cursor: pointer;
+    overflow: hidden;
+    position: relative;
+    opacity: 0.55;
+    transition: border-color 0.2s, transform 0.15s, opacity 0.15s, box-shadow 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-surface);
+    animation: frameGlow 3s ease-in-out infinite;
+  }
+
+  .frame-card.selected {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+
+  .frame-card .tile-title {
+    font-size: 14px;
+    font-weight: 800;
+    text-align: center;
+    color: var(--text-primary);
+    padding: 8px;
+  }
+
+  .frame-card.locked .tile-title {
+    opacity: 0.6;
+  }
 
   .theme-grid {
     display: grid;
@@ -3073,10 +3300,10 @@
     border-bottom: 1px solid rgba(255,255,255,0.08);
   }
   .theme-arcade .page {
-    background: rgba(18,18,42,0.85) !important;
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255,255,255,0.08);
+    background: transparent !important;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: none;
   }
   .theme-arcade .navbar {
     background: rgba(18,18,42,0.90) !important;
@@ -3441,10 +3668,10 @@
     border-bottom: 1px solid rgba(217,70,168,0.1);
   }
   .theme-hunter .page {
-    background: rgba(245,240,252,0.78) !important;
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
-    border: 1px solid rgba(217,70,168,0.06);
+    background: transparent !important;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: none;
   }
   .theme-hunter .navbar {
     background: rgba(245,240,252,0.88) !important;
@@ -3814,10 +4041,10 @@
     position: relative;
   }
   .theme-nebula .page {
-    background: rgba(14,21,40,0.82) !important;
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(124,91,245,0.06);
+    background: transparent !important;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: none;
     overflow: hidden;
     position: relative;
   }
@@ -4254,11 +4481,11 @@
     position: relative;
   }
   .theme-liquid .content {
-    background: rgba(88,72,160,0.06) !important;
-    backdrop-filter: blur(24px) saturate(160%);
-    -webkit-backdrop-filter: blur(24px) saturate(160%);
-    border: 1px solid rgba(88,72,160,0.10) !important;
-    box-shadow: 0 4px 24px rgba(88,72,160,0.06), inset 0 1px 0 rgba(255,255,255,0.30);
+    background: transparent !important;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: none !important;
+    box-shadow: none !important;
     overflow: hidden;
     position: relative;
   }
@@ -4281,7 +4508,6 @@
 
   /* --- Inner specular highlight on panels (top-left light source) --- */
   .theme-liquid .topbar::before,
-  .theme-liquid .content::before,
   .theme-liquid .navbar::before {
     content: '';
     position: absolute;
@@ -5203,6 +5429,8 @@
   </header>
 
   <main class="content">
+    <div class="content-banner" id="content-banner"></div>
+    <div class="content-overlay"></div>
     <div class="page active" id="page-home">
     </div>
 
@@ -5317,6 +5545,12 @@
           <div class="settings-tile" id="themes-tile" onclick="showThemes()">
             <div class="tile-info"><div class="tile-title">Themes</div></div>
           </div>
+          <div class="settings-tile" id="banners-tile" onclick="showBanners()">
+            <div class="tile-info"><div class="tile-title">Banners</div></div>
+          </div>
+          <div class="settings-tile" id="frames-tile" onclick="showFrames()">
+            <div class="tile-info"><div class="tile-title">Frames</div></div>
+          </div>
           <div class="settings-tile" onclick="showTos()">
             <div class="tile-info"><div class="tile-title">Terms of Service</div></div>
           </div>
@@ -5352,6 +5586,14 @@
       <div class="theme-section" id="theme-section">
         <button class="back-btn" onclick="hideSettingsSub()">&#9664; Settings</button>
         <div class="theme-grid" id="theme-grid"></div>
+      </div>
+      <div class="banner-section" id="banner-section">
+        <button class="back-btn" onclick="hideSettingsSub()">&#9664; Settings</button>
+        <div class="banner-grid" id="banner-grid"></div>
+      </div>
+      <div class="frame-section" id="frame-section">
+        <button class="back-btn" onclick="hideSettingsSub()">&#9664; Settings</button>
+        <div class="frame-grid" id="frame-grid"></div>
       </div>
       <div class="legal-section" id="tos-section">
         <button class="back-btn" onclick="hideSettingsSub()">&#9664; Settings</button>
@@ -5740,6 +5982,8 @@
   </main>
 
   <nav class="navbar">
+    <div class="navbar-banner" id="navbar-banner"></div>
+    <div class="navbar-overlay"></div>
     <div class="nav-item active" data-page="home" onclick="navigateTo('home')">
       <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 12.5l9-9 9 9M5 11v8a1 1 0 001 1h4v-5h4v5h4a1 1 0 001-1v-8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
       <span class="nav-label">Home</span>
@@ -7503,8 +7747,102 @@ var userCoins = 5000;
 var unlockedThemes = ['wireframe-light', 'wireframe-dark', 'neon-pink', 'cyber-cyan', 'sunset-blaze', 'light-mode', 'rainforest', 'neon-arcade', 'hunter', 'nebula', 'liquid-glass'];
 var pendingPurchaseId = null;
 
+var banners = [
+  { id: 'space1', name: 'Space 1', file: 'banners/Space 1.png' },
+  { id: 'daisies', name: 'Daisies', file: 'banners/Daisies.png' },
+  { id: 'space2', name: 'Space 2', file: 'banners/Space 2.png', locked: true, price: 500 },
+  { id: 'gothic1', name: 'Gothic 1', file: 'banners/Gothic 1.png', locked: true, price: 750 },
+  { id: 'sully', name: 'Sully', file: 'banners/Sully.png', locked: true, price: 1000 },
+  { id: 'cracked-desert', name: 'Cracked Desert', file: 'banners/Cracked Desert.png' },
+  { id: 'butterfly', name: 'Butterfly', file: 'banners/Butterfly.png' },
+  { id: 'comic', name: 'Comic', file: 'banners/Comic.png', locked: true, price: 500 },
+  { id: 'gothic2', name: 'Gothic 2', file: 'banners/Gothic 2.png', locked: true, price: 750 },
+  { id: 'swirls', name: 'Swirls', file: 'banners/Swirls.png', locked: true, price: 1000 },
+  { id: 'magic', name: 'Magic', file: 'banners/Magic.png', locked: true, price: 1000 }
+];
+var currentBanner = null;
+var unlockedBanners = ['space1', 'daisies', 'cracked-desert', 'butterfly'];
+var pendingBannerPurchaseId = null;
+
+var frames = [
+  { id: 'none', name: 'None', color1: 'transparent', color2: 'transparent' },
+  { id: 'pink-purple', name: 'Pink Purple', color1: '#db2777', color2: '#a855f7' },
+  { id: 'cyan-blue', name: 'Cyan Blue', color1: '#06b6d4', color2: '#3b82f6' },
+  { id: 'gold-orange', name: 'Gold Orange', color1: '#f59e0b', color2: '#f97316', locked: true, price: 500 },
+  { id: 'green-teal', name: 'Green Teal', color1: '#10b981', color2: '#14b8a6', locked: true, price: 500 },
+  { id: 'red-pink', name: 'Red Pink', color1: '#ef4444', color2: '#ec4899', locked: true, price: 750 },
+  { id: 'purple-blue', name: 'Purple Blue', color1: '#8b5cf6', color2: '#6366f1', locked: true, price: 750 },
+  { id: 'rainbow', name: 'Rainbow', color1: '#ff0080', color2: '#00d4ff', locked: true, price: 1000 },
+  { id: 'fire', name: 'Fire', color1: '#ff4500', color2: '#ffd700', locked: true, price: 1000 }
+];
+var currentFrame = 'pink-purple';
+var unlockedFrames = ['none', 'pink-purple', 'cyan-blue'];
+var pendingFramePurchaseId = null;
+
 function isThemeUnlocked(id) {
   return unlockedThemes.indexOf(id) >= 0;
+}
+
+function isBannerUnlocked(id) {
+  return unlockedBanners.indexOf(id) >= 0;
+}
+
+function isFrameUnlocked(id) {
+  return unlockedFrames.indexOf(id) >= 0;
+}
+
+function applyFrame(frameId) {
+  var frame = null;
+  for (var i = 0; i < frames.length; i++) {
+    if (frames[i].id === frameId) { frame = frames[i]; break; }
+  }
+  if (!frame) return;
+  if (frame.locked && !isFrameUnlocked(frameId)) {
+    openFramePurchasePopup(frameId);
+    return;
+  }
+  currentFrame = frameId;
+  var root = document.documentElement;
+  root.style.setProperty('--frame-color-1', frame.color1);
+  root.style.setProperty('--frame-color-2', frame.color2);
+  buildFrameGrid();
+  sendToUnity('frameChanged', frameId);
+}
+
+function applyBanner(bannerId) {
+  var banner = null;
+  for (var i = 0; i < banners.length; i++) {
+    if (banners[i].id === bannerId) { banner = banners[i]; break; }
+  }
+  if (!banner) return;
+  if (banner.locked && !isBannerUnlocked(bannerId)) {
+    openBannerPurchasePopup(bannerId);
+    return;
+  }
+  currentBanner = bannerId;
+
+  // Create a style rule for the banner that targets ::before
+  var styleId = 'banner-style';
+  var existingStyle = document.getElementById(styleId);
+  if (existingStyle) existingStyle.parentNode.removeChild(existingStyle);
+
+  var style = document.createElement('style');
+  style.id = styleId;
+  style.textContent = '.topbar::before { background-image: url(' + banner.file + ') !important; }';
+  document.head.appendChild(style);
+
+  // Apply same banner to navbar and content
+  var navBanner = document.getElementById('navbar-banner');
+  if (navBanner) {
+    navBanner.style.backgroundImage = 'url(' + banner.file + ')';
+  }
+  var contentBanner = document.getElementById('content-banner');
+  if (contentBanner) {
+    contentBanner.style.backgroundImage = 'url(' + banner.file + ')';
+  }
+
+  buildBannerGrid();
+  sendToUnity('bannerChanged', bannerId);
 }
 
 function hexLum(hex) {
@@ -7767,10 +8105,20 @@ function closePurchasePopup(e) {
   if (e && e.target !== document.getElementById('purchase-overlay')) return;
   document.getElementById('purchase-overlay').className = 'purchase-overlay';
   pendingPurchaseId = null;
+  pendingBannerPurchaseId = null;
+  pendingFramePurchaseId = null;
 }
 
 function confirmPurchase() {
   if (!pendingPurchaseId) return;
+  if (pendingBannerPurchaseId) {
+    confirmBannerPurchase();
+    return;
+  }
+  if (pendingFramePurchaseId) {
+    confirmFramePurchase();
+    return;
+  }
   var theme = null;
   for (var i = 0; i < themes.length; i++) {
     if (themes[i].id === pendingPurchaseId) { theme = themes[i]; break; }
@@ -7782,6 +8130,95 @@ function confirmPurchase() {
   applyTheme(pendingPurchaseId);
   buildThemeGrid();
   sendToUnity('themePurchased', pendingPurchaseId);
+}
+
+function openBannerPurchasePopup(bannerId) {
+  var banner = null;
+  for (var i = 0; i < banners.length; i++) {
+    if (banners[i].id === bannerId) { banner = banners[i]; break; }
+  }
+  if (!banner) return;
+  pendingBannerPurchaseId = bannerId;
+  pendingPurchaseId = bannerId;
+  var preview = document.getElementById('purchase-preview');
+  preview.style.background = '';
+  preview.style.backgroundImage = 'url(' + banner.file + ')';
+  preview.style.backgroundSize = 'cover';
+  preview.style.backgroundPosition = 'center';
+  document.getElementById('purchase-title').textContent = banner.name;
+  document.getElementById('purchase-cost').textContent = banner.price.toLocaleString() + ' Coins';
+  var balEl = document.getElementById('purchase-balance');
+  balEl.textContent = 'Your balance: ' + userCoins.toLocaleString() + ' Coins';
+  var canAfford = userCoins >= banner.price;
+  balEl.className = 'purchase-balance' + (canAfford ? '' : ' insufficient');
+  var btn = document.getElementById('purchase-confirm-btn');
+  btn.disabled = !canAfford;
+  btn.textContent = canAfford ? 'Unlock' : 'Not enough coins';
+  document.getElementById('purchase-overlay').className = 'purchase-overlay active';
+}
+
+function confirmBannerPurchase() {
+  if (!pendingBannerPurchaseId) return;
+  var banner = null;
+  for (var i = 0; i < banners.length; i++) {
+    if (banners[i].id === pendingBannerPurchaseId) { banner = banners[i]; break; }
+  }
+  if (!banner || userCoins < banner.price) return;
+  userCoins -= banner.price;
+  unlockedBanners.push(pendingBannerPurchaseId);
+  var bannerId = pendingBannerPurchaseId;
+  pendingBannerPurchaseId = null;
+  pendingPurchaseId = null;
+  closePurchasePopup();
+  applyBanner(bannerId);
+  buildBannerGrid();
+  sendToUnity('bannerPurchased', bannerId);
+}
+
+function openFramePurchasePopup(frameId) {
+  var frame = null;
+  for (var i = 0; i < frames.length; i++) {
+    if (frames[i].id === frameId) { frame = frames[i]; break; }
+  }
+  if (!frame) return;
+  pendingFramePurchaseId = frameId;
+  pendingPurchaseId = frameId;
+  var preview = document.getElementById('purchase-preview');
+  preview.style.background = '';
+  preview.style.backgroundImage = 'none';
+  preview.style.border = '8px solid ' + frame.color1;
+  preview.style.borderRadius = '50%';
+  preview.style.animation = 'frameGlow 3s ease-in-out infinite';
+  preview.style.setProperty('--frame-color-1', frame.color1);
+  preview.style.setProperty('--frame-color-2', frame.color2);
+  document.getElementById('purchase-title').textContent = frame.name;
+  document.getElementById('purchase-cost').textContent = frame.price.toLocaleString() + ' Coins';
+  var balEl = document.getElementById('purchase-balance');
+  balEl.textContent = 'Your balance: ' + userCoins.toLocaleString() + ' Coins';
+  var canAfford = userCoins >= frame.price;
+  balEl.className = 'purchase-balance' + (canAfford ? '' : ' insufficient');
+  var btn = document.getElementById('purchase-confirm-btn');
+  btn.disabled = !canAfford;
+  btn.textContent = canAfford ? 'Unlock' : 'Not enough coins';
+  document.getElementById('purchase-overlay').className = 'purchase-overlay active';
+}
+
+function confirmFramePurchase() {
+  if (!pendingFramePurchaseId) return;
+  var frame = null;
+  for (var i = 0; i < frames.length; i++) {
+    if (frames[i].id === pendingFramePurchaseId) { frame = frames[i]; break; }
+  }
+  if (!frame || userCoins < frame.price) return;
+  userCoins -= frame.price;
+  unlockedFrames.push(pendingFramePurchaseId);
+  var frameId = pendingFramePurchaseId;
+  pendingFramePurchaseId = null;
+  pendingPurchaseId = null;
+  closePurchasePopup();
+  applyFrame(frameId);
+  buildFrameGrid();
+  sendToUnity('framePurchased', frameId);
 }
 
 function buildSlantedGradient(swatches) {
@@ -7825,11 +8262,73 @@ function buildThemeGrid() {
   if (typeof initLiquidSpecular === 'function') initLiquidSpecular();
 }
 
+function buildBannerGrid() {
+  var grid = document.getElementById('banner-grid');
+  grid.innerHTML = '';
+  for (var i = 0; i < banners.length; i++) {
+    var b = banners[i];
+    var isLocked = b.locked && !isBannerUnlocked(b.id);
+    var card = document.createElement('div');
+    card.className = 'banner-card' + (b.id === currentBanner ? ' selected' : '') + (isLocked ? ' locked' : '');
+    card.setAttribute('data-banner', b.id);
+    card.onclick = (function(id) { return function() { applyBanner(id); }; })(b.id);
+    card.style.backgroundImage = 'url(' + b.file + ')';
+    var html = '<div class="tile-info"><div class="tile-title">' + b.name + '</div></div>';
+    if (isLocked) {
+      html += '<div class="theme-lock-banner">&#128274; Unlock for ' + b.price.toLocaleString() + ' Coins</div>';
+    }
+    card.innerHTML = html;
+    grid.appendChild(card);
+  }
+  // Also set the Banners settings tile background
+  var bannersTile = document.getElementById('banners-tile');
+  if (bannersTile && currentBanner) {
+    var active = null;
+    for (var j = 0; j < banners.length; j++) {
+      if (banners[j].id === currentBanner) { active = banners[j]; break; }
+    }
+    if (active) {
+      bannersTile.style.backgroundImage = 'url(' + active.file + ')';
+      bannersTile.style.backgroundSize = 'cover';
+      bannersTile.style.backgroundPosition = 'center';
+    }
+  }
+  // Re-inject liquid specular elements on rebuilt banner cards
+  if (typeof initLiquidSpecular === 'function') initLiquidSpecular();
+}
+
+function buildFrameGrid() {
+  var grid = document.getElementById('frame-grid');
+  grid.innerHTML = '';
+  for (var i = 0; i < frames.length; i++) {
+    var f = frames[i];
+    var isLocked = f.locked && !isFrameUnlocked(f.id);
+    var card = document.createElement('div');
+    card.className = 'frame-card' + (f.id === currentFrame ? ' selected' : '') + (isLocked ? ' locked' : '');
+    card.setAttribute('data-frame', f.id);
+    card.onclick = (function(id) { return function() { applyFrame(id); }; })(f.id);
+    card.style.borderColor = f.color1;
+    card.style.setProperty('--frame-color-1', f.color1);
+    card.style.setProperty('--frame-color-2', f.color2);
+    card.style.boxShadow = '0 0 20px ' + f.color1 + ', 0 0 40px ' + f.color2;
+    var html = '<div class="tile-title">' + f.name + '</div>';
+    if (isLocked) {
+      html += '<div class="theme-lock-banner">&#128274; ' + f.price.toLocaleString() + '</div>';
+    }
+    card.innerHTML = html;
+    grid.appendChild(card);
+  }
+  // Re-inject liquid specular elements on rebuilt frame cards
+  if (typeof initLiquidSpecular === 'function') initLiquidSpecular();
+}
+
 var activeLegalEl = null;
 
 function hideSettingsSub() {
   document.getElementById('settings-main').style.display = 'flex';
   document.getElementById('theme-section').className = 'theme-section';
+  document.getElementById('banner-section').className = 'banner-section';
+  document.getElementById('frame-section').className = 'frame-section';
   document.getElementById('tos-section').className = 'legal-section';
   document.getElementById('pp-section').className = 'legal-section';
   activeLegalEl = null;
@@ -7840,6 +8339,18 @@ function hideSettingsSub() {
 function showThemes() {
   document.getElementById('settings-main').style.display = 'none';
   document.getElementById('theme-section').className = 'theme-section active';
+}
+
+function showBanners() {
+  document.getElementById('settings-main').style.display = 'none';
+  document.getElementById('banner-section').className = 'banner-section active';
+  buildBannerGrid();
+}
+
+function showFrames() {
+  document.getElementById('settings-main').style.display = 'none';
+  document.getElementById('frame-section').className = 'frame-section active';
+  buildFrameGrid();
 }
 
 function showTos() {
@@ -8092,6 +8603,22 @@ function init() {
   buildVaultGrid();
   buildSeasonGrid();
   applyTheme(currentTheme);
+
+  // Initialize random unlocked banner
+  var availableBanners = [];
+  for (var b = 0; b < banners.length; b++) {
+    if (!banners[b].locked || isBannerUnlocked(banners[b].id)) {
+      availableBanners.push(banners[b].id);
+    }
+  }
+  if (availableBanners.length > 0) {
+    var randomIdx = Math.floor(Math.random() * availableBanners.length);
+    applyBanner(availableBanners[randomIdx]);
+  }
+
+  // Initialize default frame
+  applyFrame(currentFrame);
+
   initVuplexListener();
   initStatTicker();
   initLiquidPointerTracking();

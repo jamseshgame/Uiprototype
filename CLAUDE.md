@@ -30,6 +30,14 @@ npm run build    # Vite production build
 - **Single file**: All CSS is in `<style>`, all JS is in `<script>`, all HTML is inline
 - **No build step**: The file is served directly to the WebView
 
+## Data Files
+
+- **songs.json**: Song library containing 100 tracks with metadata fields: `rank`, `title`, `artist`, `file` (path to cover art in `art/`), `duration` (seconds), `bpm`, `genre`, `decade`
+  - Loaded and rendered by `buildSoloPanel()` to generate the paginated setlist grid
+  - Cover art files are `art/001.jpg` through `art/100.jpg`
+- **Profile avatars**: `rael_new.png`, `jooleeno.jpg`, `ted.png`, `abbie.png`, `arthen.jpg` — used by the profile switcher in the topbar
+- **screenshot_script.cjs**: Playwright-based automated screenshot testing (not part of the main prototype)
+
 ## Architecture of index.html
 
 ### Structure (top to bottom)
@@ -51,7 +59,9 @@ npm run build    # Vite production build
 
 ### Solo Panel & Pagination
 - `SOLO_PER_PAGE = 3` rows per page, paginated with arrow buttons
-- `buildSoloPanel()` renders the setlist grid with instrument buttons, cover art, and a peek row
+- `buildSoloPanel()` renders the setlist grid with instrument buttons, cover art, and metadata bubbles (title, artist, duration, BPM)
+- Song metadata is loaded from `songs.json` and displayed as colored bubbles on each song tile
+- Page transitions use directional slide animations (up/down) when navigating between pages
 - `sizeSoloPeek()` must be called when the Play page **becomes visible** (not during init when page is `display: none`)
 
 ### Popup Overlays
@@ -75,6 +85,13 @@ Key variables set by themes: `--bg-body`, `--bg-panel`, `--bg-surface`, `--bg-su
 - Staggered `animation-delay` per element type
 - Disabled in wireframe themes via `display: none !important`
 
+### VR-Specific Optimizations
+- **Minimum text size**: 16px minimum for all text to ensure readability in VR
+- **SVG nav icons**: Inline SVG icons replace Unicode characters for consistent rendering across VR WebView
+- **:active fallbacks**: Interactive elements use `:active` pseudo-class for Quest laser pointer compatibility (since hover is unreliable)
+- **Page transitions**: Cross-fade animations between pages for smooth VR navigation
+- **3D coin**: CSS 3D transform-based rotating coin in topbar with stacked edge slices and ticker-synced animation
+
 ## Common Pitfalls
 
 - **Measuring hidden elements**: `offsetHeight` returns 0 for elements inside `display: none` pages. Schedule measurements in `navigateTo()` callbacks when the page becomes active.
@@ -82,3 +99,4 @@ Key variables set by themes: `--bg-body`, `--bg-panel`, `--bg-surface`, `--bg-su
 - **Inline styles on solo buttons**: Instrument button colors are set via `style.background` in JS. CSS overrides need `!important`.
 - **Pseudo-element conflicts**: `::after` is used by theme background images on panels and active nav underlines. `::before` is used by shimmer animations and Liquid Glass specular effects. Check both before adding new pseudo-element usage.
 - **`applyTheme()` takes a string**: Call `applyTheme('nebula')`, not `applyTheme(themeObj)`.
+- **Song data structure**: Songs in `songs.json` must include all metadata fields (`duration`, `bpm`, `genre`, `decade`) for the solo panel bubbles to render correctly.
