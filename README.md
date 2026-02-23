@@ -13,8 +13,11 @@ Open http://localhost:3000 in your browser.
 
 ## Features
 
-- **8 navigable pages**: Home, Social, Spaces, Play, Vault, Store, Season, Settings
+- **9 navigable pages**: Home, Social, Spaces, Play, Vault, Store, Season, Career, Settings
+- **Customizable home page**: 3x3 grid layout system with every valid rectangular tiling — browse and select from all possible partitions via a layout picker overlay
 - **11 themes**: Wireframe Light/Dark, Neon Pink, Cyber Cyan, Sunset Blaze, Light Mode, Rainforest, Neon Arcade, Hunter, Nebula, Liquid Glass
+- **Scrolling banners**: Purchasable banner images that scroll across topbar, navbar, and content area with dark overlays for readability
+- **Profile frames**: Animated gradient borders on profile avatars with purchasable color combinations
 - **Liquid Glass theme**: Glassmorphism panels with backdrop-filter blur, prismatic borders, specular tracking, and coloured palette (#5848a0, #c83868, #289878, #c89030)
 - **Profile switcher**: Multiple user profiles (Rael, Jooleeno, Ted, Abbie, Arthen) with avatar, level, XP, and coins
 - **3D coin**: CSS 3D rotating coin with stacked edge slices, inner ridge, and ticker-synced spin animation
@@ -38,7 +41,7 @@ Open http://localhost:3000 in your browser.
 ## Project Structure
 
 ```
-index.html              # The full UI prototype (~8100 lines)
+index.html              # The full UI prototype (~8900 lines)
 songs.json              # Song library (100 tracks with metadata)
 CLAUDE.md               # AI coding assistant instructions
 screenshot_script.cjs   # Playwright automated screenshot testing
@@ -48,6 +51,7 @@ ted.png                 # Profile avatar - Ted
 abbie.png               # Profile avatar - Abbie
 arthen.jpg              # Profile avatar - Arthen
 art/                    # Song cover artwork (001-100.jpg)
+banners/                # Banner image PNGs for scrolling banner system
 src/                    # Figma Make-exported React/Vite app (reference only)
 ```
 

@@ -36,12 +36,16 @@
     --overlay-light: rgba(0,0,0,0.05);
     --overlay-swap: rgba(0,0,0,0.12);
     --scrollbar-color: rgba(0,0,0,0.15);
-    --glow-pink: 0 0 0 3px var(--pink), 0 0 20px rgba(219,39,119,0.4);
+    --glow-pink: 0 0 0 3px var(--pink), 0 0 20px var(--pink-40);
 
     --pad: 32px;
     --panel-gap: 20px;
     --panel-radius: 28px;
     --grid-gap: 16px;
+    --pink-15: rgba(219,39,119,0.15);
+    --pink-30: rgba(219,39,119,0.3);
+    --pink-40: rgba(219,39,119,0.4);
+    --pink-50: rgba(219,39,119,0.5);
 
     /*
       No header row now — full grid height.
@@ -499,7 +503,7 @@
     cursor: pointer;
     position: relative;
     background: var(--bg-surface);
-    border: 1px solid transparent;
+    border: 2px solid transparent;
     transition: box-shadow 0.15s, filter 0.15s, border-color 0.15s;
   }
 
@@ -709,7 +713,7 @@
   }
 
   .play-panel-header {
-    padding: var(--pad) var(--pad) 10px;
+    padding: var(--pad) var(--pad) 12px;
     font-size: 18px;
     font-weight: 700;
     flex-shrink: 0;
@@ -737,7 +741,7 @@
 
   .play-song-row:hover { background: var(--bg-surface-hover); }
   .play-song-row.selected {
-    background: rgba(219,39,119,0.15);
+    background: var(--pink-15);
     border: 1px solid var(--pink);
   }
 
@@ -862,7 +866,7 @@
 
   .play-lb-row.lb-you .play-lb-tile {
     border: 2px solid var(--pink);
-    box-shadow: 0 0 12px rgba(219,39,119,0.4);
+    box-shadow: 0 0 12px var(--pink-40);
   }
 
   .play-lb-row.lb-you .play-lb-name { color: var(--pink); }
@@ -972,7 +976,7 @@
   }
 
   .play-mode-tab.active {
-    background: rgba(219,39,119,0.15);
+    background: var(--pink-15);
     color: var(--pink);
     border-color: var(--pink);
   }
@@ -1121,6 +1125,8 @@
     justify-content: center;
     flex-wrap: nowrap;
     overflow: hidden;
+    min-height: 28px;
+    flex-shrink: 0;
   }
 
   .meta-bubble {
@@ -1187,7 +1193,7 @@
 
   .play-solo-cover {
     aspect-ratio: 1;
-    height: 80%;
+    height: 90%;
     border-radius: calc(var(--panel-radius) / 2);
     overflow: hidden;
     flex-shrink: 0;
@@ -1203,6 +1209,13 @@
 
 
   .play-solo-cover-add {
+    aspect-ratio: 1;
+    height: 90%;
+    border-radius: calc(var(--panel-radius) / 2);
+    overflow: hidden;
+    flex-shrink: 0;
+    position: relative;
+    background: var(--bg-surface);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -1219,7 +1232,7 @@
 
   .play-solo-btn {
     aspect-ratio: 1;
-    height: 80%;
+    height: 90%;
     border-radius: calc(var(--panel-radius) / 2);
     cursor: pointer;
     border: 2px solid transparent;
@@ -1264,7 +1277,7 @@
 
   .play-solo-add {
     aspect-ratio: 1;
-    height: 80%;
+    height: 90%;
     border-radius: calc(var(--panel-radius) / 2);
     background: var(--bg-surface);
     border: 2px solid transparent;
@@ -1411,12 +1424,12 @@
   .space-popup-cat-options {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
+    gap: var(--grid-gap);
   }
 
   .space-popup-opt {
     border-radius: calc(var(--panel-radius) / 2);
-    padding: 22px 18px;
+    padding: 22px 22px;
     cursor: pointer;
     display: flex;
     flex-direction: column;
@@ -1497,7 +1510,7 @@
   .loadout-cat-options {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
+    gap: var(--grid-gap);
   }
 
   .loadout-opt {
@@ -1558,7 +1571,7 @@
 
   .loadout-close-btn {
     align-self: center;
-    padding: 18px 64px;
+    padding: 20px 64px;
     border-radius: calc(var(--panel-radius) / 2);
     border: none;
     background: var(--bg-surface);
@@ -1577,7 +1590,7 @@
     font-size: 18px;
     font-weight: 700;
     color: var(--text-secondary);
-    padding: 4px 4px 0;
+    padding: 0 4px;
     flex-shrink: 0;
   }
 
@@ -1720,7 +1733,7 @@
     justify-content: center;
     gap: 28px;
     flex-shrink: 0;
-    padding: 24px 0;
+    padding: var(--panel-gap) 0;
   }
 
   .play-go-btn {
@@ -1738,7 +1751,7 @@
 
   .play-go-btn:hover {
     transform: scale(1.05);
-    box-shadow: 0 0 30px rgba(219,39,119,0.5);
+    box-shadow: 0 0 30px var(--pink-50);
   }
 
   .play-duration {
@@ -1962,8 +1975,8 @@
     border-radius: calc(var(--panel-radius) / 3);
     overflow: hidden;
     position: relative;
-    background: rgba(219,39,119,0.15);
-    border: 2px solid rgba(219,39,119,0.3);
+    background: var(--pink-15);
+    border: 2px solid var(--pink-30);
   }
 
   .picker-setlist-tile img {
@@ -2051,7 +2064,7 @@
   .picker-filter:focus {
     outline: none;
     border-color: var(--pink);
-    box-shadow: 0 0 0 2px rgba(219,39,119,0.3);
+    box-shadow: 0 0 0 2px var(--pink-30);
   }
 
   /* ── Spaces Grid ─────────────────────────────────── */
@@ -2070,7 +2083,7 @@
     cursor: pointer;
     position: relative;
     background: var(--bg-surface);
-    border: 1px solid transparent;
+    border: 2px solid transparent;
     transition: box-shadow 0.15s, filter 0.15s, border-color 0.15s;
   }
 
@@ -2128,7 +2141,7 @@
     cursor: pointer;
     position: relative;
     background: var(--bg-surface);
-    border: 1px solid transparent;
+    border: 2px solid transparent;
     opacity: 0.55;
     transition: box-shadow 0.15s, filter 0.15s, border-color 0.15s, opacity 0.15s;
   }
@@ -2243,7 +2256,7 @@
   }
 
   .nav-item.active {
-    background: rgba(219,39,119,0.15);
+    background: var(--pink-15);
     border-color: var(--pink);
   }
 
@@ -2318,7 +2331,7 @@
     cursor: pointer;
     position: relative;
     background: var(--bg-surface);
-    border: 1px solid transparent;
+    border: 2px solid transparent;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -2438,12 +2451,12 @@
   .frame-grid {
     display: grid;
     grid-template-columns: repeat(5, 200px);
-    gap: 40px;
+    gap: var(--pad);
     justify-content: center;
     align-content: center;
     flex: 1;
     min-height: 0;
-    padding: 40px;
+    padding: var(--pad);
   }
 
   .frame-card {
@@ -2910,7 +2923,7 @@
 
   .purchase-buttons {
     display: flex;
-    gap: 20px;
+    gap: var(--panel-gap);
     justify-content: center;
     margin-top: 6px;
   }
@@ -2954,7 +2967,7 @@
     border: none;
     background: var(--bg-surface);
     color: var(--text-primary);
-    font-size: 36px;
+    font-size: 38px;
     font-weight: 800;
     cursor: pointer;
     font-family: inherit;
@@ -3030,7 +3043,7 @@
   .key {
     min-width: 80px;
     height: 80px;
-    border-radius: 14px;
+    border-radius: calc(var(--panel-radius) / 2);
     border: none;
     background: var(--bg-surface);
     color: var(--text-primary);
@@ -3052,7 +3065,7 @@
 
   .save-buttons {
     display: flex;
-    gap: 20px;
+    gap: var(--panel-gap);
     justify-content: center;
     margin-top: 6px;
   }
@@ -3107,7 +3120,7 @@
   .load-list {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: var(--grid-gap);
     overflow-y: auto;
     flex: 1;
     min-height: 0;
@@ -3166,7 +3179,7 @@
 
   .load-item-btn {
     padding: 14px 28px;
-    border-radius: 12px;
+    border-radius: calc(var(--panel-radius) / 2);
     border: none;
     font-size: 22px;
     font-weight: 700;
@@ -3188,12 +3201,12 @@
 
   .load-close-btn {
     align-self: center;
-    padding: 18px 64px;
+    padding: 20px 64px;
     border-radius: calc(var(--panel-radius) / 2);
     border: none;
     background: var(--bg-surface);
     color: var(--text-primary);
-    font-size: 26px;
+    font-size: 34px;
     font-weight: 700;
     cursor: pointer;
     font-family: inherit;
@@ -3472,7 +3485,7 @@
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 20px !important;
+    border-radius: calc(var(--panel-radius) / 2) !important;
     transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
   .theme-arcade .solo-popup-option:hover,
@@ -3539,7 +3552,7 @@
   /* --- Keyboard keys --- */
   .theme-arcade .key,
   .theme-arcade .key-wide {
-    border-radius: 16px !important;
+    border-radius: calc(var(--panel-radius) / 2) !important;
     border: 1px solid rgba(255,255,255,0.1);
     transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
     background: rgba(26,26,62,0.8) !important;
@@ -3840,7 +3853,7 @@
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
     border: 1px solid rgba(217,70,168,0.08);
-    border-radius: 20px !important;
+    border-radius: calc(var(--panel-radius) / 2) !important;
     transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
   .theme-hunter .solo-popup-option:hover,
@@ -3908,7 +3921,7 @@
   /* --- Keyboard keys --- */
   .theme-hunter .key,
   .theme-hunter .key-wide {
-    border-radius: 16px !important;
+    border-radius: calc(var(--panel-radius) / 2) !important;
     border: 1px solid rgba(217,70,168,0.1);
     transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
     background: rgba(232,223,244,0.8) !important;
@@ -4272,7 +4285,7 @@
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
     border: 1px solid rgba(124,91,245,0.08);
-    border-radius: 16px !important;
+    border-radius: calc(var(--panel-radius) / 2) !important;
     transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
   .theme-nebula .solo-popup-option:hover,
@@ -4340,7 +4353,7 @@
   /* --- Keyboard keys --- */
   .theme-nebula .key,
   .theme-nebula .key-wide {
-    border-radius: 14px !important;
+    border-radius: calc(var(--panel-radius) / 2) !important;
     border: 1px solid rgba(124,91,245,0.1);
     transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
     background: rgba(22,32,64,0.9) !important;
@@ -4751,7 +4764,7 @@
     backdrop-filter: blur(12px) saturate(150%);
     -webkit-backdrop-filter: blur(12px) saturate(150%);
     border: 1px solid rgba(88,72,160,0.10);
-    border-radius: 18px !important;
+    border-radius: calc(var(--panel-radius) / 2) !important;
     box-shadow: 0 4px 16px rgba(88,72,160,0.08), inset 0 1px 0 rgba(255,255,255,0.20);
     transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
     position: relative;
@@ -4925,7 +4938,7 @@
   /* --- Glass keyboard keys --- */
   .theme-liquid .key,
   .theme-liquid .key-wide {
-    border-radius: 14px !important;
+    border-radius: calc(var(--panel-radius) / 2) !important;
     background: rgba(88,72,160,0.04) !important;
     border: 1px solid rgba(88,72,160,0.08);
     box-shadow: 0 2px 8px rgba(88,72,160,0.06), inset 0 1px 0 rgba(255,255,255,0.20);
@@ -5271,6 +5284,11 @@
     display: none !important;
   }
 
+  .theme-wireframe .solo-btn-label {
+    position: static !important;
+    text-align: center;
+  }
+
   .theme-wireframe .play-solo-cover-add {
     border: 2px dashed var(--border-strong);
   }
@@ -5371,6 +5389,46 @@
     display: none !important;
   }
 
+  /* ── Home Grid ──────────────────────────────────────── */
+  .home-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: var(--grid-gap);
+    flex: 1;
+    min-height: 0;
+  }
+
+  .home-tile {
+    border-radius: calc(var(--panel-radius) / 2);
+    background: var(--bg-surface);
+    border: 2px solid var(--border-subtle);
+    min-height: 0;
+  }
+
+  /* ── Layout Picker Overlay ─────────────────────────── */
+  .layout-overlay          { display:none; position:absolute; inset:0; background:rgba(0,0,0,0.7); z-index:999; align-items:center; justify-content:center; }
+  .layout-overlay.active   { display:flex; }
+  .layout-popup            { background:var(--bg-panel); border-radius:var(--panel-radius); padding:40px 52px; width:1700px; max-height:90%; display:flex; flex-direction:column; position:relative; }
+  .layout-title            { font-size:40px; font-weight:800; text-align:center; margin-bottom:8px; }
+  .layout-count            { font-size:22px; color:var(--text-secondary); text-align:center; margin-bottom:16px; }
+  .layout-browser          { display:grid; grid-template-columns:repeat(8,1fr); gap:12px; overflow-y:auto; flex:1; min-height:0; }
+
+  /* Thumbnail cards (padding-top trick for 1:1 — Chromium 91 lacks aspect-ratio) */
+  .layout-thumb-wrap       { position:relative; width:100%; padding-top:100%; }
+  .layout-thumb            { position:absolute; top:0;left:0;right:0;bottom:0; display:grid; grid-template-columns:repeat(3,1fr); grid-template-rows:repeat(3,1fr); gap:3px; padding:6px; border-radius:calc(var(--panel-radius)/3); border:2px solid var(--border-subtle); background:var(--bg-panel); cursor:pointer; }
+  .layout-thumb:hover      { border-color:var(--pink); }
+  .layout-thumb.selected   { border-color:var(--pink); box-shadow:0 0 0 3px var(--pink-30); }
+  .layout-thumb-tile       { border-radius:3px; background:var(--bg-surface); }
+
+  /* "Layouts" button on home page */
+  .home-layout-btn         { position:absolute; bottom:16px; right:16px; padding:12px 28px; border-radius:calc(var(--panel-radius)/2); border:2px solid var(--border-strong); background:var(--bg-surface); color:var(--text-primary); font-size:22px; font-weight:700; cursor:pointer; font-family:inherit; z-index:5; }
+  .home-layout-btn:hover   { background:var(--bg-surface-hover); }
+
+  /* Wireframe cleanup */
+  .theme-wireframe .home-tile::before,
+  .theme-wireframe .layout-thumb::before { display:none !important; }
+
 </style>
 </head>
 <body>
@@ -5432,6 +5490,8 @@
     <div class="content-banner" id="content-banner"></div>
     <div class="content-overlay"></div>
     <div class="page active" id="page-home">
+      <div class="home-grid" id="home-grid"></div>
+      <button class="home-layout-btn" onclick="openLayoutPicker()">Layouts</button>
     </div>
 
     <div class="page" id="page-play">
@@ -6095,6 +6155,15 @@
   </div>
 </div>
 
+<div class="layout-overlay" id="layout-overlay" onclick="closeLayoutPicker(event)">
+  <div class="layout-popup" onclick="event.stopPropagation()">
+    <button class="popup-close-btn" onclick="closeLayoutPicker()">&#10005;</button>
+    <div class="layout-title">Choose Layout</div>
+    <div class="layout-count" id="layout-count"></div>
+    <div class="layout-browser" id="layout-browser"></div>
+  </div>
+</div>
+
 </div><!-- /viewport -->
 
 <script>
@@ -6342,6 +6411,7 @@ var songDiffs = {};
 var songSpaces = {};
 var savedSetlists = [];
 var setlistCounter = 1;
+var defaultIconStyle = 'position:absolute;bottom:0;right:0;height:80%;opacity:0.3;pointer-events:none;object-fit:contain';
 
 var spaceCategories = [
   {id:'stage', label:'Stage', options:[
@@ -6586,7 +6656,6 @@ function buildSoloPanel(panel) {
     instBtn.className = 'play-solo-btn' + (isEmpty ? ' empty' : '');
     instBtn.setAttribute('data-inst', instObj.id);
     instBtn.style.background = instObj.bg;
-    var defaultIconStyle = 'position:absolute;bottom:0;right:0;height:80%;opacity:0.3;pointer-events:none;object-fit:contain';
     var iconHtml = instObj.icon ? '<img class="solo-btn-icon" src="' + instObj.icon + '" style="' + (instObj.iconStyle || defaultIconStyle) + '">' : '';
     instBtn.innerHTML = '<span class="solo-btn-label">' + instObj.label + '</span>' + iconHtml;
     instBtn.onclick = (function(songIdx) {
@@ -7020,7 +7089,6 @@ function buildCoopOptionRow(container, options, selectedId, onSelect) {
     var tile = document.createElement('div');
     tile.className = 'play-coop-tile' + (o.id === selectedId ? ' selected' : '');
     tile.style.background = o.bg;
-    var defaultIconStyle = 'position:absolute;bottom:0;right:0;height:80%;opacity:0.3;pointer-events:none;object-fit:contain';
     var iconHtml = o.icon ? '<img src="' + o.icon + '" style="' + (o.iconStyle || defaultIconStyle) + '">' : '';
     tile.innerHTML = '<span class="play-opt-label">' + o.label + '</span>' + iconHtml;
     tile.onclick = (function(opt) {
@@ -7643,7 +7711,7 @@ function applyPickerFilters() {
 
 function buildPlayPanel(songs) {
   allSongs = songs;
-  setlist = songs.slice(0, 6);
+  setlist = [songs[Math.floor(Math.random() * songs.length)]];
   generateDefaultSetlists();
   initLobbyPlates();
   buildModeTabs();
@@ -7721,7 +7789,7 @@ function buildVaultGrid() {
 
 // ── Themes ──────────────────────────────────────────────
 var themes = [
-  { id: 'wireframe-light', name: 'Wireframe Light', bg: '#ffffff', panel: '#f5f5f5', tile: '#ebebeb', tileHover: '#e0e0e0', accent: '#000000', cssClass: 'theme-wireframe' },
+  { id: 'wireframe-light', name: 'Wireframe Light', bg: '#ffffff', panel: '#fafafa', tile: '#ebebeb', tileHover: '#e0e0e0', accent: '#000000', cssClass: 'theme-wireframe' },
   { id: 'wireframe-dark',  name: 'Wireframe Dark',  bg: '#000000', panel: '#0a0a0a', tile: '#141414', tileHover: '#1e1e1e', accent: '#ffffff', cssClass: 'theme-wireframe' },
   { id: 'neon-pink',    name: 'Neon Pink',    bg: '#0d0d1a', panel: '#1a1a2e', tile: '#222238', tileHover: '#2c2c44', accent: '#db2777' },
   { id: 'cyber-cyan',   name: 'Cyber Cyan',   bg: '#051a1f', panel: '#0a2a32', tile: '#10343e', tileHover: '#18404c', accent: '#0891b2' },
@@ -7742,8 +7810,10 @@ var themes = [
   { id: 'liquid-glass', name: 'Liquid Glass', bg: '#ffffff', panel: '#f0edf6', tile: '#e8e4f0', tileHover: '#ddd8ea', accent: '#c83868', cssClass: 'theme-liquid' }
 ];
 
-var currentTheme = 'liquid-glass';
+var currentTheme = 'wireframe-light';
 var userCoins = 5000;
+var allTilings = [];
+var currentLayout = 0;
 var unlockedThemes = ['wireframe-light', 'wireframe-dark', 'neon-pink', 'cyber-cyan', 'sunset-blaze', 'light-mode', 'rainforest', 'neon-arcade', 'hunter', 'nebula', 'liquid-glass'];
 var pendingPurchaseId = null;
 
@@ -8081,7 +8151,22 @@ function initLiquidPointerTracking() {
   vp.addEventListener('touchend', handleLiquidPointerLeave, false);
 }
 
+function resetPurchasePreview() {
+  var p = document.getElementById('purchase-preview');
+  if (!p) return;
+  p.style.background = '';
+  p.style.backgroundImage = '';
+  p.style.backgroundSize = '';
+  p.style.backgroundPosition = '';
+  p.style.border = '';
+  p.style.borderRadius = '';
+  p.style.animation = '';
+  p.style.removeProperty('--frame-color-1');
+  p.style.removeProperty('--frame-color-2');
+}
+
 function openPurchasePopup(themeId) {
+  resetPurchasePreview();
   var theme = null;
   for (var i = 0; i < themes.length; i++) {
     if (themes[i].id === themeId) { theme = themes[i]; break; }
@@ -8133,6 +8218,7 @@ function confirmPurchase() {
 }
 
 function openBannerPurchasePopup(bannerId) {
+  resetPurchasePreview();
   var banner = null;
   for (var i = 0; i < banners.length; i++) {
     if (banners[i].id === bannerId) { banner = banners[i]; break; }
@@ -8176,6 +8262,7 @@ function confirmBannerPurchase() {
 }
 
 function openFramePurchasePopup(frameId) {
+  resetPurchasePreview();
   var frame = null;
   for (var i = 0; i < frames.length; i++) {
     if (frames[i].id === frameId) { frame = frames[i]; break; }
@@ -8584,6 +8671,133 @@ function buildSeasonGrid() {
   }
 }
 
+// ── Home Grid Layout System ──────────────────────────────────────
+function generateAllTilings() {
+  var results = [];
+  var grid = [
+    [0, 0, 0],
+    [0, 0, 0],
+    [0, 0, 0]
+  ];
+
+  function findEmpty() {
+    for (var r = 0; r < 3; r++) {
+      for (var c = 0; c < 3; c++) {
+        if (grid[r][c] === 0) return { r: r, c: c };
+      }
+    }
+    return null;
+  }
+
+  function canPlace(r, c, w, h) {
+    if (r + h > 3 || c + w > 3) return false;
+    for (var dr = 0; dr < h; dr++) {
+      for (var dc = 0; dc < w; dc++) {
+        if (grid[r + dr][c + dc] !== 0) return false;
+      }
+    }
+    return true;
+  }
+
+  function place(r, c, w, h, val) {
+    for (var dr = 0; dr < h; dr++) {
+      for (var dc = 0; dc < w; dc++) {
+        grid[r + dr][c + dc] = val;
+      }
+    }
+  }
+
+  function solve(tiles) {
+    var cell = findEmpty();
+    if (!cell) {
+      results.push(tiles.slice());
+      return;
+    }
+    var r = cell.r, c = cell.c;
+    for (var w = 1; w <= 3 - c; w++) {
+      for (var h = 1; h <= 3 - r; h++) {
+        if (canPlace(r, c, w, h)) {
+          place(r, c, w, h, 1);
+          tiles.push({ r: r, c: c, w: w, h: h });
+          solve(tiles);
+          tiles.pop();
+          place(r, c, w, h, 0);
+        }
+      }
+    }
+  }
+
+  solve([]);
+  return results;
+}
+
+function buildHomeGrid(layoutIndex) {
+  var container = document.getElementById('home-grid');
+  container.innerHTML = '';
+  var tiling = allTilings[layoutIndex];
+  for (var i = 0; i < tiling.length; i++) {
+    var t = tiling[i];
+    var tile = document.createElement('div');
+    tile.className = 'home-tile';
+    tile.style.gridColumn = (t.c + 1) + ' / span ' + t.w;
+    tile.style.gridRow = (t.r + 1) + ' / span ' + t.h;
+    container.appendChild(tile);
+  }
+}
+
+function buildLayoutBrowser() {
+  var browser = document.getElementById('layout-browser');
+  browser.innerHTML = '';
+  document.getElementById('layout-count').textContent = allTilings.length + ' layouts';
+  for (var i = 0; i < allTilings.length; i++) {
+    var wrap = document.createElement('div');
+    wrap.className = 'layout-thumb-wrap';
+    var thumb = document.createElement('div');
+    thumb.className = 'layout-thumb' + (i === currentLayout ? ' selected' : '');
+    thumb.setAttribute('data-layout-index', i);
+    thumb.onclick = (function(idx) {
+      return function() { selectLayout(idx); };
+    })(i);
+
+    var tiling = allTilings[i];
+    for (var j = 0; j < tiling.length; j++) {
+      var t = tiling[j];
+      var cell = document.createElement('div');
+      cell.className = 'layout-thumb-tile';
+      cell.style.gridColumn = (t.c + 1) + ' / span ' + t.w;
+      cell.style.gridRow = (t.r + 1) + ' / span ' + t.h;
+      thumb.appendChild(cell);
+    }
+
+    wrap.appendChild(thumb);
+    browser.appendChild(wrap);
+  }
+}
+
+function selectLayout(index) {
+  currentLayout = index;
+  buildHomeGrid(index);
+  var thumbs = document.querySelectorAll('.layout-thumb');
+  for (var i = 0; i < thumbs.length; i++) {
+    var idx = parseInt(thumbs[i].getAttribute('data-layout-index'), 10);
+    if (idx === index) {
+      thumbs[i].className = 'layout-thumb selected';
+    } else {
+      thumbs[i].className = 'layout-thumb';
+    }
+  }
+}
+
+function openLayoutPicker() {
+  buildLayoutBrowser();
+  document.getElementById('layout-overlay').className = 'layout-overlay active';
+}
+
+function closeLayoutPicker(e) {
+  if (e && e.target !== document.getElementById('layout-overlay')) return;
+  document.getElementById('layout-overlay').className = 'layout-overlay';
+}
+
 function init() {
   // Hide grid nav on start (home is blank, picker shows it when needed)
   var gridNavs = document.querySelectorAll('.grid-nav');
@@ -8602,18 +8816,22 @@ function init() {
   buildSpacesGrid();
   buildVaultGrid();
   buildSeasonGrid();
+  allTilings = generateAllTilings();
+  buildHomeGrid(currentLayout);
   applyTheme(currentTheme);
 
-  // Initialize random unlocked banner
-  var availableBanners = [];
-  for (var b = 0; b < banners.length; b++) {
-    if (!banners[b].locked || isBannerUnlocked(banners[b].id)) {
-      availableBanners.push(banners[b].id);
+  // Initialize random unlocked banner (skip for wireframe themes)
+  if (currentTheme.indexOf('wireframe') === -1) {
+    var availableBanners = [];
+    for (var b = 0; b < banners.length; b++) {
+      if (!banners[b].locked || isBannerUnlocked(banners[b].id)) {
+        availableBanners.push(banners[b].id);
+      }
     }
-  }
-  if (availableBanners.length > 0) {
-    var randomIdx = Math.floor(Math.random() * availableBanners.length);
-    applyBanner(availableBanners[randomIdx]);
+    if (availableBanners.length > 0) {
+      var randomIdx = Math.floor(Math.random() * availableBanners.length);
+      applyBanner(availableBanners[randomIdx]);
+    }
   }
 
   // Initialize default frame
