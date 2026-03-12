@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=1920, height=1920, initial-scale=1.0, user-scalable=no">
 <title>Jamsesh</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><radialGradient id='g' cx='35%25' cy='35%25'><stop offset='0%25' stop-color='%23ff4444'/><stop offset='100%25' stop-color='%238b0000'/></radialGradient></defs><polygon points='50,5 61,38 97,38 68,59 79,93 50,72 21,93 32,59 3,38 39,38' fill='url(%23g)'/></svg>">
-<link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700;800&family=DM+Sans:wght@400;500;600;700;800&family=Orbitron:wght@400;500;700;800;900&family=Chakra+Petch:wght@400;500;600;700&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- Fonts loaded locally: DM Sans, Orbitron, Chakra Petch, Oswald -->
 <style>
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -2218,6 +2218,7 @@
   }
 
   .play-tile:hover .setlist-actions { opacity: 1; }
+  .play-tile:active .setlist-actions { opacity: 1; }
 
   .setlist-btn {
     flex: 1;
@@ -2243,6 +2244,7 @@
 
 
   .play-solo-cover:hover .setlist-actions { opacity: 1; }
+  .play-solo-cover:active .setlist-actions { opacity: 1; }
 
   .play-picker {
     display: none;
@@ -2297,6 +2299,7 @@
   }
 
   .song-tile:hover .song-tile-actions { opacity: 1; }
+  .song-tile:active .song-tile-actions { opacity: 1; }
 
   .song-tile-btn {
     flex: 1;
@@ -2384,6 +2387,7 @@
   }
 
   .picker-setlist-tile:hover .picker-setlist-remove { opacity: 1; }
+  .picker-setlist-tile:active .picker-setlist-remove { opacity: 1; }
 
   .picker-setlist-tile.picker-setlist-empty {
     border-style: dashed;
@@ -7567,42 +7571,42 @@
         <div class="results-lb-list" id="lb-group">
           <div class="results-lb-entry">
             <div class="results-lb-rank">1</div>
-            <div class="results-lb-avatar"><img src="https://i.pravatar.cc/150?img=12" alt=""></div>
+            <div class="results-lb-avatar"><img src="avatars/placeholder-12.png" alt=""></div>
             <div class="results-lb-info"><div class="results-lb-name">Neon Phantoms</div><div class="results-lb-score-val">1,245,678</div></div>
           </div>
           <div class="results-lb-entry highlight">
             <div class="results-lb-rank">2</div>
-            <div class="results-lb-avatar"><img src="https://i.pravatar.cc/150?img=33" alt=""></div>
+            <div class="results-lb-avatar"><img src="avatars/placeholder-33.png" alt=""></div>
             <div class="results-lb-info"><div class="results-lb-name">Jamsesh Hunters</div><div class="results-lb-score-val">1,123,456</div></div>
           </div>
           <div class="results-lb-entry">
             <div class="results-lb-rank">3</div>
-            <div class="results-lb-avatar"><img src="https://i.pravatar.cc/150?img=47" alt=""></div>
+            <div class="results-lb-avatar"><img src="avatars/placeholder-47.png" alt=""></div>
             <div class="results-lb-info"><div class="results-lb-name">Electric Dreams</div><div class="results-lb-score-val">1,098,765</div></div>
           </div>
           <div class="results-lb-entry">
             <div class="results-lb-rank">4</div>
-            <div class="results-lb-avatar"><img src="https://i.pravatar.cc/150?img=5" alt=""></div>
+            <div class="results-lb-avatar"><img src="avatars/placeholder-5.png" alt=""></div>
             <div class="results-lb-info"><div class="results-lb-name">Rhythm Rebels</div><div class="results-lb-score-val">987,654</div></div>
           </div>
           <div class="results-lb-entry">
             <div class="results-lb-rank">5</div>
-            <div class="results-lb-avatar"><img src="https://i.pravatar.cc/150?img=20" alt=""></div>
+            <div class="results-lb-avatar"><img src="avatars/placeholder-20.png" alt=""></div>
             <div class="results-lb-info"><div class="results-lb-name">Sonic Wolves</div><div class="results-lb-score-val">945,210</div></div>
           </div>
           <div class="results-lb-entry">
             <div class="results-lb-rank">6</div>
-            <div class="results-lb-avatar"><img src="https://i.pravatar.cc/150?img=60" alt=""></div>
+            <div class="results-lb-avatar"><img src="avatars/placeholder-60.png" alt=""></div>
             <div class="results-lb-info"><div class="results-lb-name">Bass Bandits</div><div class="results-lb-score-val">912,033</div></div>
           </div>
           <div class="results-lb-entry">
             <div class="results-lb-rank">7</div>
-            <div class="results-lb-avatar"><img src="https://i.pravatar.cc/150?img=31" alt=""></div>
+            <div class="results-lb-avatar"><img src="avatars/placeholder-31.png" alt=""></div>
             <div class="results-lb-info"><div class="results-lb-name">Velvet Crush</div><div class="results-lb-score-val">889,441</div></div>
           </div>
           <div class="results-lb-entry">
             <div class="results-lb-rank">8</div>
-            <div class="results-lb-avatar"><img src="https://i.pravatar.cc/150?img=15" alt=""></div>
+            <div class="results-lb-avatar"><img src="avatars/placeholder-15.png" alt=""></div>
             <div class="results-lb-info"><div class="results-lb-name">Star Strummers</div><div class="results-lb-score-val">854,112</div></div>
           </div>
         </div>
@@ -7610,17 +7614,17 @@
         <div class="results-lb-list" id="lb-me" style="display:none">
           <div class="results-lb-entry">
             <div class="results-lb-rank">1</div>
-            <div class="results-lb-avatar"><img src="https://i.pravatar.cc/150?img=9" alt=""></div>
+            <div class="results-lb-avatar"><img src="avatars/placeholder-9.png" alt=""></div>
             <div class="results-lb-info"><div class="results-lb-name">xShadowPick</div><div class="results-lb-score-val">1,312,400</div></div>
           </div>
           <div class="results-lb-entry">
             <div class="results-lb-rank">2</div>
-            <div class="results-lb-avatar"><img src="https://i.pravatar.cc/150?img=25" alt=""></div>
+            <div class="results-lb-avatar"><img src="avatars/placeholder-25.png" alt=""></div>
             <div class="results-lb-info"><div class="results-lb-name">MelodyQueen</div><div class="results-lb-score-val">1,198,320</div></div>
           </div>
           <div class="results-lb-entry">
             <div class="results-lb-rank">3</div>
-            <div class="results-lb-avatar"><img src="https://i.pravatar.cc/150?img=44" alt=""></div>
+            <div class="results-lb-avatar"><img src="avatars/placeholder-44.png" alt=""></div>
             <div class="results-lb-info"><div class="results-lb-name">BeatDropper99</div><div class="results-lb-score-val">1,087,650</div></div>
           </div>
           <div class="results-lb-entry highlight">
@@ -7630,22 +7634,22 @@
           </div>
           <div class="results-lb-entry">
             <div class="results-lb-rank">5</div>
-            <div class="results-lb-avatar"><img src="https://i.pravatar.cc/150?img=52" alt=""></div>
+            <div class="results-lb-avatar"><img src="avatars/placeholder-52.png" alt=""></div>
             <div class="results-lb-info"><div class="results-lb-name">FretNinja</div><div class="results-lb-score-val">965,880</div></div>
           </div>
           <div class="results-lb-entry">
             <div class="results-lb-rank">6</div>
-            <div class="results-lb-avatar"><img src="https://i.pravatar.cc/150?img=38" alt=""></div>
+            <div class="results-lb-avatar"><img src="avatars/placeholder-38.png" alt=""></div>
             <div class="results-lb-info"><div class="results-lb-name">GrooveMonkey</div><div class="results-lb-score-val">943,210</div></div>
           </div>
           <div class="results-lb-entry">
             <div class="results-lb-rank">7</div>
-            <div class="results-lb-avatar"><img src="https://i.pravatar.cc/150?img=18" alt=""></div>
+            <div class="results-lb-avatar"><img src="avatars/placeholder-18.png" alt=""></div>
             <div class="results-lb-info"><div class="results-lb-name">RiffLord420</div><div class="results-lb-score-val">921,550</div></div>
           </div>
           <div class="results-lb-entry">
             <div class="results-lb-rank">8</div>
-            <div class="results-lb-avatar"><img src="https://i.pravatar.cc/150?img=67" alt=""></div>
+            <div class="results-lb-avatar"><img src="avatars/placeholder-67.png" alt=""></div>
             <div class="results-lb-info"><div class="results-lb-name">PickSlinger</div><div class="results-lb-score-val">898,770</div></div>
           </div>
         </div>
@@ -7756,8 +7760,113 @@ function handleUnityMessage(msg) {
   switch(msg.type) {
     case 'updateProfile': updateProfile(msg.data); break;
     case 'navigate': navigateTo(msg.data); break;
-    default: console.log('[Unity→Jamsesh] Unhandled:', msg);
+    case 'updateSongs': updateSongsFromBackend(msg.data); break;
+    case 'updateLeaderboard': updateLeaderboardFromBackend(msg.data); break;
+    case 'updateFriends': updateFriendsFromBackend(msg.data); break;
+    case 'updateGroups': updateGroupsFromBackend(msg.data); break;
+    case 'updateLobby': updateLobbyFromBackend(msg.data); break;
+    case 'updateHubs': updateHubsFromBackend(msg.data); break;
+    case 'updateCoins': updateCoinsFromBackend(msg.data); break;
+    case 'gameResults': showGameResults(msg.data); break;
+    default: console.log('[Unity\u2192Jamsesh] Unhandled:', msg);
   }
+}
+
+// ── PlayFab Data Receivers ─────────────────────────────
+// Unity sends these after fetching from PlayFab backend
+
+function updateSongsFromBackend(data) {
+  // data: [{rank,title,artist,file,duration,bpm,genre,decade}, ...]
+  if (data && data.length) {
+    allSongs = data;
+    buildGrid(allSongs);
+  }
+}
+
+function updateLeaderboardFromBackend(data) {
+  // data: {song,instrument,difficulty,type,entries:[{pos,name,score,avatar},...]}
+  var list = document.getElementById('play-lb-list');
+  if (!list || !data || !data.entries) return;
+  list.innerHTML = '';
+  for (var i = 0; i < data.entries.length; i++) {
+    var lb = data.entries[i];
+    var row = document.createElement('div');
+    row.className = 'play-lb-row';
+    row.innerHTML =
+      '<span class="play-lb-pos">' + lb.pos + '</span>' +
+      '<div class="play-lb-tile">' +
+        '<img class="play-lb-avatar" src="' + lb.avatar + '" alt="">' +
+        '<div class="play-lb-info">' +
+          '<div class="play-lb-name">' + lb.name + '</div>' +
+          '<div class="play-lb-score">' + lb.score.toLocaleString() + '</div>' +
+        '</div>' +
+      '</div>';
+    list.appendChild(row);
+  }
+}
+
+function updateFriendsFromBackend(data) {
+  // data: [{name,online,avatar}, ...]
+  if (!data) return;
+  // Store and rebuild
+  window._backendFriends = data;
+  buildSocialPage();
+}
+
+function updateGroupsFromBackend(data) {
+  // data: [{name,members,file}, ...]
+  if (!data) return;
+  window._backendGroups = data;
+  buildSocialPage();
+}
+
+function updateLobbyFromBackend(data) {
+  // data: [{name,avatar,instrument,difficulty,ready}, ...]
+  if (!data) return;
+  for (var i = 0; i < data.length && i < lobbyPlayers.length; i++) {
+    lobbyPlayers[i].name = data[i].name || lobbyPlayers[i].name;
+    lobbyPlayers[i].avatar = data[i].avatar || lobbyPlayers[i].avatar;
+    lobbyPlayers[i].instrument = data[i].instrument || lobbyPlayers[i].instrument;
+    lobbyPlayers[i].difficulty = data[i].difficulty || lobbyPlayers[i].difficulty;
+    lobbyPlayers[i].ready = data[i].ready !== undefined ? data[i].ready : lobbyPlayers[i].ready;
+  }
+  buildPlayGrid();
+}
+
+function updateHubsFromBackend(data) {
+  // data: [{name,count,img}, ...]
+  if (!data) return;
+  window._backendHubs = data;
+  buildSpacesGrid();
+}
+
+function updateCoinsFromBackend(data) {
+  // data: {coins: number}
+  if (data && data.coins !== undefined) {
+    userCoins = data.coins;
+    var profile = getActiveProfile();
+    if (profile) profile.coins = data.coins;
+  }
+}
+
+function showGameResults(data) {
+  // data: {score,stars,accuracy,combo,perfect,notes,song:{title,artist,file}}
+  if (!data) return;
+  if (data.song) {
+    var artEl = document.getElementById('results-album-art');
+    var titleEl = document.getElementById('results-song-title');
+    var artistEl = document.getElementById('results-song-artist');
+    if (artEl && data.song.file) artEl.src = data.song.file;
+    if (titleEl) titleEl.textContent = data.song.title || 'Unknown';
+    if (artistEl) artistEl.textContent = data.song.artist || 'Unknown';
+  }
+  switchResultsTab('me');
+  var black = document.getElementById('onboard-black');
+  black.className = 'visible';
+  setTimeout(function() {
+    document.getElementById('screen-results1').classList.add('active');
+    setTimeout(function() { black.className = ''; }, 50);
+  }, 200);
 }
 
 function updateProfile(data) {
@@ -7966,6 +8075,7 @@ function buildSocialPage() {
   // ── Groups ──
   var groupGrid = document.getElementById('social-grid-groups');
   groupGrid.innerHTML = '';
+  // PLAYFAB HOOKUP: Replace with data from Unity via sendToUnity('getGroups') / updateGroups message
   var groups = [
     { name: 'Jamsesh Hunters', members: '8/10', file: 'bandlogos/Gemini_Generated_Image_4aa5a04aa5a04aa5.jpg' },
     { name: 'Neon Phantoms', members: '10/10', file: 'bandlogos/Gemini_Generated_Image_7nxmb87nxmb87nxm.jpg' },
@@ -7995,19 +8105,20 @@ function buildSocialPage() {
   var friendsWrap = document.getElementById('social-friends-list');
   friendsWrap.innerHTML = '';
   friendsWrap.className = 'friends-list-wrap';
+  // PLAYFAB HOOKUP: Replace with data from Unity via sendToUnity('getFriends') / updateFriends message
   var friends = [
     { name: 'Jooleeno', online: true, avatar: 'jooleeno.jpg' },
     { name: 'Ted', online: true, avatar: 'ted.png' },
     { name: 'Abbie', online: true, avatar: 'abbie.png' },
     { name: 'Arthen', online: false, avatar: 'arthen.jpg' },
-    { name: 'xShadowPick', online: true, avatar: 'https://i.pravatar.cc/150?img=9' },
-    { name: 'MelodyQueen', online: false, avatar: 'https://i.pravatar.cc/150?img=25' },
-    { name: 'BeatDropper99', online: false, avatar: 'https://i.pravatar.cc/150?img=44' },
-    { name: 'FretNinja', online: true, avatar: 'https://i.pravatar.cc/150?img=52' },
-    { name: 'GrooveMonkey', online: false, avatar: 'https://i.pravatar.cc/150?img=38' },
-    { name: 'RiffLord420', online: true, avatar: 'https://i.pravatar.cc/150?img=18' },
-    { name: 'PickSlinger', online: false, avatar: 'https://i.pravatar.cc/150?img=67' },
-    { name: 'StarShredder', online: false, avatar: 'https://i.pravatar.cc/150?img=11' }
+    { name: 'xShadowPick', online: true, avatar: 'avatars/placeholder-9.png' },
+    { name: 'MelodyQueen', online: false, avatar: 'avatars/placeholder-25.png' },
+    { name: 'BeatDropper99', online: false, avatar: 'avatars/placeholder-44.png' },
+    { name: 'FretNinja', online: true, avatar: 'avatars/placeholder-52.png' },
+    { name: 'GrooveMonkey', online: false, avatar: 'avatars/placeholder-38.png' },
+    { name: 'RiffLord420', online: true, avatar: 'avatars/placeholder-18.png' },
+    { name: 'PickSlinger', online: false, avatar: 'avatars/placeholder-67.png' },
+    { name: 'StarShredder', online: false, avatar: 'avatars/placeholder-11.png' }
   ];
   for (var i = 0; i < friends.length; i++) {
     var f = friends[i];
@@ -8034,6 +8145,7 @@ function buildSpacesGrid() {
   // ── Public (Hubs) ──
   var pubGrid = document.getElementById('spaces-grid-public');
   pubGrid.innerHTML = '';
+  // PLAYFAB HOOKUP: Replace with data from Unity via sendToUnity('getHubs') / updateHubs message
   var hubs = [
     { name: '18+ Only', count: '18/25', img: 'social.png' },
     { name: 'Swifties', count: '22/25', img: 'stage.png' },
@@ -8143,6 +8255,7 @@ var instruments = [
 ];
 
 // lobbyPlayers uses np plates defined below (initialized in initLobbyPlates)
+// PLAYFAB HOOKUP: Replace with data from Unity via sendToUnity('getLobby') / updateLobby message
 var lobbyPlayers = [
   {name:'xShredMaster',  avatar:'art/001.jpg', plate:null, plateClass:null,            instrument:'guitar', difficulty:'expert', ready:true},
   {name:'BeatDropQueen', avatar:'art/002.jpg', plate:null, plateClass:'plate-holo',    instrument:'drums',  difficulty:'hard',   ready:true},
@@ -9782,47 +9895,98 @@ function buildOptionsRow(container) {
   container.appendChild(optionsRow);
 }
 
+var coopGridPage = 0;
+var COOP_SONGS_PER_PAGE = 2;
+
 function buildCoopGrid(grid) {
   // Songs area with friend grids
   var songsArea = document.createElement('div');
   songsArea.className = 'coop-songs-area';
 
-  for (var i = 0; i < setlist.length; i++) {
-    if (!setlist[i]) continue;
-    var s = setlist[i];
+  var totalPages = Math.max(1, Math.ceil(setlist.length / COOP_SONGS_PER_PAGE));
+  if (coopGridPage >= totalPages) coopGridPage = totalPages - 1;
+  var start = coopGridPage * COOP_SONGS_PER_PAGE;
+
+  for (var i = start; i < start + COOP_SONGS_PER_PAGE; i++) {
     var row = document.createElement('div');
     row.className = 'coop-song-row';
 
-    // Song tile (left)
-    var songTile = document.createElement('div');
-    songTile.className = 'coop-song-tile';
-    songTile.onclick = (function(idx) { return function() { showPlayPicker(); }; })(i);
-    songTile.innerHTML =
-      '<img src="' + (s.file || 'art/001.jpg') + '" alt="">' +
-      '<div class="coop-song-info">' +
-        '<div class="song-title">' + (s.title || 'Unknown') + '</div>' +
-        '<div class="song-artist">' + (s.artist || 'Unknown') + '</div>' +
-      '</div>';
-    row.appendChild(songTile);
+    if (i < setlist.length && setlist[i]) {
+      var s = setlist[i];
+      // Song tile (left)
+      var songTile = document.createElement('div');
+      songTile.className = 'coop-song-tile';
+      songTile.onclick = (function(idx) { return function() { showPlayPicker(); }; })(i);
+      songTile.innerHTML =
+        '<img src="' + (s.file || 'art/001.jpg') + '" alt="">' +
+        '<div class="coop-song-info">' +
+          '<div class="song-title">' + (s.title || 'Unknown') + '</div>' +
+          '<div class="song-artist">' + (s.artist || 'Unknown') + '</div>' +
+        '</div>';
+      row.appendChild(songTile);
 
-    // Friend grid (right) — 3x3 with lobbyPlayers
-    var friendGrid = document.createElement('div');
-    friendGrid.className = 'coop-friend-grid';
-    for (var j = 0; j < 9; j++) {
-      var p = lobbyPlayers[j];
-      var cell = document.createElement('div');
-      cell.className = 'coop-friend-cell';
-      if (p) {
-        cell.innerHTML =
-          '<img src="' + p.avatar + '" alt="">' +
-          '<div class="friend-name">' + p.name + '</div>';
+      // Friend grid (right) — 3x3 with lobbyPlayers
+      var friendGrid = document.createElement('div');
+      friendGrid.className = 'coop-friend-grid';
+      for (var j = 0; j < 9; j++) {
+        var p = lobbyPlayers[j];
+        var cell = document.createElement('div');
+        cell.className = 'coop-friend-cell';
+        if (p) {
+          cell.innerHTML =
+            '<img src="' + p.avatar + '" alt="">' +
+            '<div class="friend-name">' + p.name + '</div>';
+        }
+        friendGrid.appendChild(cell);
       }
-      friendGrid.appendChild(cell);
+      row.appendChild(friendGrid);
+    } else {
+      // Empty add-song row
+      var addTile = document.createElement('div');
+      addTile.className = 'coop-song-tile';
+      addTile.style.cursor = 'pointer';
+      addTile.style.justifyContent = 'center';
+      addTile.style.alignItems = 'center';
+      addTile.style.border = '2px dashed #444444';
+      addTile.style.background = 'transparent';
+      addTile.innerHTML = '<div style="font-size:48px;color:#444444">+</div>';
+      addTile.onclick = function() { showPlayPicker(); };
+      row.appendChild(addTile);
+      var emptyGrid = document.createElement('div');
+      emptyGrid.className = 'coop-friend-grid';
+      for (var k = 0; k < 9; k++) {
+        var emptyCell = document.createElement('div');
+        emptyCell.className = 'coop-friend-cell';
+        emptyGrid.appendChild(emptyCell);
+      }
+      row.appendChild(emptyGrid);
     }
-    row.appendChild(friendGrid);
     songsArea.appendChild(row);
   }
   grid.appendChild(songsArea);
+
+  // Pagination row
+  if (totalPages > 1) {
+    var pagRow = document.createElement('div');
+    pagRow.className = 'play-grid-pagination';
+    var prevBtn = document.createElement('button');
+    prevBtn.className = 'play-grid-nav-btn';
+    prevBtn.innerHTML = '&#9664;';
+    prevBtn.disabled = coopGridPage === 0;
+    prevBtn.onclick = function() { coopGridPage--; buildPlayGrid(); };
+    var label = document.createElement('div');
+    label.className = 'page-label';
+    label.textContent = (coopGridPage + 1) + ' / ' + totalPages;
+    var nextBtn = document.createElement('button');
+    nextBtn.className = 'play-grid-nav-btn';
+    nextBtn.innerHTML = '&#9654;';
+    nextBtn.disabled = coopGridPage >= totalPages - 1;
+    nextBtn.onclick = function() { coopGridPage++; buildPlayGrid(); };
+    pagRow.appendChild(prevBtn);
+    pagRow.appendChild(label);
+    pagRow.appendChild(nextBtn);
+    grid.appendChild(pagRow);
+  }
 
   // Bottom bar: options row + go-bar row
   var bottomBar = document.createElement('div');
@@ -10287,7 +10451,7 @@ var themes = [
   { id: 'cyber-cyan',   name: 'Cyber Cyan',   bg: '#051a1f', panel: '#0a2a32', tile: '#10343e', tileHover: '#18404c', accent: '#0891b2' },
   { id: 'sunset-blaze', name: 'Sunset Blaze', bg: '#1a0d08', panel: '#2e1a10', tile: '#3a2218', tileHover: '#482c20', accent: '#ea580c' },
   { id: 'light-mode',   name: 'Light Mode',   bg: '#e8e8f0', panel: '#f8f8fc', tile: '#eeeef4', tileHover: '#e2e2ec', accent: '#c0206a' },
-  { id: 'rainforest',   name: 'Rainforest',   bg: '#e8e8f0', panel: '#f8f8fc', tile: '#eeeef4', tileHover: '#e2e2ec', accent: '#16a368', bgImage: 'https://images.unsplash.com/photo-1448375240586-882707db888b?w=1920&q=80' },
+  { id: 'rainforest',   name: 'Rainforest',   bg: '#e8e8f0', panel: '#f8f8fc', tile: '#eeeef4', tileHover: '#e2e2ec', accent: '#16a368', bgImage: 'themes/rainforest-bg.jpg' },
   { id: 'dracula',      name: 'Dracula',      bg: '#1e1f29', panel: '#282a36', tile: '#2e3040', tileHover: '#363848', accent: '#ff79c6', locked: true, price: 1000 },
   { id: 'nord',         name: 'Nord',         bg: '#2e3440', panel: '#3b4252', tile: '#434c5e', tileHover: '#4c566a', accent: '#88c0d0', locked: true, price: 1000 },
   { id: 'monokai',      name: 'Monokai',      bg: '#1e1f1c', panel: '#272822', tile: '#30302a', tileHover: '#3a3a32', accent: '#f92672', locked: true, price: 1000 },
