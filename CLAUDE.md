@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Jamsesh is a VR music rhythm game. This repo contains its UI prototype — a **single-file HTML/CSS/JS application** (`index.html`, ~8700 lines) designed to run inside **Vuplex WebView on Meta Quest headsets**. The viewport is a fixed **1920x1920 pixel** panel.
+Jamsesh is a VR music rhythm game. This repo contains its UI prototype — a **single-file HTML/CSS/JS application** (`index.html`, ~12800 lines) designed to run inside **Vuplex WebView on Meta Quest headsets**. The viewport is a fixed **1920x1920 pixel** panel.
 
 There is also a `src/` directory with a Figma Make-exported React/Vite app — this is a separate reference artifact and is **not** the primary working file.
 
@@ -30,6 +30,7 @@ npm run build    # Vite production build
   - No CSS `gap` on flex in older builds; test carefully
 - **Single file**: All CSS is in `<style>`, all JS is in `<script>`, all HTML is inline
 - **No build step**: The file is served directly to the WebView
+- **Exception**: The second `<script>` block (~line 12579) is a post-load interaction layer that uses modern JS (arrow functions, `forEach`). This block runs after the main ES5 app and is acceptable since it is a separate concern — but all **main application code** in the first `<script>` must remain ES5.
 
 ## Data Files
 
@@ -42,15 +43,24 @@ npm run build    # Vite production build
 ## Architecture of index.html
 
 ### Structure (top to bottom)
-1. **CSS** (lines 9–5374): Global styles, component styles, theme overrides (Arcade, Hunter, Nebula, Liquid Glass, Wireframe), banner/frame styles, shimmer animations
-2. **HTML** (lines ~4969–6144): `.viewport` containing `.topbar`, 9 `.page` elements (home, play, career, season, social, spaces, vault, store, settings), `.navbar`, and all popup overlays (inside `.viewport` for correct centering)
-3. **JavaScript** (lines ~6100–8688): Vuplex bridge, navigation, page builders, theme engine, banner/frame systems, profile system, data arrays
+1. **CSS** (lines 9–7475): Global styles, component styles, theme overrides (Arcade, Hunter, Nebula, Liquid Glass, Wireframe), banner/frame styles, shimmer animations, layout overlay styles
+2. **HTML** (lines ~7477–8438): `.viewport` containing a full-screen `<canvas>` for particle background, `.topbar`, 9 `.page` elements (home, play, career, season, social, spaces, vault, store, settings), `.navbar`, all popup overlays, and `.layout-overlay` for the home grid picker
+3. **JavaScript — Main App** (lines ~8439–12578): Vuplex bridge, navigation, page builders, theme engine, banner/frame systems, profile system, home grid tiling generator, data arrays
+4. **JavaScript — Interaction Layer** (lines ~12579–12772): Click bounce feedback and canvas-based particle festival background animation (uses modern JS)
 
 ### Navigation
 - Pages use `display: none` / `.page.active { display: flex }` — **elements in hidden pages have 0 `offsetHeight`**
 - `navigateTo(pageName)` toggles page visibility and updates navbar
 - Song picker is a sub-panel within the Play page, toggled via `showPlayPicker()`/`hidePlayPicker()`
 - Settings page has toggled sub-sections: `showThemes()`, `showBanners()`, `showFrames()`, `showTos()`, `showPrivacy()`
+- Social page has tabs switched via `switchSocialTab(tab)` (friends, groups, etc.)
+
+### Home Grid & Layout System
+- `generateAllTilings()` computes all valid rectangular tilings of a 3x3 grid into `var allTilings = []`
+- `buildHomeGrid(layoutIndex)` renders the home page as octagon-clipped tiles with per-tile glow colors and drop-shadow hover effects
+- `var currentLayout = 283` — default tiling index
+- Layout picker overlay (`.layout-overlay`) shows thumbnail previews of all tilings in a scrollable grid
+- `openLayoutPicker()` / `closeLayoutPicker()` / `selectLayout(index)` manage the overlay
 
 ### Theme System
 - `var themes = [...]` array (~20 themes) defines theme objects with `id`, `bg`, `panel`, `tile`, `tileHover`, `accent`, and optional `cssClass`, `locked`, `price`, `bgImage`
@@ -90,7 +100,7 @@ npm run build    # Vite production build
 - `buildSongColumn()` renders the left-side setlist with add/remove/swap
 
 ### Popup Overlays
-- All overlays (solo-popup, loadout, purchase, save, load) live **inside `.viewport`** and use `position: absolute` to center relative to the 1920x1920 UI panel
+- All overlays (solo-popup, loadout, purchase, save, load, layout-overlay) live **inside `.viewport`** and use `position: absolute` to center relative to the 1920x1920 UI panel
 - Overlays use `z-index: 999`
 - Purchase flow: check `locked` + `isThemeUnlocked()`/`isBannerUnlocked()`/`isFrameUnlocked()` → open popup → confirm → add to unlocked array → apply
 
@@ -98,6 +108,12 @@ npm run build    # Vite production build
 - `var profiles = [...]` defines user profiles (Rael, Jooleeno, Ted, Abbie, Arthen) with avatar, level, XP, coins
 - `switchProfile(profileId)` changes active profile and updates topbar
 - `initStatTicker()` drives the topbar stat ticker rotating through Level, XP, Coins, Season progress every 5 seconds, synced with 3D coin spin animation
+
+### Particle Background
+- Full-viewport `<canvas id="jamseshParticles">` at z-index 0 behind all UI
+- 180 particles: 80 wave-riders follow sine-wave music bands, 100 ambient floaters drift upward
+- 5 horizontal wave lines with glow effects (cyan → purple → pink palette)
+- `drawParticles()` runs via `requestAnimationFrame` loop in the second `<script>` block
 
 ### Liquid Glass Theme
 - `initLiquidSpecular()` injects `::before` pseudo-elements into 20+ interactive element types (only when Liquid Glass is active)
@@ -134,6 +150,7 @@ Frame variables: `--frame-color-1`, `--frame-color-2`
 - `var unlockedThemes`, `var unlockedBanners`, `var unlockedFrames` — arrays of unlocked IDs
 - `var userCoins = 5000` — currency for purchasing locked items
 - `var soloPage = 0`, `var currentPage = 0` — pagination state for solo panel and song picker respectively
+- `var allTilings = []`, `var currentLayout = 283` — home grid tiling data and selected layout
 
 ## Common Pitfalls
 
@@ -146,3 +163,5 @@ Frame variables: `--frame-color-1`, `--frame-color-2`
 - **Dynamic style injection**: `applyBanner()` creates/replaces a `<style id="banner-style">` element at runtime. Don't duplicate this pattern without checking for the existing element.
 - **Liquid Glass cleanup**: Switching away from Liquid Glass must clean up injected specular elements and pointer tracking listeners. `applyTheme()` handles this, but be aware if modifying theme switching.
 - **Setlist is global**: Setlist state does not change when switching profiles — it persists across profile switches.
+- **Two script blocks**: The main app (first `<script>`) is ES5. The interaction layer (second `<script>`) uses modern JS. New application logic should go in the first block using ES5 syntax.
+- **Canvas z-index**: The particle canvas is at `z-index: 0` with `pointer-events: none`. UI elements must remain above it.

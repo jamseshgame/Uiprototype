@@ -4145,6 +4145,341 @@
   }
   .load-close-btn:hover { filter: brightness(1.15); }
 
+  /* ── Create Group Overlay ──────────────────────────── */
+  .create-group-overlay {
+    display: none;
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: #111111;
+    z-index: 999;
+    align-items: center;
+    justify-content: center;
+  }
+  .create-group-overlay.active { display: flex; }
+
+  .create-group-popup {
+    background: var(--bg-panel);
+    border: 2px solid var(--border-strong);
+    border-radius: var(--panel-radius);
+    padding: 40px 52px;
+    width: 1600px;
+    max-width: 92%;
+    max-height: 95%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-color) transparent;
+  }
+
+  .create-group-header {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+
+  .create-group-logo {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    border: 3px solid var(--border-strong);
+    background: var(--bg-surface);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+    transition: border-color 0.15s;
+  }
+  .create-group-logo:hover {
+    border-color: var(--pink);
+  }
+  .create-group-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .create-group-logo .logo-plus {
+    font-size: 64px;
+    font-weight: 300;
+    color: var(--text-muted);
+  }
+
+  .create-group-columns {
+    display: flex;
+    gap: 24px;
+    flex: 1;
+    min-height: 0;
+  }
+
+  .create-group-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 0;
+  }
+
+  .create-group-col-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    padding: 0 4px;
+  }
+
+  .create-group-list {
+    flex: 1;
+    min-height: 0;
+    max-height: 400px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 4px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-color) transparent;
+  }
+
+  .create-group-friend {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 16px;
+    background: var(--bg-surface);
+    border-radius: var(--panel-radius);
+    transition: background 0.15s;
+  }
+
+  .create-group-friend-avatar {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  .create-group-friend-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .create-group-friend-name {
+    flex: 1;
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--text-primary);
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .create-group-friend-btn {
+    padding: 10px 20px;
+    border-radius: var(--panel-radius);
+    border: none;
+    font-size: 20px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: filter 0.15s;
+    flex-shrink: 0;
+  }
+  .create-group-friend-btn:hover { filter: brightness(1.15); }
+  .create-group-friend-btn-add { background: var(--pink); color: #fff; }
+  .create-group-friend-btn-remove { background: var(--bg-panel); color: var(--text-secondary); }
+
+  .create-group-empty {
+    padding: 28px 0;
+    color: var(--text-muted);
+    font-size: 22px;
+    font-weight: 500;
+    text-align: center;
+  }
+
+  /* ── Create Space Overlay ──────────────────────────── */
+  .create-space-overlay {
+    display: none;
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: #111111;
+    z-index: 999;
+    align-items: center;
+    justify-content: center;
+  }
+  .create-space-overlay.active { display: flex; }
+
+  .create-space-popup {
+    background: var(--bg-panel);
+    border: 2px solid var(--border-strong);
+    border-radius: var(--panel-radius);
+    padding: 40px 52px;
+    width: 1600px;
+    max-width: 92%;
+    max-height: 95%;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-color) transparent;
+  }
+
+  .create-space-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    border-radius: var(--panel-radius);
+    overflow: hidden;
+    border: 2px solid var(--border-strong);
+    align-self: center;
+  }
+  .create-space-toggle-btn {
+    padding: 14px 40px;
+    border: none;
+    background: var(--bg-surface);
+    color: var(--text-secondary);
+    font-size: 24px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: background 0.15s, color 0.15s;
+  }
+  .create-space-toggle-btn.active {
+    background: var(--pink);
+    color: #fff;
+  }
+
+  .create-space-env-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+
+  .create-space-env {
+    border-radius: var(--panel-radius);
+    overflow: hidden;
+    cursor: pointer;
+    position: relative;
+    aspect-ratio: 16/10;
+    border: 3px solid transparent;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .create-space-env:hover {
+    border-color: var(--border-strong);
+  }
+  .create-space-env.selected {
+    border-color: var(--pink);
+    box-shadow: 0 0 0 2px var(--pink);
+  }
+  .create-space-env img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .create-space-env-label {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 20px 12px 10px;
+    background: linear-gradient(0deg, rgba(0,0,0,0.85) 0%, transparent 100%);
+    font-size: 22px;
+    font-weight: 700;
+    color: #ffffff;
+    text-align: center;
+  }
+
+  /* ── Logo Picker Overlay ───────────────────────────── */
+  .logo-picker-overlay {
+    display: none;
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+  }
+  .logo-picker-overlay.active { display: flex; }
+
+  .logo-picker-popup {
+    background: var(--bg-panel);
+    border: 2px solid var(--border-strong);
+    border-radius: var(--panel-radius);
+    padding: 40px 52px;
+    width: 700px;
+    max-width: 80%;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    text-align: center;
+  }
+
+  .logo-picker-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+
+  .logo-picker-item {
+    aspect-ratio: 1;
+    border-radius: 50%;
+    overflow: hidden;
+    cursor: pointer;
+    border: 3px solid transparent;
+    transition: border-color 0.15s, transform 0.15s;
+  }
+  .logo-picker-item:hover {
+    border-color: var(--border-strong);
+    transform: scale(1.05);
+  }
+  .logo-picker-item.selected {
+    border-color: var(--pink);
+    box-shadow: 0 0 0 2px var(--pink);
+  }
+  .logo-picker-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* ── Create-New Tile ───────────────────────────────── */
+  .space-tile-create {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 12px;
+    background: var(--bg-surface);
+    border: 3px dashed var(--border-strong);
+    border-radius: var(--panel-radius);
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .space-tile-create:hover {
+    border-color: var(--pink);
+    background: var(--bg-surface-hover);
+  }
+  .space-tile-create:active {
+    transform: scale(0.97);
+  }
+  .space-tile-create-plus {
+    font-size: 64px;
+    font-weight: 300;
+    color: var(--text-muted);
+    line-height: 1;
+  }
+  .space-tile-create-label {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-secondary);
+  }
+
   /* ── VR Pointer Fallback ─────────────────────────
      Duplicate hover effects on :active so VR laser
      pointers always produce visual feedback even if
@@ -4516,7 +4851,10 @@
   .theme-arcade .space-popup,
   .theme-arcade .loadout-popup,
   .theme-arcade .save-popup,
-  .theme-arcade .load-popup {
+  .theme-arcade .load-popup,
+  .theme-arcade .create-group-popup,
+  .theme-arcade .create-space-popup,
+  .theme-arcade .logo-picker-popup {
     background: #12122a !important;
     border: 1px solid rgba(255,255,255,0.1);
     box-shadow: 0 0 30px rgba(255,45,120,0.15), 0 0 60px rgba(168,85,247,0.1);
@@ -4864,7 +5202,10 @@
   .theme-hunter .space-popup,
   .theme-hunter .loadout-popup,
   .theme-hunter .save-popup,
-  .theme-hunter .load-popup {
+  .theme-hunter .load-popup,
+  .theme-hunter .create-group-popup,
+  .theme-hunter .create-space-popup,
+  .theme-hunter .logo-picker-popup {
     background: #f5f0fc !important;
     border: 1px solid rgba(217,70,168,0.1);
     box-shadow: 0 0 25px rgba(217,70,168,0.1), 0 0 50px rgba(167,139,250,0.06);
@@ -5221,7 +5562,10 @@
   .theme-nebula .space-popup,
   .theme-nebula .loadout-popup,
   .theme-nebula .save-popup,
-  .theme-nebula .load-popup {
+  .theme-nebula .load-popup,
+  .theme-nebula .create-group-popup,
+  .theme-nebula .create-space-popup,
+  .theme-nebula .logo-picker-popup {
     background: #0e1528 !important;
     border: 1px solid rgba(124,91,245,0.12);
     box-shadow: 0 0 25px rgba(124,91,245,0.12), 0 0 50px rgba(20,184,166,0.06);
@@ -5782,7 +6126,10 @@
   .theme-liquid .space-popup,
   .theme-liquid .loadout-popup,
   .theme-liquid .save-popup,
-  .theme-liquid .load-popup {
+  .theme-liquid .load-popup,
+  .theme-liquid .create-group-popup,
+  .theme-liquid .create-space-popup,
+  .theme-liquid .logo-picker-popup {
     background: #f0edf6 !important;
     /* backdrop-filter removed for VR perf */
     border: 1px solid rgba(88,72,160,0.12);
@@ -8224,6 +8571,58 @@ button:focus,
   </div>
 </div>
 
+<div class="create-group-overlay" id="create-group-overlay" onclick="closeCreateGroup(event)">
+  <div class="create-group-popup" onclick="event.stopPropagation()" style="position:relative">
+    <button class="popup-close-btn" onclick="closeCreateGroup()">&#10005;</button>
+    <h2 style="font-size:40px;font-weight:800;color:var(--text-primary);margin:0;text-align:center">Create Group</h2>
+    <div class="create-group-header">
+      <div class="create-group-logo" id="create-group-logo" onclick="openLogoPicker()">
+        <span class="logo-plus">+</span>
+      </div>
+      <input class="save-input" id="create-group-name" type="text" placeholder="Group Name" style="flex:1">
+    </div>
+    <div class="create-group-columns">
+      <div class="create-group-col">
+        <div class="create-group-col-title">Available Friends</div>
+        <div class="create-group-list" id="create-group-available"></div>
+      </div>
+      <div class="create-group-col">
+        <div class="create-group-col-title">Group Members</div>
+        <div class="create-group-list" id="create-group-members"></div>
+      </div>
+    </div>
+    <div class="save-buttons">
+      <button class="save-btn-cancel" onclick="closeCreateGroup()">Cancel</button>
+      <button class="save-btn-confirm" onclick="confirmCreateGroup()">Create</button>
+    </div>
+  </div>
+</div>
+
+<div class="logo-picker-overlay" id="logo-picker-overlay" onclick="closeLogoPicker(event)">
+  <div class="logo-picker-popup" onclick="event.stopPropagation()" style="position:relative">
+    <button class="popup-close-btn" onclick="closeLogoPicker()">&#10005;</button>
+    <h2 style="font-size:36px;font-weight:800;color:var(--text-primary);margin:0">Choose Logo</h2>
+    <div class="logo-picker-grid" id="logo-picker-grid"></div>
+  </div>
+</div>
+
+<div class="create-space-overlay" id="create-space-overlay" onclick="closeCreateSpace(event)">
+  <div class="create-space-popup" onclick="event.stopPropagation()" style="position:relative">
+    <button class="popup-close-btn" onclick="closeCreateSpace()">&#10005;</button>
+    <h2 style="font-size:40px;font-weight:800;color:var(--text-primary);margin:0;text-align:center">Create Space</h2>
+    <input class="save-input" id="create-space-name" type="text" placeholder="Space Name">
+    <div class="create-space-toggle" id="create-space-toggle">
+      <button class="create-space-toggle-btn active" onclick="setCreateSpaceType('public')">Public</button>
+      <button class="create-space-toggle-btn" onclick="setCreateSpaceType('private')">Private</button>
+    </div>
+    <div class="create-space-env-grid" id="create-space-env-grid"></div>
+    <div class="save-buttons">
+      <button class="save-btn-cancel" onclick="closeCreateSpace()">Cancel</button>
+      <button class="save-btn-confirm" onclick="confirmCreateSpace()">Create</button>
+    </div>
+  </div>
+</div>
+
 <!-- ══════════════ RESULTS SCREEN 1 ══════════════ -->
 <div class="game-screen" id="screen-results1" style="background:#111111">
   <div class="results-panel">
@@ -8777,6 +9176,14 @@ function buildSocialPage() {
   // ── Groups ──
   var groupGrid = document.getElementById('social-grid-groups');
   groupGrid.innerHTML = '';
+
+  // Create New tile
+  var createTile = document.createElement('div');
+  createTile.className = 'space-tile-create';
+  createTile.onclick = function() { openCreateGroup(); };
+  createTile.innerHTML = '<div class="space-tile-create-plus">+</div><div class="space-tile-create-label">Create New</div>';
+  groupGrid.appendChild(createTile);
+
   // PLAYFAB HOOKUP: Replace with data from Unity via sendToUnity('getGroups') / updateGroups message
   var groups = [
     { name: 'Jamsesh Hunters', members: '8/10', file: 'bandlogos/Gemini_Generated_Image_4aa5a04aa5a04aa5.jpg' },
@@ -8848,6 +9255,14 @@ function buildSpacesGrid() {
   // ── Public (Hubs) ──
   var pubGrid = document.getElementById('spaces-grid-public');
   pubGrid.innerHTML = '';
+
+  // Create New tile
+  var createPub = document.createElement('div');
+  createPub.className = 'space-tile-create';
+  createPub.onclick = function() { openCreateSpace('public'); };
+  createPub.innerHTML = '<div class="space-tile-create-plus">+</div><div class="space-tile-create-label">Create New</div>';
+  pubGrid.appendChild(createPub);
+
   // PLAYFAB HOOKUP: Replace with data from Unity via sendToUnity('getHubs') / updateHubs message
   var hubs = [
     { name: '18+ Only', count: '18/25', img: 'social.png' },
@@ -8857,8 +9272,7 @@ function buildSpacesGrid() {
     { name: 'Rock Legends', count: '15/25', img: 'stage.png' },
     { name: 'Indie Corner', count: '6/25', img: 'lobby.png' },
     { name: 'Hip-Hop Lounge', count: '19/25', img: 'social.png' },
-    { name: 'Metal Pit', count: '12/25', img: 'stage.png' },
-    { name: 'Acoustic Chill', count: '4/25', img: 'lobby.png' }
+    { name: 'Metal Pit', count: '12/25', img: 'stage.png' }
   ];
   for (var i = 0; i < hubs.length; i++) {
     var h = hubs[i];
@@ -8879,9 +9293,17 @@ function buildSpacesGrid() {
     pubGrid.appendChild(tile);
   }
 
-  // ── Private (3 spaces) ──
+  // ── Private ──
   var privGrid = document.getElementById('spaces-grid-private');
   privGrid.innerHTML = '';
+
+  // Create New tile
+  var createPriv = document.createElement('div');
+  createPriv.className = 'space-tile-create';
+  createPriv.onclick = function() { openCreateSpace('private'); };
+  createPriv.innerHTML = '<div class="space-tile-create-plus">+</div><div class="space-tile-create-label">Create New</div>';
+  privGrid.appendChild(createPriv);
+
   var spaceItems = [
     { name: 'Stage', desc: 'Perform live on stage', img: 'stage.png' },
     { name: 'Social Hub', desc: 'Hang out with friends', img: 'social.png' },
@@ -8905,6 +9327,226 @@ function buildSpacesGrid() {
       '</div>';
     privGrid.appendChild(tile);
   }
+}
+
+// ── Create Group ────────────────────────────────────────
+var createGroupMembers = [];
+var createGroupLogo = '';
+
+var groupLogoOptions = [
+  'bandlogos/Gemini_Generated_Image_4aa5a04aa5a04aa5.jpg',
+  'bandlogos/Gemini_Generated_Image_7nxmb87nxmb87nxm.jpg',
+  'bandlogos/Gemini_Generated_Image_8etd7p8etd7p8etd.jpg',
+  'bandlogos/Gemini_Generated_Image_ds7ykeds7ykeds7y.jpg',
+  'bandlogos/Gemini_Generated_Image_dyvmgcdyvmgcdyvm.jpg',
+  'bandlogos/Gemini_Generated_Image_g3jblgg3jblgg3jb.jpg',
+  'bandlogos/Gemini_Generated_Image_wzsyntwzsyntwzsy.jpg'
+];
+
+var availableFriends = [
+  { name: 'Jooleeno', avatar: 'jooleeno.jpg' },
+  { name: 'Ted', avatar: 'ted.png' },
+  { name: 'Abbie', avatar: 'abbie.png' },
+  { name: 'Arthen', avatar: 'arthen.jpg' },
+  { name: 'xShadowPick', avatar: 'avatars/placeholder-9.png' },
+  { name: 'MelodyQueen', avatar: 'avatars/placeholder-25.png' },
+  { name: 'BeatDropper99', avatar: 'avatars/placeholder-44.png' },
+  { name: 'FretNinja', avatar: 'avatars/placeholder-52.png' },
+  { name: 'GrooveMonkey', avatar: 'avatars/placeholder-38.png' },
+  { name: 'RiffLord420', avatar: 'avatars/placeholder-18.png' }
+];
+
+function openCreateGroup() {
+  createGroupMembers = [];
+  createGroupLogo = '';
+  document.getElementById('create-group-name').value = '';
+  var logoEl = document.getElementById('create-group-logo');
+  logoEl.innerHTML = '<span class="logo-plus">+</span>';
+  renderCreateGroupLists();
+  document.getElementById('create-group-overlay').className = 'create-group-overlay active';
+}
+
+function closeCreateGroup(e) {
+  if (e && e.target !== document.getElementById('create-group-overlay')) return;
+  document.getElementById('create-group-overlay').className = 'create-group-overlay';
+}
+
+function renderCreateGroupLists() {
+  var avail = document.getElementById('create-group-available');
+  var members = document.getElementById('create-group-members');
+  avail.innerHTML = '';
+  members.innerHTML = '';
+
+  var addedNames = {};
+  for (var m = 0; m < createGroupMembers.length; m++) {
+    addedNames[createGroupMembers[m].name] = true;
+  }
+
+  for (var i = 0; i < availableFriends.length; i++) {
+    var f = availableFriends[i];
+    if (addedNames[f.name]) continue;
+    var row = document.createElement('div');
+    row.className = 'create-group-friend';
+    row.innerHTML =
+      '<div class="create-group-friend-avatar"><img src="' + f.avatar + '" alt=""></div>' +
+      '<div class="create-group-friend-name">' + f.name + '</div>';
+    var btn = document.createElement('button');
+    btn.className = 'create-group-friend-btn create-group-friend-btn-add';
+    btn.textContent = 'Add';
+    btn.onclick = (function(friend) {
+      return function() { addFriendToGroup(friend); };
+    })(f);
+    row.appendChild(btn);
+    avail.appendChild(row);
+  }
+  if (!avail.children.length) {
+    avail.innerHTML = '<div class="create-group-empty">No more friends to add</div>';
+  }
+
+  for (var j = 0; j < createGroupMembers.length; j++) {
+    var mf = createGroupMembers[j];
+    var mrow = document.createElement('div');
+    mrow.className = 'create-group-friend';
+    mrow.innerHTML =
+      '<div class="create-group-friend-avatar"><img src="' + mf.avatar + '" alt=""></div>' +
+      '<div class="create-group-friend-name">' + mf.name + '</div>';
+    var rbtn = document.createElement('button');
+    rbtn.className = 'create-group-friend-btn create-group-friend-btn-remove';
+    rbtn.textContent = 'Remove';
+    rbtn.onclick = (function(idx) {
+      return function() { removeFriendFromGroup(idx); };
+    })(j);
+    mrow.appendChild(rbtn);
+    members.appendChild(mrow);
+  }
+  if (!createGroupMembers.length) {
+    members.innerHTML = '<div class="create-group-empty">Add friends to your group</div>';
+  }
+}
+
+function addFriendToGroup(friend) {
+  createGroupMembers.push(friend);
+  renderCreateGroupLists();
+}
+
+function removeFriendFromGroup(idx) {
+  createGroupMembers.splice(idx, 1);
+  renderCreateGroupLists();
+}
+
+function confirmCreateGroup() {
+  var name = document.getElementById('create-group-name').value.trim();
+  if (!name) return;
+  sendToUnity('createGroup', {
+    name: name,
+    logo: createGroupLogo,
+    members: createGroupMembers.map(function(f) { return f.name; })
+  });
+  closeCreateGroup();
+}
+
+// ── Logo Picker ─────────────────────────────────────────
+function openLogoPicker() {
+  var grid = document.getElementById('logo-picker-grid');
+  grid.innerHTML = '';
+  for (var i = 0; i < groupLogoOptions.length; i++) {
+    var item = document.createElement('div');
+    item.className = 'logo-picker-item' + (groupLogoOptions[i] === createGroupLogo ? ' selected' : '');
+    item.innerHTML = '<img src="' + groupLogoOptions[i] + '" alt="">';
+    item.onclick = (function(logo) {
+      return function() { selectGroupLogo(logo); };
+    })(groupLogoOptions[i]);
+    grid.appendChild(item);
+  }
+  document.getElementById('logo-picker-overlay').className = 'logo-picker-overlay active';
+}
+
+function closeLogoPicker(e) {
+  if (e && e.target !== document.getElementById('logo-picker-overlay')) return;
+  document.getElementById('logo-picker-overlay').className = 'logo-picker-overlay';
+}
+
+function selectGroupLogo(logoFile) {
+  createGroupLogo = logoFile;
+  var logoEl = document.getElementById('create-group-logo');
+  logoEl.innerHTML = '<img src="' + logoFile + '" alt="">';
+  closeLogoPicker();
+}
+
+// ── Create Space ────────────────────────────────────────
+var createSpaceType = 'public';
+var createSpaceEnv = '';
+
+var spaceEnvironments = [
+  { id: 'stage',      name: 'Stage',       img: 'stage.png' },
+  { id: 'social-hub', name: 'Social Hub',  img: 'social.png' },
+  { id: 'lobby',      name: 'Lobby',       img: 'lobby.png' },
+  { id: 'arena',      name: 'Arena',       img: 'stage.png' },
+  { id: 'beach',      name: 'Beach',       img: 'social.png' },
+  { id: 'forest',     name: 'Forest',      img: 'lobby.png' },
+  { id: 'rooftop',    name: 'Rooftop',     img: 'stage.png' },
+  { id: 'studio',     name: 'Studio',      img: 'social.png' },
+  { id: 'stadium',    name: 'Stadium',     img: 'lobby.png' }
+];
+
+function openCreateSpace(type) {
+  createSpaceType = type || 'public';
+  createSpaceEnv = '';
+  document.getElementById('create-space-name').value = '';
+  updateCreateSpaceToggle();
+  buildCreateSpaceEnvGrid();
+  document.getElementById('create-space-overlay').className = 'create-space-overlay active';
+}
+
+function closeCreateSpace(e) {
+  if (e && e.target !== document.getElementById('create-space-overlay')) return;
+  document.getElementById('create-space-overlay').className = 'create-space-overlay';
+}
+
+function setCreateSpaceType(type) {
+  createSpaceType = type;
+  updateCreateSpaceToggle();
+}
+
+function updateCreateSpaceToggle() {
+  var btns = document.getElementById('create-space-toggle').children;
+  var types = ['public', 'private'];
+  for (var i = 0; i < btns.length; i++) {
+    btns[i].className = 'create-space-toggle-btn' + (types[i] === createSpaceType ? ' active' : '');
+  }
+}
+
+function buildCreateSpaceEnvGrid() {
+  var grid = document.getElementById('create-space-env-grid');
+  grid.innerHTML = '';
+  for (var i = 0; i < spaceEnvironments.length; i++) {
+    var env = spaceEnvironments[i];
+    var card = document.createElement('div');
+    card.className = 'create-space-env' + (createSpaceEnv === env.id ? ' selected' : '');
+    card.innerHTML =
+      '<img src="' + env.img + '" alt="">' +
+      '<div class="create-space-env-label">' + env.name + '</div>';
+    card.onclick = (function(envId) {
+      return function() { selectSpaceEnv(envId); };
+    })(env.id);
+    grid.appendChild(card);
+  }
+}
+
+function selectSpaceEnv(envId) {
+  createSpaceEnv = envId;
+  buildCreateSpaceEnvGrid();
+}
+
+function confirmCreateSpace() {
+  var name = document.getElementById('create-space-name').value.trim();
+  if (!name || !createSpaceEnv) return;
+  sendToUnity('createSpace', {
+    name: name,
+    type: createSpaceType,
+    environment: createSpaceEnv
+  });
+  closeCreateSpace();
 }
 
 // ── Play Panel ──────────────────────────────────────────
