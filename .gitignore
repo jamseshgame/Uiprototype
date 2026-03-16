@@ -1,4 +1,2 @@
-node_modules/
-dist/
-.vite/
-.claude/
+# Unity meta files (generated when used as a submodule in Unity projects)
+*.meta
