@@ -164,8 +164,6 @@
     overflow: hidden;
     position: relative;
     z-index: 0;
-    -webkit-backdrop-filter: blur(3px);
-    backdrop-filter: blur(3px);
     box-shadow: 0 0 10px rgba(0,224,255,0.3), 0 8px 12px rgba(0,0,0,0.3);
   }
 
@@ -525,8 +523,6 @@
     box-shadow:
       0 0 8px rgba(0,224,255,0.25),
       0 8px 12px rgba(0,0,0,0.3);
-    -webkit-backdrop-filter: blur(3px);
-    backdrop-filter: blur(3px);
   }
 
   /* Holographic shimmer edge — top border glow */
@@ -2809,8 +2805,6 @@
     height: var(--nav-btn-h);
     -webkit-clip-path: polygon(10px 0%, calc(100% - 10px) 0%, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0% calc(100% - 10px), 0% 10px);
     clip-path: polygon(10px 0%, calc(100% - 10px) 0%, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0% calc(100% - 10px), 0% 10px);
-    -webkit-backdrop-filter: blur(2px);
-    backdrop-filter: blur(2px);
     box-shadow:
       inset 0 0 0 1px rgba(0,255,180,0.1),
       inset 0 4px 12px rgba(0,0,0,0.3);
@@ -2889,8 +2883,6 @@
     border-radius: 0;
     -webkit-clip-path: polygon(10px 0%, calc(100% - 10px) 0%, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0% calc(100% - 10px), 0% 10px);
     clip-path: polygon(10px 0%, calc(100% - 10px) 0%, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0% calc(100% - 10px), 0% 10px);
-    -webkit-backdrop-filter: blur(2px);
-    backdrop-filter: blur(2px);
     box-shadow: inset 0 0 0 1px rgba(0,255,180,0.1);
     filter: drop-shadow(0 0 6px rgba(0,255,180,0.12));
     font-size: 30px;
@@ -3081,8 +3073,6 @@
     border-radius: var(--panel-radius);
     border: 1px solid rgba(0,224,255,0.3);
     border-top-color: rgba(0,224,255,0.5);
-    -webkit-backdrop-filter: blur(3px);
-    backdrop-filter: blur(3px);
     box-shadow: 0 0 10px rgba(0,224,255,0.4), 0 8px 12px rgba(0,0,0,0.4);
     padding: 0 var(--pad);
     position: relative;
@@ -4517,7 +4507,6 @@
     font-family: 'Orbitron', sans-serif !important;
   }
 
-  /* --- Solid panels (no backdrop-filter for VR perf) --- */
   .theme-arcade .topbar {
     background: #12122a !important;
     border-bottom: 1px solid rgba(255,255,255,0.08);
@@ -4867,7 +4856,6 @@
     font-family: 'Chakra Petch', sans-serif !important;
   }
 
-  /* --- Solid panels (no backdrop-filter for VR perf) --- */
   .theme-hunter .topbar {
     background: #f5f0fc !important;
     border-bottom: 1px solid rgba(217,70,168,0.1);
@@ -5219,7 +5207,6 @@
     100% { background-position: 0% 0%; }
   }
 
-  /* --- Solid panels (no backdrop-filter for VR perf) --- */
   .theme-nebula .topbar {
     background: #0e1528 !important;
     border-bottom: 1px solid rgba(124,91,245,0.1);
@@ -5587,7 +5574,6 @@
   /* --- Glassmorphism panels with layered inner highlights --- */
   .theme-liquid .topbar {
     background: #f2f0f7 !important;
-    /* backdrop-filter removed for VR perf */
     border: 1px solid rgba(88,72,160,0.12) !important;
     border-bottom: 1px solid rgba(88,72,160,0.15) !important;
     box-shadow: 0 8px 12px rgba(88,72,160,0.08), inset 0 1px 0 rgba(255,255,255,0.35);
@@ -5596,7 +5582,6 @@
   }
   .theme-liquid .content {
     background: transparent !important;
-    /* backdrop-filter removed for VR perf */
     border: none !important;
     box-shadow: none !important;
     overflow: hidden;
@@ -5610,7 +5595,6 @@
   }
   .theme-liquid .navbar {
     background: #f2f0f7 !important;
-    /* backdrop-filter removed for VR perf */
     border: 1px solid rgba(88,72,160,0.12) !important;
     border-top: 1px solid rgba(88,72,160,0.15) !important;
     box-shadow: 0 -4px 12px rgba(88,72,160,0.06), inset 0 1px 0 rgba(255,255,255,0.35);
@@ -5635,7 +5619,6 @@
     border-radius: 999px !important;
     background: #f8f8fb !important;
     border: 1px solid rgba(88,72,160,0.08);
-    /* backdrop-filter removed for VR perf */
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.20);
     transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
     transform-origin: center center;
@@ -5818,7 +5801,6 @@
 
   /* --- Liquid: meta bubbles --- */
   .theme-liquid .meta-bubble {
-    /* backdrop-filter removed for VR perf */
     box-shadow: 0 2px 10px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.35);
   }
 
@@ -5852,7 +5834,6 @@
   .theme-liquid .loadout-opt,
   .theme-liquid .play-coop-tile {
     background: #f7f6fa !important;
-    /* backdrop-filter removed for VR perf */
     border: 1px solid rgba(88,72,160,0.10);
     border-radius: var(--panel-radius) !important;
     box-shadow: 0 4px 12px rgba(88,72,160,0.08), inset 0 1px 0 rgba(255,255,255,0.20);
@@ -5908,7 +5889,6 @@
     box-shadow:
       0 8px 12px rgba(88,72,160,0.20),
       inset 0 1px 0 rgba(255,255,255,0.30);
-    /* backdrop-filter removed for VR perf */
     transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
     color: #fff !important;
     text-shadow: 0 1px 3px rgba(0,0,0,0.2);
@@ -5954,7 +5934,6 @@
     border: 1px solid rgba(88,72,160,0.10);
     background: #f7f6fa !important;
     box-shadow: 0 4px 12px rgba(88,72,160,0.06), inset 0 1px 0 rgba(255,255,255,0.20);
-    /* backdrop-filter removed for VR perf */
     transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
     position: relative;
     overflow: hidden;
@@ -5980,7 +5959,6 @@
   /* --- Glass go bar: soft gradient fold --- */
   .theme-liquid .play-go-bar {
     background: transparent !important;
-    /* backdrop-filter removed for VR perf */
     border-top: none;
     box-shadow: none;
     position: relative;
@@ -6017,7 +5995,6 @@
     background: #f8f8fb !important;
     border: 1px solid rgba(88,72,160,0.08);
     box-shadow: 0 2px 8px rgba(88,72,160,0.06), inset 0 1px 0 rgba(255,255,255,0.20);
-    /* backdrop-filter removed for VR perf */
     transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
   .theme-liquid .key:hover,
@@ -6066,7 +6043,6 @@
   .theme-liquid .create-space-popup,
   .theme-liquid .logo-picker-popup {
     background: #f0edf6 !important;
-    /* backdrop-filter removed for VR perf */
     border: 1px solid rgba(88,72,160,0.12);
     box-shadow:
       0 8px 12px rgba(88,72,160,0.15),
@@ -6091,7 +6067,6 @@
     border: 1px solid rgba(88,72,160,0.10);
     background: #f8f8fb !important;
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.20);
-    /* backdrop-filter removed for VR perf */
   }
 
   /* --- Heading: frosted glass text effect --- */
@@ -6108,7 +6083,6 @@
   .theme-liquid .vault-tile:hover,
   .theme-liquid .settings-tile:hover,
   .theme-liquid .theme-card:not(.locked):hover,
-  /* backdrop-filter hover effects removed for VR perf */
 
   /* ── Liquid Glass: Luminous Border Glow (::after) ─ */
   .theme-liquid .nav-item::after,
@@ -6228,8 +6202,6 @@
       inset 0 0 0 3px rgba(88,72,160,0.25),
       inset 0 0 0 5px rgba(255,255,255,0.7) !important;
     animation: none !important;
-    -webkit-backdrop-filter: blur(3px);
-    backdrop-filter: blur(3px);
   }
 
   /* Cel-shade hard highlight — frosted glass diagonal slash */
@@ -6603,8 +6575,6 @@
       rgba(10,14,42,0.35) !important;
     background-size: 200% 200%, 200% 200%, 200% 200%, 100% 100% !important;
     animation: none !important;
-    -webkit-backdrop-filter: blur(2px);
-    backdrop-filter: blur(2px);
     box-shadow:
       inset 0 0 0 3px var(--glow-color, rgba(0,224,255,0.8)),
       inset 0 0 12px var(--glow-color, rgba(0,224,255,0.35)) !important;
