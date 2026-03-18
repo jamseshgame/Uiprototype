@@ -8627,11 +8627,38 @@ function handleUnityMessage(msg) {
 // ── PlayFab Data Receivers ─────────────────────────────
 // Unity sends these after fetching from PlayFab backend
 
+function showPlayLoading(show) {
+  var grid = document.getElementById('play-grid');
+  if (!grid) return;
+  if (show) {
+    grid.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;width:100%;color:#666;font-size:28px">Loading songs\u2026</div>';
+  }
+}
+
+function updateSongCover(index, fileUrl) {
+  if (!allSongs[index]) return;
+  allSongs[index].file = fileUrl;
+  // Update setlist entries that reference this song
+  for (var i = 0; i < setlist.length; i++) {
+    if (setlist[i] && setlist[i].title === allSongs[index].title) {
+      setlist[i].file = fileUrl;
+    }
+  }
+}
+
+// Called by Unity after all album art has been pushed — refresh to show covers
+function songsReady() {
+  buildPlayGrid();
+  buildGrid(allSongs);
+}
+
 function updateSongsFromBackend(data) {
   // data: [{rank,title,artist,file,duration,bpm,genre,decade}, ...]
   if (data && data.length) {
     allSongs = data;
+    showPlayLoading(false);
     buildGrid(allSongs);
+    buildPlayPanel(allSongs);
   }
 }
 
@@ -12812,17 +12839,10 @@ function init() {
   var gridNavs = document.querySelectorAll('.grid-nav');
   for (var i = 0; i < gridNavs.length; i++) gridNavs[i].style.display = 'none';
 
-  var xhr = new XMLHttpRequest();
-  xhr.open('GET', 'songs.json', true);
-  xhr.onload = function() {
-    if (xhr.status === 200) {
-      var songs = JSON.parse(xhr.responseText);
-      buildGrid(songs);
-      buildPlayPanel(songs);
-      buildStoreGrid();
-    }
-  };
-  xhr.send();
+  // Initialize play panel structure; Unity bridge pushes real songs + art
+  buildPlayPanel([]);
+  buildStoreGrid();
+  showPlayLoading(true);
   buildSocialPage();
   buildSpacesGrid();
   buildVaultGrid();
