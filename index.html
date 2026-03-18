@@ -10145,7 +10145,11 @@ function switchResultsTab(tab) {
 }
 
 function startGame() {
-  sendToUnity('startGame', selectedInstrument);
+  var titles = [];
+  for (var i = 0; i < setlist.length; i++) {
+    titles.push(setlist[i].title);
+  }
+  sendToUnity('startGame', {instrument: selectedInstrument, difficulty: selectedDifficulty, setlist: titles});
   // Reset tabs to group
   switchResultsTab('group');
   // Populate results with first setlist song if available
@@ -10311,7 +10315,7 @@ function loadSetlist(idx) {
   document.getElementById('load-overlay').className = 'load-overlay';
   buildSongColumn();
   buildRightPanel();
-  sendToUnity('setlistUpdated', setlist.length);
+  syncSetlistToUnity();
 }
 
 function deleteSetlist(idx) {
@@ -10353,7 +10357,7 @@ function removeFromSetlist(idx) {
   songDiffs = newDiff;
   songSpaces = newSpace;
   buildPlayGrid();
-  sendToUnity('setlistUpdated', setlist.length);
+  syncSetlistToUnity();
 }
 
 function swapSetlistSong(idx) {
@@ -10552,7 +10556,7 @@ function addSongToSetlist(song) {
   }
   buildPlayGrid();
   buildPickerSetlist();
-  sendToUnity('selectSong', song.title);
+  syncSetlistToUnity();
 }
 
 var PICKER_SETLIST_SLOTS = 6;
@@ -10858,7 +10862,7 @@ function applyPickerFilters() {
 
 function buildPlayPanel(songs) {
   allSongs = songs;
-  // Pick 6 random songs for the setlist
+  // Pick 3 random songs for the setlist
   var shuffled = songs.slice();
   for (var i = shuffled.length - 1; i > 0; i--) {
     var j = Math.floor(Math.random() * (i + 1));
@@ -10870,6 +10874,19 @@ function buildPlayPanel(songs) {
   buildModeTabs();
   buildPlayGrid();
   buildLeaderboard();
+
+  // Push initial config state so Unity config matches the UI defaults
+  sendToUnity('selectInstrument', selectedInstrument);
+  sendToUnity('selectDifficulty', selectedDifficulty);
+  syncSetlistToUnity();
+}
+
+function syncSetlistToUnity() {
+  var titles = [];
+  for (var i = 0; i < setlist.length; i++) {
+    titles.push(setlist[i].title);
+  }
+  sendToUnity('setlistUpdated', titles);
 }
 
 var soloGridPage = 0;
