@@ -358,26 +358,18 @@
     background: url('JamPick.png') center center / contain no-repeat;
     filter: drop-shadow(0 2px 6px rgba(0,0,0,0.4));
   }
-  .coin-front::after { display: none; }
   /* Back face — pick image mirrored */
   .coin-back {
     transform: rotateY(180deg) translateZ(3px);
     background: url('JamPick.png') center center / contain no-repeat;
     filter: drop-shadow(0 2px 6px rgba(0,0,0,0.4));
   }
-  .coin-back::after { display: none; }
   /* Edge slices — thin purple strip matching the pick border */
   .coin-edge {
     position: absolute;
     width: 100%;
     height: 100%;
     transform-style: preserve-3d;
-  }
-  .coin-edge-slice {
-    display: none;
-  }
-  .coin-shine {
-    display: none;
   }
 
   /* ── Main Content ─────────────────────────────────── */
@@ -449,6 +441,7 @@
   .grid-nav-btn:hover {
     background: var(--bg-surface-hover);
     color: var(--text-primary);
+    box-shadow: 0 0 20px rgba(255,80,200,0.3), 0 0 50px rgba(255,80,200,0.1);
   }
 
   .grid-nav-btn:disabled {
@@ -488,28 +481,6 @@
     position: relative;
     border: 2px solid transparent;
     transition: box-shadow 0.15s, filter 0.15s, border-color 0.15s;
-  }
-
-  /* ── Music wave + float animations ──────────────── */
-  @keyframes waveScroll {
-    0%   { background-position: 0 0; }
-    100% { background-position: 200px 0; }
-  }
-  @keyframes wavePulse {
-    0%   { opacity: 0.35; }
-    50%  { opacity: 0.7; }
-    100% { opacity: 0.35; }
-  }
-  @keyframes holoFloat {
-    0%   { transform: translateY(0); }
-    50%  { transform: translateY(-4px); }
-    100% { transform: translateY(0); }
-  }
-  @keyframes energyFlow {
-    0%   { background-position: 0% 0%, 100% 100%, 50% 0%, 0% 0%; }
-    33%  { background-position: 100% 50%, 0% 50%, 0% 100%, 0% 0%; }
-    66%  { background-position: 50% 100%, 50% 0%, 100% 50%, 0% 0%; }
-    100% { background-position: 0% 0%, 100% 100%, 50% 0%, 0% 0%; }
   }
 
   /* ── Holographic card shared style ─────────────────── */
@@ -554,64 +525,7 @@
       inset 0 -1px 0 rgba(168,85,247,0.08);
     -webkit-backdrop-filter: blur(20px) saturate(1.6);
     backdrop-filter: blur(20px) saturate(1.6);
-    animation: energyFlow 12s ease-in-out infinite, holoFloat 6s ease-in-out infinite;
   }
-
-  /* Music wave bands flowing across panels */
-  .song-tile::after,
-  .play-tile::after,
-  .play-coop-tile::after,
-  .space-tile::after,
-  .season-tile::after,
-  .vault-tile::after,
-  .settings-tile::after,
-  .theme-card::after,
-  .home-tile::after,
-  .solo-popup-option::after,
-  .loadout-opt::after,
-  .nav-item::after,
-  .grid-nav-btn::after,
-  .play-mode-tab::after,
-  .play-bar-btn::after,
-  .play-go-btn::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: 100%;
-    background:
-      repeating-linear-gradient(90deg,
-        rgba(0,224,255,0.0)  0px,
-        rgba(0,224,255,0.12) 4px,
-        rgba(0,224,255,0.0)  8px,
-        rgba(168,85,247,0.08) 12px,
-        rgba(168,85,247,0.0) 16px,
-        rgba(0,224,255,0.0)  20px,
-        rgba(0,224,255,0.1)  24px,
-        rgba(0,224,255,0.0)  28px,
-        rgba(217,70,168,0.06) 32px,
-        rgba(217,70,168,0.0) 36px,
-        rgba(0,224,255,0.0)  40px
-      );
-    -webkit-mask-image: linear-gradient(0deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.1) 40%, rgba(0,0,0,0) 70%);
-    mask-image: linear-gradient(0deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.1) 40%, rgba(0,0,0,0) 70%);
-    border-radius: inherit;
-    pointer-events: none;
-    z-index: 2;
-    animation: waveScroll 3s linear infinite, wavePulse 4s ease-in-out infinite;
-    display: none;
-  }
-
-  /* Stagger wave scroll for variety */
-  .play-tile::after, .space-tile::after    { animation-delay: 0.4s; }
-  .season-tile::after, .vault-tile::after   { animation-delay: 0.8s; }
-  .settings-tile::after, .theme-card::after { animation-delay: 1.2s; }
-  .nav-item::after { animation-delay: 0.2s; }
-  /* Stagger float so panels don't bob in unison */
-  .play-tile, .space-tile   { animation-delay: 0.5s; }
-  .season-tile, .vault-tile  { animation-delay: 1.0s; }
-  .settings-tile, .theme-card { animation-delay: 1.5s; }
 
   /* Holographic shimmer edge — top border glow */
   .song-tile,
@@ -707,11 +621,13 @@
   .key:active,
   .key-wide:active {
     transform: translateY(-12px) scale(1.04);
-    border-color: rgba(255,80,200,0.7);
+    border-color: rgba(255,80,200,0.8);
     box-shadow:
-      inset 0 0 0 2px rgba(255,80,200,0.4),
-      inset 0 0 30px rgba(255,255,255,0.1);
-    filter: drop-shadow(0 0 25px rgba(255,80,200,0.6)) drop-shadow(0 0 50px rgba(255,80,200,0.2)) drop-shadow(0 25px 35px rgba(0,0,0,0.7));
+      inset 0 0 0 3px rgba(255,80,200,0.5),
+      inset 0 0 40px rgba(255,255,255,0.12),
+      0 0 20px rgba(255,80,200,0.4),
+      0 0 50px rgba(255,80,200,0.2);
+    filter: drop-shadow(0 0 35px rgba(255,80,200,0.8)) drop-shadow(0 0 70px rgba(255,80,200,0.35)) drop-shadow(0 0 100px rgba(255,80,200,0.15)) drop-shadow(0 25px 35px rgba(0,0,0,0.7));
   }
 
   /* ── Futuristic cut-corner frames ──────────────── */
@@ -762,11 +678,13 @@
   }
   #page-store .space-tile:hover,
   #page-store .space-tile:active {
-    outline-color: rgba(255,200,0,0.3);
+    outline-color: rgba(255,200,0,0.4);
     box-shadow:
-      inset 0 0 0 2px rgba(255,200,0,0.5),
-      inset 0 0 30px rgba(255,255,255,0.1);
-    filter: drop-shadow(0 0 25px rgba(255,200,0,0.6)) drop-shadow(0 0 50px rgba(255,200,0,0.2)) drop-shadow(0 25px 35px rgba(0,0,0,0.7));
+      inset 0 0 0 4px rgba(255,200,0,0.6),
+      inset 0 0 40px rgba(255,255,255,0.12),
+      0 0 25px rgba(255,200,0,0.5),
+      0 0 60px rgba(255,200,0,0.2);
+    filter: drop-shadow(0 0 40px rgba(255,200,0,0.8)) drop-shadow(0 0 80px rgba(255,200,0,0.35)) drop-shadow(0 0 120px rgba(255,200,0,0.15)) drop-shadow(0 25px 35px rgba(0,0,0,0.7));
   }
 
   /* Social/Friends = green energy zone */
@@ -784,11 +702,13 @@
   }
   #page-social .space-tile:hover,
   #page-social .space-tile:active {
-    outline-color: rgba(0,255,180,0.3);
+    outline-color: rgba(0,255,180,0.4);
     box-shadow:
-      inset 0 0 0 2px rgba(0,255,180,0.5),
-      inset 0 0 30px rgba(255,255,255,0.1);
-    filter: drop-shadow(0 0 25px rgba(0,255,180,0.6)) drop-shadow(0 0 50px rgba(0,255,180,0.2)) drop-shadow(0 25px 35px rgba(0,0,0,0.7));
+      inset 0 0 0 4px rgba(0,255,180,0.6),
+      inset 0 0 40px rgba(255,255,255,0.12),
+      0 0 25px rgba(0,255,180,0.5),
+      0 0 60px rgba(0,255,180,0.2);
+    filter: drop-shadow(0 0 40px rgba(0,255,180,0.8)) drop-shadow(0 0 80px rgba(0,255,180,0.35)) drop-shadow(0 0 120px rgba(0,255,180,0.15)) drop-shadow(0 25px 35px rgba(0,0,0,0.7));
   }
 
   /* Music Spaces = pink energy zone */
@@ -806,11 +726,13 @@
   }
   #page-spaces .space-tile:hover,
   #page-spaces .space-tile:active {
-    outline-color: rgba(255,80,200,0.3);
+    outline-color: rgba(255,80,200,0.4);
     box-shadow:
-      inset 0 0 0 2px rgba(255,80,200,0.5),
-      inset 0 0 30px rgba(255,255,255,0.1);
-    filter: drop-shadow(0 0 25px rgba(255,80,200,0.6)) drop-shadow(0 0 50px rgba(255,80,200,0.2)) drop-shadow(0 25px 35px rgba(0,0,0,0.7));
+      inset 0 0 0 4px rgba(255,80,200,0.6),
+      inset 0 0 40px rgba(255,255,255,0.12),
+      0 0 25px rgba(255,80,200,0.5),
+      0 0 60px rgba(255,80,200,0.2);
+    filter: drop-shadow(0 0 40px rgba(255,80,200,0.8)) drop-shadow(0 0 80px rgba(255,80,200,0.35)) drop-shadow(0 0 120px rgba(255,80,200,0.15)) drop-shadow(0 25px 35px rgba(0,0,0,0.7));
   }
 
   /* ── Enhanced hover lift ─────────────────────────── */
@@ -854,11 +776,13 @@
   .vault-tile:active,
   .settings-tile:active,
   .theme-card:active {
-    border-color: rgba(255,80,200,0.7);
+    border-color: rgba(255,80,200,0.8);
     box-shadow:
-      inset 0 0 0 2px rgba(255,80,200,0.4),
-      inset 0 0 30px rgba(255,255,255,0.1);
-    filter: brightness(1) drop-shadow(0 0 25px rgba(255,80,200,0.6)) drop-shadow(0 0 50px rgba(255,80,200,0.2)) drop-shadow(0 25px 35px rgba(0,0,0,0.7));
+      inset 0 0 0 3px rgba(255,80,200,0.5),
+      inset 0 0 40px rgba(255,255,255,0.12),
+      0 0 20px rgba(255,80,200,0.4),
+      0 0 50px rgba(255,80,200,0.2);
+    filter: brightness(1) drop-shadow(0 0 35px rgba(255,80,200,0.8)) drop-shadow(0 0 70px rgba(255,80,200,0.35)) drop-shadow(0 0 100px rgba(255,80,200,0.15)) drop-shadow(0 25px 35px rgba(0,0,0,0.7));
   }
 
   /* Shared selected state */
@@ -987,7 +911,7 @@
     transition: background 0.15s;
   }
 
-  .play-song-row:hover { background: var(--bg-surface-hover); }
+  .play-song-row:hover { background: var(--bg-surface-hover); box-shadow: 0 0 15px rgba(255,80,200,0.25), 0 0 40px rgba(255,80,200,0.08); }
   .play-song-row.selected {
     background: var(--pink-15);
     border: 1px solid var(--pink);
@@ -1175,7 +1099,7 @@
     transition: background 0.15s;
   }
 
-  .lb-type-btn:hover { background: var(--bg-surface-hover); }
+  .lb-type-btn:hover { background: var(--bg-surface-hover); box-shadow: 0 0 20px rgba(0,224,255,0.3), 0 0 50px rgba(0,224,255,0.1); }
 
   /* ── Play Grid Layout ─────────────────────────────── */
   .play-main {
@@ -1225,6 +1149,7 @@
   .play-mode-tab:hover {
     background: #444444;
     color: #ffffff;
+    box-shadow: 0 0 20px rgba(255,80,200,0.3), 0 0 50px rgba(255,80,200,0.1);
   }
 
   .play-mode-tab.active {
@@ -2435,6 +2360,7 @@
 
   .play-go-btn:hover {
     background: #e0e0e0;
+    box-shadow: 0 0 0 2px #ffffff, 0 0 25px rgba(255,255,255,0.5), 0 0 60px rgba(255,255,255,0.2);
   }
 
   .play-duration {
@@ -2881,7 +2807,7 @@
       inset 0 4px 12px rgba(0,0,0,0.3);
     filter: drop-shadow(0 0 6px rgba(0,255,180,0.12)) drop-shadow(0 8px 16px rgba(0,0,0,0.3));
     transition: filter 0.3s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
-    animation: friendSlideIn 0.4s ease-out both, energyFlow 14s ease-in-out infinite;
+    animation: friendSlideIn 0.4s ease-out both;
     animation-delay: var(--friend-delay, 0s);
   }
   /* Asymmetric clip per row */
@@ -2893,9 +2819,11 @@
   .friend-item:active {
     transform: translateY(-6px) scale(1.02);
     box-shadow:
-      inset 0 0 0 2px rgba(0,255,180,0.4),
-      inset 0 0 20px rgba(255,255,255,0.05);
-    filter: drop-shadow(0 0 20px rgba(0,255,180,0.5)) drop-shadow(0 0 40px rgba(0,255,180,0.15)) drop-shadow(0 20px 30px rgba(0,0,0,0.6));
+      inset 0 0 0 3px rgba(0,255,180,0.5),
+      inset 0 0 30px rgba(255,255,255,0.08),
+      0 0 20px rgba(0,255,180,0.4),
+      0 0 50px rgba(0,255,180,0.15);
+    filter: drop-shadow(0 0 30px rgba(0,255,180,0.7)) drop-shadow(0 0 60px rgba(0,255,180,0.3)) drop-shadow(0 0 90px rgba(0,255,180,0.1)) drop-shadow(0 20px 30px rgba(0,0,0,0.6));
   }
   /* Online friend — brighter border + avatar glow */
   .friend-item.online {
@@ -3177,8 +3105,8 @@
 
   .nav-item:hover,
   .nav-item:active {
-    background: linear-gradient(135deg, rgba(255,80,200,0.35), rgba(60,130,255,0.35));
-    border-color: rgba(255,80,200,0.5);
+    background: linear-gradient(135deg, rgba(60,130,255,0.35), rgba(0,224,255,0.35));
+    border-color: rgba(60,130,255,0.5);
   }
 
   .nav-item.active {
@@ -3204,7 +3132,7 @@
     flex-shrink: 0;
   }
 
-  .nav-item.active .nav-icon { color: #000000; }
+  .nav-item.active .nav-icon { color: #4a2080; }
 
   .nav-label {
     font-size: 20px;
@@ -3214,7 +3142,7 @@
     text-shadow: none;
   }
 
-  .nav-item.active .nav-label { color: #000000; }
+  .nav-item.active .nav-label { color: #4a2080; }
 
   /* ── Back Button ─────────────────────────────────────── */
   .back-btn {
@@ -3240,6 +3168,7 @@
   .back-btn:hover {
     background: var(--bg-surface-hover);
     color: var(--text-primary);
+    box-shadow: 0 0 20px rgba(255,80,200,0.3), 0 0 50px rgba(255,80,200,0.1);
   }
 
   /* ── Settings ──────────────────────────────────────── */
@@ -3907,7 +3836,7 @@
   }
   .play-bar-btn:hover {
     transform: scale(1.05);
-    box-shadow: 0 0 20px rgba(255,255,255,0.1);
+    box-shadow: 0 0 20px rgba(255,80,200,0.35), 0 0 50px rgba(255,80,200,0.15), 0 0 8px rgba(255,255,255,0.15);
   }
 
   /* ── Save Setlist Overlay ──────────────────────────── */
@@ -6522,101 +6451,6 @@
     background: rgba(64,184,196,0.35);
   }
 
-  /* ── Shimmer Animations ──────────────────────────── */
-  @keyframes shimmerIdle {
-    0%, 85% { transform: translateX(-100%); }
-    100% { transform: translateX(250%); }
-  }
-  @keyframes shimmerHover {
-    0%, 30% { transform: translateX(-100%); }
-    100% { transform: translateX(250%); }
-  }
-  @keyframes shimmerActive {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(250%); }
-  }
-
-  /* Ensure shimmer containment on elements missing overflow/position */
-  .nav-item,
-  .play-mode-tab,
-  .play-bar-btn,
-  .play-go-btn,
-  .lb-type-btn {
-    overflow: hidden;
-    position: relative;
-  }
-
-  /* Shimmer sweep pseudo-element */
-  .nav-item::before,
-  .play-mode-tab::before,
-  .play-solo-btn::before,
-  .play-solo-cover::before,
-  .play-bar-btn::before,
-  .play-go-btn::before,
-  .settings-tile::before,
-  .song-tile::before,
-  .theme-card:not(.locked)::before,
-  .lb-type-btn::before,
-  .space-tile::before,
-  .vault-tile::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 55%;
-    height: 100%;
-    /* Shimmer disabled for VR perf (opacity + alpha gradient on animated layer) */
-    display: none;
-  }
-
-  /* Stagger delays so elements don't shimmer in sync */
-  .nav-item::before              { animation-delay: 0s; }
-  .play-mode-tab::before         { animation-delay: 1.2s; }
-  .play-solo-btn::before         { animation-delay: 2.4s; }
-  .play-solo-cover::before       { animation-delay: 3.6s; }
-  .play-bar-btn::before          { animation-delay: 0.6s; }
-  .play-go-btn::before           { animation-delay: 4.2s; }
-  .settings-tile::before         { animation-delay: 0.8s; }
-  .song-tile::before             { animation-delay: 1.8s; }
-  .theme-card:not(.locked)::before { animation-delay: 2.8s; }
-  .lb-type-btn::before           { animation-delay: 1.5s; }
-  .space-tile::before            { animation-delay: 3.2s; }
-  .vault-tile::before            { animation-delay: 0.4s; }
-
-  /* Hover — faster sweep, brighter */
-  .nav-item:hover::before,
-  .play-mode-tab:hover::before,
-  .play-solo-btn:hover::before,
-  .play-solo-cover:hover::before,
-  .play-bar-btn:hover::before,
-  .play-go-btn:hover::before,
-  .settings-tile:hover::before,
-  .song-tile:hover::before,
-  .theme-card:not(.locked):hover::before,
-  .lb-type-btn:hover::before,
-  .space-tile:hover::before,
-  .vault-tile:hover::before {
-    opacity: 0.8;
-    animation: shimmerHover 3s ease-in-out infinite;
-  }
-
-  /* Active/click — fastest sweep, brightest */
-  .nav-item:active::before,
-  .play-mode-tab:active::before,
-  .play-solo-btn:active::before,
-  .play-solo-cover:active::before,
-  .play-bar-btn:active::before,
-  .play-go-btn:active::before,
-  .settings-tile:active::before,
-  .song-tile:active::before,
-  .theme-card:not(.locked):active::before,
-  .lb-type-btn:active::before,
-  .space-tile:active::before,
-  .vault-tile:active::before {
-    opacity: 1;
-    animation: shimmerActive 0.6s ease-in-out infinite;
-  }
-
   /* ── Wireframe Testing Theme (Dark & Light) ──────── */
   .theme-wireframe,
   .theme-wireframe * {
@@ -6720,22 +6554,6 @@
     border-color: var(--text-primary) !important;
   }
 
-  /* Kill shimmer on wireframe */
-  .theme-wireframe .nav-item::before,
-  .theme-wireframe .play-mode-tab::before,
-  .theme-wireframe .play-solo-btn::before,
-  .theme-wireframe .play-solo-cover::before,
-  .theme-wireframe .play-bar-btn::before,
-  .theme-wireframe .play-go-btn::before,
-  .theme-wireframe .settings-tile::before,
-  .theme-wireframe .song-tile::before,
-  .theme-wireframe .theme-card::before,
-  .theme-wireframe .lb-type-btn::before,
-  .theme-wireframe .space-tile::before,
-  .theme-wireframe .vault-tile::before {
-    display: none !important;
-  }
-
   /* ── Home Grid ──────────────────────────────────────── */
   .home-grid {
     display: grid;
@@ -6785,7 +6603,7 @@
       radial-gradient(ellipse at 50% 80%, rgba(255,80,200,0.04) 0%, transparent 50%),
       rgba(10,14,42,0.35) !important;
     background-size: 200% 200%, 200% 200%, 200% 200%, 100% 100% !important;
-    animation: energyFlow 12s ease-in-out infinite !important;
+    animation: none !important;
     -webkit-backdrop-filter: blur(8px) saturate(1.3);
     backdrop-filter: blur(8px) saturate(1.3);
     box-shadow:
@@ -6824,9 +6642,9 @@
       radial-gradient(ellipse at 50% 80%, rgba(255,80,200,0.06) 0%, transparent 50%),
       rgba(10,14,42,0.45) !important;
     box-shadow:
-      inset 0 0 0 4px var(--glow-hover, rgba(255,80,200,0.9)),
-      inset 0 0 24px var(--glow-hover, rgba(255,80,200,0.5)),
-      inset 0 0 0 6px rgba(0,0,0,0.7),
+      inset 0 0 0 5px var(--glow-hover, rgba(255,80,200,0.9)),
+      inset 0 0 35px var(--glow-hover, rgba(255,80,200,0.6)),
+      inset 0 0 0 7px rgba(0,0,0,0.7),
       inset 0 -40% 0 rgba(0,0,0,0.12),
       inset 0 6px 0 rgba(255,255,255,0.2) !important;
   }
@@ -7656,14 +7474,18 @@
 
 }
 
-.home-grid > *:hover,
+.home-grid > *:hover {
+  transform: translateY(-8px) scale(1.02);
+}
+
 .play-grid > *:hover {
 
   transform: translateY(-8px) scale(1.02);
 
   box-shadow:
   0 15px 35px rgba(0,0,0,.6),
-  0 0 20px var(--pink-40);
+  0 0 30px rgba(255,80,200,0.4),
+  0 0 60px rgba(255,80,200,0.15);
 
 }
 
@@ -7742,11 +7564,11 @@
 
   background:linear-gradient(
   135deg,
-  var(--pink),
-  var(--cyan)
+  rgba(60,130,255,0.5),
+  rgba(0,224,255,0.5)
   );
 
-  box-shadow:0 0 20px var(--pink-40);
+  box-shadow:0 0 25px rgba(60,130,255,0.5), 0 0 60px rgba(60,130,255,0.2);
 
 }
 
@@ -7760,7 +7582,7 @@ button:focus,
 
   box-shadow:
   0 0 0 3px #ffffff,
-  0 0 15px var(--pink);
+  0 0 15px rgba(60,130,255,0.6);
 
 }
 
@@ -12856,28 +12678,15 @@ function buildHomeGrid(layoutIndex) {
       tile.style.setProperty('--glow-hover', gc.h);
       wrap.style.filter = gc.f;
 
-      /* Hover: swap wrapper filter to brighter + pulse */
-      (function(el, normal, hover, pulse) {
-        var pulseId = null;
-        var on = false;
-        function startPulse() {
-          if (on) return;
-          on = true;
+      /* Hover: swap wrapper filter to brighter glow (no pulse) */
+      (function(el, normal, hover) {
+        el.addEventListener('mouseenter', function() {
           el.style.filter = hover;
-          var bright = false;
-          pulseId = setInterval(function() {
-            bright = !bright;
-            el.style.filter = bright ? pulse : hover;
-          }, 600);
-        }
-        function stopPulse() {
-          on = false;
-          clearInterval(pulseId);
+        }, false);
+        el.addEventListener('mouseleave', function() {
           el.style.filter = normal;
-        }
-        el.addEventListener('mouseenter', startPulse, false);
-        el.addEventListener('mouseleave', stopPulse, false);
-      })(wrap, gc.f, gc.fh, gc.fp);
+        }, false);
+      })(wrap, gc.f, gc.fh);
 
       /* Unique clip-path per tile */
       tile.style.webkitClipPath = cp;
