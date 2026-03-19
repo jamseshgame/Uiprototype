@@ -8638,18 +8638,35 @@ function showPlayLoading(show) {
 function updateSongCover(index, fileUrl) {
   if (!allSongs[index]) return;
   allSongs[index].file = fileUrl;
-  // Update setlist entries that reference this song
+
+  // Update the grid tile image directly (avoids full grid rebuild)
+  var pages = document.querySelectorAll('.grid-page');
+  var pageIdx = Math.floor(index / SONGS_PER_PAGE);
+  var tileIdx = index % SONGS_PER_PAGE;
+  if (pages[pageIdx]) {
+    var imgs = pages[pageIdx].querySelectorAll('.song-tile > img');
+    if (imgs[tileIdx]) imgs[tileIdx].src = fileUrl;
+  }
+
+  // Update setlist entries that reference this song and refresh the solo panel
+  var needsRefresh = false;
   for (var i = 0; i < setlist.length; i++) {
     if (setlist[i] && setlist[i].title === allSongs[index].title) {
       setlist[i].file = fileUrl;
+      needsRefresh = true;
     }
+  }
+  if (needsRefresh) {
+    buildPlayGrid();
+    buildRightPanel();
   }
 }
 
-// Called by Unity after all album art has been pushed — refresh to show covers
+// Called by Unity once the song list is available (covers load asynchronously after)
 function songsReady() {
   buildPlayGrid();
   buildGrid(allSongs);
+  buildRightPanel();
 }
 
 function updateSongsFromBackend(data) {
@@ -8693,10 +8710,24 @@ function updateFriendsFromBackend(data) {
 }
 
 function updateGroupsFromBackend(data) {
-  // data: [{name,members,file}, ...]
+  // data: [{id,name,members,file}, ...]
   if (!data) return;
   window._backendGroups = data;
   buildSocialPage();
+}
+
+function updateGroupLogo(index, fileUrl) {
+  if (!window._backendGroups || !window._backendGroups[index]) return;
+  window._backendGroups[index].file = fileUrl;
+
+  // Update the tile image directly (offset by 1 for the "Create New" tile)
+  var groupGrid = document.getElementById('social-grid-groups');
+  if (!groupGrid) return;
+  var tiles = groupGrid.querySelectorAll('.space-tile');
+  if (tiles[index]) {
+    var img = tiles[index].querySelector('img');
+    if (img) img.src = fileUrl;
+  }
 }
 
 function updateLobbyFromBackend(data) {
@@ -8962,8 +8993,7 @@ function buildSocialPage() {
   createTile.innerHTML = '<div class="space-tile-create-plus">+</div><div class="space-tile-create-label">Create New</div>';
   groupGrid.appendChild(createTile);
 
-  // PLAYFAB HOOKUP: Replace with data from Unity via sendToUnity('getGroups') / updateGroups message
-  var groups = [
+  var groups = window._backendGroups || [
     { name: 'Jamsesh Hunters', members: '8/10', file: 'bandlogos/Gemini_Generated_Image_4aa5a04aa5a04aa5.jpg' },
     { name: 'Neon Phantoms', members: '10/10', file: 'bandlogos/Gemini_Generated_Image_7nxmb87nxmb87nxm.jpg' },
     { name: 'Electric Dreams', members: '6/10', file: 'bandlogos/Gemini_Generated_Image_8etd7p8etd7p8etd.jpg' },
@@ -8977,7 +9007,13 @@ function buildSocialPage() {
     var tile = document.createElement('div');
     tile.className = 'space-tile';
     tile.onclick = (function(grp) {
-      return function() { sendToUnity('viewGroup', grp.name); };
+      return function() {
+        if (grp.id) {
+          sendToUnity('enterBandspace', { id: grp.id, name: grp.name });
+        } else {
+          sendToUnity('viewGroup', grp.name);
+        }
+      };
     })(g);
     tile.innerHTML =
       '<img src="' + g.file + '" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover" alt="">' +
@@ -10931,7 +10967,7 @@ function buildSoloGrid(grid) {
       tile.onclick = (function(idx) { return function() { showPlayPicker(); }; })(i);
       tile.innerHTML =
         '<div class="play-grid-song-art">' +
-          '<img src="' + (s.file || 'art/001.jpg') + '" alt="">' +
+          '<img src="' + (s.file || '') + '" alt="" style="' + (s.file ? '' : 'display:none') + '">' +
           '<div class="song-pos">' + (i + 1) + '</div>' +
         '</div>' +
         '<div class="play-grid-song-info">' +
