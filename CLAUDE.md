@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Jamsesh is a VR music rhythm game. This repo contains its UI prototype — a **single-file HTML/CSS/JS application** (`index.html`, ~12800 lines) designed to run inside **Vuplex WebView on Meta Quest headsets**. The viewport is a fixed **1920x1920 pixel** panel.
+Jamsesh is a VR music rhythm game. This repo contains its UI prototype — a **single-file HTML/CSS/JS application** (`index.html`, ~13200 lines) designed to run inside **Vuplex WebView on Meta Quest headsets**. The viewport is a fixed **1920x1920 pixel** panel.
 
 There is also a `src/` directory with a Figma Make-exported React/Vite app — this is a separate reference artifact and is **not** the primary working file.
 
@@ -35,25 +35,31 @@ npm run build    # Vite production build
 ## Data Files
 
 - **songs.json**: Song library containing 100 tracks with metadata fields: `rank`, `title`, `artist`, `file` (path to cover art in `art/`), `duration` (seconds), `bpm`, `genre`, `decade`
-  - Loaded via XMLHttpRequest in `init()` and rendered by `buildSoloPanel()` for the paginated setlist grid
+  - Loaded via XMLHttpRequest in `init()` and rendered by `buildPlayGrid()` for the solo setlist and `buildStoreGrid()` for the store songs tab
   - Cover art files are `art/001.jpg` through `art/100.jpg`
 - **banners/**: Banner image PNGs (Space 1, Daisies, Gothic, etc.) used by the scrolling banner system
+- **Space images**: `stage.png`, `social.png`, `lobby.png` — used as tile backgrounds in the Spaces page
+- **Game assets**: `vlcsnap-2026-03-10-14h09m45s826.png` (gameplay screenshot), `JamPick.png` (picks icon), `grammys.jpg` (season banner), `Logo (1080 x 1080 px).png` (Jamsesh logo)
 - **Profile avatars**: `rael_new.png`, `jooleeno.jpg`, `ted.png`, `abbie.png`, `arthen.jpg` — used by the profile switcher in the topbar
 
 ## Architecture of index.html
 
 ### Structure (top to bottom)
-1. **CSS** (lines 9–7475): Global styles, component styles, theme overrides (Arcade, Hunter, Nebula, Liquid Glass, Wireframe), banner/frame styles, shimmer animations, layout overlay styles
-2. **HTML** (lines ~7477–8438): `.viewport` containing a full-screen `<canvas>` for particle background, `.topbar`, 9 `.page` elements (home, play, career, season, social, spaces, vault, store, settings), `.navbar`, all popup overlays, and `.layout-overlay` for the home grid picker
-3. **JavaScript — Main App** (lines ~8439–12578): Vuplex bridge, navigation, page builders, theme engine, banner/frame systems, profile system, home grid tiling generator, data arrays
-4. **JavaScript — Interaction Layer** (lines ~12579–12772): Click bounce feedback and canvas-based particle festival background animation (uses modern JS)
+1. **CSS** (lines 9–7573): Global styles, component styles, play grid/coop/option-picker styles, game screen/results/rewards styles, theme overrides (Arcade, Hunter, Nebula, Liquid Glass, Wireframe), banner/frame styles, shimmer animations, layout overlay styles
+2. **HTML** (lines ~7574–8588): `.viewport` containing a full-screen `<canvas>` for particle background, `.topbar`, 9 `.page` elements (home, play, career, season, social, spaces, vault, store, settings), `.navbar`, all popup overlays (solo-popup, option-picker, save/load setlist), `.layout-overlay`, and game screens (gameplay, results 1, results 2)
+3. **JavaScript — Main App** (lines ~8589–12991): Vuplex bridge, navigation, page builders, theme engine, banner/frame systems, profile system, play grid system (solo/coop/battle), option picker popups, store builder, home grid tiling generator, data arrays
+4. **JavaScript — Interaction Layer** (lines ~12992–13165): Click bounce feedback and canvas-based particle festival background animation (uses modern JS)
 
 ### Navigation
 - Pages use `display: none` / `.page.active { display: flex }` — **elements in hidden pages have 0 `offsetHeight`**
 - `navigateTo(pageName)` toggles page visibility and updates navbar
 - Song picker is a sub-panel within the Play page, toggled via `showPlayPicker()`/`hidePlayPicker()`
 - Settings page has toggled sub-sections: `showThemes()`, `showBanners()`, `showFrames()`, `showTos()`, `showPrivacy()`
-- Social page has tabs switched via `switchSocialTab(tab)` (friends, groups, etc.)
+- Social page: 2 tabs (Groups, Friends) via `switchSocialTab(tab)`
+- Spaces page: 2 tabs (Public, Private) via `switchSpacesTab(tab)`
+- Vault page: 2 tabs (Owned, Creator) via `switchVaultTab(tab)`
+- Store page: 3 tabs (Songs, Packs, Items) via `switchStoreTab(tab)`
+- Season page: "COMING SOON" placeholder (no interactive content)
 
 ### Home Grid & Layout System
 - `generateAllTilings()` computes all valid rectangular tilings of a 3x3 grid into `var allTilings = []`
@@ -82,26 +88,42 @@ npm run build    # Vite production build
 - Profile avatar border animates between frame colors via `@keyframes frameGlow`
 - `buildFrameGrid()` renders circular frame preview cards in a 5-column grid
 
-### Solo Panel & Pagination
-- `SOLO_PER_PAGE = 3` rows per page, paginated with arrow buttons
-- `buildSoloPanel()` renders the setlist grid with instrument/difficulty/space/loadout buttons, cover art, and metadata bubbles
-- Page transitions use directional slide animations (up/down)
-- `sizeSoloPeek()` must be called when the Play page **becomes visible** (not during init when page is `display: none`)
+### Play Tab System
+- Three modes: **Solo**, **Group**, **Battle** — switched via `setPlayMode(mode)` which calls `buildPlayGrid()`
+- `buildPlayGrid()` dispatches to `buildSoloGrid()` or `buildCoopGrid()` based on `playMode`
+- **Solo mode**: 3 songs per page with pagination (`soloGridPage`), setlist summary row (song count + total duration), and option tiles (Instrument/Difficulty/Experience)
+- **Group/Battle mode**: Left column of song tiles + 3x3 friend avatar grid per song from `lobbyPlayers[]`, bottom 6 buttons (options row + Save/Start/Load)
+- Option tiles open popup panels via `openOptionPicker(type)`:
+  - **Instrument**: Simple list (Guitar, Drums, Vocals, Bass) → sets `selectedInstrument`
+  - **Difficulty**: Simple list (Easy, Normal, Hard, Expert) → sets `selectedDifficulty`
+  - **Experience**: Tabbed picker with 5 tabs (Stage, Gem, Highway, Inst. Skin, Skybox) → sets `selectedExpItems[tab]` and `selectedExperience`
+- `buildPlayPanel(songs)` initializes the setlist with 3 random songs and calls `buildPlayGrid()`
+- Static `.play-go-bar` (Save/Start/Load) shown in solo mode, hidden in coop (rendered dynamically)
 
 ### Song Picker Grid
 - `SONGS_PER_PAGE = 20` songs per grid page
 - `buildGrid(songs)` renders the paginated song grid with `buildNavButtons()` for pagination
 - `constrainGridNav()` measures grid page height dynamically — must run after picker is visible
-- `applyPickerFilters()` applies instrument/difficulty/sort filters
+- `applyPickerFilters()` applies genre/decade/duration/sort filters
+- `showPlayPicker()` hides play-main-layout and shows the picker; `hidePlayPicker()` reverses
 
-### Play Mode Tabs
-- Three modes: Solo, Co-op, Battle — switched via `setPlayMode(mode)`
-- `buildSoloPanel()` for solo; `buildCoopPanel()` for co-op/battle (with player nameplates)
-- `buildSongColumn()` renders the left-side setlist with add/remove/swap
+### Gameplay & Results Flow
+- `startGame()` populates results from setlist, fades to gameplay screen via `#onboard-black` overlay
+- **Gameplay screen**: Full-screen screenshot, click anywhere → `showResults1()`
+- **Results Screen 1**: Two columns — left (album art + score with Group/Me tabs, 2x2 stats grid), right (full-height leaderboard with Group/Me lists). `switchResultsTab(tab)` syncs both panels.
+- **Results Screen 2**: 2x2 rewards grid (Picks, Badges, XP, Grammys Season). Back/Continue buttons.
+- All game screens use `position: absolute; z-index: 998` inside `.viewport`, toggled via `.active` class
+- Transitions use fade-to-black (`#onboard-black` div at z-index 1001, 200ms opacity transition)
+
+### Store Page
+- 3 tabs: **Songs** (9 random cover art tiles with $2.99 price tags), **Packs** (6 themed bundles + 3 locked with unlock dates), **Items** (9 category sections: Spaces, Stages, Avatar, Instruments, Gem, Highway, Skybox, Theme, Frame)
+- `buildStoreGrid()` called after songs load in XHR callback (needs `allSongs` populated)
+- `switchStoreTab(tab)` toggles between songs/packs/items
 
 ### Popup Overlays
-- All overlays (solo-popup, loadout, purchase, save, load, layout-overlay) live **inside `.viewport`** and use `position: absolute` to center relative to the 1920x1920 UI panel
+- All overlays (solo-popup, option-picker, loadout, purchase, save, load, layout-overlay) live **inside `.viewport`** and use `position: absolute` to center relative to the 1920x1920 UI panel
 - Overlays use `z-index: 999`
+- Option picker overlay (`#option-picker-overlay`) used by instrument/difficulty/experience selection
 - Purchase flow: check `locked` + `isThemeUnlocked()`/`isBannerUnlocked()`/`isFrameUnlocked()` → open popup → confirm → add to unlocked array → apply
 
 ### Profile System
@@ -130,6 +152,8 @@ Key variables set by themes: `--bg-body`, `--bg-panel`, `--bg-surface`, `--bg-su
 
 Frame variables: `--frame-color-1`, `--frame-color-2`
 
+**Unified radius**: All panels, buttons, tabs, and tiles use `var(--panel-radius)` (28px). No `calc(var(--panel-radius) / 2)` or hardcoded pixel values — only exceptions are `50%` for circles, `999px` for pills, and the quest onboarding screen.
+
 ### Shimmer Animations
 - `::before` pseudo-element on interactive elements (nav items, buttons, tiles)
 - Three tiers: `shimmerIdle` (10s), `shimmerHover` (3s), `shimmerActive` (0.6s)
@@ -146,11 +170,16 @@ Frame variables: `--frame-color-1`, `--frame-color-2`
 ### Key Global State
 - `var allSongs = []` — loaded from songs.json
 - `var setlist = []` — current song setlist (global, not per-profile)
+- `var playMode = 'solo'` — current play tab mode (solo/coop/battle)
+- `var selectedInstrument`, `var selectedDifficulty`, `var selectedExperience` — play option selections
+- `var selectedExpItems = {stage, gem, highway, skin, skybox}` — per-tab experience selections
+- `var soloGridPage = 0` — pagination state for solo play grid
 - `var currentTheme`, `var currentBanner`, `var currentFrame` — active cosmetic selections
 - `var unlockedThemes`, `var unlockedBanners`, `var unlockedFrames` — arrays of unlocked IDs
 - `var userCoins = 5000` — currency for purchasing locked items
-- `var soloPage = 0`, `var currentPage = 0` — pagination state for solo panel and song picker respectively
+- `var currentPage = 0` — pagination state for song picker
 - `var allTilings = []`, `var currentLayout = 283` — home grid tiling data and selected layout
+- `var lobbyPlayers = [9]` — player data for coop/battle friend grids
 
 ## Common Pitfalls
 
@@ -165,3 +194,8 @@ Frame variables: `--frame-color-1`, `--frame-color-2`
 - **Setlist is global**: Setlist state does not change when switching profiles — it persists across profile switches.
 - **Two script blocks**: The main app (first `<script>`) is ES5. The interaction layer (second `<script>`) uses modern JS. New application logic should go in the first block using ES5 syntax.
 - **Canvas z-index**: The particle canvas is at `z-index: 0` with `pointer-events: none`. UI elements must remain above it.
+- **Null guard on removed elements**: If you remove an HTML element (e.g., `#season-grid`), any JS function that accesses it must add a null check (`if (!container) return;`), otherwise it crashes and blocks all subsequent JS execution in `init()`.
+- **Store grid needs songs loaded**: `buildStoreGrid()` must be called inside the XHR callback after `allSongs` is populated, not in the synchronous init block.
+- **Play grid mode switching**: `buildPlayGrid()` dynamically changes the `#play-grid` className between `play-grid--solo` and `play-grid--coop`, and toggles the static `.play-go-bar` visibility. Coop mode renders its own bottom buttons.
+- **`aspect-ratio` CSS not supported**: Chromium 91 does not support `aspect-ratio`. Use fixed `width`/`height` dimensions instead.
+- **Greyscale wireframe design**: The current UI is a greyscale wireframe for UX evaluation. All results/rewards screens, buttons, and tabs use black/white/grey color scheme (#333333 inactive, #ffffff active with `box-shadow: 0 0 0 2px #ffffff`).
