@@ -6915,6 +6915,56 @@
     font-family: 'Inter', sans-serif;
   }
   .onboard-screen.hidden { display: none; }
+
+  /* Early Access disclaimer */
+  .early-access-overlay {
+    position: absolute;
+    top: 0; left: 0;
+    width: 1920px; height: 1920px;
+    z-index: 1002;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 120px 160px;
+    box-sizing: border-box;
+    background: transparent;
+  }
+  .early-access-overlay.hidden { display: none; }
+  .early-access-title {
+    font-family: 'Inter', sans-serif;
+    font-size: 96px;
+    font-weight: 900;
+    color: #ffffff;
+    margin: 0 0 80px 0;
+    text-align: center;
+    text-shadow: 0 4px 40px rgba(0,0,0,0.6);
+  }
+  .early-access-body {
+    font-family: 'Inter', sans-serif;
+    font-size: 44px;
+    font-weight: 400;
+    line-height: 1.7;
+    color: rgba(255,255,255,0.88);
+    margin: 0 0 100px 0;
+    text-align: center;
+    text-shadow: 0 2px 20px rgba(0,0,0,0.5);
+  }
+  .early-access-ok {
+    font-family: 'Inter', sans-serif;
+    font-size: 48px;
+    font-weight: 800;
+    color: #ffffff;
+    background: var(--pink, #e91e8c);
+    border: none;
+    border-radius: var(--panel-radius);
+    padding: 40px 200px;
+    cursor: pointer;
+    text-shadow: none;
+  }
+  .early-access-ok:active {
+    opacity: 0.8;
+  }
   #onboard-black {
     position: absolute;
     top: 0; left: 0;
@@ -7793,6 +7843,13 @@ button:focus,
 
 <div class="viewport">
     <canvas id="jamseshParticles" style="position:absolute;top:0;left:0;width:1920px;height:1920px;pointer-events:none;z-index:0;"></canvas>
+
+<!-- ══════════════ EARLY ACCESS DISCLAIMER ══════════════ -->
+<div class="early-access-overlay" id="early-access-overlay">
+  <h2 class="early-access-title">Early Access</h2>
+  <p class="early-access-body">Welcome to Jamsesh! This game is currently in early access. Some features may be incomplete, and you may experience occasional bugs or changes as we continue development. We are actively adding new content, improving performance, and refining the experience based on your feedback. If you run into any issues or have suggestions, we would love to hear from you on Discord at <a href="https://discord.gg/jamsesh" style="color:var(--pink, #e91e8c);text-decoration:underline">discord.gg/jamsesh</a>. Thanks for being part of the journey!</p>
+  <button class="early-access-ok" onclick="dismissEarlyAccess()">OK</button>
+</div>
 
 <!-- ══════════════ TOP BAR ══════════════ -->
 <header class="topbar" onclick="navigateTo('career')" style="cursor:pointer">
@@ -13573,7 +13630,26 @@ function onboardPermsOk() {
   );
 }
 
+function dismissEarlyAccess() {
+  var overlay = document.getElementById('early-access-overlay');
+  if (overlay) overlay.classList.add('hidden');
+  var topbar = document.querySelector('.topbar');
+  var navbar = document.querySelector('.navbar');
+  if (topbar) topbar.style.display = '';
+  if (navbar) navbar.style.display = '';
+  var pages = document.querySelectorAll('.page');
+  for (var i = 0; i < pages.length; i++) pages[i].style.visibility = '';
+}
+
 function init() {
+  // Hide main UI while early access screen is showing
+  var topbar = document.querySelector('.topbar');
+  var navbar = document.querySelector('.navbar');
+  if (topbar) topbar.style.display = 'none';
+  if (navbar) navbar.style.display = 'none';
+  var allPages = document.querySelectorAll('.page');
+  for (var p = 0; p < allPages.length; p++) allPages[p].style.visibility = 'hidden';
+
   navigateTo('home');
   // Hide grid nav on start (home is blank, picker shows it when needed)
   var gridNavs = document.querySelectorAll('.grid-nav');
