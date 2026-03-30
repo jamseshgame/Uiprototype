@@ -14504,6 +14504,9 @@ function updateQuestTime() {
 // URL params: ?mode=demo | ?mode=onboard | ?step=N | ?reset
 // Flags version: bump LEGAL_VERSION when TOS/PP changes to re-show legal
 // ===========================================================================
+// Onboarding step from ?step=N (set by C# WebViewPage enum). null = no step param.
+var currentStep = null;
+
 var LEGAL_VERSION = '1';
 var demoEnabled = false;     // ?demo — show demo-only screens
 var onboardEnabled = false;  // ?onboard — force onboarding even if completed
@@ -14535,21 +14538,10 @@ function parseMode() {
   // Load saved flags from localStorage (dev) or Vuplex (prod)
   onboardFlags = _loadOnboardFlags();
 
-  // ?step=N or ?step=name — override: mark all steps before N as complete
-  // Named steps: legal, perms, tutorial, menu (or numbers 1-4)
-  if (map.step) {
-    var stepOrder = ['legal', 'perms_explainer', 'tutorial_play'];
-    var stepNames = {legal: 1, perms: 2, tutorial: 3, menu: 4};
-    var stepNum = stepNames[map.step] || parseInt(map.step, 10) || 1;
-    for (var s = 0; s < stepOrder.length; s++) {
-      if (s < stepNum - 1) {
-        onboardFlags[stepOrder[s]] = true;
-      } else {
-        delete onboardFlags[stepOrder[s]];
-      }
-    }
-    if (onboardFlags.legal) onboardFlags.legal_version = LEGAL_VERSION;
-    _saveOnboardFlags();
+  // ?step=N — set by C# WebViewPage enum
+  if ('step' in map) {
+    var stepNum = parseInt(map.step, 10);
+    if (!isNaN(stepNum)) currentStep = stepNum;
   }
 
   console.log('[Mode] demo=' + demoEnabled + ', onboard=' + onboardEnabled + ', flags=' + JSON.stringify(onboardFlags));
@@ -14593,15 +14585,21 @@ function isOnboardMode() {
   return onboardEnabled;
 }
 
-// Entry point: kicks off the first screen
+// Entry point: kicks off the first screen based on ?step=N from C#
 function startFlow() {
   if (isDemoMode()) {
-    // Demo screens first: Meta Store → Quest Home → Boot → Early Access → ...
     _showOnboardScreen('onboard-meta-store');
     return;
   }
 
-  // Non-demo: Early Access → onboarding steps → Main UI
+  // If C# provided a step, route directly to that screen
+  if (currentStep !== null) {
+    if (currentStep >= 4) { _showMainUI(); return; }
+    if (currentStep === 3) { _showMainUI(); return; }
+    if (currentStep === 2) { _showOnboardScreen('onboard-perms-explain'); return; }
+  }
+
+  // Default / step 1: Early Access → onboarding steps → Main UI
   var ea = document.getElementById('early-access-overlay');
   if (ea) ea.className = 'early-access-overlay';
 }
@@ -14642,7 +14640,8 @@ function _showMainUI() {
   var pages = document.querySelectorAll('.page');
   for (var i = 0; i < pages.length; i++) pages[i].style.visibility = '';
 
-  // Onboarding step 1: first play tutorial
+  // Only show tutorial if step says so (3 = tutorial), skip for home (4+)
+  if (currentStep !== null && currentStep >= 4) return;
   if (!isStepComplete('tutorial_play')) {
     startTutorialPlay();
   }
