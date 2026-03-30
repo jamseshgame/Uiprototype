@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1920, height=1920, initial-scale=1.0, user-scalable=no">
+<title>Jamsesh</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><radialGradient id='g' cx='35%25' cy='35%25'><stop offset='0%25' stop-color='%23ff4444'/><stop offset='100%25' stop-color='%238b0000'/></radialGradient></defs><polygon points='50,5 61,38 97,38 68,59 79,93 50,72 21,93 32,59 3,38 39,38' fill='url(%23g)'/></svg>">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div id="onboard-black"></div>
+<div class="viewport">
+    <canvas id="jamseshParticles" style="position:absolute;top:0;left:0;width:1920px;height:1920px;pointer-events:none;z-index:0;"></canvas>
+<header class="topbar" onclick="navigateTo('career')" style="cursor:pointer">
+    <div class="topbar-main">
+      <div class="profile-avatar">
+        <img src="rael_new.png" alt="Rael">
+      </div>
+      <div class="profile-info">
+        <div class="profile-name">Rael</div>
+      </div>
+      <div class="topbar-spacer"></div>
+      <div class="profile-info profile-info-right">
+        <div class="stat-ticker" id="stat-ticker"></div>
+      </div>
+      <div class="coin-scene">
+        <div class="coin-body">
+          <div class="coin-edge">
+            <div class="coin-edge-slice" style="transform:translateZ(-3px)"></div>
+            <div class="coin-edge-slice" style="transform:translateZ(-2px)"></div>
+            <div class="coin-edge-slice" style="transform:translateZ(-1px)"></div>
+            <div class="coin-edge-slice" style="transform:translateZ(0px)"></div>
+            <div class="coin-edge-slice" style="transform:translateZ(1px)"></div>
+            <div class="coin-edge-slice" style="transform:translateZ(2px)"></div>
+            <div class="coin-edge-slice" style="transform:translateZ(3px)"></div>
+          </div>
+          <div class="coin-front coin-face"></div>
+          <div class="coin-back coin-face"></div>
+          <div class="coin-shine"></div>
+        </div>
+      </div>
+    </div>
+    <div class="xp-bar-full"><div class="xp-bar-fill" style="width:65%"></div></div>
+  </header>
+
+  <main class="content">
+    <div class="content-banner" id="content-banner"></div>
+    <div class="content-overlay"></div>
+    <div class="page active" id="page-store">
+      <div class="play-mode-tabs" id="store-tabs">
+        <button class="play-mode-tab active" onclick="switchStoreTab('songs')">Songs</button>
+        <button class="play-mode-tab" onclick="switchStoreTab('packs')">Packs</button>
+        <button class="play-mode-tab" onclick="switchStoreTab('items')">Items</button>
+        <button class="play-mode-tab" onclick="switchStoreTab('vault')">Vault</button>
+      </div>
+      <div id="store-tab-songs" class="vault-tab-content"><div class="spaces-grid" id="store-songs-grid"></div></div>
+      <div id="store-tab-packs" class="vault-tab-content" style="display:none"><div class="spaces-grid" id="store-packs-grid"></div></div>
+      <div id="store-tab-items" class="vault-tab-content" style="display:none"><div class="spaces-grid" id="store-items-grid"></div></div>
+      <div id="store-tab-vault" class="vault-tab-content" style="display:none"><div class="spaces-grid" id="vault-grid"></div><div class="vault-creator-grid" id="vault-creator-grid" style="display:none"></div></div>
+    </div>
+  </main>
+
+  <nav class="navbar">
+    <div class="navbar-banner" id="navbar-banner"></div>
+    <div class="navbar-overlay"></div>
+    <div class="nav-item active" data-page="home" onclick="navigateTo('home')">
+      <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 12.5l9-9 9 9M5 11v8a1 1 0 001 1h4v-5h4v5h4a1 1 0 001-1v-8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      <span class="nav-label">Home</span>
+    </div>
+    <div class="nav-item" data-page="social" onclick="navigateTo('social')">
+      <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 3-1.34 3-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05C16.19 13.89 17 15.02 17 16.5V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" fill="currentColor"/></svg></span>
+      <span class="nav-label">Social</span>
+    </div>
+    <div class="nav-item" data-page="spaces" onclick="navigateTo('spaces')">
+      <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" fill="currentColor"/></svg></span>
+      <span class="nav-label">Spaces</span>
+    </div>
+    <div class="nav-item" data-page="play" onclick="navigateTo('play')">
+      <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="currentColor"/></svg></span>
+      <span class="nav-label">Play</span>
+    </div>
+    <div class="nav-item" data-page="creator" onclick="navigateTo('creator')">
+      <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M12 22C6.49 22 2 17.51 2 12S6.49 2 12 2s10 4.49 10 10-4.49 10-10 10zm0-18c-4.41 0-8 3.59-8 8s3.59 8 8 8 8-3.59 8-8-3.59-8-8-8zm-5.5 11.5c-.28 0-.5-.22-.5-.5s.22-.5.5-.5.5.22.5.5-.22.5-.5.5zm2-5c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm4-2c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm4 2c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm1.5 5c-.28 0-.5-.22-.5-.5s.22-.5.5-.5.5.22.5.5-.22.5-.5.5z" fill="currentColor"/><path d="M22 12c0 .55-.45 1-1 1h-2l-3.2 3.2c-.39.39-1.01.39-1.4 0l-.4-.4c-.39-.39-.39-1.01 0-1.4L17.6 11H21c.55 0 1 .45 1 1z" fill="currentColor"/></svg></span>
+      <span class="nav-label">Creator</span>
+    </div>
+    <div class="nav-item" data-page="store" onclick="navigateTo('store')">
+      <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M20 4H4v2h16V4zm1 10v-2l-1-5H4l-1 5v2h1v6h10v-6h4v6h2v-6h1zm-9 4H6v-4h6v4z" fill="currentColor"/></svg></span>
+      <span class="nav-label">Store</span>
+    </div>
+    <div class="nav-item" data-page="season" onclick="navigateTo('season')">
+      <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z" fill="currentColor"/></svg></span>
+      <span class="nav-label">Season</span>
+    </div>
+  </nav>
+
+<div class="purchase-overlay" id="purchase-overlay" onclick="closePurchasePopup(event)">
+  <div class="purchase-popup" onclick="event.stopPropagation()" style="position:relative">
+    <button class="popup-close-btn" onclick="closePurchasePopup()">&#10005;</button>
+    <div class="purchase-preview" id="purchase-preview"></div>
+    <div class="purchase-title" id="purchase-title"></div>
+    <div class="purchase-cost" id="purchase-cost"></div>
+    <div class="purchase-balance" id="purchase-balance"></div>
+    <div class="purchase-buttons">
+      <button class="purchase-btn purchase-btn-cancel" onclick="closePurchasePopup()">Cancel</button>
+      <button class="purchase-btn purchase-btn-confirm" id="purchase-confirm-btn" onclick="confirmPurchase()">Unlock</button>
+    </div>
+  </div>
+</div>
+
+
+<div class="option-picker-overlay" id="option-picker-overlay" style="display:none" onclick="closeOptionPicker()">
+  <div class="option-picker-panel" id="option-picker-panel" onclick="event.stopPropagation()"></div>
+</div>
+
+</div>
+
+<script src="js/app.js"></script>
+<script src="js/particles.js"></script>
+<script>init();</script>
+</body>
+</html>
