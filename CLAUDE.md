@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Jamsesh is a VR music rhythm game. This repo contains its UI prototype — a **single-file HTML/CSS/JS application** (`index.html`, ~13200 lines) designed to run inside **Vuplex WebView on Meta Quest headsets**. The viewport is a fixed **1920x1920 pixel** panel.
+Jamsesh is a VR music rhythm game. This repo contains its UI prototype — a **single-file HTML/CSS/JS application** (`index.html`, ~14000 lines) designed to run inside **Vuplex WebView on Meta Quest headsets**. The viewport is a fixed **1920x1920 pixel** panel.
 
 There is also a `src/` directory with a Figma Make-exported React/Vite app — this is a separate reference artifact and is **not** the primary working file.
 
@@ -30,7 +30,7 @@ npm run build    # Vite production build
   - No CSS `gap` on flex in older builds; test carefully
 - **Single file**: All CSS is in `<style>`, all JS is in `<script>`, all HTML is inline
 - **No build step**: The file is served directly to the WebView
-- **Exception**: The second `<script>` block (~line 12579) is a post-load interaction layer that uses modern JS (arrow functions, `forEach`). This block runs after the main ES5 app and is acceptable since it is a separate concern — but all **main application code** in the first `<script>` must remain ES5.
+- **Exception**: The second `<script>` block (~line 13800) is a post-load interaction layer that uses modern JS (arrow functions, `forEach`). This block runs after the main ES5 app and is acceptable since it is a separate concern — but all **main application code** in the first `<script>` must remain ES5.
 
 ## Data Files
 
@@ -45,10 +45,10 @@ npm run build    # Vite production build
 ## Architecture of index.html
 
 ### Structure (top to bottom)
-1. **CSS** (lines 9–7573): Global styles, component styles, play grid/coop/option-picker styles, game screen/results/rewards styles, theme overrides (Arcade, Hunter, Nebula, Liquid Glass, Wireframe), banner/frame styles, shimmer animations, layout overlay styles
-2. **HTML** (lines ~7574–8588): `.viewport` containing a full-screen `<canvas>` for particle background, `.topbar`, 9 `.page` elements (home, play, career, season, social, spaces, vault, store, settings), `.navbar`, all popup overlays (solo-popup, option-picker, save/load setlist), `.layout-overlay`, and game screens (gameplay, results 1, results 2)
-3. **JavaScript — Main App** (lines ~8589–12991): Vuplex bridge, navigation, page builders, theme engine, banner/frame systems, profile system, play grid system (solo/coop/battle), option picker popups, store builder, home grid tiling generator, data arrays
-4. **JavaScript — Interaction Layer** (lines ~12992–13165): Click bounce feedback and canvas-based particle festival background animation (uses modern JS)
+1. **CSS** (lines 9–7800): Global styles, component styles, play grid/coop/option-picker styles, game screen/results/rewards styles, theme overrides (Arcade, Hunter, Nebula, Liquid Glass, Wireframe), banner/frame styles, shimmer animations, layout overlay styles, onboarding/early-access styles, create-group/create-space popup styles
+2. **HTML** (lines ~7801–8870): Onboarding screens (legal agreement, permissions), `.viewport` containing early access overlay, full-screen `<canvas>` for particle background, `.topbar`, 9 `.page` elements (home, play, career, season, social, spaces, vault, store, settings), `.navbar`, all popup overlays (solo-popup, option-picker, save/load setlist, create-group, logo-picker, create-space), `.layout-overlay`, and game screens (gameplay, results 1, results 2)
+3. **JavaScript — Main App** (lines ~8870–13800): Vuplex bridge, navigation, page builders, theme engine, banner/frame systems, profile system, play grid system (solo/coop/battle), option picker popups, store builder, home grid tiling generator, social/spaces builders, create-group/create-space flows, onboarding flow, data arrays
+4. **JavaScript — Interaction Layer** (lines ~13800–13967): Click bounce feedback and canvas-based particle festival background animation (uses modern JS)
 
 ### Navigation
 - Pages use `display: none` / `.page.active { display: flex }` — **elements in hidden pages have 0 `offsetHeight`**
@@ -121,10 +121,37 @@ npm run build    # Vite production build
 - `switchStoreTab(tab)` toggles between songs/packs/items
 
 ### Popup Overlays
-- All overlays (solo-popup, option-picker, loadout, purchase, save, load, layout-overlay) live **inside `.viewport`** and use `position: absolute` to center relative to the 1920x1920 UI panel
-- Overlays use `z-index: 999`
+- All overlays (solo-popup, option-picker, loadout, purchase, save, load, layout-overlay, create-group, logo-picker, create-space) live **inside `.viewport`** and use `position: absolute` to center relative to the 1920x1920 UI panel
+- **Z-index layering**: Early access overlay (1002) → onboard-black transition (1001) → onboard screens / logo picker (1000) → all other popups (999) → game screens (998)
 - Option picker overlay (`#option-picker-overlay`) used by instrument/difficulty/experience selection
 - Purchase flow: check `locked` + `isThemeUnlocked()`/`isBannerUnlocked()`/`isFrameUnlocked()` → open popup → confirm → add to unlocked array → apply
+
+### Onboarding & Early Access Flow
+- **Early Access overlay** (`#early-access-overlay`, z-index 1002): Full-panel disclaimer shown on load before the main menu. Transparent background shows the particle canvas beneath. `dismissEarlyAccess()` hides it and reveals the topbar/navbar/pages.
+- **`init()` hides main UI on startup**: Topbar and navbar are set to `display: none`, pages to `visibility: hidden` until the early access screen is dismissed.
+- **Onboard Legal screen** (`#onboard-legal`, z-index 1000): Terms of Service / Privacy Policy agreement with tabbed content, checkbox, and agree button. `onboardComplete()` validates and transitions to permissions screen.
+- **Onboard Permissions screen** (`#onboard-perms-explain`, z-index 1000): Explains Camera & Microphone permissions. `onboardPermsOk()` transitions to home page.
+- **Fade-to-black transitions**: `onboardFadeToBlack()` uses `#onboard-black` (z-index 1001) for 200ms opacity transitions between onboarding stages.
+
+### Social & Spaces Builders
+- `buildSocialPage()` renders the Groups tab (3x3 grid with "Create New" tile + 7 sample groups) and Friends tab (list with online/offline status + "Add Friend" button)
+- `buildSpacesGrid()` renders Public tab (3x3 grid with "Create New" tile + 8 sample hubs) and Private tab ("Create New" tile + 3 preset spaces)
+- Both "Create New" tiles use dashed borders and `+` icons styled with `.create-new-tile`
+
+### Create Group Popup
+- `openCreateGroup()` opens `#create-group-overlay` (z-index 999) with group name input, logo picker button, and two-column friend invite layout (Available Friends / Group Members)
+- `renderCreateGroupLists()` renders add/remove buttons for friend management
+- `confirmCreateGroup()` sends group data to Unity via `sendToUnity('createGroup', ...)`
+- **Logo Picker** (`#logo-picker-overlay`, z-index 1000): Sub-overlay with 3x3 grid of band logos from `groupLogoOptions[]`. `openLogoPicker()` / `selectGroupLogo()` / `closeLogoPicker()` manage it.
+- Group name input uses native OS keyboard (no on-screen keyboard)
+
+### Create Space Popup
+- `openCreateSpace(type)` opens `#create-space-overlay` (z-index 999) with space name input, public/private toggle (pre-set from calling tab), and 3x3 environment selector grid
+- 9 environments: Stage, Social Hub, Lobby, Arena, Beach, Forest, Rooftop, Studio, Stadium
+- `setCreateSpaceType(type)` toggles between public/private
+- `selectSpaceEnv(env)` highlights the selected environment tile
+- `confirmCreateSpace()` sends space data to Unity via `sendToUnity('createSpace', ...)`
+- Space name input uses native OS keyboard (no on-screen keyboard)
 
 ### Profile System
 - `var profiles = [...]` defines user profiles (Rael, Jooleeno, Ted, Abbie, Arthen) with avatar, level, XP, coins
@@ -133,7 +160,7 @@ npm run build    # Vite production build
 
 ### Particle Background
 - Full-viewport `<canvas id="jamseshParticles">` at z-index 0 behind all UI
-- 180 particles: 80 wave-riders follow sine-wave music bands, 100 ambient floaters drift upward
+- 90 particles: 40 wave-riders follow sine-wave music bands, 50 ambient floaters drift upward
 - 5 horizontal wave lines with glow effects (cyan → purple → pink palette)
 - `drawParticles()` runs via `requestAnimationFrame` loop in the second `<script>` block
 
@@ -199,3 +226,5 @@ Frame variables: `--frame-color-1`, `--frame-color-2`
 - **Play grid mode switching**: `buildPlayGrid()` dynamically changes the `#play-grid` className between `play-grid--solo` and `play-grid--coop`, and toggles the static `.play-go-bar` visibility. Coop mode renders its own bottom buttons.
 - **`aspect-ratio` CSS not supported**: Chromium 91 does not support `aspect-ratio`. Use fixed `width`/`height` dimensions instead.
 - **Greyscale wireframe design**: The current UI is a greyscale wireframe for UX evaluation. All results/rewards screens, buttons, and tabs use black/white/grey color scheme (#333333 inactive, #ffffff active with `box-shadow: 0 0 0 2px #ffffff`).
+- **Early access hides main UI**: `init()` hides topbar/navbar/pages on startup. `dismissEarlyAccess()` restores them. If adding new init-time UI, ensure it handles the hidden state.
+- **Create popups use native keyboard**: Group name and space name inputs are standard `<input type="text">` — no on-screen keyboard. Don't add `readonly` to these inputs.

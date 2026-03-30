@@ -194,7 +194,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0,0,0,0.3) !important;
+    background: rgba(0,0,0,0.5) !important;
     background-image: none !important;
     z-index: 2;
     pointer-events: none;
@@ -2929,8 +2929,8 @@
   }
   .creator-tile svg { width: 96px; height: 96px; fill: #ffffff; }
   .creator-tile-label {
-    font-size: 32px;
-    font-weight: 700;
+    font-size: 40px;
+    font-weight: 800;
     color: #ffffff;
   }
   .creator-tile-desc {
@@ -2944,10 +2944,10 @@
     align-items: center;
     justify-content: center;
   }
-  .creator-tile-shape.portrait { width: 120px; height: 160px; border-radius: var(--panel-radius); }
-  .creator-tile-shape.wide { width: 200px; height: 120px; border-radius: var(--panel-radius); }
-  .creator-tile-shape.square { width: 140px; height: 140px; border-radius: var(--panel-radius); }
-  .creator-tile-shape.circle { width: 140px; height: 140px; border-radius: 50%; }
+  .creator-tile-shape.portrait { width: 180px; height: 240px; border-radius: var(--panel-radius); }
+  .creator-tile-shape.wide { width: 300px; height: 180px; border-radius: var(--panel-radius); }
+  .creator-tile-shape.square { width: 220px; height: 220px; border-radius: var(--panel-radius); }
+  .creator-tile-shape.circle { width: 220px; height: 220px; border-radius: 50%; }
   .creator-tile-shape svg { width: 48px; height: 48px; fill: #888888; }
 
   /* ── Creator Pagination ──────────────────────────── */
@@ -3012,6 +3012,34 @@
     flex-shrink: 0;
   }
 
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  /* ── Preview Nav Buttons ──────────────────────────── */
+  .preview-nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 5;
+    width: 100px;
+    height: 200px;
+    border: none;
+    border-radius: var(--panel-radius);
+    background: rgba(0,0,0,0.5);
+    color: #ffffff;
+    font-size: 48px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+  }
+  .preview-nav-btn:active { background: rgba(0,0,0,0.8); }
+  .preview-nav-left { left: 24px; }
+  .preview-nav-right { right: 24px; }
+
   /* ── Creator Art Flow ──────────────────────────── */
   .creator-art-shapes {
     display: grid;
@@ -3030,7 +3058,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 12px;
+    gap: 20px;
     cursor: pointer;
     transition: background 0.15s, border-color 0.15s;
   }
@@ -6813,6 +6841,29 @@
     transform: translateY(-4px) scale(1.08) rotate(-4deg);
   }
 
+  /* Floating social avatars on home tile */
+  @keyframes floatAvatar {
+    0% { transform: translate(0, 0); }
+    25% { transform: translate(15px, -20px); }
+    50% { transform: translate(-10px, -35px); }
+    75% { transform: translate(-20px, -10px); }
+    100% { transform: translate(0, 0); }
+  }
+  .home-tile-avatar {
+    position: absolute;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid rgba(255,255,255,0.5);
+    z-index: 2;
+    animation: floatAvatar linear infinite;
+    pointer-events: none;
+  }
+  .home-tile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
   /* Season banner in top-wide home tile */
   .home-banner {
     width: 100%;
@@ -6925,8 +6976,8 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    padding: 120px 160px;
+    justify-content: flex-start;
+    padding: 280px 160px 0;
     box-sizing: border-box;
     background: transparent;
   }
@@ -6951,6 +7002,10 @@
     text-shadow: 0 2px 20px rgba(0,0,0,0.5);
   }
   .early-access-ok {
+    position: absolute;
+    top: 1100px;
+    left: 50%;
+    transform: translateX(-50%);
     font-family: 'Inter', sans-serif;
     font-size: 48px;
     font-weight: 800;
@@ -6958,12 +7013,13 @@
     background: var(--pink, #e91e8c);
     border: none;
     border-radius: var(--panel-radius);
-    padding: 40px 200px;
+    padding: 36px 200px;
     cursor: pointer;
     text-shadow: none;
+    transition: transform 0.15s;
   }
   .early-access-ok:active {
-    opacity: 0.8;
+    transform: translateX(-50%) scale(0.97);
   }
   #onboard-black {
     position: absolute;
@@ -6978,6 +7034,461 @@
   #onboard-black.visible {
     opacity: 1;
   }
+
+  /* ── Meta Store Page (demo only) ── */
+  .meta-store-screen {
+    background: url('large-crowd-celebrates-music-festival-concert-people-enjoy-show-stadium-confetti-night-atmosphere-silhouettes-raise-hands-385686498.webp') center center / cover no-repeat;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+  }
+  .meta-store-window {
+    width: 1400px;
+    background: #1e1e2e;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 20px 80px rgba(0,0,0,0.6);
+    display: flex;
+    flex-direction: column;
+  }
+  .meta-store-nav {
+    display: flex;
+    align-items: center;
+    padding: 16px 28px;
+    background: #2a2a3a;
+    gap: 32px;
+    font-size: 20px;
+    color: #aaaaaa;
+  }
+  .meta-store-nav-back {
+    font-size: 28px;
+    color: #ffffff;
+    cursor: pointer;
+  }
+  .meta-store-nav-item {
+    cursor: default;
+  }
+  .meta-store-nav-item.active {
+    color: #ffffff;
+    font-weight: 600;
+  }
+  .meta-store-nav-item.highlight {
+    color: #00e0ff;
+  }
+  .meta-store-nav-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    color: #ffffff;
+    font-size: 20px;
+  }
+  .meta-store-nav-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #555;
+    overflow: hidden;
+  }
+  .meta-store-nav-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .meta-store-sidebar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 56px;
+    background: #2a2a3a;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 64px;
+    gap: 28px;
+    font-size: 22px;
+    color: #888;
+  }
+  .meta-store-body {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+  .meta-store-hero {
+    width: 100%;
+    height: 400px;
+    background: linear-gradient(180deg, #1a0a2e 0%, #0d0d1a 60%, #1e1e2e 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .meta-store-hero-glow {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(ellipse at center 40%, rgba(255,160,0,0.15) 0%, transparent 70%);
+  }
+  .meta-store-hero-title {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+  }
+  .meta-store-hero-title .title-main {
+    font-family: 'Chakra Petch', 'Inter', sans-serif;
+    font-size: 80px;
+    font-weight: 900;
+    color: #ffffff;
+    text-transform: uppercase;
+    letter-spacing: 6px;
+    text-shadow: 0 0 40px rgba(255,180,0,0.4), 0 4px 20px rgba(0,0,0,0.8);
+  }
+  .meta-store-hero-title .title-sub {
+    font-family: 'Chakra Petch', 'Inter', sans-serif;
+    font-size: 44px;
+    font-weight: 700;
+    color: #e0a030;
+    text-transform: uppercase;
+    letter-spacing: 8px;
+    text-shadow: 0 0 20px rgba(255,160,0,0.3);
+  }
+  .meta-store-info {
+    padding: 28px 36px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .meta-store-info-left {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .meta-store-app-name {
+    font-size: 30px;
+    font-weight: 700;
+    color: #ffffff;
+  }
+  .meta-store-tags {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+  .meta-store-tag {
+    font-size: 18px;
+    color: #888;
+    background: #333;
+    padding: 4px 14px;
+    border-radius: 999px;
+  }
+  .meta-store-owners {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+  }
+  .meta-store-owner-avatars {
+    display: flex;
+  }
+  .meta-store-owner-avatars span {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #555;
+    border: 2px solid #1e1e2e;
+    margin-left: -8px;
+    display: inline-block;
+    overflow: hidden;
+  }
+  .meta-store-owner-avatars span:first-child {
+    margin-left: 0;
+  }
+  .meta-store-owner-avatars span img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .meta-store-owners-text {
+    font-size: 18px;
+    color: #888;
+  }
+  .meta-store-get-btn {
+    font-family: 'Inter', sans-serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: #1e1e2e;
+    background: #ffffff;
+    border: none;
+    border-radius: 999px;
+    padding: 16px 64px;
+    cursor: pointer;
+    transition: transform 0.15s;
+  }
+  .meta-store-get-btn:active {
+    transform: scale(0.95);
+    background: #dddddd;
+  }
+  .meta-store-disclaimer {
+    padding: 0 36px 20px;
+    font-size: 16px;
+    color: #666;
+    line-height: 1.5;
+    background: #1a1a2a;
+    margin: 0 20px;
+    border-radius: 12px;
+    padding: 16px 24px;
+  }
+  .meta-store-screenshots {
+    padding: 16px 36px 20px;
+    display: flex;
+    gap: 16px;
+    overflow: hidden;
+  }
+  .meta-store-screenshot {
+    width: 220px;
+    height: 140px;
+    border-radius: 12px;
+    background: #333;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+  .meta-store-screenshot img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .meta-store-bottom-bar {
+    display: flex;
+    align-items: center;
+    padding: 12px 28px;
+    background: #2a2a3a;
+    gap: 16px;
+    font-size: 18px;
+    color: #aaaaaa;
+  }
+  .meta-store-bottom-close {
+    margin-left: auto;
+    display: flex;
+    gap: 16px;
+    font-size: 20px;
+    color: #888;
+  }
+  .meta-store-bottom-close span {
+    cursor: pointer;
+  }
+
+  /* ── Quest Home Screen (demo only) ── */
+  .quest-home {
+    background: #1a1a2e url('Immersive-Home-ef80975639e678b3.webp') center center / cover no-repeat;
+    justify-content: center;
+    padding: 0;
+  }
+  .quest-time {
+    font-size: 48px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 60px;
+    letter-spacing: 1px;
+  }
+  .quest-grid {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 48px;
+  }
+  .quest-row {
+    display: flex;
+    gap: 48px;
+    justify-content: center;
+  }
+  .quest-icon {
+    width: 140px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    cursor: default;
+  }
+  .quest-icon.clickable { cursor: pointer; }
+  .quest-icon.clickable .quest-icon-tile { box-shadow: 0 0 0 3px #ffffff44; }
+  .quest-icon.clickable:active .quest-icon-tile { transform: scale(0.92); }
+  .quest-icon-tile {
+    width: 120px;
+    height: 120px;
+    border-radius: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    color: #ffffff;
+    transition: transform 0.15s;
+    overflow: hidden;
+  }
+  .quest-icon-tile img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 28px;
+  }
+  .quest-icon-label {
+    font-size: 18px;
+    font-weight: 500;
+    color: #ffffffcc;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 140px;
+  }
+  .quest-dock {
+    margin-top: auto;
+    margin-bottom: 60px;
+    background: #1c1c3a;
+    border-radius: 40px;
+    padding: 16px 48px;
+    display: flex;
+    gap: 40px;
+    align-items: center;
+  }
+  .quest-dock-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    color: #ffffff;
+  }
+
+  /* ── Boot Splash (demo only) ── */
+  .boot-splash {
+    background: #2a2a2a;
+    cursor: pointer;
+    flex-direction: column;
+  }
+  .boot-logo {
+    width: 1800px;
+    height: 1800px;
+    object-fit: contain;
+  }
+
+  /* ── OS Permission Popups (demo only) ── */
+  .perm-popup-screen {
+    background: #1a1a1a;
+    justify-content: center;
+  }
+  .perm-popup-card {
+    width: 800px;
+    background: #2c2c2e;
+    border-radius: var(--panel-radius);
+    padding: 56px 64px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .perm-popup-icon {
+    font-size: 72px;
+    margin-bottom: 28px;
+    color: #ffffff;
+  }
+  .perm-popup-title {
+    font-size: 36px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 20px;
+    line-height: 1.3;
+  }
+  .perm-popup-desc {
+    font-size: 24px;
+    line-height: 1.5;
+    color: #aaaaaa;
+    margin-bottom: 28px;
+  }
+  .perm-popup-desc strong {
+    color: #dddddd;
+    font-weight: 600;
+  }
+  .perm-popup-save {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+    align-self: flex-start;
+  }
+  .perm-popup-save-box {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--panel-radius);
+    background: #0078d4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-size: 20px;
+    font-weight: 700;
+  }
+  .perm-popup-save-label {
+    font-size: 24px;
+    font-weight: 600;
+    color: #ffffff;
+  }
+  .perm-popup-info {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 32px;
+    align-self: flex-start;
+    text-align: left;
+  }
+  .perm-popup-info-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #555555;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .perm-popup-info-text {
+    font-size: 22px;
+    color: #999999;
+    line-height: 1.4;
+  }
+  .perm-popup-allow {
+    width: 100%;
+    padding: 22px 0;
+    border-radius: var(--panel-radius);
+    border: none;
+    background: #0078d4;
+    color: #ffffff;
+    font-size: 28px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s;
+  }
+  .perm-popup-allow:active { background: #005ea6; }
+  .perm-popup-deny {
+    width: 100%;
+    padding: 22px 0;
+    border-radius: var(--panel-radius);
+    border: none;
+    background: #3a3a3c;
+    color: #ffffff;
+    font-size: 28px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s;
+  }
+  .perm-popup-deny:active { background: #2a2a2c; }
 
   /* ── Legal Agreement ── */
   .legal-agree {
@@ -7019,7 +7530,7 @@
   }
   .legal-agree-body {
     flex: 1;
-    max-height: 900px;
+    max-height: 580px;
     width: 100%;
     background: #333333;
     border-radius: var(--panel-radius);
@@ -7036,6 +7547,10 @@
   .legal-agree-body ul { margin: 0 0 16px 32px; }
   .legal-agree-body li { font-size: 22px; line-height: 1.6; color: #cccccc; margin-bottom: 8px; }
   .legal-agree-footer {
+    position: absolute;
+    top: 960px;
+    left: 50%;
+    transform: translateX(-50%);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -7075,23 +7590,25 @@
   }
   .legal-agree-ok {
     position: absolute;
-    bottom: 80px;
+    top: 1100px;
     left: 50%;
     transform: translateX(-50%);
     padding: 36px 128px;
     border-radius: var(--panel-radius);
     border: none;
-    background: #6b1038;
+    background: #c0206a;
     color: #ffffff;
     font-size: 48px;
     font-weight: 700;
-    cursor: default;
+    cursor: pointer;
     font-family: inherit;
-    transition: background 0.15s, transform 0.15s;
+    transition: background 0.15s, transform 0.15s, opacity 0.3s;
+    opacity: 0;
+    pointer-events: none;
   }
   .legal-agree-ok.enabled {
-    background: #c0206a;
-    cursor: pointer;
+    opacity: 1;
+    pointer-events: auto;
   }
   .legal-agree-ok.enabled:hover { transform: translateX(-50%) scale(1.08); }
   .legal-agree-ok.enabled:active { transform: translateX(-50%) scale(0.97); background: #a01858; }
@@ -7156,7 +7673,7 @@
   }
   .perms-explain-ok {
     position: absolute;
-    bottom: 80px;
+    top: 1100px;
     left: 50%;
     transform: translateX(-50%);
     padding: 36px 128px;
@@ -7803,6 +8320,137 @@ button:focus,
 
 <div id="onboard-black"></div>
 
+<!-- ══════════════ ONBOARDING: Meta Store Page (demo only) ══════════════ -->
+<div class="onboard-screen meta-store-screen hidden" id="onboard-meta-store">
+  <div class="meta-store-window">
+    <div class="meta-store-nav">
+      <span class="meta-store-nav-back">&#8592;</span>
+      <span class="meta-store-nav-item active">Home</span>
+      <span class="meta-store-nav-item">Top charts</span>
+      <span class="meta-store-nav-item highlight">Categories &#9662;</span>
+      <span class="meta-store-nav-item highlight">Horizon+</span>
+      <span class="meta-store-nav-item">Wishlist</span>
+      <span class="meta-store-nav-right">
+        <span>&#128269; Search</span>
+        <span class="meta-store-nav-avatar"><img src="rael_new.png" alt=""></span>
+        <span>&#8942;</span>
+      </span>
+    </div>
+    <div class="meta-store-body">
+      <div class="meta-store-hero">
+        <div class="meta-store-hero-glow"></div>
+        <div class="meta-store-hero-title">
+          <div class="title-main">Jamsesh</div>
+          <div class="title-sub">Backstage Pass</div>
+        </div>
+      </div>
+      <div class="meta-store-info">
+        <div class="meta-store-info-left">
+          <div class="meta-store-app-name">Jamsesh</div>
+          <div class="meta-store-tags">
+            <span class="meta-store-tag">Games</span>
+            <span class="meta-store-tag">Rhythm</span>
+          </div>
+          <div class="meta-store-owners">
+            <div class="meta-store-owner-avatars">
+              <span><img src="rael_new.png" alt=""></span>
+              <span><img src="jooleeno.jpg" alt=""></span>
+              <span><img src="ted.png" alt=""></span>
+            </div>
+            <span class="meta-store-owners-text">4 own this</span>
+          </div>
+        </div>
+        <button class="meta-store-get-btn" onclick="onboardAdvance('metastore')">Get</button>
+      </div>
+      <div class="meta-store-disclaimer">This app may access your display name, username, user ID, profile pictures, avatars, age group and a list of followers and people you follow who also own this app.</div>
+      <div class="meta-store-screenshots">
+        <div class="meta-store-screenshot"><img src="art/001.jpg" alt=""></div>
+        <div class="meta-store-screenshot"><img src="art/010.jpg" alt=""></div>
+        <div class="meta-store-screenshot"><img src="art/025.jpg" alt=""></div>
+        <div class="meta-store-screenshot"><img src="art/040.jpg" alt=""></div>
+        <div class="meta-store-screenshot"><img src="art/055.jpg" alt=""></div>
+      </div>
+    </div>
+    <div class="meta-store-bottom-bar">
+      <span>Store</span>
+      <span class="meta-store-bottom-close">
+        <span>&#8722;</span>
+        <span>&#10005;</span>
+      </span>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ ONBOARDING: Quest Home (demo only) ══════════════ -->
+<div class="onboard-screen quest-home hidden" id="onboard-quest">
+  <div class="quest-time" id="quest-time">12:00</div>
+  <div class="quest-grid">
+    <div class="quest-row">
+      <div class="quest-icon">
+        <div class="quest-icon-tile" style="background:linear-gradient(135deg,#0078d7,#00bcf2)">&#128722;</div>
+        <div class="quest-icon-label">Store</div>
+      </div>
+      <div class="quest-icon">
+        <div class="quest-icon-tile" style="background:linear-gradient(135deg,#ff6f00,#ff9100)">&#128240;</div>
+        <div class="quest-icon-label">Feed</div>
+      </div>
+      <div class="quest-icon">
+        <div class="quest-icon-tile" style="background:linear-gradient(135deg,#00c853,#69f0ae)">&#128172;</div>
+        <div class="quest-icon-label">Chats</div>
+      </div>
+      <div class="quest-icon">
+        <div class="quest-icon-tile" style="background:linear-gradient(135deg,#2196f3,#64b5f6)">&#127760;</div>
+        <div class="quest-icon-label">Browser</div>
+      </div>
+    </div>
+    <div class="quest-row">
+      <div class="quest-icon">
+        <div class="quest-icon-tile" style="background:linear-gradient(135deg,#7b1fa2,#ce93d8)">&#10067;</div>
+        <div class="quest-icon-label">Help &amp; Tips</div>
+      </div>
+      <div class="quest-icon">
+        <div class="quest-icon-tile" style="background:linear-gradient(135deg,#d32f2f,#ef5350)">&#128250;</div>
+        <div class="quest-icon-label">TV</div>
+      </div>
+      <div class="quest-icon">
+        <div class="quest-icon-tile" style="background:linear-gradient(135deg,#1565c0,#42a5f5)">&#128077;</div>
+        <div class="quest-icon-label">Facebook</div>
+      </div>
+      <div class="quest-icon">
+        <div class="quest-icon-tile" style="background:linear-gradient(135deg,#c2185b,#f06292)">&#128247;</div>
+        <div class="quest-icon-label">Instagram</div>
+      </div>
+      <div class="quest-icon">
+        <div class="quest-icon-tile" style="background:linear-gradient(135deg,#2e7d32,#66bb6a)">&#128222;</div>
+        <div class="quest-icon-label">WhatsApp</div>
+      </div>
+    </div>
+    <div class="quest-row">
+      <div class="quest-icon">
+        <div class="quest-icon-tile" style="background:linear-gradient(135deg,#0277bd,#4fc3f7)">&#128172;</div>
+        <div class="quest-icon-label">Messenger</div>
+      </div>
+      <div class="quest-icon">
+        <div class="quest-icon-tile" style="background:linear-gradient(135deg,#37474f,#78909c)">&#128421;</div>
+        <div class="quest-icon-label">Remote Desktop</div>
+      </div>
+      <div class="quest-icon">
+        <div class="quest-icon-tile" style="background:linear-gradient(135deg,#b71c1c,#e57373)">&#9876;</div>
+        <div class="quest-icon-label">Asgard's Wrath 2</div>
+      </div>
+      <div class="quest-icon clickable" onclick="onboardAdvance('quest')">
+        <div class="quest-icon-tile" style="background:linear-gradient(135deg,#c0206a,#e91e90)"><img src="Logo (1080 x 1080 px).png" alt="Jamsesh"></div>
+        <div class="quest-icon-label">Jamsesh</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ ONBOARDING: Boot Splash (demo only) ══════════════ -->
+<div class="onboard-screen boot-splash hidden" id="onboard-boot" onclick="onboardAdvance('boot')">
+  <img class="boot-logo" src="Logo (1080 x 1080 px).png" alt="Jamsesh Logo">
+</div>
+
 <!-- ══════════════ ONBOARDING: Legal Agreement ══════════════ -->
 <div class="onboard-screen legal-agree hidden" id="onboard-legal">
   <div class="legal-agree-title">Before You Jam</div>
@@ -7816,8 +8464,8 @@ button:focus,
       <div class="legal-agree-checkbox" id="legal-checkbox"></div>
       <div class="legal-agree-check-label">I agree to the Terms of Service and Privacy Policy</div>
     </div>
-    <button class="legal-agree-ok" id="legal-ok" onclick="onboardComplete()">OK</button>
   </div>
+  <button class="legal-agree-ok" id="legal-ok" onclick="onboardComplete()">OK</button>
 </div>
 
 <!-- ══════════════ ONBOARDING: Permissions Explainer ══════════════ -->
@@ -7841,11 +8489,45 @@ button:focus,
   <button class="perms-explain-ok" onclick="onboardPermsOk()">Got It</button>
 </div>
 
+<!-- ══════════════ ONBOARDING: Camera Permission (demo only) ══════════════ -->
+<div class="onboard-screen perm-popup-screen hidden" id="onboard-perm-camera">
+  <div class="perm-popup-card">
+    <div class="perm-popup-icon">&#128083;</div>
+    <div class="perm-popup-title">Allow this app to access your headset cameras?</div>
+    <div class="perm-popup-desc">This is to make certain features work, such as letting apps use the cameras on your headset to capture your physical surroundings. <strong>Learn more</strong></div>
+    <div class="perm-popup-save">
+      <div class="perm-popup-save-box">&#10003;</div>
+      <div class="perm-popup-save-label">Save my preference</div>
+    </div>
+    <div class="perm-popup-info">
+      <div class="perm-popup-info-icon">i</div>
+      <div class="perm-popup-info-text">jamsesh will be able to take photos and video of your physical surroundings.</div>
+    </div>
+    <button class="perm-popup-allow" onclick="onboardPermNext('camera')">Allow</button>
+    <button class="perm-popup-deny" onclick="onboardPermNext('camera')">Don't allow</button>
+  </div>
+</div>
+
+<!-- ══════════════ ONBOARDING: Microphone Permission (demo only) ══════════════ -->
+<div class="onboard-screen perm-popup-screen hidden" id="onboard-perm-mic">
+  <div class="perm-popup-card">
+    <div class="perm-popup-icon">&#127908;</div>
+    <div class="perm-popup-title">Allow this app to access your microphone?</div>
+    <div class="perm-popup-desc"><strong>jamsesh</strong> will be able to use your microphone. This is to make certain features work, such as talking to others or recording audio.</div>
+    <div class="perm-popup-save">
+      <div class="perm-popup-save-box">&#10003;</div>
+      <div class="perm-popup-save-label">Save my preference</div>
+    </div>
+    <button class="perm-popup-allow" onclick="onboardPermNext('mic')">Allow</button>
+    <button class="perm-popup-deny" onclick="onboardPermNext('mic')">Don't allow</button>
+  </div>
+</div>
+
 <div class="viewport">
     <canvas id="jamseshParticles" style="position:absolute;top:0;left:0;width:1920px;height:1920px;pointer-events:none;z-index:0;"></canvas>
 
 <!-- ══════════════ EARLY ACCESS DISCLAIMER ══════════════ -->
-<div class="early-access-overlay" id="early-access-overlay">
+<div class="early-access-overlay hidden" id="early-access-overlay">
   <h2 class="early-access-title">Early Access</h2>
   <p class="early-access-body">Welcome to Jamsesh! This game is currently in early access. Some features may be incomplete, and you may experience occasional bugs or changes as we continue development. We are actively adding new content, improving performance, and refining the experience based on your feedback. If you run into any issues or have suggestions, we would love to hear from you on Discord at <a href="https://discord.gg/jamsesh" style="color:var(--pink, #e91e8c);text-decoration:underline">discord.gg/jamsesh</a>. Thanks for being part of the journey!</p>
   <button class="early-access-ok" onclick="dismissEarlyAccess()">OK</button>
@@ -8521,12 +9203,15 @@ button:focus,
   <button class="play-go-btn" style="width:100%;flex-shrink:0" onclick="saveCreatorResults()"><svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor"><path d="M17 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>Save</button>
 </div>
 
-<div class="creator-screen" id="creator-art-preview-screen">
-  <div style="flex:1;min-height:0;width:100%;display:flex;align-items:center;justify-content:center">
-    <img id="creator-art-preview-img" src="" alt="" style="max-width:100%;max-height:100%;object-fit:contain;border-radius:var(--panel-radius)">
+<div class="creator-screen" id="creator-art-preview-screen" style="padding:0;gap:0">
+  <div style="flex:1;min-height:0;width:100%;position:relative;overflow:hidden">
+    <img id="creator-art-preview-img" src="" alt="" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover">
+    <button class="preview-nav-btn preview-nav-left" onclick="previewNav(-1)">&#9664;</button>
+    <button class="preview-nav-btn preview-nav-right" onclick="previewNav(1)">&#9654;</button>
   </div>
-  <div style="display:flex;gap:var(--grid-gap);width:100%;flex-shrink:0">
+  <div style="display:flex;gap:var(--grid-gap);width:100%;flex-shrink:0;padding:24px 48px">
     <button class="play-bar-btn" style="flex:1" onclick="closeCreatorScreen()"><svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>Back</button>
+    <button class="play-bar-btn" style="flex:1" onclick="usePhotoForArt()"><svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor"><path d="M12 22C6.49 22 2 17.51 2 12S6.49 2 12 2s10 4.04 10 9c0 3.31-2.69 6-6 6h-1.77c-.28 0-.5.22-.5.5 0 .12.05.23.13.33.41.47.64 1.06.64 1.67A2.5 2.5 0 0 1 12 22zm0-18c-4.41 0-8 3.59-8 8s3.59 8 8 8c.28 0 .5-.22.5-.5a.54.54 0 0 0-.14-.35c-.41-.46-.63-1.05-.63-1.65a2.5 2.5 0 0 1 2.5-2.5H16c2.21 0 4-1.79 4-4 0-3.86-3.59-7-8-7z"/><circle cx="6.5" cy="11.5" r="1.5"/><circle cx="9.5" cy="7.5" r="1.5"/><circle cx="14.5" cy="7.5" r="1.5"/><circle cx="17.5" cy="11.5" r="1.5"/></svg>New Art</button>
     <button class="play-bar-btn" style="flex:1" onclick="deleteCreatorArt()"><svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>Delete</button>
   </div>
 </div>
@@ -8539,46 +9224,7 @@ button:focus,
   <div class="save-popup" onclick="event.stopPropagation()" style="position:relative">
     <button class="popup-close-btn" onclick="closeSaveOverlay()">&#10005;</button>
     <h2>Save Setlist</h2>
-    <input class="save-input" id="save-setlist-input" type="text" readonly>
-    <div class="keyboard">
-      <div class="keyboard-row">
-        <button class="key" onclick="onScreenKey('Q')">Q</button>
-        <button class="key" onclick="onScreenKey('W')">W</button>
-        <button class="key" onclick="onScreenKey('E')">E</button>
-        <button class="key" onclick="onScreenKey('R')">R</button>
-        <button class="key" onclick="onScreenKey('T')">T</button>
-        <button class="key" onclick="onScreenKey('Y')">Y</button>
-        <button class="key" onclick="onScreenKey('U')">U</button>
-        <button class="key" onclick="onScreenKey('I')">I</button>
-        <button class="key" onclick="onScreenKey('O')">O</button>
-        <button class="key" onclick="onScreenKey('P')">P</button>
-      </div>
-      <div class="keyboard-row">
-        <button class="key" onclick="onScreenKey('A')">A</button>
-        <button class="key" onclick="onScreenKey('S')">S</button>
-        <button class="key" onclick="onScreenKey('D')">D</button>
-        <button class="key" onclick="onScreenKey('F')">F</button>
-        <button class="key" onclick="onScreenKey('G')">G</button>
-        <button class="key" onclick="onScreenKey('H')">H</button>
-        <button class="key" onclick="onScreenKey('J')">J</button>
-        <button class="key" onclick="onScreenKey('K')">K</button>
-        <button class="key" onclick="onScreenKey('L')">L</button>
-      </div>
-      <div class="keyboard-row">
-        <button class="key" onclick="onScreenKey('Z')">Z</button>
-        <button class="key" onclick="onScreenKey('X')">X</button>
-        <button class="key" onclick="onScreenKey('V')">V</button>
-        <button class="key" onclick="onScreenKey('C')">C</button>
-        <button class="key" onclick="onScreenKey('B')">B</button>
-        <button class="key" onclick="onScreenKey('N')">N</button>
-        <button class="key" onclick="onScreenKey('M')">M</button>
-        <button class="key key-wide" onclick="onScreenKey('backspace')">&#9003;</button>
-      </div>
-      <div class="keyboard-row">
-        <button class="key key-wide" onclick="onScreenKey(' ')">Space</button>
-        <button class="key key-wide" onclick="onScreenKey('clear')">Clear</button>
-      </div>
-    </div>
+    <input class="save-input" id="save-setlist-input" type="text">
     <div class="save-buttons">
       <button class="save-btn-cancel" onclick="closeSaveOverlay()">Cancel</button>
       <button class="save-btn-confirm" onclick="confirmSaveSetlist()">Save</button>
@@ -8653,6 +9299,14 @@ button:focus,
       <button class="save-btn-confirm" onclick="confirmCreateSpace()">Create</button>
     </div>
   </div>
+</div>
+
+<!-- ══════════════ TUTORIAL GAMEPLAY (demo only) ══════════════ -->
+<div class="game-screen" id="screen-tutorial-1" style="background:#000 url('fretslide1.png') center center / cover no-repeat;cursor:pointer" onclick="tutorialAdvance(1)">
+  <div id="tutorial-caption-1" style="position:absolute;bottom:120px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.75);border-radius:var(--panel-radius);padding:32px 56px;max-width:1600px;text-align:center;font-size:32px;font-weight:600;color:#ffffff;line-height:1.5">Welcome to Jamsesh Guitar Basics! We are going to get you full streaking every song in no time. I will take you through every step. Look down and move your left hand up and down the fret 3 times.</div>
+</div>
+<div class="game-screen" id="screen-tutorial-2" style="background:#000 url('fretslide2.png') center center / cover no-repeat;cursor:pointer" onclick="tutorialAdvance(2)">
+  <div style="position:absolute;bottom:120px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.75);border-radius:var(--panel-radius);padding:32px 56px;max-width:1600px;text-align:center;font-size:32px;font-weight:600;color:#ffffff;line-height:1.5">Great work! Now strum the pick across the strings. Tap anywhere to continue.</div>
 </div>
 
 <!-- ══════════════ RESULTS SCREEN 1 ══════════════ -->
@@ -8901,6 +9555,17 @@ function handleUnityMessage(msg) {
     case 'updateHubs': updateHubsFromBackend(msg.data); break;
     case 'updateCoins': updateCoinsFromBackend(msg.data); break;
     case 'gameResults': showGameResults(msg.data); break;
+    case 'onboardProgress':
+      // Unity sends PlayFab flags: {completedSteps: ['legal','perms_explainer'], legal_version: '1'}
+      if (msg.data && msg.data.completedSteps) {
+        for (var os = 0; os < msg.data.completedSteps.length; os++) {
+          onboardFlags[msg.data.completedSteps[os]] = true;
+        }
+        if (msg.data.legal_version) onboardFlags.legal_version = msg.data.legal_version;
+        _saveOnboardFlags();
+        console.log('[Mode] Synced from PlayFab:', JSON.stringify(onboardFlags));
+      }
+      break;
     default: console.log('[Unity\u2192Jamsesh] Unhandled:', msg);
   }
 }
@@ -10568,12 +11233,64 @@ function closeLoadOverlay(e) {
   document.getElementById('load-overlay').className = 'load-overlay';
 }
 
+var lessonSetlists = [
+  { name: 'Jamsesh Basic Lessons', level: 'Basic', songs: tutorialSongs },
+  { name: 'Jamsesh Advanced Lessons', level: 'Advanced', songs: tutorialSongs },
+  { name: 'Jamsesh Expert Lessons', level: 'Expert', songs: tutorialSongs }
+];
+
 function buildLoadList() {
   var list = document.getElementById('load-list');
   list.innerHTML = '';
-  if (savedSetlists.length === 0) {
-    list.innerHTML = '<div class="load-empty">No saved setlists</div>';
-    return;
+
+  // Lesson setlists at top
+  for (var l = 0; l < lessonSetlists.length; l++) {
+    var ls = lessonSetlists[l];
+    var item = document.createElement('div');
+    item.className = 'load-item';
+
+    var grid = document.createElement('div');
+    grid.className = 'load-art-grid';
+    buildArtGrid(ls.songs, grid);
+    item.appendChild(grid);
+
+    var info = document.createElement('div');
+    info.className = 'load-item-info';
+    info.innerHTML = '<div class="load-item-name">' + ls.name + '</div>' +
+      '<div class="load-item-count">' + ls.songs.length + ' song' + (ls.songs.length !== 1 ? 's' : '') + '</div>';
+    item.appendChild(info);
+
+    // 3x picks reward
+    var rewards = document.createElement('div');
+    rewards.style.cssText = 'display:flex;gap:12px;align-items:center;margin-left:auto;margin-right:24px';
+    for (var p = 0; p < 3; p++) {
+      var pick = document.createElement('div');
+      pick.style.cssText = 'display:flex;align-items:center;gap:4px';
+      pick.innerHTML = '<img src="JamPick.png" style="width:36px;height:36px;object-fit:contain">' +
+        '<span style="font-size:20px;font-weight:700;color:#FFD700">x1000</span>';
+      rewards.appendChild(pick);
+    }
+    item.appendChild(rewards);
+
+    var loadBtn = document.createElement('button');
+    loadBtn.className = 'load-item-btn load-item-btn-load';
+    loadBtn.textContent = 'Load';
+    (function(lesson) {
+      loadBtn.onclick = function() {
+        setlist = lesson.songs.slice();
+        buildPlayGrid();
+        closeLoadOverlay();
+      };
+    })(ls);
+    item.appendChild(loadBtn);
+
+    list.appendChild(item);
+  }
+
+  if (savedSetlists.length === 0 && lessonSetlists.length > 0) {
+    // Lessons shown, no need for empty message
+  } else if (savedSetlists.length === 0) {
+    list.innerHTML += '<div class="load-empty">No saved setlists</div>';
   }
   for (var i = 0; i < savedSetlists.length; i++) {
     var sl = savedSetlists[i];
@@ -10654,18 +11371,6 @@ function deleteSetlist(idx) {
   buildLoadList();
 }
 
-function onScreenKey(char) {
-  var input = document.getElementById('save-setlist-input');
-  if (char === 'backspace') {
-    input.value = input.value.slice(0, -1);
-  } else if (char === 'clear') {
-    input.value = '';
-  } else if (char === ' ') {
-    input.value += ' ';
-  } else {
-    input.value += char;
-  }
-}
 
 function removeFromSetlist(idx) {
   setlist.splice(idx, 1);
@@ -11668,6 +12373,9 @@ function buildExpPickerContent(panel) {
 
 function closeOptionPicker() {
   document.getElementById('option-picker-overlay').style.display = 'none';
+  var panel = document.getElementById('option-picker-panel');
+  panel.style.width = '';
+  panel.style.maxHeight = '';
 }
 
 function generateDefaultSetlists() {
@@ -11789,11 +12497,8 @@ var creatorSelectedShape = 'wide';
 var creatorSelectedWords = {};
 
 var creatorPhotos = [
-  'art/001.jpg', 'art/012.jpg', 'art/023.jpg', 'art/034.jpg',
-  'art/045.jpg', 'art/056.jpg', 'art/067.jpg', 'art/078.jpg',
-  'art/089.jpg', 'art/005.jpg', 'art/016.jpg', 'art/027.jpg',
-  'art/038.jpg', 'art/049.jpg', 'art/060.jpg', 'art/071.jpg',
-  'art/082.jpg', 'art/093.jpg', 'art/010.jpg', 'art/021.jpg'
+  'photos/carkey.jfif', 'photos/jumping.jpg', 'photos/doublebed.webp',
+  'photos/steak.jfif', 'photos/guitar.jpg', 'photos/houseplant.jpg'
 ];
 
 var creatorArtLogos = [
@@ -11961,7 +12666,12 @@ function buildCreatorArtGrid() {
 }
 
 function openCreatorCamera() {
-  document.getElementById('creator-camera-screen').className = 'creator-screen active';
+  if (isDemoMode()) {
+    document.getElementById('creator-camera-screen').className = 'creator-screen active';
+  } else {
+    // Normal mode: skip camera screen, add random photo directly
+    takeCreatorPhoto();
+  }
 }
 
 function closeCreatorScreen() {
@@ -11971,10 +12681,12 @@ function closeCreatorScreen() {
 
 var creatorCameraReturnTo = 'photos';
 
+var stockPhotos = ['photos/carkey.jfif','photos/jumping.jpg','photos/doublebed.webp','photos/steak.jfif','photos/guitar.jpg','photos/houseplant.jpg'];
+
 function takeCreatorPhoto() {
   closeCreatorScreen();
   // Simulate adding a new photo at position 0
-  creatorPhotos.unshift('art/' + String(Math.floor(Math.random() * 100) + 1).replace(/^(\d)$/, '00$1').replace(/^(\d\d)$/, '0$1') + '.jpg');
+  creatorPhotos.unshift(stockPhotos[Math.floor(Math.random() * stockPhotos.length)]);
   sendToUnity('creatorPhoto', {});
   if (creatorCameraReturnTo === 'artpicker') {
     openArtPhotoPicker();
@@ -12016,6 +12728,12 @@ function openArtPhotoPicker() {
   }
 }
 
+function usePhotoForArt() {
+  if (creatorPreviewSrc) {
+    openArtConfig(creatorPreviewSrc);
+  }
+}
+
 function openArtConfig(photoSrc) {
   closeCreatorScreen();
   var screen = document.getElementById('creator-art-config-screen');
@@ -12037,7 +12755,7 @@ function openArtConfig(photoSrc) {
     tile.innerHTML =
       '<div class="creator-tile-shape ' + s.cssClass + '"></div>' +
       '<div class="creator-tile-label">' + s.label + '</div>' +
-      '<div style="font-size:16px;color:#888888;text-align:center;margin-top:4px">Used in: ' + s.uses + '</div>';
+      '<div style="font-size:24px;color:#888888;text-align:center;margin-top:8px">Used in: ' + s.uses + '</div>';
     tile.onclick = (function(shape) {
       return function() {
         creatorSelectedShape = shape.id;
@@ -12075,26 +12793,42 @@ function createArt() {
 
   var grid = document.getElementById('creator-results-grid');
   grid.innerHTML = '';
-  // Simulate 4 AI-generated results using random cover art
+  // Show loading spinners first
   var resultImages = ['art/003.jpg','art/015.jpg','art/027.jpg','art/039.jpg'];
   for (var i = 0; i < 4; i++) {
     var tile = document.createElement('div');
     tile.className = 'creator-result-tile';
+    tile.id = 'cr-tile-' + i;
     tile.innerHTML =
-      '<img src="' + resultImages[i] + '" alt="">' +
-      '<div class="creator-result-check" id="cr-check-' + i + '">&#10003;</div>';
-    tile.onclick = (function(idx) {
-      return function() {
-        var check = document.getElementById('cr-check-' + idx);
-        if (check.className.indexOf('checked') !== -1) {
-          check.className = 'creator-result-check';
-        } else {
-          check.className = 'creator-result-check checked';
-        }
-      };
-    })(i);
+      '<div style="position:absolute;top:0;left:0;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;z-index:2;background:#1a1a1a" id="cr-loading-' + i + '">' +
+        '<div style="width:60px;height:60px;border:5px solid #333;border-top-color:#ffffff;border-radius:50%;animation:spin 1s linear infinite"></div>' +
+        '<div style="font-size:24px;font-weight:600;color:#888">Generating...</div>' +
+      '</div>';
     grid.appendChild(tile);
   }
+
+  // After 5 seconds, reveal the art
+  setTimeout(function() {
+    for (var j = 0; j < 4; j++) {
+      var t = document.getElementById('cr-tile-' + j);
+      if (!t) continue;
+      var loading = document.getElementById('cr-loading-' + j);
+      if (loading) loading.parentNode.removeChild(loading);
+      t.innerHTML =
+        '<img src="' + resultImages[j] + '" alt="">' +
+        '<div class="creator-result-check" id="cr-check-' + j + '">&#10003;</div>';
+      t.onclick = (function(idx) {
+        return function() {
+          var check = document.getElementById('cr-check-' + idx);
+          if (check.className.indexOf('checked') !== -1) {
+            check.className = 'creator-result-check';
+          } else {
+            check.className = 'creator-result-check checked';
+          }
+        };
+      })(j);
+    }
+  }, 5000);
 }
 
 function saveCreatorResults() {
@@ -12105,9 +12839,14 @@ function saveCreatorResults() {
 var creatorPreviewSrc = '';
 var creatorPreviewType = 'art';
 
+var creatorPreviewIndex = 0;
+
 function openArtPreview(src) {
   creatorPreviewSrc = src;
   creatorPreviewType = 'art';
+  for (var i = 0; i < creatorArtLogos.length; i++) {
+    if (creatorArtLogos[i] === src) { creatorPreviewIndex = i; break; }
+  }
   document.getElementById('creator-art-preview-img').src = src;
   document.getElementById('creator-art-preview-screen').className = 'creator-screen active';
 }
@@ -12115,8 +12854,21 @@ function openArtPreview(src) {
 function openPhotoPreview(src) {
   creatorPreviewSrc = src;
   creatorPreviewType = 'photo';
+  for (var i = 0; i < creatorPhotos.length; i++) {
+    if (creatorPhotos[i] === src) { creatorPreviewIndex = i; break; }
+  }
   document.getElementById('creator-art-preview-img').src = src;
   document.getElementById('creator-art-preview-screen').className = 'creator-screen active';
+}
+
+function previewNav(dir) {
+  var list = creatorPreviewType === 'photo' ? creatorPhotos : creatorArtLogos;
+  if (!list.length) return;
+  creatorPreviewIndex = creatorPreviewIndex + dir;
+  if (creatorPreviewIndex < 0) creatorPreviewIndex = list.length - 1;
+  if (creatorPreviewIndex >= list.length) creatorPreviewIndex = 0;
+  creatorPreviewSrc = list[creatorPreviewIndex];
+  document.getElementById('creator-art-preview-img').src = creatorPreviewSrc;
 }
 
 function deleteCreatorArt() {
@@ -12151,79 +12903,85 @@ function openCreatorNamePicker() {
   var panel = document.getElementById('option-picker-panel');
   overlay.style.display = 'flex';
   panel.innerHTML = '';
+  panel.style.width = '1700px';
+  panel.style.maxHeight = '1600px';
 
   var title = document.createElement('div');
   title.className = 'option-picker-title';
   title.textContent = 'Create for';
   panel.appendChild(title);
 
-  var choices = document.createElement('div');
-  choices.className = 'option-picker-choices';
+  var grid = document.createElement('div');
+  grid.className = 'spaces-grid';
+  grid.style.width = '100%';
+  grid.style.height = '1200px';
 
-  // Solo option (current user)
   var profileName = 'Rael';
   var profileEl = document.querySelector('.topbar-username');
   if (profileEl) profileName = profileEl.textContent;
+  var profileAvatar = 'rael_new.png';
+  var profileImg = document.querySelector('.profile-avatar img');
+  if (profileImg) profileAvatar = profileImg.src;
 
-  var soloId = 'solo:' + profileName;
   var currentId = creatorNameType + ':' + creatorSelectedName;
 
-  var soloChoice = document.createElement('div');
-  soloChoice.className = 'option-picker-choice' + (soloId === currentId ? ' selected' : '');
-  soloChoice.innerHTML =
-    '<div style="flex:1">' +
-      '<div class="option-picker-choice-label">' + profileName + '</div>' +
-      '<div class="option-picker-choice-desc">Solo</div>' +
-    '</div>';
-  soloChoice.onclick = (function(name) {
-    return function() {
-      creatorSelectedName = name;
-      creatorNameType = 'solo';
-      updateCreatorNameBtn();
-      closeOptionPicker();
-    };
-  })(profileName);
-  choices.appendChild(soloChoice);
+  var groups = window._backendGroups || [
+    { name: 'Jamsesh Hunters', file: 'bandlogos/Gemini_Generated_Image_4aa5a04aa5a04aa5.jpg' },
+    { name: 'Neon Phantoms', file: 'bandlogos/Gemini_Generated_Image_7nxmb87nxmb87nxm.jpg' },
+    { name: 'Electric Dreams', file: 'bandlogos/Gemini_Generated_Image_8etd7p8etd7p8etd.jpg' },
+    { name: 'Rhythm Rebels', file: 'bandlogos/Gemini_Generated_Image_ds7ykeds7ykeds7y.jpg' },
+    { name: 'Sonic Wolves', file: 'bandlogos/Gemini_Generated_Image_dyvmgcdyvmgcdyvm.jpg' },
+    { name: 'Bass Bandits', file: 'bandlogos/Gemini_Generated_Image_g3jblgg3jblgg3jb.jpg' },
+    { name: 'Velvet Crush', file: 'bandlogos/Gemini_Generated_Image_wzsyntwzsyntwzsy.jpg' }
+  ];
 
-  // Group options
-  var groupNames = ['Jamsesh Hunters', 'Neon Phantoms', 'Electric Dreams', 'Rhythm Rebels', 'Sonic Wolves', 'Bass Bandits', 'Velvet Crush'];
-  for (var i = 0; i < groupNames.length; i++) {
-    var gId = 'group:' + groupNames[i];
-    var gc = document.createElement('div');
-    gc.className = 'option-picker-choice' + (gId === currentId ? ' selected' : '');
-    gc.innerHTML =
-      '<div style="flex:1">' +
-        '<div class="option-picker-choice-label">' + groupNames[i] + '</div>' +
-        '<div class="option-picker-choice-desc">Group</div>' +
+  // Build tiles: Solo + groups + None = up to 9
+  var items = [];
+  items.push({ name: profileName, type: 'solo', img: profileAvatar, desc: 'Solo' });
+  for (var i = 0; i < groups.length; i++) {
+    items.push({ name: groups[i].name, type: 'group', img: groups[i].file, desc: 'Group' });
+  }
+  items.push({ name: 'None', type: 'none', img: '', desc: 'No name overlay' });
+
+  for (var t = 0; t < items.length; t++) {
+    var item = items[t];
+    var itemId = item.type + ':' + item.name;
+    var tile = document.createElement('div');
+    tile.className = 'space-tile';
+    tile.style.cursor = 'pointer';
+    tile.style.position = 'relative';
+    tile.style.overflow = 'hidden';
+    tile.style.display = 'flex';
+    tile.style.flexDirection = 'column';
+    tile.style.alignItems = 'center';
+    tile.style.justifyContent = 'flex-end';
+    tile.style.padding = '20px';
+    if (item.img) {
+      tile.style.background = 'url(' + item.img + ') center center / cover no-repeat #1a1a1a';
+    } else {
+      tile.style.background = '#2a2a2a';
+    }
+    if (itemId === currentId || (item.type === 'none' && creatorNameType === 'none')) {
+      tile.style.boxShadow = '0 0 0 3px #ffffff, 0 0 12px rgba(255,255,255,0.4)';
+    }
+    tile.innerHTML =
+      '<div style="position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(180deg,transparent 40%,rgba(0,0,0,0.8) 100%);z-index:1"></div>' +
+      '<div style="position:relative;z-index:2;text-align:center">' +
+        '<div style="font-size:28px;font-weight:800;color:#ffffff">' + item.name + '</div>' +
+        '<div style="font-size:18px;color:#aaaaaa">' + item.desc + '</div>' +
       '</div>';
-    gc.onclick = (function(name) {
+    tile.onclick = (function(it) {
       return function() {
-        creatorSelectedName = name;
-        creatorNameType = 'group';
+        creatorSelectedName = it.type === 'none' ? '' : it.name;
+        creatorNameType = it.type;
         updateCreatorNameBtn();
         closeOptionPicker();
       };
-    })(groupNames[i]);
-    choices.appendChild(gc);
+    })(item);
+    grid.appendChild(tile);
   }
 
-  // None option
-  var noneChoice = document.createElement('div');
-  noneChoice.className = 'option-picker-choice' + (creatorNameType === 'none' ? ' selected' : '');
-  noneChoice.innerHTML =
-    '<div style="flex:1">' +
-      '<div class="option-picker-choice-label">None</div>' +
-      '<div class="option-picker-choice-desc">No name overlay</div>' +
-    '</div>';
-  noneChoice.onclick = function() {
-    creatorSelectedName = '';
-    creatorNameType = 'none';
-    updateCreatorNameBtn();
-    closeOptionPicker();
-  };
-  choices.appendChild(noneChoice);
-
-  panel.appendChild(choices);
+  panel.appendChild(grid);
 }
 
 function updateCreatorNameBtn() {
@@ -13315,12 +14073,12 @@ function buildHomeGrid(layoutIndex) {
   var tiling = allTilings[layoutIndex];
   var singleIdx = 0;
   var homeTiles = [
-    { title: 'Store', sub: 'Golden Stratocaster', detail: '10,000 Picks - 7 days left', icon: '&#127928;', action: function() { navigateTo('store'); } },
-    { title: 'Vault', sub: '2 New Items Unlocked', detail: 'Check out your new gear', icon: '&#128274;', action: function() { navigateTo('store'); switchStoreTab('vault'); } },
-    { title: 'Group', sub: '3/10 Online Now', detail: 'Jamsesh Hunters are jamming', icon: '&#127911;', action: function() { navigateTo('social'); switchSocialTab('groups'); } },
-    { title: 'Spaces', sub: 'K-Pop Zone', detail: '20/25 Jammers online!', icon: '&#127760;', action: function() { navigateTo('spaces'); } },
-    { title: 'News', sub: 'Update v0.25', detail: 'New battle mode added!', icon: '&#128240;', action: function() { navigateTo('career'); } },
-    { title: 'Friends', sub: '8 Friends Online', detail: 'Jump in and jam together', icon: '&#128101;', action: function() { navigateTo('social'); switchSocialTab('friends'); } }
+    { title: 'Store', sub: 'Golden Stratocaster', detail: '10,000 Picks - 7 days left', icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="140" height="140"><path d="M37 38l-5 60c0 4 3 7 7 7h50c4 0 7-3 7-7l-5-60z" fill="#f48fb1" stroke="#000" stroke-width="3"/><path d="M37 38l-5 60c0 4 3 7 7 7h25V38z" fill="#ec407a" stroke="#000" stroke-width="3"/><path d="M64 18c-12 0-22 10-22 22v6h10v-6c0-7 5-12 12-12s12 5 12 12v6h10v-6c0-12-10-22-22-22z" fill="#424242" stroke="#000" stroke-width="3"/></svg>', bgImage: 'Gemini_Generated_Image_qjcpmnqjcpmnqjcp.jfif', action: function() { navigateTo('store'); } },
+    { title: 'Vault', sub: '2 New Items Unlocked', detail: 'Check out your new gear', icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="140" height="140"><rect x="20" y="50" width="88" height="50" rx="6" fill="#8B5E3C" stroke="#000" stroke-width="3"/><rect x="20" y="50" width="88" height="20" fill="#A0522D" stroke="#000" stroke-width="3"/><path d="M20 50 Q64 20 108 50" fill="#C4884D" stroke="#000" stroke-width="3"/><rect x="54" y="58" width="20" height="16" rx="3" fill="#FFD700" stroke="#000" stroke-width="2"/><circle cx="64" cy="66" r="3" fill="#8B5E3C"/></svg>', bgImage: 'neon-drum-kit-stockcake.webp', action: function() { navigateTo('store'); switchStoreTab('vault'); } },
+    { title: 'Creator', sub: 'Your Creations', detail: 'Build and share content', icon: '&#127912;', bgImage: groupLogoOptions[Math.floor(Math.random() * groupLogoOptions.length)], action: function() { navigateTo('vault'); switchVaultTab('creator'); } },
+    { title: 'Spaces', sub: 'K-Pop Zone', detail: '20/25 Jammers online!', icon: '&#127760;', bgImage: 'Gemini_Generated_Image_jvosmrjvosmrjvos.jfif', action: function() { navigateTo('spaces'); } },
+    { title: 'News', sub: 'Update v0.25', detail: 'New battle mode added!', icon: '&#128240;', bgImage: 'Gemini_Generated_Image_lj9j18lj9j18lj9j.jfif', action: function() { navigateTo('career'); } },
+    { title: 'Social', sub: '8 Friends Online', detail: 'Jump in and jam together', icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="140" height="140"><circle cx="46" cy="38" r="18" fill="#42A5F5" stroke="#000" stroke-width="3"/><path d="M16 95c0-20 13-33 30-33s30 13 30 33" fill="#1E88E5" stroke="#000" stroke-width="3"/><circle cx="82" cy="38" r="18" fill="#AB47BC" stroke="#000" stroke-width="3"/><path d="M52 95c0-20 13-33 30-33s30 13 30 33" fill="#8E24AA" stroke="#000" stroke-width="3"/></svg>', socialAvatars: true, action: function() { navigateTo('social'); switchSocialTab('friends'); } }
   ];
   /* All tiles = octagon with unique glow color */
   var octa = 'polygon(28px 0%, calc(100% - 28px) 0%, 100% 28px, 100% calc(100% - 28px), calc(100% - 28px) 100%, 28px 100%, 0% calc(100% - 28px), 0% 28px)';
@@ -13446,8 +14204,16 @@ function buildHomeGrid(layoutIndex) {
       tile.style.padding = '28px';
       tile.style.gap = '6px';
 
-      tile.innerHTML =
-        '<div style="font-size:48px;font-weight:900;color:#ffffff;text-shadow:-2px -2px 0 rgba(0,0,0,0.8),2px -2px 0 rgba(0,0,0,0.8),-2px 2px 0 rgba(0,0,0,0.8),2px 2px 0 rgba(0,0,0,0.8);position:relative;z-index:3;letter-spacing:1px;text-transform:uppercase">' + ht.title + '</div>'
+      var bgHtml = '';
+      if (ht.bgImage) {
+        var overlayColor = gc.c.replace(/[\d.]+\)$/, '0.25)');
+        var overlayMid = gc.c.replace(/[\d.]+\)$/, '0.4)');
+        bgHtml = '<img src="' + ht.bgImage + '" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:0">'
+          + '<div style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:1;background:linear-gradient(180deg,' + overlayColor + ' 0%,' + overlayMid + ' 40%,rgba(0,0,0,0.7) 100%)"></div>';
+      }
+      tile.style.position = 'relative';
+      tile.innerHTML = bgHtml
+        + '<div style="font-size:48px;font-weight:900;color:#ffffff;text-shadow:-2px -2px 0 rgba(0,0,0,0.8),2px -2px 0 rgba(0,0,0,0.8),-2px 2px 0 rgba(0,0,0,0.8),2px 2px 0 rgba(0,0,0,0.8);position:relative;z-index:3;letter-spacing:1px;text-transform:uppercase">' + ht.title + '</div>'
         + '<div style="font-size:34px;font-weight:700;color:rgba(255,255,255,0.9);text-shadow:-1px -1px 0 rgba(0,0,0,0.7),1px -1px 0 rgba(0,0,0,0.7),-1px 1px 0 rgba(0,0,0,0.7),1px 1px 0 rgba(0,0,0,0.7);position:relative;z-index:3">' + ht.sub + '</div>'
         + '<div style="font-size:24px;font-weight:600;color:rgba(255,255,255,0.7);text-shadow:-1px -1px 0 rgba(0,0,0,0.6),1px -1px 0 rgba(0,0,0,0.6),-1px 1px 0 rgba(0,0,0,0.6),1px 1px 0 rgba(0,0,0,0.6);position:relative;z-index:3">' + ht.detail + '</div>';
 
@@ -13455,17 +14221,47 @@ function buildHomeGrid(layoutIndex) {
       var icon = document.createElement('div');
       icon.className = 'home-tile-icon';
       icon.innerHTML = ht.icon;
+      var isSvgIcon = ht.icon.indexOf('<svg') !== -1;
       var ip = iconPos[singleIdx % iconPos.length];
-      if (ip.top) icon.style.top = ip.top;
-      if (ip.right) icon.style.right = ip.right;
-      if (ip.bottom) icon.style.bottom = ip.bottom;
-      if (ip.left) icon.style.left = ip.left;
+      if (isSvgIcon) {
+        icon.style.top = '-48px';
+        icon.style.right = '-44px';
+      } else {
+        if (ip.top) icon.style.top = ip.top;
+        if (ip.right) icon.style.right = ip.right;
+        if (ip.bottom) icon.style.bottom = ip.bottom;
+        if (ip.left) icon.style.left = ip.left;
+      }
       if (ip.ml) icon.style.marginLeft = ip.ml;
 
       wrap.onclick = (function(a) { return function() { a(); }; })(ht.action);
 
       wrap.appendChild(tile);
       wrap.appendChild(icon);
+
+      // Floating social avatars
+      if (ht.socialAvatars) {
+        var avatarData = [
+          { src: 'ted.png', size: 200, left: '15%', top: '10%', dur: '8s', delay: '0s' },
+          { src: 'abbie.png', size: 140, left: '65%', top: '8%', dur: '10s', delay: '-3s' },
+          { src: 'arthen.jpg', size: 170, left: '55%', top: '45%', dur: '9s', delay: '-5s' },
+          { src: 'jooleeno.jpg', size: 120, left: '20%', top: '50%', dur: '11s', delay: '-7s' }
+        ];
+        for (var av = 0; av < avatarData.length; av++) {
+          var a = avatarData[av];
+          var bubble = document.createElement('div');
+          bubble.className = 'home-tile-avatar';
+          bubble.style.width = a.size + 'px';
+          bubble.style.height = a.size + 'px';
+          bubble.style.left = a.left;
+          bubble.style.top = a.top;
+          bubble.style.animationDuration = a.dur;
+          bubble.style.animationDelay = a.delay;
+          bubble.innerHTML = '<img src="' + a.src + '" alt="">';
+          tile.appendChild(bubble);
+        }
+      }
+
       singleIdx++;
     } else {
       /* Fallback tile */
@@ -13616,33 +14412,388 @@ function onboardComplete() {
   if (ok.className.indexOf('enabled') === -1) return;
   var beep = new Audio('UIBeep-Generate_a_very_shor-Elevenlabs.mp3');
   beep.play();
-  onboardFadeToBlack(
-    document.getElementById('onboard-legal'),
-    document.getElementById('onboard-perms-explain')
-  );
+  completeOnboardStep('legal');
+
+  // Next: perms explainer (demo always shows it, normal/onboard checks flag)
+  if (isDemoMode() || !isStepComplete('perms_explainer')) {
+    onboardFadeToBlack(
+      document.getElementById('onboard-legal'),
+      document.getElementById('onboard-perms-explain')
+    );
+  } else {
+    onboardFadeToBlack(
+      document.getElementById('onboard-legal'),
+      null,
+      function() { _showMainUI(); }
+    );
+  }
 }
 
 function onboardPermsOk() {
-  onboardFadeToBlack(
-    document.getElementById('onboard-perms-explain'),
-    null,
-    function() { navigateTo('home'); }
-  );
+  completeOnboardStep('perms_explainer');
+  if (isDemoMode()) {
+    // Demo: show OS camera permission popup next
+    onboardFadeToBlack(
+      document.getElementById('onboard-perms-explain'),
+      document.getElementById('onboard-perm-camera')
+    );
+  } else {
+    onboardFadeToBlack(
+      document.getElementById('onboard-perms-explain'),
+      null,
+      function() { _showMainUI(); }
+    );
+  }
 }
 
-function dismissEarlyAccess() {
-  var overlay = document.getElementById('early-access-overlay');
-  if (overlay) overlay.classList.add('hidden');
+// Demo-only: Meta Store → Quest home → Boot splash → Legal
+function onboardAdvance(fromScreen) {
+  if (fromScreen === 'metastore') {
+    onboardFadeToBlack(
+      document.getElementById('onboard-meta-store'),
+      document.getElementById('onboard-quest')
+    );
+    updateQuestTime();
+    setInterval(updateQuestTime, 60000);
+  } else if (fromScreen === 'quest') {
+    onboardFadeToBlack(
+      document.getElementById('onboard-quest'),
+      document.getElementById('onboard-boot')
+    );
+  } else if (fromScreen === 'boot') {
+    // Boot splash → Early Access (every session, all modes)
+    onboardFadeToBlack(
+      document.getElementById('onboard-boot'),
+      null,
+      function() {
+        var ea = document.getElementById('early-access-overlay');
+        if (ea) ea.className = 'early-access-overlay';
+      }
+    );
+  }
+}
+
+// Demo-only: OS permission popups → main UI
+function onboardPermNext(which) {
+  if (which === 'camera') {
+    onboardFadeToBlack(
+      document.getElementById('onboard-perm-camera'),
+      document.getElementById('onboard-perm-mic')
+    );
+  } else if (which === 'mic') {
+    onboardFadeToBlack(
+      document.getElementById('onboard-perm-mic'),
+      null,
+      function() { _showMainUI(); }
+    );
+  }
+}
+
+// Demo-only: Quest home clock
+function updateQuestTime() {
+  var el = document.getElementById('quest-time');
+  if (!el) return;
+  var now = new Date();
+  var h = now.getHours();
+  var m = now.getMinutes();
+  el.textContent = (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m;
+}
+
+// ===========================================================================
+// Mode System: demo / onboard / normal
+// URL params: ?mode=demo | ?mode=onboard | ?step=N | ?reset
+// Flags version: bump LEGAL_VERSION when TOS/PP changes to re-show legal
+// ===========================================================================
+var LEGAL_VERSION = '1';
+var demoEnabled = false;     // ?demo — show demo-only screens
+var onboardEnabled = false;  // ?onboard — force onboarding even if completed
+var onboardFlags = {};       // { legal: true, perms_explainer: true }
+
+function parseMode() {
+  var params = window.location.search.substring(1).split('&');
+  var map = {};
+  for (var i = 0; i < params.length; i++) {
+    var kv = params[i].split('=');
+    if (kv[0]) map[kv[0]] = kv[1] || '';
+  }
+
+  // ?reset — clear all progress
+  if ('reset' in map) {
+    try { localStorage.removeItem('jamsesh_onboard'); } catch(e) {}
+    console.log('[Mode] Reset — cleared onboarding progress');
+  }
+
+  // Independent flags
+  demoEnabled = 'demo' in map;
+  onboardEnabled = 'onboard' in map;
+
+  // ?onboard clears saved flags to force re-run
+  if (onboardEnabled) {
+    try { localStorage.removeItem('jamsesh_onboard'); } catch(e) {}
+  }
+
+  // Load saved flags from localStorage (dev) or Vuplex (prod)
+  onboardFlags = _loadOnboardFlags();
+
+  // ?step=N — override: mark all steps before N as complete
+  if (map.step) {
+    var stepNum = parseInt(map.step, 10);
+    var stepOrder = ['legal', 'perms_explainer', 'tutorial_play'];
+    for (var s = 0; s < stepOrder.length; s++) {
+      if (s < stepNum - 1) {
+        onboardFlags[stepOrder[s]] = true;
+      } else {
+        delete onboardFlags[stepOrder[s]];
+      }
+    }
+    if (onboardFlags.legal) onboardFlags.legal_version = LEGAL_VERSION;
+    _saveOnboardFlags();
+  }
+
+  console.log('[Mode] demo=' + demoEnabled + ', onboard=' + onboardEnabled + ', flags=' + JSON.stringify(onboardFlags));
+}
+
+function _loadOnboardFlags() {
+  try {
+    var raw = localStorage.getItem('jamsesh_onboard');
+    if (raw) return JSON.parse(raw);
+  } catch(e) {}
+  return {};
+}
+
+function _saveOnboardFlags() {
+  try {
+    localStorage.setItem('jamsesh_onboard', JSON.stringify(onboardFlags));
+  } catch(e) {}
+}
+
+function completeOnboardStep(step) {
+  onboardFlags[step] = true;
+  if (step === 'legal') onboardFlags.legal_version = LEGAL_VERSION;
+  _saveOnboardFlags();
+  sendToUnity('onboardStepComplete', { step: step, flags: onboardFlags });
+  console.log('[Mode] Completed: ' + step);
+}
+
+function isStepComplete(step) {
+  if (step === 'legal') {
+    // Re-show if legal version changed
+    return onboardFlags.legal && onboardFlags.legal_version === LEGAL_VERSION;
+  }
+  return !!onboardFlags[step];
+}
+
+function isDemoMode() {
+  return demoEnabled;
+}
+
+function isOnboardMode() {
+  return onboardEnabled;
+}
+
+// Entry point: kicks off the first screen
+function startFlow() {
+  if (isDemoMode()) {
+    // Demo screens first: Meta Store → Quest Home → Boot → Early Access → ...
+    _showOnboardScreen('onboard-meta-store');
+    return;
+  }
+
+  // Non-demo: Early Access → onboarding steps → Main UI
+  var ea = document.getElementById('early-access-overlay');
+  if (ea) ea.className = 'early-access-overlay';
+}
+
+// After early access OK — route to next onboarding step or main UI
+function onboardAfterEarlyAccess() {
+  if (isDemoMode()) {
+    // Demo: always show legal next
+    _showOnboardScreen('onboard-legal');
+    return;
+  }
+
+  // Normal / onboard: skip completed steps
+  if (!isStepComplete('legal')) {
+    _showOnboardScreen('onboard-legal');
+    return;
+  }
+
+  if (!isStepComplete('perms_explainer')) {
+    _showOnboardScreen('onboard-perms-explain');
+    return;
+  }
+
+  // All steps complete — go straight to main UI
+  _showMainUI();
+}
+
+function _showOnboardScreen(id) {
+  var el = document.getElementById(id);
+  if (el) el.className = el.className.replace(' hidden', '');
+}
+
+function _showMainUI() {
   var topbar = document.querySelector('.topbar');
   var navbar = document.querySelector('.navbar');
   if (topbar) topbar.style.display = '';
   if (navbar) navbar.style.display = '';
   var pages = document.querySelectorAll('.page');
   for (var i = 0; i < pages.length; i++) pages[i].style.visibility = '';
+
+  // Onboarding step 1: first play tutorial
+  if (!isStepComplete('tutorial_play')) {
+    startTutorialPlay();
+  }
+}
+
+var tutorialSongs = [
+  { rank: 1, title: 'Guitar Basics', artist: 'Jamsesh Tutorial', file: 'instruments/guitar.png', duration: 120, bpm: 100, genre: 'Tutorial', decade: '2020s' },
+  { rank: 2, title: 'Drum Basics', artist: 'Jamsesh Tutorial', file: 'instruments/drums.png', duration: 120, bpm: 100, genre: 'Tutorial', decade: '2020s' },
+  { rank: 3, title: 'Vocal Basics', artist: 'Jamsesh Tutorial', file: 'instruments/vocals.png', duration: 120, bpm: 100, genre: 'Tutorial', decade: '2020s' }
+];
+
+function startTutorialPlay() {
+  // Navigate to play tab
+  navigateTo('play');
+
+  // Grey out navbar items except play
+  var navItems = document.querySelectorAll('.nav-item');
+  for (var i = 0; i < navItems.length; i++) {
+    var page = navItems[i].getAttribute('data-page');
+    if (page !== 'play') {
+      navItems[i].style.opacity = '0.25';
+      navItems[i].style.pointerEvents = 'none';
+    }
+  }
+
+  // Grey out topbar
+  var topbar = document.querySelector('.topbar');
+  if (topbar) {
+    topbar.style.opacity = '0.25';
+    topbar.style.pointerEvents = 'none';
+  }
+
+  // Override setlist with tutorial songs
+  setlist = tutorialSongs.slice();
+  buildPlayGrid();
+
+  // Grey out Save/Load, keep Start highlighted
+  var goBar = document.querySelector('.play-go-bar');
+  if (goBar) {
+    var btns = goBar.querySelectorAll('.play-bar-btn');
+    for (var b = 0; b < btns.length; b++) {
+      btns[b].style.opacity = '0.25';
+      btns[b].style.pointerEvents = 'none';
+    }
+  }
+
+  // Grey out mode tabs
+  var modeTabs = document.querySelectorAll('.play-mode-tab');
+  for (var m = 0; m < modeTabs.length; m++) {
+    modeTabs[m].style.opacity = '0.25';
+    modeTabs[m].style.pointerEvents = 'none';
+  }
+
+  // Override Start button to complete tutorial
+  var startBtn = document.getElementById('play-go-btn');
+  if (startBtn) {
+    startBtn.onclick = function() {
+      completeTutorialPlay();
+    };
+  }
+}
+
+function tutorialAdvance(step) {
+  var black = document.getElementById('onboard-black');
+  if (step === 1) {
+    // Tutorial screen 1 → Tutorial screen 2
+    black.className = 'visible';
+    setTimeout(function() {
+      document.getElementById('screen-tutorial-1').classList.remove('active');
+      document.getElementById('screen-tutorial-2').classList.add('active');
+      setTimeout(function() { black.className = ''; }, 50);
+    }, 200);
+  } else if (step === 2) {
+    // Tutorial screen 2 → Results
+    black.className = 'visible';
+    setTimeout(function() {
+      document.getElementById('screen-tutorial-2').classList.remove('active');
+      showResults1();
+      setTimeout(function() { black.className = ''; }, 50);
+    }, 200);
+  }
+}
+
+function completeTutorialPlay() {
+  completeOnboardStep('tutorial_play');
+
+  // Restore navbar
+  var navItems = document.querySelectorAll('.nav-item');
+  for (var i = 0; i < navItems.length; i++) {
+    navItems[i].style.opacity = '';
+    navItems[i].style.pointerEvents = '';
+  }
+
+  // Restore topbar
+  var topbar = document.querySelector('.topbar');
+  if (topbar) {
+    topbar.style.opacity = '';
+    topbar.style.pointerEvents = '';
+  }
+
+  // Restore Save/Load buttons
+  var goBar = document.querySelector('.play-go-bar');
+  if (goBar) {
+    var btns = goBar.querySelectorAll('.play-bar-btn');
+    for (var b = 0; b < btns.length; b++) {
+      btns[b].style.opacity = '';
+      btns[b].style.pointerEvents = '';
+    }
+  }
+
+  // Restore mode tabs
+  var modeTabs = document.querySelectorAll('.play-mode-tab');
+  for (var m = 0; m < modeTabs.length; m++) {
+    modeTabs[m].style.opacity = '';
+    modeTabs[m].style.pointerEvents = '';
+  }
+
+  // Restore start button to normal
+  var startBtn = document.getElementById('play-go-btn');
+  if (startBtn) {
+    startBtn.onclick = function() { startGame(); };
+  }
+
+  // Demo mode: show tutorial gameplay screens with narration
+  // Normal mode: go straight to the game
+  if (isDemoMode()) {
+    var black = document.getElementById('onboard-black');
+    black.className = 'visible';
+    setTimeout(function() {
+      document.getElementById('screen-tutorial-1').classList.add('active');
+      // Play narration audio
+      try {
+        var narration = new Audio('tutorial-guitar-intro.mp3');
+        narration.play();
+      } catch(e) {}
+      setTimeout(function() { black.className = ''; }, 50);
+    }, 200);
+  } else {
+    startGame();
+  }
+}
+
+function dismissEarlyAccess() {
+  var overlay = document.getElementById('early-access-overlay');
+  if (overlay) overlay.classList.add('hidden');
+  onboardAfterEarlyAccess();
 }
 
 function init() {
-  // Hide main UI while early access screen is showing
+  // Parse URL mode and load onboarding flags
+  parseMode();
+
+  // Hide main UI while early access / onboarding screens are showing
   var topbar = document.querySelector('.topbar');
   var navbar = document.querySelector('.navbar');
   if (topbar) topbar.style.display = 'none';
@@ -13659,6 +14810,21 @@ function init() {
   buildPlayPanel([]);
   buildStoreGrid();
   showPlayLoading(true);
+
+  // Fallback: load songs.json when running outside Vuplex (standalone browser)
+  if (!window.vuplex) {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', 'songs.json', true);
+    xhr.onreadystatechange = function() {
+      if (xhr.readyState === 4 && xhr.status === 200) {
+        try {
+          var data = JSON.parse(xhr.responseText);
+          updateSongsFromBackend(data);
+        } catch (e) {}
+      }
+    };
+    xhr.send();
+  }
   buildSocialPage();
   buildSpacesGrid();
   buildVaultGrid();
@@ -13689,6 +14855,9 @@ function init() {
 
   // Initialize legal screen content on startup
   if (typeof onboardInitLegal === 'function') onboardInitLegal();
+
+  // Start the onboarding/demo flow
+  startFlow();
 }
 
 /* ── Stat Ticker ──────────────────────────────────── */
