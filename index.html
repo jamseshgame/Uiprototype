@@ -14535,10 +14535,12 @@ function parseMode() {
   // Load saved flags from localStorage (dev) or Vuplex (prod)
   onboardFlags = _loadOnboardFlags();
 
-  // ?step=N — override: mark all steps before N as complete
+  // ?step=N or ?step=name — override: mark all steps before N as complete
+  // Named steps: legal, perms, tutorial, menu (or numbers 1-4)
   if (map.step) {
-    var stepNum = parseInt(map.step, 10);
     var stepOrder = ['legal', 'perms_explainer', 'tutorial_play'];
+    var stepNames = {legal: 1, perms: 2, tutorial: 3, menu: 4};
+    var stepNum = stepNames[map.step] || parseInt(map.step, 10) || 1;
     for (var s = 0; s < stepOrder.length; s++) {
       if (s < stepNum - 1) {
         onboardFlags[stepOrder[s]] = true;

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Jamsesh is a VR music rhythm game. This repo contains its UI prototype — a **single-file HTML/CSS/JS application** (`index.html`, ~14000 lines) designed to run inside **Vuplex WebView on Meta Quest headsets**. The viewport is a fixed **1920x1920 pixel** panel.
+Jamsesh is a VR music rhythm game. This repo contains its UI prototype — a **single-file HTML/CSS/JS application** (`index.html`, ~15100 lines) designed to run inside **Vuplex WebView on Meta Quest headsets**. The viewport is a fixed **1920x1920 pixel** panel.
 
 There is also a `src/` directory with a Figma Make-exported React/Vite app — this is a separate reference artifact and is **not** the primary working file.
 
@@ -30,7 +30,7 @@ npm run build    # Vite production build
   - No CSS `gap` on flex in older builds; test carefully
 - **Single file**: All CSS is in `<style>`, all JS is in `<script>`, all HTML is inline
 - **No build step**: The file is served directly to the WebView
-- **Exception**: The second `<script>` block (~line 13800) is a post-load interaction layer that uses modern JS (arrow functions, `forEach`). This block runs after the main ES5 app and is acceptable since it is a separate concern — but all **main application code** in the first `<script>` must remain ES5.
+- **Exception**: The second `<script>` block (~line 14961) is a post-load interaction layer that uses modern JS (arrow functions, `forEach`). This block runs after the main ES5 app and is acceptable since it is a separate concern — but all **main application code** in the first `<script>` must remain ES5.
 
 ## Data Files
 
@@ -45,10 +45,10 @@ npm run build    # Vite production build
 ## Architecture of index.html
 
 ### Structure (top to bottom)
-1. **CSS** (lines 9–7800): Global styles, component styles, play grid/coop/option-picker styles, game screen/results/rewards styles, theme overrides (Arcade, Hunter, Nebula, Liquid Glass, Wireframe), banner/frame styles, shimmer animations, layout overlay styles, onboarding/early-access styles, create-group/create-space popup styles
-2. **HTML** (lines ~7801–8870): Onboarding screens (legal agreement, permissions), `.viewport` containing early access overlay, full-screen `<canvas>` for particle background, `.topbar`, 9 `.page` elements (home, play, career, season, social, spaces, vault, store, settings), `.navbar`, all popup overlays (solo-popup, option-picker, save/load setlist, create-group, logo-picker, create-space), `.layout-overlay`, and game screens (gameplay, results 1, results 2)
-3. **JavaScript — Main App** (lines ~8870–13800): Vuplex bridge, navigation, page builders, theme engine, banner/frame systems, profile system, play grid system (solo/coop/battle), option picker popups, store builder, home grid tiling generator, social/spaces builders, create-group/create-space flows, onboarding flow, data arrays
-4. **JavaScript — Interaction Layer** (lines ~13800–13967): Click bounce feedback and canvas-based particle festival background animation (uses modern JS)
+1. **CSS** (lines 9–8317): Global styles, component styles, play grid/coop/option-picker styles, game screen/results/rewards styles, creator page styles (camera, art config, word cloud, results), theme overrides (Arcade, Hunter, Nebula, Liquid Glass, Wireframe), banner/frame styles, shimmer animations, layout overlay styles, onboarding/early-access styles, create-group/create-space popup styles
+2. **HTML** (lines ~8318–9523): Onboarding screens (legal agreement, permissions), `.viewport` containing early access overlay, full-screen `<canvas>` for particle background, `.topbar`, 9 `.page` elements (home, play, career, season, social, spaces, creator, store, settings), `.navbar`, all popup overlays (solo-popup, option-picker, save/load setlist, create-group, logo-picker, create-space), creator screens (camera, photo picker, art config, art results, art preview), `.layout-overlay`, and game screens (gameplay, results 1, results 2)
+3. **JavaScript — Main App** (lines ~9524–14960): Vuplex bridge, navigation, page builders, theme engine, banner/frame systems, profile system, play grid system (solo/coop/battle), option picker popups, store builder, creator system (photos/art/camera flows), home grid tiling generator, social/spaces builders, create-group/create-space flows, onboarding flow, data arrays
+4. **JavaScript — Interaction Layer** (lines ~14961–15134): Click bounce feedback and canvas-based particle festival background animation (uses modern JS)
 
 ### Navigation
 - Pages use `display: none` / `.page.active { display: flex }` — **elements in hidden pages have 0 `offsetHeight`**
@@ -57,8 +57,8 @@ npm run build    # Vite production build
 - Settings page has toggled sub-sections: `showThemes()`, `showBanners()`, `showFrames()`, `showTos()`, `showPrivacy()`
 - Social page: 2 tabs (Groups, Friends) via `switchSocialTab(tab)`
 - Spaces page: 2 tabs (Public, Private) via `switchSpacesTab(tab)`
-- Vault page: 2 tabs (Owned, Creator) via `switchVaultTab(tab)`
-- Store page: 3 tabs (Songs, Packs, Items) via `switchStoreTab(tab)`
+- Creator page: 3 tabs (Photos, Art, Songs) via `switchCreatorTab(tab)`
+- Store page: 4 tabs (Songs, Packs, Items, Vault) via `switchStoreTab(tab)`
 - Season page: "COMING SOON" placeholder (no interactive content)
 
 ### Home Grid & Layout System
@@ -116,9 +116,18 @@ npm run build    # Vite production build
 - Transitions use fade-to-black (`#onboard-black` div at z-index 1001, 200ms opacity transition)
 
 ### Store Page
-- 3 tabs: **Songs** (9 random cover art tiles with $2.99 price tags), **Packs** (6 themed bundles + 3 locked with unlock dates), **Items** (9 category sections: Spaces, Stages, Avatar, Instruments, Gem, Highway, Skybox, Theme, Frame)
+- 4 tabs: **Songs** (9 random cover art tiles with $2.99 price tags), **Packs** (6 themed bundles + 3 locked with unlock dates), **Items** (9 category sections: Spaces, Stages, Avatar, Instruments, Gem, Highway, Skybox, Theme, Frame), **Vault** (owned items 3x3 grid + creator shapes grid)
 - `buildStoreGrid()` called after songs load in XHR callback (needs `allSongs` populated)
-- `switchStoreTab(tab)` toggles between songs/packs/items
+- `switchStoreTab(tab)` toggles between songs/packs/items/vault
+
+### Creator Page
+- 3 tabs: **Photos** (3x3 grid with `+` capture tile, paginated), **Art** (3x3 grid with `+` create tile, band logos, paginated), **Songs** ("COMING SOON" placeholder)
+- `buildCreatorGrids()` initializes both grids; called in `init()`
+- **Photo capture flow**: `+` tile → `openCreatorCamera()` → white canvas with red 1280x720 viewfinder box + privacy notice → Capture/Cancel buttons → adds to `creatorPhotos[]`
+- **Art creation flow**: `+` tile → `openArtPhotoPicker()` (select source photo from 3x3 grid) → `openArtConfig()` (2x2 shape picker with "Used in" descriptions + Group/Solo name picker + 20-word style cloud + text prompt) → `createArt()` → 2x2 AI results grid with tickbox selection → Save
+- **Group/Solo name picker**: `openCreatorNamePicker()` reuses `#option-picker-overlay` to show current user, all groups, and "None" option
+- **Art/Photo preview**: Clicking a tile opens full-size view with Back/Delete buttons; `deleteCreatorArt()` removes from array and rebuilds grid
+- Creator screens use `.creator-screen` class (absolute, 1920x1920, z-index 998), toggled via `.active`
 
 ### Popup Overlays
 - All overlays (solo-popup, option-picker, loadout, purchase, save, load, layout-overlay, create-group, logo-picker, create-space) live **inside `.viewport`** and use `position: absolute` to center relative to the 1920x1920 UI panel

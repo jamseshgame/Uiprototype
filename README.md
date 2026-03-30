@@ -13,7 +13,7 @@ Open http://localhost:3000 in your browser.
 
 ## Features
 
-- **9 navigable pages**: Home, Social, Spaces, Play, Vault, Store, Season, Career, Settings
+- **9 navigable pages**: Home, Social, Spaces, Play, Creator, Store, Season, Career, Settings
 - **Customizable home page**: 3x3 grid layout system with every valid rectangular tiling — browse and select from all possible partitions via a layout picker overlay
 - **11 themes**: Wireframe Light/Dark, Neon Pink, Cyber Cyan, Sunset Blaze, Light Mode, Rainforest, Neon Arcade, Hunter, Nebula, Liquid Glass
 - **Scrolling banners**: Purchasable banner images that scroll across topbar, navbar, and content area with dark overlays for readability
@@ -41,7 +41,7 @@ The UI supports URL parameters to control the startup flow for development, test
 |-----------|-------------|
 | `?demo` | Enables **demo-only screens**: Meta Store page, Quest OS Home, Boot Splash, OS permission popups. These screens simulate the full Quest experience for stakeholder presentations. |
 | `?onboard` | Forces the **onboarding flow** from the beginning, clearing all saved progress. Shows Legal Agreement, Permissions Explainer, and Tutorial Play even if previously completed. |
-| `?step=N` | Jumps to onboarding **step N**, marking all prior steps as complete. See step list below. |
+| `?step=N` or `?step=name` | Jumps to onboarding **step N** (number or name), marking all prior steps as complete. See step list below. |
 | `?reset` | Clears all saved onboarding progress from `localStorage` without starting any flow. |
 
 ### Combining Flags
@@ -52,19 +52,22 @@ Flags can be combined with `&`:
 http://localhost:3000/?demo                  # Full demo with all screens
 http://localhost:3000/?onboard               # Force fresh onboarding (no demo screens)
 http://localhost:3000/?demo&onboard          # Demo screens + forced fresh onboarding
-http://localhost:3000/?demo&step=3           # Demo screens + skip to Tutorial Play
-http://localhost:3000/?step=3                # Skip to Tutorial Play (no demo screens)
+http://localhost:3000/?demo&step=tutorial     # Demo screens + skip to Tutorial Play
+http://localhost:3000/?step=tutorial          # Skip to Tutorial Play (no demo screens)
+http://localhost:3000/?step=menu             # Skip everything, straight to full menu
+http://localhost:3000/?step=perms            # Skip to Permissions Explainer
 http://localhost:3000/?reset                 # Clear all progress
 http://localhost:3000/                       # Normal mode (skips completed steps)
 ```
 
 ### Onboarding Steps
 
-| Step | Flag Name | Shown When |
-|------|-----------|------------|
-| 1 | `legal` | Once per user. Re-shown if `LEGAL_VERSION` is bumped in code. |
-| 2 | `perms_explainer` | Once per user. Explains Camera + Mic permissions. |
-| 3 | `tutorial_play` | Once per user. Locks UI to Play tab with tutorial songs (Guitar/Drum/Vocal Basics). |
+| Step | Number | Name | Shown When |
+|------|--------|------|------------|
+| 1 | `?step=1` | `?step=legal` | Legal Agreement. Once per user. Re-shown if `LEGAL_VERSION` is bumped. |
+| 2 | `?step=2` | `?step=perms` | Permissions Explainer. Once per user. Explains Camera + Mic permissions. |
+| 3 | `?step=3` | `?step=tutorial` | Tutorial Play. Once per user. Locks UI to Play tab with tutorial songs. |
+| 4 | `?step=4` | `?step=menu` | Full menu. All steps complete — straight to main UI. |
 
 ### Demo-Only Screens (require `?demo`)
 
