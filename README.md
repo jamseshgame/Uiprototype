@@ -13,21 +13,23 @@ Open http://localhost:3000 in your browser.
 
 ## Features
 
-- **9 navigable pages**: Home, Social, Spaces, Play, Creator, Store, Season, Career, Settings
-- **Customizable home page**: 3x3 grid layout system with every valid rectangular tiling — browse and select from all possible partitions via a layout picker overlay
-- **11 themes**: Wireframe Light/Dark, Neon Pink, Cyber Cyan, Sunset Blaze, Light Mode, Rainforest, Neon Arcade, Hunter, Nebula, Liquid Glass
-- **Scrolling banners**: Purchasable banner images that scroll across topbar, navbar, and content area with dark overlays for readability
-- **Profile frames**: Animated gradient borders on profile avatars with purchasable color combinations
-- **Liquid Glass theme**: Glassmorphism panels with backdrop-filter blur, prismatic borders, specular tracking, and coloured palette (#5848a0, #c83868, #289878, #c89030)
+- **9 navigable pages**: Home, Social, Spaces, Play, Creator, Store, Season, Profile, Settings
+- **Per-page colour themes**: Each page has its own gradient background, wave colours, and particle tints (Home=purple, Social=green, Spaces=blue, Play=cyan, Creator=amber, Store=pink, Season=gold, Profile=purple)
+- **Customizable home page**: 322 valid rectangular tilings of a 3x3 grid with priority-based tile assignment. `?layout=N` URL param + `?tiles=` priority override
+- **Home tile system**: 7 tile types (Season, Store, Vault, Creator, Spaces, News, Social) with 5 size variants each (1x1, 2x1, 3x1, 1x2, 1x3) in `/home_tiles/`
+- **Play tab**: Solo (3 songs + pagination + setlist summary), Group/Battle (song column + 9 friend avatars per song). Song tiles with hover replace/remove actions. 1:1 cover art
+- **Setlist loader**: 3x3 grid picker with adaptive art layouts (1 song = full cover, 2 = side-by-side, 3+ = 2x2 grid). Lesson setlists with lock flags
+- **Tutorial onboarding**: Locked UI with only Load button active, lesson setlists (Basic/Advanced/Expert) with instrument/difficulty/song locks
+- **Creator page**: Photos tab (3x3 + camera capture), Art tab (photo picker → shape/word cloud/prompt → 2x2 AI results), Songs (Coming Soon)
+- **Profile page**: Name (neon glow text), Picture (profile avatar circle with purple glow), Avatar (Genies SDK — 9 asset categories), News, Credits (floating team avatars), Device info
+- **Avatar customization**: Genies SDK integration with 9 categories (Shirts, Hoodies, Jackets, Pants, Dresses, Shoes, Hats, Glasses, Earrings)
+- **Store page**: Songs, Packs (with unlock dates), Items (9 categories), Vault tabs
+- **Virtual keyboard**: Standalone `keyboard.html` using simple-keyboard library, themed to match UI, Vuplex bridge integration
+- **Nested radius system**: `--radius-outer` (56px) for containers, `--panel-radius` (28px) for tiles/buttons following R_outer = R_inner + padding formula
+- **Page-aware buttons**: All buttons use CSS variables (`--btn-tab`, `--btn-panel`, `--btn-primary`) that auto-adapt to each page's accent colour. Zero grey buttons
 - **Profile switcher**: Multiple user profiles (Rael, Jooleeno, Ted, Abbie, Arthen) with avatar, level, XP, and coins
-- **3D coin**: CSS 3D rotating coin with stacked edge slices, inner ridge, and ticker-synced spin animation
-- **Stat ticker**: Rotating topbar display cycling through Level, XP, Coins, Season progress
-- **Solo setlist builder**: Paginated song grid with instrument/difficulty/space/loadout buttons, cover art, and coloured metadata bubbles (title, artist, duration, BPM)
-- **Setlist pagination**: Animated page transitions with directional slide when navigating up/down
-- **Song metadata**: 100 songs with authored duration, BPM, genre, and decade fields (loaded from `songs.json`)
-- **Popup overlays**: Solo options, loadout, purchase, save/load setlists — all with close buttons, centered to the 1920x1920 viewport
-- **SVG nav icons**: Inline SVG icons replacing Unicode characters for consistent VR rendering
-- **VR optimised**: Minimum 16px text sizes, :active hover fallbacks for laser pointers, page cross-fade transitions
+- **Transparent topbar**: Profile info over particle background with no banner overlay
+- **Play button highlight**: 10% larger navbar button with subtle pulse animation (8s cycle, 5s gap)
 - **Shimmer animations**: Three-tier hover system (idle/hover/active) with staggered delays
 - **Vuplex bridge**: JSON message passing to/from Unity game engine
 
@@ -43,6 +45,9 @@ The UI supports URL parameters to control the startup flow for development, test
 | `?onboard` | Forces the **onboarding flow** from the beginning, clearing all saved progress. Shows Legal Agreement, Permissions Explainer, and Tutorial Play even if previously completed. |
 | `?step=N` or `?step=name` | Jumps to onboarding **step N** (number or name), marking all prior steps as complete. See step list below. |
 | `?reset` | Clears all saved onboarding progress from `localStorage` without starting any flow. |
+| `?skip` | Bypasses everything — straight to full unlocked menu. Ignores localStorage and onboarding flags. |
+| `?layout=N` | Sets home grid layout (0–321). Persists via `sendToUnity('layoutChanged', N)`. |
+| `?tiles=a,b,c` | Overrides home tile priority order. E.g. `?tiles=social,store,season,news,spaces,vault,creator` |
 
 ### Combining Flags
 
@@ -107,19 +112,18 @@ Meta Store → Quest Home → Boot Splash → Early Access → Legal → Perms E
 ## Project Structure
 
 ```
-index.html              # The full UI prototype (~15000 lines)
+index.html              # The full UI prototype (~15500 lines)
+keyboard.html           # Virtual QWERTY keyboard (simple-keyboard, Vuplex bridge)
 songs.json              # Song library (100 tracks with metadata)
 CLAUDE.md               # AI coding assistant instructions
-screenshot_script.cjs   # Playwright automated screenshot testing
-rael_new.png            # Profile avatar - Rael
-jooleeno.jpg            # Profile avatar - Jooleeno
-ted.png                 # Profile avatar - Ted
-abbie.png               # Profile avatar - Abbie
-arthen.jpg              # Profile avatar - Arthen
+AR_Glasses.png          # Genies avatar preview image
 art/                    # Song cover artwork (001-100.jpg)
+avatar_tiles/           # Avatar asset category images (shirts, shoes, etc.)
 banners/                # Banner image PNGs for scrolling banner system
 bandlogos/              # Band/group logo images for social groups
+home_tiles/             # Per-tile home grid images (7 types x 5 sizes)
 instruments/            # Instrument icons (guitar.png, drums.png, vocals.png)
+js/                     # simple-keyboard library files
 photos/                 # Creator photos (user-captured stock photos)
 src/                    # Figma Make-exported React/Vite app (reference only)
 ```

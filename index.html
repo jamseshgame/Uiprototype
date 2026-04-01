@@ -39,8 +39,22 @@
 
     --pad: 32px;
     --panel-gap: 20px;
+    --radius-inner: 28px;
     --panel-radius: 28px;
+    --radius-outer: 56px;
     --grid-gap: 16px;
+
+    /* Page-aware button colours — set via JS in navigateTo() */
+    --btn-tab: rgba(124,58,237,0.15);
+    --btn-tab-hover: rgba(124,58,237,0.28);
+    --btn-tab-border: rgba(124,58,237,0.25);
+    --btn-panel: rgba(124,58,237,0.10);
+    --btn-panel-hover: rgba(124,58,237,0.20);
+    --btn-panel-border: rgba(124,58,237,0.18);
+    --btn-primary: rgba(124,58,237,0.30);
+    --btn-primary-hover: rgba(124,58,237,0.45);
+    --btn-primary-border: rgba(124,58,237,0.50);
+    --btn-primary-glow: rgba(124,58,237,0.35);
     --pink-15: rgba(124,58,237,0.15);
     --pink-30: rgba(124,58,237,0.3);
     --pink-40: rgba(124,58,237,0.4);
@@ -160,44 +174,20 @@
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
-    background: linear-gradient(135deg, rgba(0,224,255,0.05) 0%, rgba(255,255,255,0.02) 50%, rgba(168,85,247,0.04) 100%);
-    border-radius: var(--panel-radius);
-    border: 1px solid rgba(0,224,255,0.3);
-    border-top-color: rgba(0,224,255,0.5);
+    background: transparent;
+    border-radius: var(--radius-outer);
+    border: 1px solid rgba(255,255,255,0.10);
     overflow: hidden;
     position: relative;
     z-index: 0;
-    box-shadow: 0 0 10px rgba(0,224,255,0.3), 0 8px 12px rgba(0,0,0,0.3);
   }
 
   .topbar::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-image: url('banners/Space 1.png');
-    background-size: auto;
-    background-position: center center;
-    background-repeat: repeat-x;
-    z-index: 1;
-    pointer-events: none;
-    animation: bannerScroll 90s linear infinite;
-    width: 200%;
+    display: none;
   }
 
   .topbar::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0,0,0,0.5) !important;
-    background-image: none !important;
-    z-index: 2;
-    pointer-events: none;
+    display: none;
   }
 
   .topbar-main {
@@ -379,7 +369,7 @@
     overflow: hidden;
     padding: var(--pad);
     background: transparent;
-    border-radius: var(--panel-radius);
+    border-radius: var(--radius-outer);
     border: none;
     display: flex;
     flex-direction: column;
@@ -637,11 +627,9 @@
   .play-tile,
   .play-coop-tile,
   .theme-card {
-    border-radius: 0;
+    border-radius: var(--panel-radius);
     outline: 1px solid rgba(0,224,255,0.12);
     outline-offset: 4px;
-    -webkit-clip-path: polygon(14px 0%, calc(100% - 14px) 0%, 100% 14px, 100% calc(100% - 14px), calc(100% - 14px) 100%, 14px 100%, 0% calc(100% - 14px), 0% 14px);
-    clip-path: polygon(14px 0%, calc(100% - 14px) 0%, 100% 14px, 100% calc(100% - 14px), calc(100% - 14px) 100%, 14px 100%, 0% calc(100% - 14px), 0% 14px);
   }
 
   /* ── Depth layers — inner recessed shadows ─────── */
@@ -860,10 +848,8 @@
     flex-direction: column;
     background: var(--bg-surface);
     border: 1px solid var(--border-subtle);
-    border-radius: 0;
+    border-radius: var(--panel-radius);
     overflow: hidden;
-    -webkit-clip-path: polygon(0% 20px, 20px 0%, calc(100% - 20px) 0%, 100% 20px, 100% calc(100% - 20px), calc(100% - 20px) 100%, 20px 100%, 0% calc(100% - 20px));
-    clip-path: polygon(0% 20px, 20px 0%, calc(100% - 20px) 0%, 100% 20px, 100% calc(100% - 20px), calc(100% - 20px) 100%, 20px 100%, 0% calc(100% - 20px));
   }
 
   .play-panel-header {
@@ -1090,9 +1076,7 @@
     flex-direction: column;
     justify-content: space-between;
     min-height: 0;
-    border-radius: 0;
-    -webkit-clip-path: polygon(0% 28px, 28px 0%, calc(100% - 28px) 0%, 100% 28px, 100% calc(100% - 28px), calc(100% - 28px) 100%, 28px 100%, 0% calc(100% - 28px));
-    clip-path: polygon(0% 28px, 28px 0%, calc(100% - 28px) 0%, 100% 28px, 100% calc(100% - 28px), calc(100% - 28px) 100%, 28px 100%, 0% calc(100% - 28px));
+    border-radius: var(--panel-radius);
   }
 
   .play-section-header {
@@ -1118,20 +1102,21 @@
     align-items: center;
     justify-content: center;
     border-radius: var(--panel-radius);
-    border: 1px solid transparent;
-    background: #333333;
+    border: 1px solid var(--btn-tab-border);
+    background: var(--btn-tab);
     color: #ffffff;
     font-size: 30px;
     font-weight: 700;
     cursor: pointer;
     font-family: 'Inter', sans-serif;
-    transition: background 0.15s, color 0.15s, border-color 0.15s;
+    transition: background 0.15s, color 0.15s, border-color 0.15s, box-shadow 0.15s;
   }
 
   .play-mode-tab:hover {
-    background: #444444;
+    background: var(--btn-tab-hover);
     color: #ffffff;
-    box-shadow: 0 0 12px rgba(255,80,200,0.3);
+    border-color: var(--btn-primary-border);
+    box-shadow: 0 0 12px var(--btn-primary-glow);
   }
 
   .play-mode-tab.active {
@@ -1165,17 +1150,14 @@
     min-height: 0;
   }
   .play-grid-song {
-    background: #1a1a1a;
+    background: var(--btn-panel);
     border-radius: var(--panel-radius);
     overflow: hidden;
     cursor: pointer;
     display: flex;
     flex-direction: column;
-    transition: background 0.15s;
-  }
-  .play-grid-song {
     transition: background 0.15s, box-shadow 0.2s, border-color 0.2s;
-    border: 2px solid transparent;
+    border: 1px solid var(--btn-panel-border);
   }
   .play-grid-song:hover {
     background: #222222;
@@ -1183,12 +1165,15 @@
     box-shadow: 0 0 0 2px rgba(255,80,200,0.4), 0 0 12px rgba(255,80,200,0.5);
   }
   .play-grid-song-art {
-    flex: 1;
-    min-height: 0;
+    width: 100%;
+    padding-top: 100%;
     overflow: hidden;
     position: relative;
+    flex-shrink: 0;
   }
   .play-grid-song-art img {
+    position: absolute;
+    top: 0; left: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -1235,8 +1220,56 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
+
+  /* Song tile hover action buttons */
+  .play-grid-song-actions {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    background: rgba(0,0,0,0.6);
+    border-radius: var(--panel-radius);
+    opacity: 0;
+    transition: opacity 0.15s;
+    z-index: 5;
+    pointer-events: none;
+  }
+  .play-grid-song:hover .play-grid-song-actions {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .play-grid-song-action-btn {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-family: inherit;
+    transition: transform 0.15s, filter 0.15s;
+  }
+  .play-grid-song-action-btn:hover { transform: scale(1.15); }
+  .play-grid-song-action-btn:active { transform: scale(0.95); }
+  .play-grid-song-action-btn svg {
+    width: 36px;
+    height: 36px;
+    fill: currentColor;
+  }
+  .song-action-replace {
+    background: #ffffff;
+    color: #000000;
+  }
+  .song-action-remove {
+    background: #dc2626;
+    color: #ffffff;
+  }
+
   .play-grid-option {
-    background: #1a1a1a;
+    background: var(--btn-panel);
     border-radius: var(--panel-radius);
     display: flex;
     flex-direction: column;
@@ -1245,12 +1278,12 @@
     gap: 8px;
     cursor: pointer;
     transition: background 0.15s, box-shadow 0.2s, border-color 0.2s;
-    border: 2px solid transparent;
+    border: 1px solid var(--btn-panel-border);
   }
   .play-grid-option:hover {
-    background: #222222;
-    border-color: rgba(255,80,200,0.6);
-    box-shadow: 0 0 0 2px rgba(255,80,200,0.4), 0 0 12px rgba(255,80,200,0.5);
+    background: var(--btn-panel-hover);
+    border-color: var(--btn-primary-border);
+    box-shadow: 0 0 12px var(--btn-primary-glow);
   }
   .play-grid-option svg {
     width: 48px;
@@ -1322,7 +1355,8 @@
     align-items: center;
     gap: 32px;
     padding: 16px;
-    background: #1a1a1a;
+    background: var(--btn-panel);
+    border: 1px solid var(--btn-panel-border);
     border-radius: var(--panel-radius);
     flex-shrink: 0;
   }
@@ -1371,28 +1405,36 @@
   .coop-song-tile {
     width: 280px;
     flex-shrink: 0;
-    background: #1a1a1a;
+    background: var(--btn-panel);
     border-radius: var(--panel-radius);
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 16px;
+    gap: 0;
     cursor: pointer;
+    border: 1px solid var(--btn-panel-border);
   }
   .coop-song-tile:hover { background: #222222; }
-  .coop-song-tile img {
+  .coop-song-art {
     width: 100%;
-    flex: 1;
-    min-height: 0;
+    padding-top: 100%;
+    position: relative;
+    overflow: hidden;
     border-radius: var(--panel-radius);
+    flex-shrink: 0;
+  }
+  .coop-song-art img {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
     object-fit: cover;
+    display: block;
   }
   .coop-song-info {
     width: 100%;
     flex-shrink: 0;
+    padding: 12px 16px;
   }
   .coop-song-info .song-title {
     font-size: 20px;
@@ -1418,7 +1460,7 @@
     min-width: 0;
   }
   .coop-friend-cell {
-    background: #1a1a1a;
+    background: var(--btn-panel);
     border-radius: var(--panel-radius);
     display: flex;
     align-items: center;
@@ -1469,7 +1511,8 @@
     justify-content: center;
   }
   .option-picker-panel {
-    background: #1a1a1a;
+    background: rgba(10,10,30,0.95);
+    border: 1px solid var(--btn-tab-border);
     border-radius: var(--panel-radius);
     padding: 48px;
     display: flex;
@@ -1490,16 +1533,16 @@
     align-items: center;
     justify-content: center;
     border-radius: var(--panel-radius);
-    border: 1px solid transparent;
-    background: #333333;
+    border: 1px solid var(--btn-tab-border);
+    background: var(--btn-tab);
     color: #ffffff;
     font-size: 24px;
     font-weight: 700;
     cursor: pointer;
     font-family: 'Inter', sans-serif;
-    transition: background 0.15s;
+    transition: background 0.15s, border-color 0.15s;
   }
-  .option-picker-tab:hover { background: #444444; }
+  .option-picker-tab:hover { background: var(--btn-tab-hover); border-color: var(--btn-primary-border); }
   .option-picker-tab.active {
     background: #ffffff;
     color: #000000;
@@ -1529,13 +1572,13 @@
     align-items: center;
     gap: 20px;
     padding: 24px 32px;
-    background: #333333;
+    background: var(--btn-panel);
     border-radius: var(--panel-radius);
     cursor: pointer;
-    border: 2px solid transparent;
+    border: 1px solid var(--btn-panel-border);
     transition: background 0.15s, border-color 0.15s;
   }
-  .option-picker-choice:hover { background: #444444; }
+  .option-picker-choice:hover { background: var(--btn-panel-hover); border-color: var(--btn-primary-border); }
   .option-picker-choice.selected {
     background: #ffffff;
     color: #000000;
@@ -1909,9 +1952,9 @@
     width: 64px;
     height: 64px;
     border-radius: 50%;
-    border: 2px solid var(--border-strong);
-    background: var(--bg-surface);
-    color: var(--text-primary);
+    border: 1px solid var(--btn-panel-border);
+    background: var(--btn-panel);
+    color: #ffffff;
     font-size: 32px;
     font-weight: 700;
     cursor: pointer;
@@ -1924,7 +1967,7 @@
     line-height: 1;
   }
   .popup-close-btn:hover {
-    background: var(--bg-surface-hover);
+    background: var(--btn-panel-hover);
     transform: scale(1.1);
   }
   .popup-close-btn:active {
@@ -2350,9 +2393,9 @@
     height: var(--nav-btn-h);
     padding: 0 48px;
     border-radius: var(--panel-radius);
-    border: 1px solid #ffffff;
-    background: #ffffff;
-    color: #000000;
+    border: 2px solid var(--btn-primary-border);
+    background: var(--btn-primary);
+    color: #ffffff;
     font-size: 20px;
     font-weight: 700;
     cursor: pointer;
@@ -2362,13 +2405,13 @@
     align-items: center;
     justify-content: center;
     gap: 4px;
-    box-shadow: 0 0 0 2px #ffffff;
-    transition: background 0.2s;
+    box-shadow: 0 0 0 2px var(--btn-primary-border), 0 0 16px var(--btn-primary-glow);
+    transition: background 0.2s, box-shadow 0.2s;
   }
 
   .play-go-btn:hover {
-    background: #e0e0e0;
-    box-shadow: 0 0 0 2px #ffffff, 0 0 12px rgba(255,255,255,0.5);
+    background: var(--btn-primary-hover);
+    box-shadow: 0 0 0 2px var(--btn-primary-border), 0 0 24px var(--btn-primary-glow);
   }
 
   .play-duration {
@@ -2486,9 +2529,7 @@
     flex: 1;
     flex-direction: column;
     min-height: 0;
-    border-radius: 0;
-    -webkit-clip-path: polygon(0% 24px, 24px 0%, calc(100% - 24px) 0%, 100% 24px, 100% calc(100% - 24px), calc(100% - 24px) 100%, 24px 100%, 0% calc(100% - 24px));
-    clip-path: polygon(0% 24px, 24px 0%, calc(100% - 24px) 0%, 100% 24px, 100% calc(100% - 24px), calc(100% - 24px) 100%, 24px 100%, 0% calc(100% - 24px));
+    border-radius: var(--panel-radius);
   }
 
   .play-picker.active { display: flex; }
@@ -2804,10 +2845,8 @@
       linear-gradient(135deg, rgba(0,255,180,0.04) 0%, rgba(255,255,255,0.02) 50%, rgba(0,224,255,0.03) 100%);
     background-size: 200% 200%, 100% 100%;
     border: 1px solid rgba(0,255,180,0.15);
-    border-radius: 0;
+    border-radius: var(--panel-radius);
     height: var(--nav-btn-h);
-    -webkit-clip-path: polygon(10px 0%, calc(100% - 10px) 0%, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0% calc(100% - 10px), 0% 10px);
-    clip-path: polygon(10px 0%, calc(100% - 10px) 0%, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0% calc(100% - 10px), 0% 10px);
     box-shadow:
       inset 0 0 0 1px rgba(0,255,180,0.1),
       inset 0 4px 12px rgba(0,0,0,0.3);
@@ -2816,11 +2855,7 @@
     animation: friendSlideIn 0.4s ease-out both;
     animation-delay: var(--friend-delay, 0s);
   }
-  /* Asymmetric clip per row */
-  .friend-item:nth-child(odd) {
-    -webkit-clip-path: polygon(10px 0%, 100% 0%, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0% 100%, 0% 10px);
-    clip-path: polygon(10px 0%, 100% 0%, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0% 100%, 0% 10px);
-  }
+  /* Consistent radius for all friend items */
   .friend-item:hover,
   .friend-item:active {
     transform: translateY(-3px) scale(1.01);
@@ -2883,9 +2918,7 @@
     background: linear-gradient(135deg, rgba(0,255,180,0.06) 0%, rgba(255,255,255,0.03) 100%);
     color: #ffffff;
     border: 1px solid rgba(0,255,180,0.2);
-    border-radius: 0;
-    -webkit-clip-path: polygon(10px 0%, calc(100% - 10px) 0%, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0% calc(100% - 10px), 0% 10px);
-    clip-path: polygon(10px 0%, calc(100% - 10px) 0%, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0% calc(100% - 10px), 0% 10px);
+    border-radius: var(--panel-radius);
     box-shadow: inset 0 0 0 1px rgba(0,255,180,0.1);
     filter: drop-shadow(0 0 6px rgba(0,255,180,0.12));
     font-size: 30px;
@@ -3166,6 +3199,145 @@
     min-height: 0;
   }
 
+  /* Avatar tile scrolling image */
+  .career-btn-avatar {
+    position: relative;
+    overflow: hidden;
+  }
+  .career-btn-avatar-img {
+    position: absolute;
+    top: -5%; left: 50%;
+    transform: translateX(-50%) scale(2.64);
+    transform-origin: top center;
+    width: auto;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+    animation: avatarZoom 10s ease-in-out infinite alternate;
+    pointer-events: none;
+    z-index: 0;
+  }
+  /* Name tile — neon glow text */
+  .career-btn-neon-name {
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 72px;
+    font-weight: 900;
+    color: #ffffff;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    text-shadow:
+      0 0 10px rgba(168,85,247,0.8),
+      0 0 30px rgba(168,85,247,0.6),
+      0 0 60px rgba(124,58,237,0.4),
+      0 0 100px rgba(124,58,237,0.2);
+    z-index: 0;
+    pointer-events: none;
+    white-space: nowrap;
+    animation: neonPulse 4s ease-in-out infinite alternate;
+  }
+  @keyframes neonPulse {
+    0% {
+      text-shadow:
+        0 0 10px rgba(168,85,247,0.8),
+        0 0 30px rgba(168,85,247,0.6),
+        0 0 60px rgba(124,58,237,0.4),
+        0 0 100px rgba(124,58,237,0.2);
+    }
+    100% {
+      text-shadow:
+        0 0 15px rgba(168,85,247,1),
+        0 0 40px rgba(168,85,247,0.8),
+        0 0 80px rgba(124,58,237,0.5),
+        0 0 120px rgba(124,58,237,0.3);
+    }
+  }
+
+  /* Picture tile — profile avatar circle (perfect 1:1) */
+  .career-btn-picture-wrap {
+    position: absolute;
+    top: 42%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 50%;
+    padding-top: 50%;
+    border-radius: 50%;
+    overflow: hidden;
+    z-index: 0;
+    pointer-events: none;
+    box-shadow: 0 0 30px rgba(168,85,247,0.5), 0 0 60px rgba(124,58,237,0.3);
+    border: 3px solid rgba(168,85,247,0.6);
+  }
+  .career-btn-picture-wrap img {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .career-btn-banner {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 80px 28px 24px;
+    background: linear-gradient(0deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.7) 50%, rgba(0,0,0,0.3) 75%, transparent 100%);
+    font-size: 42px;
+    font-weight: 900;
+    color: #ffffff;
+    text-align: left;
+    text-transform: capitalize;
+    letter-spacing: 1px;
+    text-shadow:
+      -2px -2px 0 rgba(0,0,0,0.8),
+      2px -2px 0 rgba(0,0,0,0.8),
+      -2px 2px 0 rgba(0,0,0,0.8),
+      2px 2px 0 rgba(0,0,0,0.8);
+    z-index: 1;
+  }
+
+  .career-btn-sub {
+    font-size: 24px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.7);
+    text-transform: none;
+    letter-spacing: 0;
+    margin-top: 4px;
+    text-shadow:
+      -1px -1px 0 rgba(0,0,0,0.7),
+      1px -1px 0 rgba(0,0,0,0.7),
+      -1px 1px 0 rgba(0,0,0,0.7),
+      1px 1px 0 rgba(0,0,0,0.7);
+  }
+
+  /* News tile on profile */
+  .career-btn-news {
+    position: relative;
+    overflow: hidden;
+  }
+  .career-btn-news-img {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+    pointer-events: none;
+  }
+  @keyframes avatarZoom {
+    0% { transform: translateX(-50%) scale(2.64); }
+    100% { transform: translateX(-50%) scale(3.12); }
+  }
+
+  .avatar-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
   .career-btn {
     display: flex;
     flex-direction: column;
@@ -3174,12 +3346,17 @@
     gap: 12px;
     border-radius: var(--panel-radius);
     cursor: pointer;
-    background: #333333;
+    background: var(--btn-tab);
     color: #ffffff;
-    border: 1px solid transparent;
-    transition: background 0.2s, transform 0.2s;
+    border: 1px solid var(--btn-tab-border);
+    transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
     font-size: 24px;
     font-weight: 600;
+  }
+  .career-btn:hover {
+    background: var(--btn-tab-hover);
+    border-color: var(--btn-primary-border);
+    box-shadow: 0 0 12px var(--btn-primary-glow);
   }
 
   .career-btn svg {
@@ -3189,13 +3366,9 @@
     flex-shrink: 0;
   }
 
-  .career-btn:hover {
-    background: #444444;
-  }
-
   .career-btn:active {
-    background: #ffffff;
-    color: #000000;
+    border-color: var(--btn-primary-border);
+    box-shadow: 0 0 16px var(--btn-primary-glow);
     box-shadow: 0 0 0 2px #ffffff;
   }
 
@@ -3278,7 +3451,7 @@
     justify-content: center;
     gap: var(--grid-gap);
     background: linear-gradient(135deg, rgba(0,224,255,0.05) 0%, rgba(255,255,255,0.02) 50%, rgba(168,85,247,0.04) 100%);
-    border-radius: var(--panel-radius);
+    border-radius: var(--radius-outer);
     border: 1px solid rgba(0,224,255,0.3);
     border-top-color: rgba(0,224,255,0.5);
     box-shadow: 0 0 10px rgba(0,224,255,0.4), 0 8px 12px rgba(0,0,0,0.4);
@@ -3301,7 +3474,7 @@
   }
 
   .nav-item {
-    flex: 1;
+    flex: 0.9;
     height: var(--nav-btn-h);
     display: flex;
     flex-direction: column;
@@ -3310,11 +3483,41 @@
     gap: 4px;
     border-radius: var(--panel-radius);
     cursor: pointer;
-    transition: background 0.2s, border-color 0.2s;
+    transition: background 0.2s, border-color 0.2s, transform 0.2s;
     position: relative;
     z-index: 3;
     background: rgba(255,255,255,0.06);
     border: 1px solid rgba(255,255,255,0.10);
+  }
+
+  /* Play button: 10% larger with subtle pulse + 5s gap */
+  .nav-item[data-page="play"] {
+    flex: 1.1;
+    transform: scale(1.08);
+    margin: 0 12px;
+    z-index: 4;
+    border-color: rgba(0,224,255,0.25);
+    animation: playNudge 8s ease-in-out infinite;
+  }
+  .nav-item[data-page="play"].active {
+    animation: none;
+    border-color: #ffffff;
+  }
+  @keyframes playNudge {
+    0%, 62% { box-shadow: none; border-color: rgba(0,224,255,0.25); }
+    70% {
+      box-shadow: 0 0 18px rgba(0,224,255,0.35), 0 0 40px rgba(168,85,247,0.15);
+      border-color: rgba(0,224,255,0.6);
+    }
+    78% {
+      box-shadow: none;
+      border-color: rgba(168,85,247,0.5);
+    }
+    86% {
+      box-shadow: 0 0 14px rgba(168,85,247,0.3), 0 0 30px rgba(0,224,255,0.1);
+      border-color: rgba(168,85,247,0.6);
+    }
+    100% { box-shadow: none; border-color: rgba(0,224,255,0.25); }
   }
 
   .nav-item:hover,
@@ -3346,7 +3549,7 @@
     flex-shrink: 0;
   }
 
-  .nav-item.active .nav-icon { color: #4a2080; }
+  .nav-item.active .nav-icon { color: #000000; }
 
   .nav-label {
     font-size: 20px;
@@ -3356,7 +3559,7 @@
     text-shadow: none;
   }
 
-  .nav-item.active .nav-label { color: #4a2080; }
+  .nav-item.active .nav-label { color: #000000; }
 
   /* ── Back Button ─────────────────────────────────────── */
   .back-btn {
@@ -3368,13 +3571,13 @@
     justify-content: center;
     gap: 8px;
     border-radius: var(--panel-radius);
-    border: 1px solid var(--border-strong);
-    background: var(--bg-surface);
-    color: var(--text-secondary);
+    border: 1px solid var(--btn-panel-border);
+    background: var(--btn-panel);
+    color: #ffffff;
     font-size: 30px;
     font-weight: 700;
     cursor: pointer;
-    transition: background 0.15s, color 0.15s;
+    transition: background 0.15s, border-color 0.15s;
     font-family: 'Inter', sans-serif;
     margin-bottom: var(--grid-gap);
   }
@@ -3950,8 +4153,8 @@
   }
 
   .purchase-popup {
-    background: var(--bg-panel);
-    border: 2px solid var(--border-strong);
+    background: rgba(10,10,30,0.95);
+    border: 1px solid var(--btn-tab-border);
     border-radius: var(--panel-radius);
     padding: 40px 52px;
     width: 1600px;
@@ -4013,20 +4216,25 @@
   .purchase-btn:hover { filter: brightness(1.15); }
 
   .purchase-btn-confirm {
-    background: var(--pink);
-    color: #fff;
+    background: var(--btn-primary);
+    border: 2px solid var(--btn-primary-border);
+    color: #ffffff;
+    box-shadow: 0 0 12px var(--btn-primary-glow);
   }
 
   .purchase-btn-confirm:disabled {
-    background: var(--bg-surface);
-    color: var(--text-secondary);
+    background: var(--btn-panel);
+    border-color: var(--btn-panel-border);
+    color: rgba(255,255,255,0.4);
     cursor: not-allowed;
     filter: none;
+    box-shadow: none;
   }
 
   .purchase-btn-cancel {
-    background: var(--bg-surface);
-    color: var(--text-primary);
+    background: var(--btn-panel);
+    border: 1px solid var(--btn-panel-border);
+    color: #ffffff;
   }
 
   /* ── Save/Load Bar Buttons ─────────────────────────── */
@@ -4034,8 +4242,8 @@
     height: var(--nav-btn-h);
     padding: 0 48px;
     border-radius: var(--panel-radius);
-    border: 1px solid transparent;
-    background: #333333;
+    border: 1px solid var(--btn-panel-border);
+    background: var(--btn-panel);
     color: #ffffff;
     font-size: 20px;
     font-weight: 700;
@@ -4046,11 +4254,12 @@
     align-items: center;
     justify-content: center;
     gap: 4px;
-    transition: background 0.2s;
+    transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
   }
   .play-bar-btn:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 12px rgba(255,80,200,0.35), 0 0 8px rgba(255,255,255,0.15);
+    background: var(--btn-panel-hover);
+    border-color: var(--btn-primary-border);
+    box-shadow: 0 0 12px var(--btn-primary-glow);
   }
 
   /* ── Save Setlist Overlay ──────────────────────────── */
@@ -4066,8 +4275,8 @@
   .save-overlay.active { display: flex; }
 
   .save-popup {
-    background: var(--bg-panel);
-    border: 2px solid var(--border-strong);
+    background: rgba(10,10,30,0.95);
+    border: 1px solid var(--btn-tab-border);
     border-radius: var(--panel-radius);
     padding: 40px 52px;
     width: 1600px;
@@ -4090,9 +4299,9 @@
     width: 100%;
     padding: 22px 28px;
     border-radius: var(--panel-radius);
-    border: 3px solid var(--border-strong);
-    background: var(--bg-surface);
-    color: var(--text-primary);
+    border: 2px solid var(--btn-panel-border);
+    background: var(--btn-panel);
+    color: #ffffff;
     font-size: 30px;
     font-weight: 600;
     font-family: 'Inter', sans-serif;
@@ -4101,7 +4310,8 @@
     outline: none;
   }
   .save-input:focus {
-    border-color: var(--pink);
+    border-color: var(--btn-primary-border);
+    box-shadow: 0 0 12px var(--btn-primary-glow);
   }
 
   .keyboard {
@@ -4157,86 +4367,102 @@
     transition: filter 0.15s;
   }
   .save-buttons button:hover { filter: brightness(1.15); }
-  .save-btn-confirm { background: var(--pink); color: #fff; }
-  .save-btn-cancel { background: var(--bg-surface); color: var(--text-primary); }
+  .save-btn-confirm { background: var(--btn-primary); border: 2px solid var(--btn-primary-border); color: #ffffff; box-shadow: 0 0 12px var(--btn-primary-glow); }
+  .save-btn-cancel { background: var(--btn-panel); border: 1px solid var(--btn-panel-border); color: #ffffff; }
 
   /* ── Load Setlist Overlay ──────────────────────────── */
   .load-overlay {
     display: none;
     position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: #111111;
+    top: 0; left: 0;
+    width: 1920px; height: 1920px;
+    background: #000000;
     z-index: 999;
-    align-items: center;
-    justify-content: center;
+    flex-direction: column;
+    gap: 32px;
+    padding: 48px;
   }
   .load-overlay.active { display: flex; }
 
-  .load-popup {
-    background: var(--bg-panel);
-    border: 2px solid var(--border-strong);
-    border-radius: var(--panel-radius);
-    padding: 40px 52px;
-    width: 1600px;
-    max-width: 92%;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-    max-height: 95%;
-  }
-  .load-popup h2 {
-    font-size: 40px;
+  .load-title {
+    font-size: 36px;
     font-weight: 800;
-    color: var(--text-primary);
-    margin: 0;
+    color: #ffffff;
+    text-align: center;
+    flex-shrink: 0;
   }
 
   .load-list {
-    display: flex;
-    flex-direction: column;
-    gap: var(--grid-gap);
-    overflow-y: auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 48px;
+    padding: 24px;
     flex: 1;
     min-height: 0;
-    padding: 4px;
   }
 
   .load-item {
-    display: flex;
-    align-items: center;
-    gap: 22px;
-    background: var(--bg-surface);
-    border-radius: var(--panel-radius);
-    padding: 16px 22px;
-    text-align: left;
-  }
-
-  .load-art-grid {
-    width: 110px;
-    height: 110px;
-    flex-shrink: 0;
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(2, 1fr);
-    gap: 3px;
+    background: var(--btn-panel);
     border-radius: var(--panel-radius);
     overflow: hidden;
-    background: var(--bg-panel);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    transition: background 0.15s;
+    position: relative;
   }
-  .load-art-grid img {
+  .load-item:hover { background: #222222; }
+
+  .load-art-grid {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    display: flex;
+    border-radius: var(--panel-radius) var(--panel-radius) 0 0;
+  }
+  .load-art-grid.art-1 {
+    display: flex;
+  }
+  .load-art-grid.art-1 img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
   }
-  .load-art-grid .art-empty {
-    background: var(--bg-surface);
+  .load-art-grid.art-2 {
+    display: flex;
+    gap: 4px;
+    padding: 12px;
+    align-items: center;
+    background: #111111;
+  }
+  .load-art-grid.art-2 img {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    object-fit: contain;
+    border-radius: var(--panel-radius);
+  }
+  .load-art-grid.art-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 6px;
+    padding: 12px;
+    background: #111111;
+  }
+  .load-art-grid.art-grid img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    border-radius: var(--panel-radius);
   }
 
   .load-item-info {
-    flex: 1;
-    min-width: 0;
+    padding: 16px;
+    flex-shrink: 0;
   }
   .load-item-info .load-item-name {
     font-size: 28px;
@@ -4268,26 +4494,23 @@
   .load-item-btn-delete { background: var(--bg-panel); color: var(--text-secondary); }
 
   .load-empty {
-    padding: 60px 0;
-    color: var(--text-secondary);
-    font-size: 28px;
+    grid-column: 1 / -1;
+    grid-row: 1 / -1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #888888;
+    font-size: 36px;
     font-weight: 600;
   }
 
-  .load-close-btn {
-    align-self: center;
-    padding: 20px 64px;
-    border-radius: var(--panel-radius);
-    border: none;
-    background: var(--bg-surface);
-    color: var(--text-primary);
-    font-size: 34px;
-    font-weight: 700;
-    cursor: pointer;
-    font-family: 'Inter', sans-serif;
-    transition: filter 0.15s;
+  .load-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 24px;
+    flex-shrink: 0;
   }
-  .load-close-btn:hover { filter: brightness(1.15); }
 
   /* ── Create Group Overlay ──────────────────────────── */
   .create-group-overlay {
@@ -4302,8 +4525,8 @@
   .create-group-overlay.active { display: flex; }
 
   .create-group-popup {
-    background: var(--bg-panel);
-    border: 2px solid var(--border-strong);
+    background: rgba(10,10,30,0.95);
+    border: 1px solid var(--btn-tab-border);
     border-radius: var(--panel-radius);
     padding: 40px 52px;
     width: 1600px;
@@ -4432,8 +4655,8 @@
     flex-shrink: 0;
   }
   .create-group-friend-btn:hover { filter: brightness(1.15); }
-  .create-group-friend-btn-add { background: var(--pink); color: #fff; }
-  .create-group-friend-btn-remove { background: var(--bg-panel); color: var(--text-secondary); }
+  .create-group-friend-btn-add { background: var(--btn-primary); border: 1px solid var(--btn-primary-border); color: #ffffff; }
+  .create-group-friend-btn-remove { background: var(--btn-panel); border: 1px solid var(--btn-panel-border); color: #ffffff; }
 
   .create-group-empty {
     padding: 28px 0;
@@ -4456,8 +4679,8 @@
   .create-space-overlay.active { display: flex; }
 
   .create-space-popup {
-    background: var(--bg-panel);
-    border: 2px solid var(--border-strong);
+    background: rgba(10,10,30,0.95);
+    border: 1px solid var(--btn-tab-border);
     border-radius: var(--panel-radius);
     padding: 40px 52px;
     width: 1600px;
@@ -4483,18 +4706,20 @@
   }
   .create-space-toggle-btn {
     padding: 14px 40px;
-    border: none;
-    background: var(--bg-surface);
-    color: var(--text-secondary);
+    border: 1px solid var(--btn-panel-border);
+    background: var(--btn-panel);
+    color: #ffffff;
     font-size: 24px;
     font-weight: 700;
     cursor: pointer;
     font-family: 'Inter', sans-serif;
-    transition: background 0.15s, color 0.15s;
+    transition: background 0.15s, border-color 0.15s;
   }
   .create-space-toggle-btn.active {
-    background: var(--pink);
-    color: #fff;
+    background: var(--btn-primary);
+    border-color: var(--btn-primary-border);
+    color: #ffffff;
+    box-shadow: 0 0 12px var(--btn-primary-glow);
   }
 
   .create-space-env-grid {
@@ -6763,6 +6988,7 @@
     position: absolute;
     background: rgba(0,0,0,0.25);
     border: 3px solid rgba(0,0,0,0.5);
+    border-radius: var(--panel-radius);
     pointer-events: none;
     opacity: 0.5;
   }
@@ -6772,8 +6998,8 @@
     position: relative;
     min-height: 0;
     height: 100%;
-    overflow: visible;
-    border-radius: 0 !important;
+    overflow: hidden;
+    border-radius: var(--panel-radius) !important;
     border: none !important;
     outline: none !important;
     background:
@@ -7617,24 +7843,25 @@
   .perms-explain {
     background: #2a2a2a;
     justify-content: flex-start;
-    padding: 100px 200px 80px;
+    padding: 80px 160px 0;
     text-align: center;
+    gap: 0;
   }
   .perms-explain-icon {
-    font-size: 96px;
-    margin-bottom: 40px;
-  }
-  .perms-explain-title {
-    font-size: 56px;
-    font-weight: 800;
-    color: #f0f0f0;
+    font-size: 120px;
     margin-bottom: 32px;
   }
+  .perms-explain-title {
+    font-size: 72px;
+    font-weight: 800;
+    color: #f0f0f0;
+    margin-bottom: 28px;
+  }
   .perms-explain-body {
-    font-size: 30px;
-    line-height: 1.6;
+    font-size: 38px;
+    line-height: 1.4;
     color: #bbbbbb;
-    margin-bottom: 20px;
+    margin-bottom: 32px;
   }
   .perms-explain-body strong {
     color: #f0f0f0;
@@ -7642,8 +7869,8 @@
   .perms-explain-items {
     display: flex;
     justify-content: center;
-    gap: 80px;
-    margin-bottom: 60px;
+    gap: 140px;
+    margin-bottom: 32px;
   }
   .perms-explain-item {
     display: flex;
@@ -7652,36 +7879,37 @@
     gap: 16px;
   }
   .perms-explain-item-icon {
-    width: 120px;
-    height: 120px;
-    border-radius: 28px;
+    width: 180px;
+    height: 180px;
+    border-radius: var(--panel-radius);
     background: #3a3a3a;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 56px;
+    font-size: 80px;
   }
   .perms-explain-item-label {
-    font-size: 26px;
-    font-weight: 600;
+    font-size: 36px;
+    font-weight: 700;
     color: #dddddd;
   }
   .perms-explain-item-desc {
-    font-size: 22px;
+    font-size: 28px;
     color: #999999;
-    max-width: 320px;
+    max-width: 420px;
+    line-height: 1.3;
   }
   .perms-explain-ok {
     position: absolute;
     top: 1100px;
     left: 50%;
     transform: translateX(-50%);
-    padding: 36px 128px;
+    padding: 40px 160px;
     border-radius: var(--panel-radius);
     border: none;
     background: #c0206a;
     color: #ffffff;
-    font-size: 48px;
+    font-size: 56px;
     font-weight: 700;
     cursor: pointer;
     font-family: inherit;
@@ -8623,9 +8851,31 @@ button:focus,
     <div class="page" id="page-career">
       <div id="career-main" style="display:flex;flex-direction:column;flex:1;min-height:0">
         <div class="career-grid">
-          <div class="career-btn" style="grid-column:1;grid-row:1" onclick="openNameEditor()"><svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg><span>Name</span></div>
-          <div class="career-btn" style="grid-column:2;grid-row:1"><svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg><span>Picture</span></div>
+          <div class="career-btn career-btn-name" style="grid-column:1;grid-row:1;position:relative;overflow:hidden" onclick="openNameEditor()"><div class="career-btn-neon-name" id="career-neon-name">Rael</div><div class="career-btn-banner">Name<div class="career-btn-sub">Change your username</div></div></div>
+          <div class="career-btn career-btn-picture" style="grid-column:2;grid-row:1;overflow:hidden;position:relative"><div class="career-btn-picture-wrap"><img src="rael_new.png" alt=""></div><div class="career-btn-banner">Picture<div class="career-btn-sub">Change your profile picture</div></div></div>
+          <div class="career-btn career-btn-avatar" style="grid-column:3;grid-row:1" onclick="showAvatarSection()"><img class="career-btn-avatar-img" src="AR_Glasses.png" alt=""><div class="career-btn-banner">Avatar<div class="career-btn-sub">Customise your avatar</div></div></div>
+          <div class="career-btn career-btn-news" style="grid-column:1;grid-row:2;position:relative;overflow:hidden" onclick="navigateTo('career')"><img class="career-btn-news-img" src="Gemini_Generated_Image_lj9j18lj9j18lj9j.jfif" alt=""><div class="career-btn-banner">News<div class="career-btn-sub">Update v0.25 — New battle mode added!</div></div></div>
+          <div class="career-btn" style="grid-column:2;grid-row:2;position:relative;overflow:hidden">
+            <div class="home-tile-avatar" style="width:160px;height:160px;left:10%;top:8%;animation-duration:9s;animation-delay:0s"><img src="rael_new.png" alt=""></div>
+            <div class="home-tile-avatar" style="width:120px;height:120px;left:60%;top:5%;animation-duration:11s;animation-delay:-2s"><img src="jooleeno.jpg" alt=""></div>
+            <div class="home-tile-avatar" style="width:140px;height:140px;left:50%;top:45%;animation-duration:8s;animation-delay:-4s"><img src="ted.png" alt=""></div>
+            <div class="home-tile-avatar" style="width:110px;height:110px;left:15%;top:50%;animation-duration:10s;animation-delay:-6s"><img src="abbie.png" alt=""></div>
+            <div class="home-tile-avatar" style="width:130px;height:130px;left:70%;top:55%;animation-duration:12s;animation-delay:-3s"><img src="arthen.jpg" alt=""></div>
+            <div class="career-btn-banner">Credits<div class="career-btn-sub">Meet the team</div></div>
+          </div>
+          <div class="career-btn" style="grid-column:3;grid-row:2;position:relative;overflow:hidden;cursor:default;pointer-events:none">
+            <div style="position:absolute;top:0;left:0;right:0;bottom:0;display:flex;flex-direction:column;justify-content:center;padding:28px;gap:12px;z-index:1">
+              <div style="font-size:36px;color:rgba(255,255,255,0.4);font-weight:700">Device <span style="color:#ffffff;font-weight:900">Quest 3</span></div>
+              <div style="font-size:36px;color:rgba(255,255,255,0.4);font-weight:700">Firmware <span style="color:#ffffff;font-weight:900">203</span></div>
+              <div style="font-size:36px;color:rgba(255,255,255,0.4);font-weight:700">UI <span style="color:#ffffff;font-weight:900">v1.0.0.0</span></div>
+              <div style="font-size:36px;color:rgba(255,255,255,0.4);font-weight:700">Game <span style="color:#ffffff;font-weight:900">v1.0.0.0</span></div>
+            </div>
+          </div>
         </div>
+      </div>
+      <div class="avatar-section" id="avatar-section" style="display:none">
+        <button class="back-btn" onclick="hideAvatarSection()">&#8617; Profile</button>
+        <div class="spaces-grid" id="avatar-grid"></div>
       </div>
       <div class="profile-section" id="profile-section-career">
         <button class="back-btn" onclick="hideProfilePanel()">&#8617; Profile</button>
@@ -9232,11 +9482,12 @@ button:focus,
   </div>
 </div>
 
-<div class="load-overlay" id="load-overlay" onclick="closeLoadOverlay(event)">
-  <div class="load-popup" onclick="event.stopPropagation()">
-    <h2>Load Setlist</h2>
-    <div class="load-list" id="load-list"></div>
-    <button class="load-close-btn" onclick="closeLoadOverlay()">Close</button>
+<div class="load-overlay" id="load-overlay">
+  <div class="load-title">Load Setlist</div>
+  <div class="load-list" id="load-list"></div>
+  <div class="load-pagination" id="load-pagination"></div>
+  <div style="display:flex;gap:var(--grid-gap);flex-shrink:0">
+    <button class="play-bar-btn" style="flex:1" onclick="closeLoadOverlay()"><svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>Back</button>
   </div>
 </div>
 
@@ -9769,6 +10020,9 @@ function navigateTo(pageName) {
   // Grid nav always hidden by default (sub-sections show it as needed)
   var gridNavs = document.querySelectorAll('.grid-nav');
   for (var i = 0; i < gridNavs.length; i++) gridNavs[i].style.display = 'none';
+
+  // Update particle/wave colours for this page
+  if (typeof setPageColors === 'function') setPageColors(pageName);
 
   sendToUnity('navigate', pageName);
 }
@@ -10326,6 +10580,7 @@ function confirmCreateSpace() {
 // ── Play Panel ──────────────────────────────────────────
 var allSongs = [];
 var setlist = [];
+var setlistName = 'My Setlist';
 var selectedInstrument = 'guitar';
 var selectedDifficulty = 'medium';
 var playMode = 'solo';
@@ -11228,113 +11483,260 @@ function openLoadSetlist() {
   document.getElementById('load-overlay').className = 'load-overlay active';
 }
 
-function closeLoadOverlay(e) {
-  if (e && e.target !== document.getElementById('load-overlay')) return;
+function closeLoadOverlay() {
   document.getElementById('load-overlay').className = 'load-overlay';
 }
 
-var lessonSetlists = [
-  { name: 'Jamsesh Basic Lessons', level: 'Basic', songs: tutorialSongs },
-  { name: 'Jamsesh Advanced Lessons', level: 'Advanced', songs: tutorialSongs },
-  { name: 'Jamsesh Expert Lessons', level: 'Expert', songs: tutorialSongs }
+var lessonBasicSongs = [
+  { rank: 1, title: 'Guitar Basics', artist: 'Jamsesh Tutorial', file: 'instruments/guitar.png', duration: 120, bpm: 100, genre: 'Tutorial', decade: '2020s', instrument: 'guitar' },
+  { rank: 2, title: 'Drum Basics', artist: 'Jamsesh Tutorial', file: 'instruments/drums.png', duration: 120, bpm: 100, genre: 'Tutorial', decade: '2020s', instrument: 'drums' },
+  { rank: 3, title: 'Vocal Basics', artist: 'Jamsesh Tutorial', file: 'instruments/vocals.png', duration: 120, bpm: 100, genre: 'Tutorial', decade: '2020s', instrument: 'vocals' }
 ];
+var lessonAdvancedSongs = [
+  { rank: 1, title: 'Guitar Intermediate', artist: 'Jamsesh Tutorial', file: 'instruments/guitar.png', duration: 180, bpm: 120, genre: 'Tutorial', decade: '2020s', instrument: 'guitar' },
+  { rank: 2, title: 'Drum Intermediate', artist: 'Jamsesh Tutorial', file: 'instruments/drums.png', duration: 180, bpm: 120, genre: 'Tutorial', decade: '2020s', instrument: 'drums' },
+  { rank: 3, title: 'Vocal Intermediate', artist: 'Jamsesh Tutorial', file: 'instruments/vocals.png', duration: 180, bpm: 120, genre: 'Tutorial', decade: '2020s', instrument: 'vocals' }
+];
+var lessonExpertSongs = [
+  { rank: 1, title: 'Guitar Mastery', artist: 'Jamsesh Tutorial', file: 'instruments/guitar.png', duration: 240, bpm: 140, genre: 'Tutorial', decade: '2020s', instrument: 'guitar' },
+  { rank: 2, title: 'Drum Mastery', artist: 'Jamsesh Tutorial', file: 'instruments/drums.png', duration: 240, bpm: 140, genre: 'Tutorial', decade: '2020s', instrument: 'drums' },
+  { rank: 3, title: 'Vocal Mastery', artist: 'Jamsesh Tutorial', file: 'instruments/vocals.png', duration: 240, bpm: 140, genre: 'Tutorial', decade: '2020s', instrument: 'vocals' }
+];
+var lessonSetlists = [
+  { name: 'Jamsesh Basic Lessons', level: 'Basic', instrument: 'mixed', difficulty: 'easy', songs: lessonBasicSongs, lockInstrument: true, lockDifficulty: true, lockExperience: true, lockSongs: true },
+  { name: 'Jamsesh Advanced Lessons', level: 'Advanced', instrument: 'mixed', difficulty: 'medium', songs: lessonAdvancedSongs, lockInstrument: true, lockDifficulty: true, lockExperience: true, lockSongs: true, requiresComplete: 'Jamsesh Basic Lessons' },
+  { name: 'Jamsesh Expert Lessons', level: 'Expert', instrument: 'mixed', difficulty: 'hard', songs: lessonExpertSongs, lockInstrument: true, lockDifficulty: true, lockExperience: true, lockSongs: true, requiresComplete: 'Jamsesh Advanced Lessons' }
+];
+var completedSetlists = [];
+var activeSetlistLocks = null;
+
+var loadListPage = 0;
+var LOAD_PER_PAGE = 9;
+
+function isLessonComplete(name) {
+  for (var i = 0; i < completedSetlists.length; i++) {
+    if (completedSetlists[i] === name) return true;
+  }
+  return false;
+}
+
+function isTutorialMode() {
+  return !isStepComplete('tutorial_play');
+}
 
 function buildLoadList() {
   var list = document.getElementById('load-list');
   list.innerHTML = '';
+  var pagDiv = document.getElementById('load-pagination');
+  pagDiv.innerHTML = '';
 
-  // Lesson setlists at top
+  var lockStyle = 'opacity:0.3;pointer-events:none;filter:saturate(0) brightness(0.4);';
+
+  // During tutorial: only show lesson setlists
+  // After tutorial: show lessons + saved setlists
+  var showItems = [];
   for (var l = 0; l < lessonSetlists.length; l++) {
-    var ls = lessonSetlists[l];
-    var item = document.createElement('div');
-    item.className = 'load-item';
-
-    var grid = document.createElement('div');
-    grid.className = 'load-art-grid';
-    buildArtGrid(ls.songs, grid);
-    item.appendChild(grid);
-
-    var info = document.createElement('div');
-    info.className = 'load-item-info';
-    info.innerHTML = '<div class="load-item-name">' + ls.name + '</div>' +
-      '<div class="load-item-count">' + ls.songs.length + ' song' + (ls.songs.length !== 1 ? 's' : '') + '</div>';
-    item.appendChild(info);
-
-    // 3x picks reward
-    var rewards = document.createElement('div');
-    rewards.style.cssText = 'display:flex;gap:12px;align-items:center;margin-left:auto;margin-right:24px';
-    for (var p = 0; p < 3; p++) {
-      var pick = document.createElement('div');
-      pick.style.cssText = 'display:flex;align-items:center;gap:4px';
-      pick.innerHTML = '<img src="JamPick.png" style="width:36px;height:36px;object-fit:contain">' +
-        '<span style="font-size:20px;font-weight:700;color:#FFD700">x1000</span>';
-      rewards.appendChild(pick);
+    showItems.push({type: 'lesson', data: lessonSetlists[l]});
+  }
+  if (!isTutorialMode()) {
+    for (var i = 0; i < savedSetlists.length; i++) {
+      showItems.push({type: 'saved', idx: i, data: savedSetlists[i]});
     }
-    item.appendChild(rewards);
-
-    var loadBtn = document.createElement('button');
-    loadBtn.className = 'load-item-btn load-item-btn-load';
-    loadBtn.textContent = 'Load';
-    (function(lesson) {
-      loadBtn.onclick = function() {
-        setlist = lesson.songs.slice();
-        buildPlayGrid();
-        closeLoadOverlay();
-      };
-    })(ls);
-    item.appendChild(loadBtn);
-
-    list.appendChild(item);
   }
 
-  if (savedSetlists.length === 0 && lessonSetlists.length > 0) {
-    // Lessons shown, no need for empty message
-  } else if (savedSetlists.length === 0) {
-    list.innerHTML += '<div class="load-empty">No saved setlists</div>';
+  if (showItems.length === 0) {
+    list.innerHTML = '<div class="load-empty">No setlists available</div>';
+    return;
   }
-  for (var i = 0; i < savedSetlists.length; i++) {
-    var sl = savedSetlists[i];
+
+  var totalPages = Math.max(1, Math.ceil(showItems.length / LOAD_PER_PAGE));
+  if (loadListPage >= totalPages) loadListPage = totalPages - 1;
+  var start = loadListPage * LOAD_PER_PAGE;
+  var end = Math.min(start + LOAD_PER_PAGE, showItems.length);
+
+  for (var i = start; i < end; i++) {
+    var entry = showItems[i];
+    var sl = entry.data;
     var item = document.createElement('div');
     item.className = 'load-item';
 
-    var grid = document.createElement('div');
-    grid.className = 'load-art-grid';
-    buildArtGrid(sl.songs, grid);
-    item.appendChild(grid);
+    // Check if locked (requires completing a previous lesson)
+    var isLocked = sl.requiresComplete && !isLessonComplete(sl.requiresComplete);
 
+    // Art grid (top)
+    var artGrid = document.createElement('div');
+    artGrid.className = 'load-art-grid';
+    buildArtGrid(sl.songs, artGrid);
+    item.appendChild(artGrid);
+
+    // Info (bottom) with name, song count, and instrument type
     var info = document.createElement('div');
     info.className = 'load-item-info';
-    info.innerHTML = '<div class="load-item-name">' + sl.name + '</div>' +
-      '<div class="load-item-count">' + sl.songs.length + ' song' + (sl.songs.length !== 1 ? 's' : '') + '</div>';
+    var instLabel = sl.instrument === 'mixed' ? 'Mixed' : (sl.instrument || '');
+    var diffLabel = sl.difficulty ? sl.difficulty.charAt(0).toUpperCase() + sl.difficulty.slice(1) : '';
+    info.innerHTML =
+      '<div class="load-item-name">' + sl.name + '</div>' +
+      '<div class="load-item-count">' + (sl.songs ? sl.songs.length : 0) + ' songs' +
+      (instLabel ? ' &#183; ' + instLabel : '') +
+      (diffLabel ? ' &#183; ' + diffLabel : '') +
+      '</div>';
     item.appendChild(info);
 
+    // Load button
     var loadBtn = document.createElement('button');
-    loadBtn.className = 'load-item-btn load-item-btn-load';
+    loadBtn.className = 'play-go-btn';
+    loadBtn.style.cssText = 'width:100%;flex-shrink:0;margin-top:8px;height:auto;padding:16px 0';
     loadBtn.textContent = 'Load';
-    (function(idx) { loadBtn.onclick = function() { loadSetlist(idx); }; })(i);
+
+    if (isLocked) {
+      item.style.cssText = lockStyle;
+    } else {
+      if (entry.type === 'lesson') {
+        loadBtn.onclick = (function(lesson) {
+          return function(e) {
+            e.stopPropagation();
+            loadLessonSetlist(lesson);
+          };
+        })(sl);
+      } else {
+        loadBtn.onclick = (function(idx) {
+          return function(e) {
+            e.stopPropagation();
+            loadSetlist(idx);
+          };
+        })(entry.idx);
+      }
+    }
     item.appendChild(loadBtn);
 
-    var delBtn = document.createElement('button');
-    delBtn.className = 'load-item-btn load-item-btn-delete';
-    delBtn.textContent = 'Delete';
-    (function(idx) { delBtn.onclick = function() { deleteSetlist(idx); }; })(i);
-    item.appendChild(delBtn);
-
     list.appendChild(item);
+  }
+
+  if (totalPages > 1) {
+    var prevBtn = document.createElement('button');
+    prevBtn.className = 'play-grid-nav-btn';
+    prevBtn.innerHTML = '&#9664;';
+    prevBtn.disabled = loadListPage === 0;
+    prevBtn.onclick = function() { loadListPage--; buildLoadList(); };
+    var label = document.createElement('div');
+    label.style.cssText = 'font-size:24px;font-weight:700;color:#ffffff';
+    label.textContent = (loadListPage + 1) + ' / ' + totalPages;
+    var nextBtn = document.createElement('button');
+    nextBtn.className = 'play-grid-nav-btn';
+    nextBtn.innerHTML = '&#9654;';
+    nextBtn.disabled = loadListPage >= totalPages - 1;
+    nextBtn.onclick = function() { loadListPage++; buildLoadList(); };
+    pagDiv.appendChild(prevBtn);
+    pagDiv.appendChild(label);
+    pagDiv.appendChild(nextBtn);
+  }
+}
+
+function loadLessonSetlist(lesson) {
+  setlist = lesson.songs.slice();
+  setlistName = lesson.name;
+  activeSetlistLocks = {
+    lockInstrument: !!lesson.lockInstrument,
+    lockDifficulty: !!lesson.lockDifficulty,
+    lockExperience: !!lesson.lockExperience,
+    lockSongs: !!lesson.lockSongs
+  };
+  if (lesson.instrument === 'mixed') {
+    selectedInstrument = 'mixed';
+  } else if (lesson.instrument) {
+    selectedInstrument = lesson.instrument;
+  }
+  if (lesson.difficulty) {
+    selectedDifficulty = lesson.difficulty;
+  }
+  closeLoadOverlay();
+  buildPlayGrid();
+  applySetlistLocks();
+}
+
+function applySetlistLocks() {
+  if (!activeSetlistLocks) return;
+  var lockStyle = 'opacity:0.3;pointer-events:none;filter:saturate(0) brightness(0.4);';
+
+  // Lock song tiles if songs are locked
+  if (activeSetlistLocks.lockSongs) {
+    var songTiles = document.querySelectorAll('.play-grid-song');
+    for (var t = 0; t < songTiles.length; t++) {
+      songTiles[t].style.pointerEvents = 'none';
+    }
+  }
+
+  // Lock option tiles based on flags
+  var optTiles = document.querySelectorAll('.play-grid-option');
+  for (var o = 0; o < optTiles.length; o++) {
+    var label = optTiles[o].querySelector('.play-grid-option-label');
+    if (!label) continue;
+    var text = label.textContent;
+    if (text === 'Instrument' && activeSetlistLocks.lockInstrument) {
+      optTiles[o].style.cssText = lockStyle;
+    }
+    if (text === 'Difficulty' && activeSetlistLocks.lockDifficulty) {
+      optTiles[o].style.cssText = lockStyle;
+    }
+    if (text === 'Experience' && activeSetlistLocks.lockExperience) {
+      optTiles[o].style.cssText = lockStyle;
+    }
+  }
+
+  // Enable Start button now that a setlist is loaded
+  var goBar = document.querySelector('.play-go-bar');
+  if (goBar) {
+    var startBtn = document.getElementById('play-go-btn');
+    if (startBtn) {
+      startBtn.style.cssText = '';
+    }
   }
 }
 
 function buildArtGrid(songs, container) {
-  for (var i = 0; i < 4; i++) {
-    if (songs[i] && songs[i].file) {
+  if (!songs) return;
+  var validSongs = [];
+  for (var i = 0; i < songs.length; i++) {
+    if (songs[i] && songs[i].file) validSongs.push(songs[i]);
+  }
+  var count = validSongs.length;
+
+  if (count === 0) {
+    container.className = 'load-art-grid art-1';
+    container.style.background = '#1a1a1a';
+    return;
+  }
+
+  if (count === 1) {
+    container.className = 'load-art-grid art-1';
+    var img = document.createElement('img');
+    img.src = validSongs[0].file;
+    img.alt = '';
+    container.appendChild(img);
+  } else if (count === 2) {
+    container.className = 'load-art-grid art-2';
+    for (var i = 0; i < 2; i++) {
       var img = document.createElement('img');
-      img.src = songs[i].file;
+      img.src = validSongs[i].file;
       img.alt = '';
       container.appendChild(img);
-    } else {
-      var empty = document.createElement('div');
-      empty.className = 'art-empty';
-      container.appendChild(empty);
+    }
+  } else {
+    container.className = 'load-art-grid art-grid';
+    var show = Math.min(count, 4);
+    for (var i = 0; i < show; i++) {
+      var img = document.createElement('img');
+      img.src = validSongs[i].file;
+      img.alt = '';
+      container.appendChild(img);
+    }
+    // Fill remaining cells if 3 songs
+    if (show === 3) {
+      var extra = document.createElement('img');
+      extra.src = validSongs[0].file;
+      extra.alt = '';
+      extra.style.opacity = '0.3';
+      container.appendChild(extra);
     }
   }
 }
@@ -11360,9 +11762,11 @@ function loadSetlist(idx) {
       songDiffs[i] = selectedDifficulty;
     }
   }
+  setlistName = sl.name || 'My Setlist';
   document.getElementById('load-overlay').className = 'load-overlay';
   buildSongColumn();
   buildRightPanel();
+  buildPlayGrid();
   syncSetlistToUnity();
 }
 
@@ -11956,32 +12360,77 @@ function buildSoloGrid(grid) {
   var start = soloGridPage * SOLO_SONGS_PER_PAGE;
   var end = Math.min(start + SOLO_SONGS_PER_PAGE, setlist.length);
 
-  for (var i = start; i < start + SOLO_SONGS_PER_PAGE; i++) {
+  // Build song tiles for this page
+  var pageSongs = [];
+  for (var si = start; si < end; si++) {
+    pageSongs.push(setlist[si]);
+  }
+
+  // Layout: 0 songs → centered add tile; 1 song → [empty][song][+]; 2+ → songs then add tiles
+  var showSlots = [];
+  if (pageSongs.length === 0) {
+    showSlots.push({type: 'empty'});
+    showSlots.push({type: 'add'});
+    showSlots.push({type: 'empty'});
+  } else if (pageSongs.length === 1) {
+    showSlots.push({type: 'empty'});
+    showSlots.push({type: 'song', song: pageSongs[0], idx: start});
+    showSlots.push({type: 'add'});
+  } else {
+    for (var si2 = 0; si2 < pageSongs.length; si2++) {
+      showSlots.push({type: 'song', song: pageSongs[si2], idx: start + si2});
+    }
+    for (var fi = pageSongs.length; fi < SOLO_SONGS_PER_PAGE; fi++) {
+      showSlots.push({type: 'add'});
+    }
+  }
+
+  for (var sl = 0; sl < showSlots.length; sl++) {
+    var slot = showSlots[sl];
     var tile = document.createElement('div');
     tile.className = 'play-grid-song';
-    if (i < setlist.length && setlist[i]) {
-      var s = setlist[i];
+    if (slot.type === 'song' && slot.song) {
+      var s = slot.song;
       var mins = Math.floor((s.duration || 0) / 60);
       var secs = (s.duration || 0) % 60;
       var dur = mins + ':' + (secs < 10 ? '0' : '') + secs;
-      tile.onclick = (function(idx) { return function() { showPlayPicker(); }; })(i);
+      tile.style.position = 'relative';
       tile.innerHTML =
         '<div class="play-grid-song-art">' +
           '<img src="' + (s.file || '') + '" alt="" style="' + (s.file ? '' : 'display:none') + '">' +
-          '<div class="song-pos">' + (i + 1) + '</div>' +
+          '<div class="song-pos">' + (slot.idx + 1) + '</div>' +
         '</div>' +
         '<div class="play-grid-song-info">' +
           '<div class="song-title">' + (s.title || 'Unknown') + '</div>' +
           '<div class="song-artist">' + (s.artist || 'Unknown') + '</div>' +
           '<div class="song-meta">' + dur + '  &#183;  ' + (s.genre || '') + '  &#183;  ' + (s.bpm || '') + ' BPM</div>' +
+        '</div>' +
+        '<div class="play-grid-song-actions">' +
+          '<button class="play-grid-song-action-btn song-action-replace" data-idx="' + slot.idx + '"><svg viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg></button>' +
+          '<button class="play-grid-song-action-btn song-action-remove" data-idx="' + slot.idx + '"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button>' +
         '</div>';
-    } else {
-      tile.style.border = '2px dashed #333333';
-      tile.style.background = 'transparent';
+      // Bind action buttons
+      (function(idx) {
+        var replaceBtn = tile.querySelector('.song-action-replace');
+        var removeBtn = tile.querySelector('.song-action-remove');
+        if (replaceBtn) replaceBtn.onclick = function(e) { e.stopPropagation(); showPlayPicker(); };
+        if (removeBtn) removeBtn.onclick = function(e) { e.stopPropagation(); removeSoloSong(idx); };
+      })(slot.idx);
+    } else if (slot.type === 'add') {
+      tile.style.border = '2px dashed rgba(255,255,255,0.25)';
+      tile.style.background = 'rgba(255,255,255,0.04)';
+      tile.style.display = 'flex';
+      tile.style.flexDirection = 'column';
       tile.style.alignItems = 'center';
       tile.style.justifyContent = 'center';
+      tile.style.gap = '12px';
       tile.onclick = function() { showPlayPicker(); };
-      tile.innerHTML = '<div style="font-size:48px;color:#444444">+</div><div style="font-size:20px;color:#444444">Add Song</div>';
+      tile.innerHTML = '<div style="font-size:72px;color:#ffffff;font-weight:300;line-height:1">+</div><div style="font-size:28px;font-weight:700;color:rgba(255,255,255,0.7)">Add Song</div>';
+    } else {
+      // Empty spacer
+      tile.style.background = 'transparent';
+      tile.style.border = 'none';
+      tile.style.pointerEvents = 'none';
     }
     songsRow.appendChild(tile);
   }
@@ -12020,6 +12469,7 @@ function buildSoloGrid(grid) {
   var summary = document.createElement('div');
   summary.className = 'play-grid-summary';
   summary.innerHTML =
+    '<div class="play-grid-summary-item" style="font-weight:800">' + setlistName + '</div>' +
     '<div class="play-grid-summary-item"><span>Songs</span> ' + setlist.length + '</div>' +
     '<div class="play-grid-summary-item"><span>Total</span> ' + tMins + ':' + (tSecs < 10 ? '0' : '') + tSecs + '</div>';
   grid.appendChild(summary);
@@ -12028,14 +12478,26 @@ function buildSoloGrid(grid) {
   buildOptionsRow(grid);
 }
 
+function removeSoloSong(idx) {
+  if (idx >= 0 && idx < setlist.length) {
+    setlist.splice(idx, 1);
+    // Clamp page if needed
+    var totalPages = Math.max(1, Math.ceil(setlist.length / SOLO_SONGS_PER_PAGE));
+    if (soloGridPage >= totalPages) soloGridPage = totalPages - 1;
+    buildPlayGrid();
+    syncSetlistToUnity();
+  }
+}
+
 function buildOptionsRow(container) {
-  var instNames = ['Guitar', 'Drums', 'Vocals', 'Bass'];
+  var instNames = ['Guitar', 'Drums', 'Vocals', 'Bass', 'Mixed'];
   var diffNames = ['Easy', 'Normal', 'Hard', 'Expert'];
 
-  var instIdx = instNames.indexOf(selectedInstrument.charAt(0).toUpperCase() + selectedInstrument.slice(1));
+  var instDisplay = selectedInstrument.charAt(0).toUpperCase() + selectedInstrument.slice(1);
+  var instIdx = instNames.indexOf(instDisplay);
   if (instIdx < 0) instIdx = 0;
   var diffIdx = diffNames.indexOf(selectedDifficulty.charAt(0).toUpperCase() + selectedDifficulty.slice(1));
-  if (diffIdx < 0) diffIdx = 1;
+  if (diffIdx < 0) diffIdx = 0;
 
   var optionsRow = document.createElement('div');
   optionsRow.className = 'play-grid-options-row';
@@ -12094,7 +12556,7 @@ function buildCoopGrid(grid) {
       songTile.className = 'coop-song-tile';
       songTile.onclick = (function(idx) { return function() { showPlayPicker(); }; })(i);
       songTile.innerHTML =
-        '<img src="' + (s.file || 'art/001.jpg') + '" alt="">' +
+        '<div class="coop-song-art"><img src="' + (s.file || 'art/001.jpg') + '" alt=""></div>' +
         '<div class="coop-song-info">' +
           '<div class="song-title">' + (s.title || 'Unknown') + '</div>' +
           '<div class="song-artist">' + (s.artist || 'Unknown') + '</div>' +
@@ -12497,8 +12959,8 @@ var creatorSelectedShape = 'wide';
 var creatorSelectedWords = {};
 
 var creatorPhotos = [
-  'photos/carkey.jfif', 'photos/jumping.jpg', 'photos/doublebed.webp',
-  'photos/steak.jfif', 'photos/guitar.jpg', 'photos/houseplant.jpg'
+  'photos/doublebed.webp', 'photos/guitar.jpg', 'photos/houseplant.jpg',
+  'photos/jumping.jpg', 'photos/steak.jpg'
 ];
 
 var creatorArtLogos = [
@@ -13812,6 +14274,53 @@ function hideProfilePanel() {
   document.getElementById('profile-section-career').className = 'profile-section';
 }
 
+function showAvatarSection() {
+  document.getElementById('career-main').style.display = 'none';
+  document.getElementById('avatar-section').style.display = 'flex';
+  buildAvatarGrid();
+}
+
+function hideAvatarSection() {
+  document.getElementById('avatar-section').style.display = 'none';
+  document.getElementById('career-main').style.display = 'flex';
+}
+
+function buildAvatarGrid() {
+  var grid = document.getElementById('avatar-grid');
+  grid.innerHTML = '';
+
+  var avatarTypes = [
+    { id: 'shirts', label: 'Shirts', desc: 'T-shirts, crop tops, long sleeves', icon: '&#128085;', file: 'avatar_tiles/shirts.jpg' },
+    { id: 'hoodies', label: 'Hoodies', desc: 'Pullover, zip-up', icon: '&#129509;', file: 'avatar_tiles/hoodies.jpg' },
+    { id: 'jackets', label: 'Jackets', desc: 'Outerwear layers', icon: '&#129509;', file: 'avatar_tiles/jackets.jpg' },
+    { id: 'pants', label: 'Pants', desc: 'Jeans, sweatpants, cargo', icon: '&#128086;', file: 'avatar_tiles/pants.jpg' },
+    { id: 'dresses', label: 'Dresses', desc: 'Full-body, jumpsuits, armor', icon: '&#128087;', file: 'avatar_tiles/dresses.jpg' },
+    { id: 'shoes', label: 'Shoes', desc: 'Sandals, boots, platforms', icon: '&#128094;', file: 'avatar_tiles/shoes.jpg' },
+    { id: 'hats', label: 'Hats', desc: 'Caps, beanies, headphones', icon: '&#127913;', file: 'avatar_tiles/hats.jpg' },
+    { id: 'glasses', label: 'Glasses', desc: 'Eyewear, face masks, gems', icon: '&#128083;', file: 'avatar_tiles/glasses.jpg' },
+    { id: 'earrings', label: 'Earrings', desc: 'Studs, hoops, dangles', icon: '&#128141;', file: 'avatar_tiles/earrings.jpg' }
+  ];
+
+  for (var i = 0; i < avatarTypes.length; i++) {
+    var at = avatarTypes[i];
+    var tile = document.createElement('div');
+    tile.className = 'space-tile';
+    tile.style.background = 'url(' + at.file + ') center center / cover no-repeat #1a1a1a';
+    tile.style.position = 'relative';
+    tile.style.overflow = 'hidden';
+    tile.style.cursor = 'pointer';
+    tile.onclick = (function(type) {
+      return function() { sendToUnity('avatarCategory', {id: type.id, label: type.label}); };
+    })(at);
+    tile.innerHTML =
+      '<div style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.45);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px">' +
+        '<div style="font-size:36px;font-weight:800;color:#ffffff">' + at.label + '</div>' +
+        '<div style="font-size:22px;color:rgba(255,255,255,0.7);text-align:center;padding:0 16px">' + at.desc + '</div>' +
+      '</div>';
+    grid.appendChild(tile);
+  }
+}
+
 function buildProfileGrid() {
   var grid = document.getElementById('profile-grid-career');
   grid.innerHTML = '';
@@ -13861,6 +14370,10 @@ function switchProfile(profileId) {
 
   // Update topbar
   document.querySelector('.profile-name').textContent = profile.name;
+  var neonName = document.getElementById('career-neon-name');
+  if (neonName) neonName.textContent = profile.name;
+  var pictureImg = document.querySelector('.career-btn-picture-wrap img');
+  if (pictureImg) pictureImg.src = profile.avatar;
   var avatarImg = document.querySelector('.profile-avatar img');
   avatarImg.src = profile.avatar;
   avatarImg.alt = profile.name;
@@ -14067,211 +14580,127 @@ function generateAllTilings() {
   return results;
 }
 
+// Default tile priority — override via ?tiles=season,store,vault,...
+var homeTilePriority = ['season', 'store', 'vault', 'creator', 'spaces', 'news', 'social'];
+
+// All tile definitions keyed by ID
+var homeTileDefs = {
+  season:  { id: 'season',  title: 'Grammys Season', sub: '8 Days Left', detail: '40% Complete', ext: 'jpg', action: function() { navigateTo('season'); } },
+  store:   { id: 'store',   title: 'Store', sub: 'Golden Stratocaster', detail: '10,000 Picks - 7 days left', ext: 'jfif', action: function() { navigateTo('store'); } },
+  vault:   { id: 'vault',   title: 'Vault', sub: '2 New Items Unlocked', detail: 'Check out your new gear', ext: 'webp', action: function() { navigateTo('store', {tab: 'vault'}); } },
+  creator: { id: 'creator', title: 'Creator', sub: 'Your Creations', detail: 'Build and share content', ext: 'jpg', action: function() { navigateTo('creator'); } },
+  spaces:  { id: 'spaces',  title: 'Spaces', sub: 'K-Pop Zone', detail: '20/25 Jammers online!', ext: 'jfif', action: function() { navigateTo('spaces'); } },
+  news:    { id: 'news',    title: 'News', sub: 'Update v0.25', detail: 'New battle mode added!', ext: 'jfif', action: function() { navigateTo('career'); } },
+  social:  { id: 'social',  title: 'Social', sub: '8 Friends Online', detail: 'Jump in and jam together', ext: 'webp', action: function() { navigateTo('social', {tab: 'friends'}); } }
+};
+
 function buildHomeGrid(layoutIndex) {
   var container = document.getElementById('home-grid');
   container.innerHTML = '';
   var tiling = allTilings[layoutIndex];
-  var singleIdx = 0;
-  var homeTiles = [
-    { title: 'Store', sub: 'Golden Stratocaster', detail: '10,000 Picks - 7 days left', icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="140" height="140"><path d="M37 38l-5 60c0 4 3 7 7 7h50c4 0 7-3 7-7l-5-60z" fill="#f48fb1" stroke="#000" stroke-width="3"/><path d="M37 38l-5 60c0 4 3 7 7 7h25V38z" fill="#ec407a" stroke="#000" stroke-width="3"/><path d="M64 18c-12 0-22 10-22 22v6h10v-6c0-7 5-12 12-12s12 5 12 12v6h10v-6c0-12-10-22-22-22z" fill="#424242" stroke="#000" stroke-width="3"/></svg>', bgImage: 'Gemini_Generated_Image_qjcpmnqjcpmnqjcp.jfif', action: function() { navigateTo('store'); } },
-    { title: 'Vault', sub: '2 New Items Unlocked', detail: 'Check out your new gear', icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="140" height="140"><rect x="20" y="50" width="88" height="50" rx="6" fill="#8B5E3C" stroke="#000" stroke-width="3"/><rect x="20" y="50" width="88" height="20" fill="#A0522D" stroke="#000" stroke-width="3"/><path d="M20 50 Q64 20 108 50" fill="#C4884D" stroke="#000" stroke-width="3"/><rect x="54" y="58" width="20" height="16" rx="3" fill="#FFD700" stroke="#000" stroke-width="2"/><circle cx="64" cy="66" r="3" fill="#8B5E3C"/></svg>', bgImage: 'neon-drum-kit-stockcake.webp', action: function() { navigateTo('store'); switchStoreTab('vault'); } },
-    { title: 'Creator', sub: 'Your Creations', detail: 'Build and share content', icon: '&#127912;', bgImage: groupLogoOptions[Math.floor(Math.random() * groupLogoOptions.length)], action: function() { navigateTo('vault'); switchVaultTab('creator'); } },
-    { title: 'Spaces', sub: 'K-Pop Zone', detail: '20/25 Jammers online!', icon: '&#127760;', bgImage: 'Gemini_Generated_Image_jvosmrjvosmrjvos.jfif', action: function() { navigateTo('spaces'); } },
-    { title: 'News', sub: 'Update v0.25', detail: 'New battle mode added!', icon: '&#128240;', bgImage: 'Gemini_Generated_Image_lj9j18lj9j18lj9j.jfif', action: function() { navigateTo('career'); } },
-    { title: 'Social', sub: '8 Friends Online', detail: 'Jump in and jam together', icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="140" height="140"><circle cx="46" cy="38" r="18" fill="#42A5F5" stroke="#000" stroke-width="3"/><path d="M16 95c0-20 13-33 30-33s30 13 30 33" fill="#1E88E5" stroke="#000" stroke-width="3"/><circle cx="82" cy="38" r="18" fill="#AB47BC" stroke="#000" stroke-width="3"/><path d="M52 95c0-20 13-33 30-33s30 13 30 33" fill="#8E24AA" stroke="#000" stroke-width="3"/></svg>', socialAvatars: true, action: function() { navigateTo('social'); switchSocialTab('friends'); } }
-  ];
-  /* All tiles = octagon with unique glow color */
-  var octa = 'polygon(28px 0%, calc(100% - 28px) 0%, 100% 28px, 100% calc(100% - 28px), calc(100% - 28px) 100%, 28px 100%, 0% calc(100% - 28px), 0% 28px)';
-  var clips = [octa, octa, octa, octa, octa, octa];
+  if (!tiling) return;
+
+  // Build ordered tile type list from priority
+  var orderedTiles = [];
+  for (var p = 0; p < homeTilePriority.length; p++) {
+    var def = homeTileDefs[homeTilePriority[p]];
+    if (def) orderedTiles.push(def);
+  }
+  // Fallback: add any missing defs
+  for (var key in homeTileDefs) {
+    if (homeTileDefs.hasOwnProperty(key)) {
+      var found = false;
+      for (var f = 0; f < orderedTiles.length; f++) {
+        if (orderedTiles[f].id === key) { found = true; break; }
+      }
+      if (!found) orderedTiles.push(homeTileDefs[key]);
+    }
+  }
+
+  // Sort layout slots by visual importance: largest area first, then top-left
+  var slots = [];
+  for (var s = 0; s < tiling.length; s++) {
+    slots.push({ idx: s, t: tiling[s], area: tiling[s].w * tiling[s].h });
+  }
+  slots.sort(function(a, b) {
+    if (b.area !== a.area) return b.area - a.area;
+    if (a.t.r !== b.t.r) return a.t.r - b.t.r;
+    return a.t.c - b.t.c;
+  });
+
+  // Assign tile types to slots: priority[0] → biggest slot, priority[1] → next, etc.
+  var slotAssignments = [];
+  for (var i = 0; i < tiling.length; i++) slotAssignments.push(null);
+  for (var i = 0; i < slots.length; i++) {
+    slotAssignments[slots[i].idx] = orderedTiles[i % orderedTiles.length];
+  }
+
+  function getSizeKey(w, h) {
+    if (w === 1 && h === 1) return '1x1';
+    if (w === 2 && h === 1) return '2x1';
+    if (w === 3 && h === 1) return '3x1';
+    if (w === 1 && h === 2) return '1x2';
+    if (w === 1 && h === 3) return '1x3';
+    if (w === 2 && h === 2) return '1x1';
+    if (w === 2 && h === 3) return '1x2';
+    if (w === 3 && h === 2) return '3x1';
+    if (w === 3 && h === 3) return '1x1';
+    return '1x1';
+  }
+
   var glowColors = [
-    { c: 'rgba(255,200,0,0.4)',  h: 'rgba(255,200,0,0.6)',
-      f:  'drop-shadow(0 0 6px rgba(255,200,0,0.8)) drop-shadow(0 0 20px rgba(255,200,0,0.4))',
-      fh: 'drop-shadow(0 0 10px rgba(255,200,0,1)) drop-shadow(0 0 30px rgba(255,200,0,0.5))' },
-    { c: 'rgba(168,85,247,0.4)', h: 'rgba(168,85,247,0.6)',
-      f:  'drop-shadow(0 0 6px rgba(168,85,247,0.8)) drop-shadow(0 0 20px rgba(168,85,247,0.4))',
-      fh: 'drop-shadow(0 0 10px rgba(168,85,247,1)) drop-shadow(0 0 30px rgba(168,85,247,0.5))' },
-    { c: 'rgba(0,255,180,0.4)',  h: 'rgba(0,255,180,0.6)',
-      f:  'drop-shadow(0 0 6px rgba(0,255,180,0.8)) drop-shadow(0 0 20px rgba(0,255,180,0.4))',
-      fh: 'drop-shadow(0 0 10px rgba(0,255,180,1)) drop-shadow(0 0 30px rgba(0,255,180,0.5))' },
-    { c: 'rgba(255,80,200,0.4)', h: 'rgba(255,80,200,0.6)',
-      f:  'drop-shadow(0 0 6px rgba(255,80,200,0.8)) drop-shadow(0 0 20px rgba(255,80,200,0.4))',
-      fh: 'drop-shadow(0 0 10px rgba(255,80,200,1)) drop-shadow(0 0 30px rgba(255,80,200,0.5))' },
-    { c: 'rgba(0,224,255,0.4)',  h: 'rgba(0,224,255,0.6)',
-      f:  'drop-shadow(0 0 6px rgba(0,224,255,0.8)) drop-shadow(0 0 20px rgba(0,224,255,0.4))',
-      fh: 'drop-shadow(0 0 10px rgba(0,224,255,1)) drop-shadow(0 0 30px rgba(0,224,255,0.5))' },
-    { c: 'rgba(60,130,255,0.4)', h: 'rgba(60,130,255,0.6)',
-      f:  'drop-shadow(0 0 6px rgba(60,130,255,0.8)) drop-shadow(0 0 20px rgba(60,130,255,0.4))',
-      fh: 'drop-shadow(0 0 10px rgba(60,130,255,1)) drop-shadow(0 0 30px rgba(60,130,255,0.5))' }
+    { c: 'rgba(255,200,0,0.4)', f: 'drop-shadow(0 0 6px rgba(255,200,0,0.8)) drop-shadow(0 0 20px rgba(255,200,0,0.4))', fh: 'drop-shadow(0 0 10px rgba(255,200,0,1)) drop-shadow(0 0 30px rgba(255,200,0,0.5))' },
+    { c: 'rgba(168,85,247,0.4)', f: 'drop-shadow(0 0 6px rgba(168,85,247,0.8)) drop-shadow(0 0 20px rgba(168,85,247,0.4))', fh: 'drop-shadow(0 0 10px rgba(168,85,247,1)) drop-shadow(0 0 30px rgba(168,85,247,0.5))' },
+    { c: 'rgba(0,255,180,0.4)', f: 'drop-shadow(0 0 6px rgba(0,255,180,0.8)) drop-shadow(0 0 20px rgba(0,255,180,0.4))', fh: 'drop-shadow(0 0 10px rgba(0,255,180,1)) drop-shadow(0 0 30px rgba(0,255,180,0.5))' },
+    { c: 'rgba(255,80,200,0.4)', f: 'drop-shadow(0 0 6px rgba(255,80,200,0.8)) drop-shadow(0 0 20px rgba(255,80,200,0.4))', fh: 'drop-shadow(0 0 10px rgba(255,80,200,1)) drop-shadow(0 0 30px rgba(255,80,200,0.5))' },
+    { c: 'rgba(0,224,255,0.4)', f: 'drop-shadow(0 0 6px rgba(0,224,255,0.8)) drop-shadow(0 0 20px rgba(0,224,255,0.4))', fh: 'drop-shadow(0 0 10px rgba(0,224,255,1)) drop-shadow(0 0 30px rgba(0,224,255,0.5))' },
+    { c: 'rgba(60,130,255,0.4)', f: 'drop-shadow(0 0 6px rgba(60,130,255,0.8)) drop-shadow(0 0 20px rgba(60,130,255,0.4))', fh: 'drop-shadow(0 0 10px rgba(60,130,255,1)) drop-shadow(0 0 30px rgba(60,130,255,0.5))' },
+    { c: 'rgba(255,180,80,0.4)', f: 'drop-shadow(0 0 6px rgba(255,180,80,0.8)) drop-shadow(0 0 20px rgba(255,180,80,0.4))', fh: 'drop-shadow(0 0 10px rgba(255,180,80,1)) drop-shadow(0 0 30px rgba(255,180,80,0.5))' }
   ];
-  /* Season banner — wide octagon */
-  var bannerClip = 'polygon(28px 0%, calc(100% - 28px) 0%, 100% 28px, 100% calc(100% - 28px), calc(100% - 28px) 100%, 28px 100%, 0% calc(100% - 28px), 0% 28px)';
-  /* Icon position per tile — all top-right corner */
-  var iconPos = [
-    { top: '-18px', right: '-14px' },
-    { top: '-18px', right: '-14px' },
-    { top: '-18px', right: '-14px' },
-    { top: '-18px', right: '-14px' },
-    { top: '-18px', right: '-14px' },
-    { top: '-18px', right: '-14px' }
-  ];
-  /* Shadow panel offsets — alternating directions for depth variety */
-  var shadowOff = [
-    { top: '8px', left: '8px', right: '-8px', bottom: '-8px' },
-    { top: '8px', left: '-8px', right: '8px', bottom: '-8px' },
-    { top: '10px', left: '6px', right: '-6px', bottom: '-10px' },
-    { top: '-6px', left: '8px', right: '-8px', bottom: '6px' },
-    { top: '8px', left: '-10px', right: '10px', bottom: '-8px' },
-    { top: '10px', left: '8px', right: '-8px', bottom: '-10px' }
-  ];
-  var delays = [0, 0.4, 0.8, 0.2, 0.6, 1.0, 0.3, 0.7, 1.1];
 
   for (var i = 0; i < tiling.length; i++) {
     var t = tiling[i];
-    var delay = delays[i % delays.length];
+    var ht = slotAssignments[i];
+    if (!ht) continue;
+    var gc = glowColors[i % glowColors.length];
+    var sizeKey = getSizeKey(t.w, t.h);
+    var bgSrc = 'home_tiles/' + ht.id + '_' + sizeKey + '.' + ht.ext;
 
-    /* Wrapper — grid child, glow host */
     var wrap = document.createElement('div');
     wrap.className = 'home-tile-wrap';
     wrap.style.gridColumn = (t.c + 1) + ' / span ' + t.w;
     wrap.style.gridRow = (t.r + 1) + ' / span ' + t.h;
+    wrap.style.filter = gc.f;
+    wrap.style.cursor = 'pointer';
 
-    /* Shadow panel — offset depth layer */
-    var shadow = document.createElement('div');
-    shadow.className = 'home-tile-shadow';
+    // Hover glow
+    (function(el, normal, hover) {
+      el.addEventListener('mouseenter', function() { el.style.filter = hover; }, false);
+      el.addEventListener('mouseleave', function() { el.style.filter = normal; }, false);
+    })(wrap, gc.f, gc.fh);
 
-    /* Tile */
+    wrap.onclick = (function(a) { return function() { a(); }; })(ht.action);
+
     var tile = document.createElement('div');
     tile.className = 'home-tile';
-    tile.style.animationDelay = delay + 's';
-    tile.style.setProperty('--tile-delay', delay + 's');
+    tile.style.position = 'relative';
+    tile.style.display = 'flex';
+    tile.style.flexDirection = 'column';
+    tile.style.justifyContent = 'flex-end';
+    tile.style.padding = '28px';
+    tile.style.gap = '6px';
+    tile.style.setProperty('--glow-color', gc.c);
 
-    if (t.w === 3 && t.h === 1) {
-      /* Banner — angled parallelogram, amber glow */
-      wrap.className = 'home-tile-wrap glow-amber';
-      wrap.style.setProperty('--glow-color', 'rgba(255,180,80,0.3)');
-      wrap.style.setProperty('--glow-hover', 'rgba(255,180,80,0.5)');
-      tile.style.webkitClipPath = bannerClip;
-      tile.style.clipPath = bannerClip;
-      shadow.style.webkitClipPath = bannerClip;
-      shadow.style.clipPath = bannerClip;
-      shadow.style.top = '8px';
-      shadow.style.left = '8px';
-      shadow.style.right = '-8px';
-      shadow.style.bottom = '-8px';
+    var overlayColor = gc.c.replace(/[\d.]+\)$/, '0.25)');
+    var overlayMid = gc.c.replace(/[\d.]+\)$/, '0.4)');
+    tile.innerHTML =
+      '<img src="' + bgSrc + '" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:0;border-radius:var(--panel-radius)" alt="">' +
+      '<div style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:1;background:linear-gradient(180deg,' + overlayColor + ' 0%,' + overlayMid + ' 40%,rgba(0,0,0,0.7) 100%);border-radius:var(--panel-radius)"></div>' +
+      '<div style="font-size:48px;font-weight:900;color:#ffffff;text-shadow:-2px -2px 0 rgba(0,0,0,0.8),2px -2px 0 rgba(0,0,0,0.8),-2px 2px 0 rgba(0,0,0,0.8),2px 2px 0 rgba(0,0,0,0.8);position:relative;z-index:3;letter-spacing:1px;text-transform:uppercase">' + ht.title + '</div>' +
+      '<div style="font-size:34px;font-weight:700;color:rgba(255,255,255,0.9);text-shadow:-1px -1px 0 rgba(0,0,0,0.7),1px -1px 0 rgba(0,0,0,0.7),-1px 1px 0 rgba(0,0,0,0.7),1px 1px 0 rgba(0,0,0,0.7);position:relative;z-index:3">' + ht.sub + '</div>' +
+      '<div style="font-size:24px;font-weight:600;color:rgba(255,255,255,0.7);text-shadow:-1px -1px 0 rgba(0,0,0,0.6),1px -1px 0 rgba(0,0,0,0.6),-1px 1px 0 rgba(0,0,0,0.6),1px 1px 0 rgba(0,0,0,0.6);position:relative;z-index:3">' + ht.detail + '</div>';
 
-      tile.innerHTML = '<div class="home-banner">'
-        + '<img class="home-banner-bg" src="grammys.jpg" alt="">'
-        + '<div class="home-banner-overlay"></div>'
-        + '<div class="home-banner-content">'
-        + '<img class="home-banner-logo" src="Logo (1080 x 1080 px).png" alt="Jamsesh">'
-        + '<div class="home-banner-text">'
-        + '<div class="home-banner-title">Grammys Season</div>'
-        + '<div class="home-banner-sub">8 Days Left</div>'
-        + '<div class="home-banner-progress">40% Complete</div>'
-        + '</div></div></div>';
-
-      wrap.appendChild(shadow);
-      wrap.appendChild(tile);
-    } else if (t.w === 1 && t.h === 1 && singleIdx < homeTiles.length) {
-      var ht = homeTiles[singleIdx];
-      var ci = singleIdx % clips.length;
-      var cp = clips[ci];
-
-      /* Per-tile glow — filter on WRAPPER (not tile, since clip-path clips filter) */
-      var gc = glowColors[singleIdx % glowColors.length];
-      wrap.className = 'home-tile-wrap';
-      tile.style.setProperty('--glow-color', gc.c);
-      tile.style.setProperty('--glow-hover', gc.h);
-      wrap.style.filter = gc.f;
-
-      /* Hover: swap wrapper filter to brighter glow (no pulse) */
-      (function(el, normal, hover) {
-        el.addEventListener('mouseenter', function() {
-          el.style.filter = hover;
-        }, false);
-        el.addEventListener('mouseleave', function() {
-          el.style.filter = normal;
-        }, false);
-      })(wrap, gc.f, gc.fh);
-
-      /* Unique clip-path per tile */
-      tile.style.webkitClipPath = cp;
-      tile.style.clipPath = cp;
-
-      tile.style.display = 'flex';
-      tile.style.flexDirection = 'column';
-      tile.style.justifyContent = 'flex-end';
-      tile.style.padding = '28px';
-      tile.style.gap = '6px';
-
-      var bgHtml = '';
-      if (ht.bgImage) {
-        var overlayColor = gc.c.replace(/[\d.]+\)$/, '0.25)');
-        var overlayMid = gc.c.replace(/[\d.]+\)$/, '0.4)');
-        bgHtml = '<img src="' + ht.bgImage + '" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:0">'
-          + '<div style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:1;background:linear-gradient(180deg,' + overlayColor + ' 0%,' + overlayMid + ' 40%,rgba(0,0,0,0.7) 100%)"></div>';
-      }
-      tile.style.position = 'relative';
-      tile.innerHTML = bgHtml
-        + '<div style="font-size:48px;font-weight:900;color:#ffffff;text-shadow:-2px -2px 0 rgba(0,0,0,0.8),2px -2px 0 rgba(0,0,0,0.8),-2px 2px 0 rgba(0,0,0,0.8),2px 2px 0 rgba(0,0,0,0.8);position:relative;z-index:3;letter-spacing:1px;text-transform:uppercase">' + ht.title + '</div>'
-        + '<div style="font-size:34px;font-weight:700;color:rgba(255,255,255,0.9);text-shadow:-1px -1px 0 rgba(0,0,0,0.7),1px -1px 0 rgba(0,0,0,0.7),-1px 1px 0 rgba(0,0,0,0.7),1px 1px 0 rgba(0,0,0,0.7);position:relative;z-index:3">' + ht.sub + '</div>'
-        + '<div style="font-size:24px;font-weight:600;color:rgba(255,255,255,0.7);text-shadow:-1px -1px 0 rgba(0,0,0,0.6),1px -1px 0 rgba(0,0,0,0.6),-1px 1px 0 rgba(0,0,0,0.6),1px 1px 0 rgba(0,0,0,0.6);position:relative;z-index:3">' + ht.detail + '</div>';
-
-      /* Floating icon — sits in wrapper, partially outside tile clip */
-      var icon = document.createElement('div');
-      icon.className = 'home-tile-icon';
-      icon.innerHTML = ht.icon;
-      var isSvgIcon = ht.icon.indexOf('<svg') !== -1;
-      var ip = iconPos[singleIdx % iconPos.length];
-      if (isSvgIcon) {
-        icon.style.top = '-48px';
-        icon.style.right = '-44px';
-      } else {
-        if (ip.top) icon.style.top = ip.top;
-        if (ip.right) icon.style.right = ip.right;
-        if (ip.bottom) icon.style.bottom = ip.bottom;
-        if (ip.left) icon.style.left = ip.left;
-      }
-      if (ip.ml) icon.style.marginLeft = ip.ml;
-
-      wrap.onclick = (function(a) { return function() { a(); }; })(ht.action);
-
-      wrap.appendChild(tile);
-      wrap.appendChild(icon);
-
-      // Floating social avatars
-      if (ht.socialAvatars) {
-        var avatarData = [
-          { src: 'ted.png', size: 200, left: '15%', top: '10%', dur: '8s', delay: '0s' },
-          { src: 'abbie.png', size: 140, left: '65%', top: '8%', dur: '10s', delay: '-3s' },
-          { src: 'arthen.jpg', size: 170, left: '55%', top: '45%', dur: '9s', delay: '-5s' },
-          { src: 'jooleeno.jpg', size: 120, left: '20%', top: '50%', dur: '11s', delay: '-7s' }
-        ];
-        for (var av = 0; av < avatarData.length; av++) {
-          var a = avatarData[av];
-          var bubble = document.createElement('div');
-          bubble.className = 'home-tile-avatar';
-          bubble.style.width = a.size + 'px';
-          bubble.style.height = a.size + 'px';
-          bubble.style.left = a.left;
-          bubble.style.top = a.top;
-          bubble.style.animationDuration = a.dur;
-          bubble.style.animationDelay = a.delay;
-          bubble.innerHTML = '<img src="' + a.src + '" alt="">';
-          tile.appendChild(bubble);
-        }
-      }
-
-      singleIdx++;
-    } else {
-      /* Fallback tile */
-      var cp = clips[i % clips.length];
-      tile.style.webkitClipPath = cp;
-      tile.style.clipPath = cp;
-
-      wrap.appendChild(tile);
-    }
-
+    wrap.appendChild(tile);
     container.appendChild(wrap);
   }
   updateLayoutBtn(layoutIndex);
@@ -14301,7 +14730,12 @@ function buildLayoutBrowser() {
       thumb.appendChild(cell);
     }
 
+    var label = document.createElement('div');
+    label.style.cssText = 'position:absolute;bottom:4px;left:0;right:0;text-align:center;font-size:16px;font-weight:700;color:#666666;z-index:2;pointer-events:none';
+    label.textContent = i;
+
     wrap.appendChild(thumb);
+    wrap.appendChild(label);
     browser.appendChild(wrap);
   }
 }
@@ -14334,6 +14768,10 @@ function selectLayout(index) {
       thumbs[i].className = 'layout-thumb';
     }
   }
+  // Update URL and persist via Unity/PlayFab
+  try { window.history.replaceState(null, '', '?layout=' + index); } catch(e) {}
+  sendToUnity('layoutChanged', index);
+  closeLayoutPicker();
 }
 
 function openLayoutPicker() {
@@ -14510,6 +14948,7 @@ var currentStep = null;
 var LEGAL_VERSION = '1';
 var demoEnabled = false;     // ?demo — show demo-only screens
 var onboardEnabled = false;  // ?onboard — force onboarding even if completed
+var skipAll = false;         // ?skip — bypass everything, straight to full menu
 var onboardFlags = {};       // { legal: true, perms_explainer: true }
 
 function parseMode() {
@@ -14529,6 +14968,7 @@ function parseMode() {
   // Independent flags
   demoEnabled = 'demo' in map;
   onboardEnabled = 'onboard' in map;
+  skipAll = 'skip' in map;
 
   // ?onboard clears saved flags to force re-run
   if (onboardEnabled) {
@@ -14544,7 +14984,23 @@ function parseMode() {
     if (!isNaN(stepNum)) currentStep = stepNum;
   }
 
-  console.log('[Mode] demo=' + demoEnabled + ', onboard=' + onboardEnabled + ', flags=' + JSON.stringify(onboardFlags));
+  // ?layout=N — override home grid layout (0-321, clamped after tilings generate)
+  if (map.layout) {
+    var layoutNum = parseInt(map.layout, 10);
+    if (!isNaN(layoutNum) && layoutNum >= 0) {
+      currentLayout = layoutNum;
+    }
+  }
+
+  // ?tiles=season,store,vault,... — override home tile priority order
+  if (map.tiles) {
+    var tileList = map.tiles.split(',');
+    if (tileList.length > 0) {
+      homeTilePriority = tileList;
+    }
+  }
+
+  console.log('[Mode] demo=' + demoEnabled + ', onboard=' + onboardEnabled + ', layout=' + currentLayout + ', flags=' + JSON.stringify(onboardFlags));
 }
 
 function _loadOnboardFlags() {
@@ -14570,8 +15026,8 @@ function completeOnboardStep(step) {
 }
 
 function isStepComplete(step) {
+  if (skipAll) return true;
   if (step === 'legal') {
-    // Re-show if legal version changed
     return onboardFlags.legal && onboardFlags.legal_version === LEGAL_VERSION;
   }
   return !!onboardFlags[step];
@@ -14587,6 +15043,13 @@ function isOnboardMode() {
 
 // Entry point: kicks off the first screen based on ?step=N from C#
 function startFlow() {
+  // ?skip — bypass everything immediately
+  if (skipAll) {
+    _setUrlStep('menu');
+    _showMainUI();
+    return;
+  }
+
   if (isDemoMode()) {
     _showOnboardScreen('onboard-meta-store');
     return;
@@ -14599,7 +15062,14 @@ function startFlow() {
     if (currentStep === 2) { _showOnboardScreen('onboard-perms-explain'); return; }
   }
 
-  // Default / step 1: Early Access → onboarding steps → Main UI
+  // If all steps complete, skip early access and go straight to main UI
+  if (isStepComplete('legal') && isStepComplete('perms_explainer') && isStepComplete('tutorial_play')) {
+    _showMainUI();
+    return;
+  }
+
+  // Non-demo: Early Access → onboarding steps → Main UI
+  _setUrlStep('early-access');
   var ea = document.getElementById('early-access-overlay');
   if (ea) ea.className = 'early-access-overlay';
 }
@@ -14627,9 +15097,27 @@ function onboardAfterEarlyAccess() {
   _showMainUI();
 }
 
+function _setUrlStep(stepName) {
+  try {
+    var url = window.location.pathname + '?step=' + stepName;
+    window.history.replaceState(null, '', url);
+  } catch(e) {}
+}
+
 function _showOnboardScreen(id) {
   var el = document.getElementById(id);
   if (el) el.className = el.className.replace(' hidden', '');
+  // Update URL slug to reflect current step
+  var screenToStep = {
+    'onboard-meta-store': 'demo-store',
+    'onboard-quest': 'demo-quest',
+    'onboard-boot': 'demo-boot',
+    'onboard-legal': 'legal',
+    'onboard-perms-explain': 'perms',
+    'onboard-perm-camera': 'demo-camera',
+    'onboard-perm-mic': 'demo-mic'
+  };
+  if (screenToStep[id]) _setUrlStep(screenToStep[id]);
 }
 
 function _showMainUI() {
@@ -14643,7 +15131,10 @@ function _showMainUI() {
   // Only show tutorial if step says so (3 = tutorial), skip for home (4+)
   if (currentStep !== null && currentStep >= 4) return;
   if (!isStepComplete('tutorial_play')) {
+    _setUrlStep('tutorial');
     startTutorialPlay();
+  } else {
+    _setUrlStep('menu');
   }
 }
 
@@ -14657,51 +15148,61 @@ function startTutorialPlay() {
   // Navigate to play tab
   navigateTo('play');
 
-  // Grey out navbar items except play
+  var lockStyle = 'opacity:0.3;pointer-events:none;filter:saturate(0) brightness(0.4);';
+
+  // Lock navbar items except play
   var navItems = document.querySelectorAll('.nav-item');
   for (var i = 0; i < navItems.length; i++) {
     var page = navItems[i].getAttribute('data-page');
     if (page !== 'play') {
-      navItems[i].style.opacity = '0.25';
-      navItems[i].style.pointerEvents = 'none';
+      navItems[i].style.cssText = lockStyle;
     }
   }
 
-  // Grey out topbar
+  // Lock topbar
   var topbar = document.querySelector('.topbar');
   if (topbar) {
-    topbar.style.opacity = '0.25';
-    topbar.style.pointerEvents = 'none';
+    topbar.style.cssText = lockStyle;
   }
 
   // Override setlist with tutorial songs
-  setlist = tutorialSongs.slice();
+  setlist = lessonBasicSongs.slice();
+  setlistName = 'Jamsesh Basic Lessons';
+  selectedInstrument = 'mixed';
+  selectedDifficulty = 'easy';
+  activeSetlistLocks = { lockInstrument: true, lockDifficulty: true, lockExperience: true, lockSongs: true };
   buildPlayGrid();
 
-  // Grey out Save/Load, keep Start highlighted
+  // Lock Save and Start, keep Load active
   var goBar = document.querySelector('.play-go-bar');
   if (goBar) {
-    var btns = goBar.querySelectorAll('.play-bar-btn');
+    var btns = goBar.children;
     for (var b = 0; b < btns.length; b++) {
-      btns[b].style.opacity = '0.25';
-      btns[b].style.pointerEvents = 'none';
+      var btn = btns[b];
+      var isLoad = btn.textContent.indexOf('Load') !== -1;
+      if (!isLoad) {
+        btn.style.cssText = lockStyle;
+      }
     }
   }
 
-  // Grey out mode tabs
+  // Lock mode tabs
   var modeTabs = document.querySelectorAll('.play-mode-tab');
   for (var m = 0; m < modeTabs.length; m++) {
-    modeTabs[m].style.opacity = '0.25';
-    modeTabs[m].style.pointerEvents = 'none';
+    modeTabs[m].style.cssText = lockStyle;
   }
 
-  // Override Start button to complete tutorial
-  var startBtn = document.getElementById('play-go-btn');
-  if (startBtn) {
-    startBtn.onclick = function() {
-      completeTutorialPlay();
-    };
+  // Lock song tiles and option tiles
+  var songTiles = document.querySelectorAll('.play-grid-song');
+  for (var t = 0; t < songTiles.length; t++) {
+    songTiles[t].style.cssText = lockStyle;
   }
+  var optTiles = document.querySelectorAll('.play-grid-option');
+  for (var o = 0; o < optTiles.length; o++) {
+    optTiles[o].style.cssText = lockStyle;
+  }
+  var summaryRow = document.querySelector('.play-grid-summary');
+  if (summaryRow) summaryRow.style.cssText = lockStyle;
 }
 
 function tutorialAdvance(step) {
@@ -14832,6 +15333,8 @@ function init() {
   buildCreatorGrids();
   buildSeasonGrid();
   allTilings = generateAllTilings();
+  // Clamp layout to valid range
+  if (currentLayout < 0 || currentLayout >= allTilings.length) currentLayout = 283;
   buildHomeGrid(currentLayout);
   applyTheme(currentTheme);
 
@@ -15036,16 +15539,56 @@ for (var w = 0; w < NUM_WAVES; w++) {
   });
 }
 
-/* Palette: cyan -> purple -> pink */
+/* Per-page colour palettes: waves, gradient, particle tint */
+var pageColorSchemes = {
+  home:    { accent: [124,58,237], waves: [[124,58,237],[168,85,247],[200,100,255],[140,60,220],[100,40,200]], grad: ["#0a0e2a","#1a1040","#2e1248","#4a1050"], pt: [124,58,237], pb: [200,100,255] },
+  social:  { accent: [16,185,129], waves: [[16,185,129],[34,197,94],[52,211,153],[20,170,120],[10,200,140]], grad: ["#041f1a","#0a2e20","#0f3d2a","#153d20"], pt: [16,185,129], pb: [52,211,153] },
+  spaces:  { accent: [59,130,246], waves: [[59,130,246],[96,165,250],[37,99,235],[100,150,255],[60,120,220]], grad: ["#050e2a","#0c1a40","#122850","#1a3060"], pt: [59,130,246], pb: [96,165,250] },
+  play:    { accent: [6,182,212], waves: [[6,182,212],[34,211,238],[8,145,178],[56,189,248],[20,170,200]], grad: ["#041e24","#0a2a30","#0e3640","#124050"], pt: [6,182,212], pb: [56,189,248] },
+  creator: { accent: [245,158,11], waves: [[245,158,11],[251,191,36],[234,138,0],[255,170,40],[220,140,20]], grad: ["#1a1408","#2a1e0a","#3a280e","#4a3210"], pt: [245,158,11], pb: [251,191,36] },
+  store:   { accent: [236,72,153], waves: [[236,72,153],[244,114,182],[219,39,119],[255,100,170],[200,50,140]], grad: ["#1a0a1a","#2e0e28","#401238","#501648"], pt: [236,72,153], pb: [244,114,182] },
+  season:  { accent: [234,179,8], waves: [[234,179,8],[250,204,21],[202,138,4],[255,200,40],[200,160,10]], grad: ["#1a1608","#2a220a","#3a2e0e","#4a3a10"], pt: [234,179,8], pb: [250,204,21] },
+  career:  { accent: [168,85,247], waves: [[168,85,247],[140,60,220],[200,100,255],[124,58,237],[180,100,240]], grad: ["#0e0828","#1a1040","#24144a","#301852"], pt: [140,60,220], pb: [200,100,255] },
+  settings:{ accent: [168,85,247], waves: [[168,85,247],[140,60,220],[200,100,255],[124,58,237],[180,100,240]], grad: ["#0e0828","#1a1040","#24144a","#301852"], pt: [140,60,220], pb: [200,100,255] }
+};
+var activePageScheme = 'home';
+
+function setPageColors(pageName) {
+  var scheme = pageColorSchemes[pageName] || pageColorSchemes.home;
+  activePageScheme = pageName;
+  waveColors = scheme.waves;
+  bgGrad = ctx.createLinearGradient(0, 0, 1920, 1920);
+  bgGrad.addColorStop(0, scheme.grad[0]);
+  bgGrad.addColorStop(0.4, scheme.grad[1]);
+  bgGrad.addColorStop(0.7, scheme.grad[2]);
+  bgGrad.addColorStop(1, scheme.grad[3]);
+
+  // Set button CSS variables from page accent
+  var a = scheme.accent;
+  var r = document.documentElement;
+  var rgb = a[0] + ',' + a[1] + ',' + a[2];
+  r.style.setProperty('--btn-tab',           'rgba(' + rgb + ',0.15)');
+  r.style.setProperty('--btn-tab-hover',     'rgba(' + rgb + ',0.28)');
+  r.style.setProperty('--btn-tab-border',    'rgba(' + rgb + ',0.25)');
+  r.style.setProperty('--btn-panel',         'rgba(' + rgb + ',0.10)');
+  r.style.setProperty('--btn-panel-hover',   'rgba(' + rgb + ',0.20)');
+  r.style.setProperty('--btn-panel-border',  'rgba(' + rgb + ',0.18)');
+  r.style.setProperty('--btn-primary',       'rgba(' + rgb + ',0.30)');
+  r.style.setProperty('--btn-primary-hover', 'rgba(' + rgb + ',0.45)');
+  r.style.setProperty('--btn-primary-border','rgba(' + rgb + ',0.50)');
+  r.style.setProperty('--btn-primary-glow',  'rgba(' + rgb + ',0.35)');
+}
+
+/* Palette — initialized to home */
 var waveColors = [
-  [0, 224, 255],
-  [100, 140, 255],
-  [168, 85, 247],
-  [220, 60, 180],
-  [255, 80, 200]
+  [124,58,237],
+  [168,85,247],
+  [200,100,255],
+  [140,60,220],
+  [100,40,200]
 ];
 
-/* dark blue to pink gradient background */
+/* Background gradient — initialized to home */
 var bgGrad = ctx.createLinearGradient(0, 0, 1920, 1920);
 bgGrad.addColorStop(0, "#0a0e2a");
 bgGrad.addColorStop(0.4, "#1a1040");
@@ -15085,11 +15628,12 @@ function drawParticles() {
     var pulseScale = 1 + Math.sin(p.pulse) * 0.35;
     var drawR = p.r * pulseScale;
 
-    /* Colour based on vertical position */
+    /* Colour based on vertical position — lerp between page scheme top/bottom */
+    var scheme = pageColorSchemes[activePageScheme] || pageColorSchemes.home;
     var t = p.y / 1920;
-    var cr = Math.round(0 + t * 255);
-    var cg = Math.round(224 - t * 160);
-    var cb = Math.round(255 - t * 55);
+    var cr = Math.round(scheme.pt[0] + t * (scheme.pb[0] - scheme.pt[0]));
+    var cg = Math.round(scheme.pt[1] + t * (scheme.pb[1] - scheme.pt[1]));
+    var cb = Math.round(scheme.pt[2] + t * (scheme.pb[2] - scheme.pt[2]));
 
     if (p.wave) {
       /* Wave-riding particles — follow a sine wave */
@@ -15130,6 +15674,7 @@ function drawParticles() {
   requestAnimationFrame(drawParticles);
 }
 
+setPageColors('home');
 drawParticles();
 
 </script>
