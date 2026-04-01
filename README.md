@@ -2,6 +2,25 @@
 
 Single-file HTML/CSS/JS UI prototype for **Jamsesh**, a VR music rhythm game running inside Vuplex WebView on Meta Quest headsets. Fixed 1920x1920 pixel viewport.
 
+## Changelog (2026-04-01)
+
+- **Per-page colour themes** — each tab has its own gradient background, wave/particle colours (Home=purple, Social=green, Spaces=blue, Play=cyan, Creator=amber, Store=pink, Season=gold, Profile=purple)
+- **Page-aware buttons** — all buttons use CSS variables that auto-adapt to each page's accent colour. Zero grey buttons across entire UI
+- **Nested radius system** — `--radius-outer` (56px) for containers, `--panel-radius` (28px) for tiles. Removed all octagon clip-paths, replaced with border-radius
+- **Home tile system** — 7 tile types with 5 size variants each in `/home_tiles/`. Priority-based assignment (biggest tile gets highest priority). `?layout=N` and `?tiles=` URL params
+- **Play tab redesign** — song hover actions (replace/remove buttons), 1:1 square cover art, smart empty-state layouts (1 song centered, 0 songs single add tile)
+- **Setlist loader** — 3x3 grid picker with adaptive art layouts (1 song=full cover, 2=side-by-side, 3+=2x2 grid). Lesson setlists with lock flags for instrument/difficulty/experience/songs
+- **Tutorial onboarding** — locked UI with only Load button active, Basic/Advanced/Expert lesson progression, Mixed instrument type
+- **Profile page** — neon glow name tile, profile picture with purple glow, Genies avatar (zoom animation), news tile, credits (floating team avatars), device info tile
+- **Avatar customization** — Genies SDK integration with 9 asset categories (Shirts, Hoodies, Jackets, Pants, Dresses, Shoes, Hats, Glasses, Earrings)
+- **Creator page** — photos/art/songs tabs with camera capture, photo picker, shape/word cloud/prompt config, 2x2 AI results with tickbox selection
+- **Virtual keyboard** — `keyboard.html` using simple-keyboard library, dark theme, Vuplex bridge integration
+- **Transparent topbar** — profile info over particle background with no banner overlay
+- **Play button highlight** — 10% larger navbar button with subtle 8s pulse animation (5s gap)
+- **URL updates** — onboarding step shown in URL via `history.replaceState` (`?step=legal`, `?step=perms`, `?step=tutorial`, `?step=menu`)
+- **`?skip` flag** — bypasses everything, straight to full unlocked menu regardless of localStorage
+- **Popup theming** — all popups and their buttons use page-aware colour variables
+
 ## Quick Start
 
 ```bash
