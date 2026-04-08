@@ -417,8 +417,8 @@
     flex: 1;
     width: 100%;
     border-radius: var(--panel-radius);
-    border: 1px solid rgba(255,255,255,0.10);
-    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--btn-tab-border);
+    background: var(--btn-tab);
     color: #ffffff;
     font-size: 22px;
     line-height: 0.7;
@@ -465,19 +465,22 @@
 
   .grid-page {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    align-content: start;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: auto auto auto;
     gap: var(--grid-gap);
+    overflow: hidden;
   }
 
   .song-tile {
-    aspect-ratio: 1;
     border-radius: var(--panel-radius);
     overflow: hidden;
     cursor: pointer;
     position: relative;
     border: 2px solid transparent;
     transition: box-shadow 0.15s, filter 0.15s, border-color 0.15s;
+    min-height: 0;
+    min-width: 0;
+    padding-top: 100%;
   }
 
   /* ── Holographic card shared style ─────────────────── */
@@ -519,7 +522,6 @@
   }
 
   /* Holographic shimmer edge — top border glow */
-  .song-tile,
   .play-tile,
   .space-tile,
   .season-tile,
@@ -783,6 +785,9 @@
   }
 
   .song-tile img {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -796,8 +801,8 @@
     bottom: 0;
     left: 0;
     right: 0;
-    padding: 32px 8px 8px;
-    background: linear-gradient(0deg, #0a0a0a 0%, var(--bg-surface) 100%);
+    padding: 40px 12px 10px;
+    background: linear-gradient(0deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.5) 60%, transparent 100%);
   }
 
   .song-tile .tile-rank {
@@ -810,20 +815,23 @@
   }
 
   .song-tile .tile-title {
-    font-size: 18px;
-    font-weight: 700;
+    font-size: 20px;
+    font-weight: 800;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     line-height: 1.2;
+    color: #ffffff;
+    text-shadow: 0 1px 6px rgba(0,0,0,0.5);
   }
 
   .song-tile .tile-artist {
     font-size: 16px;
-    color: var(--text-muted);
+    color: rgba(255,255,255,0.7);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.5);
   }
 
   .song-tile .tile-meta {
@@ -833,6 +841,7 @@
     color: rgba(255,255,255,0.50);
     margin-top: 2px;
     white-space: nowrap;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.5);
   }
 
   /* ── Play Panel ──────────────────────────────────── */
@@ -961,8 +970,8 @@
     gap: 12px;
     padding: 0 16px;
     border-radius: var(--panel-radius);
-    border: 1px solid var(--border-subtle);
-    background: var(--bg-surface);
+    border: 1px solid var(--btn-tab-border);
+    background: var(--btn-tab);
     height: 100%;
     position: relative;
     overflow: hidden;
@@ -1052,8 +1061,8 @@
     width: 100%;
     height: var(--nav-btn-h);
     border-radius: var(--panel-radius);
-    border: 1px solid var(--border-strong);
-    background: var(--bg-surface);
+    border: 1px solid var(--btn-tab-border);
+    background: var(--btn-tab);
     color: var(--text-primary);
     font-size: 30px;
     font-weight: 700;
@@ -1159,7 +1168,7 @@
     transition: background 0.15s, box-shadow 0.2s, border-color 0.2s;
     border: 1px solid var(--btn-panel-border);
   }
-  .play-grid-song:hover {
+  .play-grid-songs-row:not(.has-songs) .play-grid-song:hover {
     background: #222222;
     border-color: rgba(255,80,200,0.6);
     box-shadow: 0 0 0 2px rgba(255,80,200,0.4), 0 0 12px rgba(255,80,200,0.5);
@@ -1221,51 +1230,46 @@
     text-overflow: ellipsis;
   }
 
-  /* Song tile hover action buttons */
-  .play-grid-song-actions {
+  /* Songs row hover — darken all tiles together */
+  .play-grid-songs-row.has-songs {
+    cursor: pointer;
+  }
+  .play-grid-songs-row.has-songs .play-grid-song {
+    position: relative;
+  }
+  .play-grid-songs-row.has-songs .play-grid-song::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0);
+    border-radius: var(--panel-radius);
+    transition: background 0.2s;
+    z-index: 4;
+    pointer-events: none;
+  }
+  .play-grid-songs-row.has-songs:hover .play-grid-song::after {
+    background: rgba(0,0,0,0.55);
+  }
+  .play-grid-edit-label {
     position: absolute;
     top: 0; left: 0; right: 0; bottom: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 24px;
-    background: rgba(0,0,0,0.6);
-    border-radius: var(--panel-radius);
-    opacity: 0;
-    transition: opacity 0.15s;
     z-index: 5;
     pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
   }
-  .play-grid-song:hover .play-grid-song-actions {
+  .play-grid-songs-row.has-songs:hover .play-grid-edit-label {
     opacity: 1;
-    pointer-events: auto;
   }
-  .play-grid-song-action-btn {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    border: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    font-family: inherit;
-    transition: transform 0.15s, filter 0.15s;
-  }
-  .play-grid-song-action-btn:hover { transform: scale(1.15); }
-  .play-grid-song-action-btn:active { transform: scale(0.95); }
-  .play-grid-song-action-btn svg {
-    width: 36px;
-    height: 36px;
-    fill: currentColor;
-  }
-  .song-action-replace {
-    background: #ffffff;
-    color: #000000;
-  }
-  .song-action-remove {
-    background: #dc2626;
+  .play-grid-edit-label span {
+    font-size: 32px;
+    font-weight: 800;
     color: #ffffff;
+    text-align: center;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.6);
   }
 
   .play-grid-option {
@@ -1600,6 +1604,103 @@
   .option-picker-choice.selected .option-picker-choice-desc {
     color: #444444;
   }
+
+  /* ── Filter Grid Popup ───────────────────────── */
+  .option-picker-panel.filter-panel {
+    width: 1440px;
+    max-height: 1440px;
+  }
+  .filter-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+  }
+  .filter-grid-tile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    border-radius: var(--panel-radius);
+    cursor: pointer;
+    border: 2px solid rgba(255,255,255,0.08);
+    position: relative;
+    padding: 28px 16px;
+    transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+  }
+  .filter-grid-tile:hover {
+    border-color: rgba(255,255,255,0.35);
+    transform: scale(1.03);
+  }
+  .filter-grid-tile.selected {
+    border-color: #ffffff;
+    box-shadow: 0 0 0 2px #ffffff, 0 0 16px rgba(255,255,255,0.3);
+  }
+  .filter-tile-emoji {
+    font-size: 64px;
+    line-height: 1;
+  }
+  .filter-tile-label {
+    font-size: 22px;
+    font-weight: 700;
+    color: #ffffff;
+    text-align: center;
+  }
+  .filter-tile-check {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: 2px solid rgba(255,255,255,0.3);
+    background: rgba(0,0,0,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 800;
+    color: transparent;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+  }
+  .filter-grid-tile.selected .filter-tile-check {
+    background: #ffffff;
+    border-color: #ffffff;
+    color: #000000;
+  }
+  .filter-actions {
+    display: flex;
+    gap: 16px;
+    flex-shrink: 0;
+  }
+  .filter-apply-btn {
+    flex: 2;
+    height: 72px;
+    border-radius: var(--panel-radius);
+    border: none;
+    background: #ffffff;
+    color: #000000;
+    font-size: 28px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: opacity 0.15s;
+  }
+  .filter-apply-btn:hover { opacity: 0.85; }
+  .filter-clear-btn {
+    flex: 1;
+    height: 72px;
+    border-radius: var(--panel-radius);
+    border: 1px solid var(--border-strong);
+    background: var(--bg-surface);
+    color: #ffffff;
+    font-size: 28px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: background 0.15s;
+  }
+  .filter-clear-btn:hover { background: var(--bg-surface-hover); }
 
   .name-editor-input {
     width: 100%;
@@ -2624,11 +2725,18 @@
     gap: var(--grid-gap);
     min-width: 0;
     align-items: center;
+    flex: 1;
   }
 
   .picker-setlist-nav {
     display: flex;
     justify-content: center;
+    gap: var(--grid-gap);
+  }
+
+  .picker-setlist-row {
+    display: flex;
+    align-items: center;
     gap: var(--grid-gap);
   }
 
@@ -2699,20 +2807,55 @@
     pointer-events: none;
   }
 
+  /* ── Picker Drag & Drop ──────────────────────── */
+  .picker-drag-ghost {
+    position: fixed;
+    width: 100px;
+    height: 100px;
+    border-radius: var(--panel-radius);
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.85;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 0 2px var(--pink);
+    transform: translate(-50%, -50%);
+  }
+  .picker-drag-ghost img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .picker-setlist-tile.dragging {
+    opacity: 0.3;
+    transition: opacity 0.15s;
+  }
+  .song-tile.dragging {
+    opacity: 0.3;
+    transition: opacity 0.15s;
+  }
+  .picker-setlist-tile.drop-target {
+    border-color: rgba(255,80,200,1);
+    box-shadow: 0 0 0 3px rgba(255,80,200,0.8), 0 0 30px rgba(255,80,200,0.7), 0 0 60px rgba(255,80,200,0.4);
+    background: rgba(255,80,200,0.55);
+  }
+
   .picker-filters {
     display: flex;
     gap: calc(var(--grid-gap) * 2);
     flex-shrink: 0;
     align-items: center;
+    padding: 8px 0;
+    overflow: visible;
   }
 
   .picker-filter {
     flex: 1;
     height: var(--nav-btn-h);
     border-radius: var(--panel-radius);
-    border: 1px solid var(--border-strong);
-    background: var(--bg-surface);
-    color: var(--text-primary);
+    border: 1px solid var(--btn-tab-border);
+    background: var(--btn-tab);
+    color: #ffffff;
     font-size: 28px;
     font-weight: 700;
     font-family: 'Inter', sans-serif;
@@ -2720,16 +2863,12 @@
     padding: 0 18px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-  }
-  .picker-filter-arrow {
-    font-size: 20px;
-    color: var(--text-muted);
-    margin-left: 8px;
+    justify-content: center;
   }
   .picker-filter.filter-active {
-    border-color: var(--pink);
-    box-shadow: 0 0 0 2px var(--pink-30);
+    background: var(--btn-primary);
+    border-color: var(--btn-primary-border);
+    box-shadow: 0 0 12px var(--btn-primary-glow);
   }
 
   /* ── Spaces Grid ─────────────────────────────────── */
@@ -8818,10 +8957,10 @@ button:focus,
         <div class="play-picker-body">
           <div class="picker-songs-col">
             <div class="picker-filters">
-              <button class="picker-filter" id="filter-genre-btn" onclick="openFilterPicker('genre')">All Genres <span class="picker-filter-arrow">&#9662;</span></button>
-              <button class="picker-filter" id="filter-decade-btn" onclick="openFilterPicker('decade')">All Decades <span class="picker-filter-arrow">&#9662;</span></button>
-              <button class="picker-filter" id="filter-duration-btn" onclick="openFilterPicker('duration')">Any Length <span class="picker-filter-arrow">&#9662;</span></button>
-              <button class="picker-filter" id="filter-sort-btn" onclick="openFilterPicker('sort')">Popularity <span class="picker-filter-arrow">&#9662;</span></button>
+              <button class="picker-filter" id="filter-genre-btn" onclick="openFilterPicker('genre')">All Genres</button>
+              <button class="picker-filter" id="filter-decade-btn" onclick="openFilterPicker('decade')">All Decades</button>
+              <button class="picker-filter" id="filter-duration-btn" onclick="openFilterPicker('duration')">Any Length</button>
+              <button class="picker-filter" id="filter-sort-btn" onclick="openFilterPicker('sort')">Popularity</button>
             </div>
             <div class="picker-grid-row">
               <div class="grid-viewport">
@@ -9836,13 +9975,10 @@ function updateSongCover(index, fileUrl) {
   if (!allSongs[index]) return;
   allSongs[index].file = fileUrl;
 
-  // Update the grid tile image directly (avoids full grid rebuild)
-  var pages = document.querySelectorAll('.grid-page');
-  var pageIdx = Math.floor(index / SONGS_PER_PAGE);
-  var tileIdx = index % SONGS_PER_PAGE;
-  if (pages[pageIdx]) {
-    var imgs = pages[pageIdx].querySelectorAll('.song-tile > img');
-    if (imgs[tileIdx]) imgs[tileIdx].src = fileUrl;
+  // Update every visible instance of this song tile directly.
+  var imgs = document.querySelectorAll('.song-tile[data-song-index="' + index + '"] > img');
+  for (var imgIdx = 0; imgIdx < imgs.length; imgIdx++) {
+    imgs[imgIdx].src = fileUrl;
   }
 
   // Update setlist entries that reference this song and refresh the solo panel
@@ -10030,19 +10166,73 @@ function navigateTo(pageName) {
 // ── Song Grid ──────────────────────────────────────────
 var currentPage = 0;
 var totalPages = 0;
-var SONGS_PER_PAGE = 20;
+var SONGS_PER_PAGE = 12;
 var pageHeight = 0;
+var GRID_COLUMNS = 4;
+var GRID_DEFAULT_ROWS = 3;
+var GRID_DEFAULT_STEP_ROWS = 2;
+
+function getGridGap() {
+  var page = document.querySelector('.grid-page');
+  if (page) return parseFloat(getComputedStyle(page).gap) || 0;
+  return parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--grid-gap')) || 0;
+}
+
+function getGridPagingMetrics() {
+  var viewport = document.querySelector('.grid-viewport');
+  var gap = getGridGap();
+  var pageRows = GRID_DEFAULT_ROWS;
+  var stepRows = GRID_DEFAULT_STEP_ROWS;
+
+  if (viewport && viewport.clientWidth && viewport.clientHeight) {
+    var tileSize = (viewport.clientWidth - gap * (GRID_COLUMNS - 1)) / GRID_COLUMNS;
+    var rowStride = tileSize + gap;
+    if (tileSize > 0 && rowStride > 0) {
+      var visibleRows = viewport.clientHeight / rowStride;
+      pageRows = Math.max(1, Math.ceil(visibleRows));
+      stepRows = Math.max(1, Math.floor(visibleRows));
+    }
+  }
+
+  if (pageRows > 1 && stepRows >= pageRows) stepRows = pageRows - 1;
+  if (stepRows < 1) stepRows = 1;
+
+  return {
+    gap: gap,
+    pageRows: pageRows,
+    stepRows: stepRows,
+    pageSize: pageRows * GRID_COLUMNS
+  };
+}
+
+function getRenderedGridPageHeight() {
+  var firstPage = document.querySelector('.grid-page');
+  if (!firstPage) return 0;
+
+  var measuredHeight = Math.ceil(firstPage.getBoundingClientRect().height);
+  if (measuredHeight > 0) return measuredHeight;
+
+  var measuredTile = firstPage.querySelector('.song-tile');
+  if (!measuredTile) return 0;
+
+  var gap = parseFloat(getComputedStyle(firstPage).gap) || 0;
+  return Math.ceil(3 * measuredTile.offsetHeight + 2 * gap);
+}
+
+function syncGridPageMetrics() {
+  pageHeight = getRenderedGridPageHeight();
+  if (!pageHeight) return 0;
+
+  var gridPages = document.querySelectorAll('.grid-page');
+  for (var i = 0; i < gridPages.length; i++) {
+    gridPages[i].style.height = pageHeight + 'px';
+  }
+
+  return pageHeight;
+}
 
 function buildNavButtons(container, id) {
   container.innerHTML = '';
-
-  // Top of list
-  var top = document.createElement('button');
-  top.className = 'grid-nav-btn';
-  top.innerHTML = '<span>&#9650;</span><span>&#9650;</span>';
-  top.onclick = function() { goToPage(0); };
-  top.id = id + '-top';
-  container.appendChild(top);
 
   // Up one page
   var prev = document.createElement('button');
@@ -10059,31 +10249,37 @@ function buildNavButtons(container, id) {
   next.onclick = function() { gridPage(1); };
   next.id = id + '-next';
   container.appendChild(next);
-
-  // Bottom of list
-  var bottom = document.createElement('button');
-  bottom.className = 'grid-nav-btn';
-  bottom.innerHTML = '<span>&#9660;</span><span>&#9660;</span>';
-  bottom.onclick = function() { goToPage(totalPages - 1); };
-  bottom.id = id + '-bottom';
-  container.appendChild(bottom);
 }
 
 function buildGrid(songs) {
   var track = document.getElementById('grid-track');
   track.innerHTML = '';
-  totalPages = Math.ceil(songs.length / SONGS_PER_PAGE);
+  var paging = getGridPagingMetrics();
+  SONGS_PER_PAGE = paging.pageSize;
+
+  var totalRows = Math.ceil(songs.length / GRID_COLUMNS);
+  var startRows = [];
+  if (totalRows > 0) {
+    for (var startRow = 0; startRow < totalRows; startRow += paging.stepRows) {
+      startRows.push(startRow);
+      if (startRow + paging.pageRows >= totalRows) break;
+    }
+  }
+  totalPages = startRows.length;
 
   for (var p = 0; p < totalPages; p++) {
     var page = document.createElement('div');
     page.className = 'grid-page';
-    var start = p * SONGS_PER_PAGE;
+    page.style.gridTemplateRows = 'repeat(' + paging.pageRows + ', auto)';
+    var start = startRows[p] * GRID_COLUMNS;
     var end = Math.min(start + SONGS_PER_PAGE, songs.length);
 
     for (var i = start; i < end; i++) {
       var song = songs[i];
       var tile = document.createElement('div');
       tile.className = 'song-tile';
+      tile.setAttribute('data-song-index', i);
+      tile._song = song;
       tile.onclick = (function(s) {
         return function() { selectPickerSong(s, this); };
       })(song);
@@ -10124,6 +10320,7 @@ function buildGrid(songs) {
 
 function goToPage(idx) {
   if (idx < 0 || idx >= totalPages) return;
+  if (!pageHeight) syncGridPageMetrics();
   currentPage = idx;
   document.getElementById('grid-track').style.transform = 'translateY(-' + (currentPage * pageHeight) + 'px)';
   updateNavState();
@@ -10136,14 +10333,10 @@ function updateNavState() {
   for (var n = 0; n < navs.length; n++) {
     var atTop = (currentPage === 0);
     var atBottom = (currentPage === totalPages - 1);
-    var top = navs[n].querySelector('[id$="-top"]');
     var prev = navs[n].querySelector('[id$="-prev"]');
     var next = navs[n].querySelector('[id$="-next"]');
-    var bottom = navs[n].querySelector('[id$="-bottom"]');
-    if (top) top.disabled = atTop;
     if (prev) prev.disabled = atTop;
     if (next) next.disabled = atBottom;
-    if (bottom) bottom.disabled = atBottom;
   }
 }
 
@@ -11983,7 +12176,15 @@ function selectPickerSong(song, tileEl) {
   pickerSelectedSong = song;
   var tiles = document.querySelectorAll('.song-tile');
   for (var i = 0; i < tiles.length; i++) tiles[i].classList.remove('active');
-  if (tileEl) tileEl.classList.add('active');
+  if (tileEl) {
+    var songIndex = tileEl.getAttribute('data-song-index');
+    if (songIndex != null) {
+      var matchingTiles = document.querySelectorAll('.song-tile[data-song-index="' + songIndex + '"]');
+      for (var mt = 0; mt < matchingTiles.length; mt++) matchingTiles[mt].classList.add('active');
+    } else {
+      tileEl.classList.add('active');
+    }
+  }
   buildLeaderboard();
 }
 
@@ -11999,26 +12200,51 @@ function addSongToSetlist(song) {
   syncSetlistToUnity();
 }
 
-var PICKER_SETLIST_SLOTS = 6;
+var PICKER_SETLIST_SLOTS = 4;
 var pickerSetlistPage = 0;
 
 function buildPickerSetlist() {
   var container = document.getElementById('picker-setlist-tiles');
   var nav = document.getElementById('picker-setlist-nav');
   if (!container) return;
+
+  // Build into a wrapper row: [left arrow] [tiles] [right arrow]
+  var parent = container.parentNode;
+  // Remove old row wrapper if present
+  var oldRow = parent.querySelector('.picker-setlist-row');
+  if (oldRow) parent.removeChild(oldRow);
+
   container.innerHTML = '';
   if (nav) nav.innerHTML = '';
+  container.style.display = 'none';
+
   var total = setlist.length;
   var maxPage = Math.max(0, Math.ceil(total / PICKER_SETLIST_SLOTS) - 1);
   if (pickerSetlistPage > maxPage) pickerSetlistPage = maxPage;
   var startIdx = pickerSetlistPage * PICKER_SETLIST_SLOTS;
-  var needsPaging = total > PICKER_SETLIST_SLOTS;
+
+  var row = document.createElement('div');
+  row.className = 'picker-setlist-row';
+
+  // Left arrow
+  var left = document.createElement('button');
+  left.className = 'picker-setlist-arrow';
+  left.innerHTML = '&#9664;';
+  left.disabled = total <= PICKER_SETLIST_SLOTS || pickerSetlistPage === 0;
+  left.onclick = function() { pickerSetlistPage--; buildPickerSetlist(); };
+  row.appendChild(left);
+
+  // Tiles container
+  var tilesWrap = document.createElement('div');
+  tilesWrap.className = 'picker-setlist-tiles';
+  tilesWrap.id = 'picker-setlist-tiles-inner';
 
   for (var i = 0; i < PICKER_SETLIST_SLOTS; i++) {
     var songIdx = startIdx + i;
     var tile = document.createElement('div');
     if (songIdx < total) {
       tile.className = 'picker-setlist-tile';
+      tile._setlistIdx = songIdx;
       tile.innerHTML =
         '<img src="' + setlist[songIdx].file + '" alt="">' +
         '<div class="picker-setlist-remove">&#10005;</div>';
@@ -12032,35 +12258,273 @@ function buildPickerSetlist() {
     } else {
       tile.className = 'picker-setlist-tile picker-setlist-empty';
     }
-    container.appendChild(tile);
+    tilesWrap.appendChild(tile);
+  }
+  row.appendChild(tilesWrap);
+
+  // Right arrow
+  var right = document.createElement('button');
+  right.className = 'picker-setlist-arrow';
+  right.innerHTML = '&#9654;';
+  right.disabled = total <= PICKER_SETLIST_SLOTS || pickerSetlistPage >= maxPage;
+  right.onclick = function() { pickerSetlistPage++; buildPickerSetlist(); };
+  row.appendChild(right);
+
+  parent.insertBefore(row, nav);
+}
+
+// ── Picker Drag & Drop ──────────────────────────────
+var pickerDragInited = false;
+var pickerDrag = {
+  active: false,
+  pending: false,
+  source: '',
+  song: null,
+  fromIdx: -1,
+  startX: 0,
+  startY: 0,
+  ghost: null,
+  indicator: null,
+  dropIdx: -1,
+  srcEl: null,
+  suppressClick: false
+};
+var PICKER_DRAG_THRESHOLD = 8;
+
+function initPickerDragDrop() {
+  if (pickerDragInited) return;
+  pickerDragInited = true;
+
+  var track = document.getElementById('grid-track');
+  var slParent = document.querySelector('.picker-setlist');
+
+  if (track) {
+    track.addEventListener('mousedown', function(e) {
+      pickerGridMousedown(e);
+    });
+    track.addEventListener('click', function(e) {
+      if (pickerDrag.suppressClick) {
+        e.stopPropagation();
+        e.preventDefault();
+        pickerDrag.suppressClick = false;
+      }
+    }, true);
   }
 
-  // Pagination arrows below tiles
-  if (needsPaging && nav) {
-    var left = document.createElement('button');
-    left.className = 'picker-setlist-arrow';
-    left.innerHTML = '&#9664;';
-    left.disabled = pickerSetlistPage === 0;
-    left.onclick = function() { pickerSetlistPage--; buildPickerSetlist(); };
-    nav.appendChild(left);
+  if (slParent) {
+    slParent.addEventListener('mousedown', function(e) {
+      pickerSlMousedown(e);
+    });
+    slParent.addEventListener('click', function(e) {
+      if (pickerDrag.suppressClick) {
+        e.stopPropagation();
+        e.preventDefault();
+        pickerDrag.suppressClick = false;
+      }
+    }, true);
+  }
 
-    var right = document.createElement('button');
-    right.className = 'picker-setlist-arrow';
-    right.innerHTML = '&#9654;';
-    right.disabled = pickerSetlistPage >= maxPage;
-    right.onclick = function() { pickerSetlistPage++; buildPickerSetlist(); };
-    nav.appendChild(right);
+  document.addEventListener('mousemove', function(e) {
+    pickerDragMove(e);
+  });
+  document.addEventListener('mouseup', function(e) {
+    pickerDragEnd(e);
+  });
+}
+
+function pickerGridMousedown(e) {
+  var el = e.target;
+  while (el && !el.classList.contains('song-tile')) {
+    if (el.classList.contains('song-tile-btn') || el.classList.contains('song-tile-actions')) return;
+    el = el.parentElement;
+  }
+  if (!el || !el._song) return;
+  e.preventDefault();
+
+  pickerDrag.pending = true;
+  pickerDrag.source = 'grid';
+  pickerDrag.song = el._song;
+  pickerDrag.fromIdx = -1;
+  pickerDrag.startX = e.clientX;
+  pickerDrag.startY = e.clientY;
+  pickerDrag.active = false;
+  pickerDrag.dropIdx = -1;
+  pickerDrag.srcEl = el;
+}
+
+function pickerSlMousedown(e) {
+  var el = e.target;
+  while (el && !el.classList.contains('picker-setlist-tile')) {
+    if (el.classList.contains('picker-setlist-remove')) return;
+    el = el.parentElement;
+  }
+  if (!el || el.classList.contains('picker-setlist-empty')) return;
+  if (typeof el._setlistIdx === 'undefined') return;
+  e.preventDefault();
+
+  pickerDrag.pending = true;
+  pickerDrag.source = 'setlist';
+  pickerDrag.song = setlist[el._setlistIdx];
+  pickerDrag.fromIdx = el._setlistIdx;
+  pickerDrag.startX = e.clientX;
+  pickerDrag.startY = e.clientY;
+  pickerDrag.active = false;
+  pickerDrag.dropIdx = -1;
+  pickerDrag.srcEl = el;
+}
+
+function pickerDragMove(e) {
+  if (!pickerDrag.pending && !pickerDrag.active) return;
+
+  var dx = e.clientX - pickerDrag.startX;
+  var dy = e.clientY - pickerDrag.startY;
+
+  if (pickerDrag.pending && !pickerDrag.active) {
+    if (Math.sqrt(dx * dx + dy * dy) < PICKER_DRAG_THRESHOLD) return;
+    pickerDrag.active = true;
+    pickerDrag.pending = false;
+
+    var ghost = document.createElement('div');
+    ghost.className = 'picker-drag-ghost';
+    var img = document.createElement('img');
+    img.src = pickerDrag.song.file || '';
+    ghost.appendChild(img);
+    document.body.appendChild(ghost);
+    pickerDrag.ghost = ghost;
+
+    if (pickerDrag.srcEl) {
+      pickerDrag.srcEl.classList.add('dragging');
+    }
+  }
+
+  if (!pickerDrag.active) return;
+
+  if (pickerDrag.ghost) {
+    pickerDrag.ghost.style.left = e.clientX + 'px';
+    pickerDrag.ghost.style.top = e.clientY + 'px';
+  }
+
+  pickerUpdateDrop(e);
+}
+
+function pickerUpdateDrop(e) {
+  var container = document.getElementById('picker-setlist-tiles-inner') || document.getElementById('picker-setlist-tiles');
+  if (!container) return;
+
+  var rect = container.getBoundingClientRect();
+  var inBounds = (
+    e.clientX >= rect.left - 20 && e.clientX <= rect.right + 20 &&
+    e.clientY >= rect.top - 40 && e.clientY <= rect.bottom + 40
+  );
+
+  if (!inBounds) {
+    pickerRemoveIndicator();
+    pickerDrag.dropIdx = -1;
+    return;
+  }
+
+  var tiles = container.querySelectorAll('.picker-setlist-tile');
+  var startIdx = pickerSetlistPage * PICKER_SETLIST_SLOTS;
+  var localDropIdx = 0;
+
+  for (var i = 0; i < tiles.length; i++) {
+    if (tiles[i].classList.contains('picker-setlist-empty')) break;
+    var tileRect = tiles[i].getBoundingClientRect();
+    var midX = tileRect.left + tileRect.width / 2;
+    if (e.clientX > midX) {
+      localDropIdx = i + 1;
+    }
+  }
+
+  var globalIdx = startIdx + localDropIdx;
+  if (globalIdx > setlist.length) globalIdx = setlist.length;
+
+  // For reorder, hide indicator when drop would be a no-op
+  if (pickerDrag.source === 'setlist') {
+    var from = pickerDrag.fromIdx;
+    if (globalIdx === from || globalIdx === from + 1) {
+      pickerRemoveIndicator();
+      pickerDrag.dropIdx = -1;
+      return;
+    }
+  }
+
+  pickerDrag.dropIdx = globalIdx;
+  pickerShowIndicator(container, tiles, localDropIdx);
+}
+
+function pickerShowIndicator(container, tiles, localIdx) {
+  pickerRemoveIndicator();
+  // Highlight the tile at the drop position
+  var targetIdx = localIdx;
+  if (targetIdx >= tiles.length) targetIdx = tiles.length - 1;
+  if (targetIdx >= 0 && tiles[targetIdx]) {
+    tiles[targetIdx].classList.add('drop-target');
   }
 }
 
+function pickerRemoveIndicator() {
+  var targets = document.querySelectorAll('.picker-setlist-tile.drop-target');
+  for (var i = 0; i < targets.length; i++) {
+    targets[i].classList.remove('drop-target');
+  }
+}
+
+function pickerDragEnd(e) {
+  if (!pickerDrag.active && !pickerDrag.pending) return;
+
+  if (pickerDrag.active) {
+    pickerDrag.suppressClick = true;
+    setTimeout(function() { pickerDrag.suppressClick = false; }, 100);
+
+    if (pickerDrag.dropIdx >= 0) {
+      var dropIdx = pickerDrag.dropIdx;
+
+      if (pickerDrag.source === 'grid') {
+        setlist.splice(dropIdx, 0, pickerDrag.song);
+      } else if (pickerDrag.source === 'setlist') {
+        var fromIdx = pickerDrag.fromIdx;
+        var song = setlist.splice(fromIdx, 1)[0];
+        if (dropIdx > fromIdx) dropIdx--;
+        setlist.splice(dropIdx, 0, song);
+      }
+
+      buildPickerSetlist();
+      buildPlayGrid();
+      syncSetlistToUnity();
+    }
+  }
+
+  pickerCleanupDrag();
+}
+
+function pickerCleanupDrag() {
+  if (pickerDrag.ghost && pickerDrag.ghost.parentNode) {
+    pickerDrag.ghost.parentNode.removeChild(pickerDrag.ghost);
+  }
+  pickerRemoveIndicator();
+
+  var dragging = document.querySelectorAll('.dragging');
+  for (var i = 0; i < dragging.length; i++) {
+    dragging[i].classList.remove('dragging');
+  }
+
+  pickerDrag.active = false;
+  pickerDrag.pending = false;
+  pickerDrag.ghost = null;
+  pickerDrag.song = null;
+  pickerDrag.source = '';
+  pickerDrag.fromIdx = -1;
+  pickerDrag.dropIdx = -1;
+  pickerDrag.srcEl = null;
+}
+
 function constrainGridNav() {
-  var tile = document.querySelector('.song-tile');
   var navEl = document.getElementById('grid-nav-right');
-  if (tile && navEl) {
-    var tileH = tile.offsetHeight;
-    var page = document.querySelector('.grid-page');
-    var gap = page ? parseFloat(getComputedStyle(page).gap) || 10 : 10;
-    var contentH = Math.ceil(4 * tileH + 3 * gap);
+  if (navEl) {
+    var viewport = document.querySelector('.grid-viewport');
+    var contentH = viewport ? viewport.clientHeight : (pageHeight || getRenderedGridPageHeight());
+    if (!contentH) return;
     navEl.style.maxHeight = contentH + 'px';
   }
 }
@@ -12069,23 +12533,19 @@ function showPlayPicker() {
   document.getElementById('play-main-layout').style.display = 'none';
   document.getElementById('play-picker').className = 'play-picker active';
   // Reset filters
-  pickerFilterGenre = '';
-  pickerFilterDecade = '';
+  pickerFilterGenres = [];
+  pickerFilterDecades = [];
   pickerFilterDuration = '';
   pickerFilterSort = 'rank';
   updateFilterButtons();
   pickerSetlistPage = 0;
-  // Rebuild grid with all songs
+  buildPickerSetlist();
+  // Lock the page step to the rendered page height so page-down never skips rows.
+  var gridNavs = document.querySelectorAll('.grid-nav');
+  for (var i = 0; i < gridNavs.length; i++) gridNavs[i].style.display = 'flex';
+  // Rebuild the grid after the picker layout has taken its final width and height.
   buildGrid(allSongs);
-  // Measure page height now that picker is visible
-  var vp = document.querySelector('.grid-viewport');
-  if (vp) {
-    pageHeight = vp.clientHeight;
-    var gridPages = document.querySelectorAll('.grid-page');
-    for (var i = 0; i < gridPages.length; i++) {
-      gridPages[i].style.height = pageHeight + 'px';
-    }
-  }
+  syncGridPageMetrics();
   constrainGridNav();
   currentPage = 0;
   goToPage(0);
@@ -12093,13 +12553,11 @@ function showPlayPicker() {
     buildNavButtons(document.getElementById('grid-nav-right'), 'right');
     updateNavState();
   }
-  var gridNavs = document.querySelectorAll('.grid-nav');
-  for (var i = 0; i < gridNavs.length; i++) gridNavs[i].style.display = 'flex';
   // Auto-select first song tile
   pickerSelectedSong = null;
   var firstTile = document.querySelector('.song-tile');
   if (firstTile) firstTile.click();
-  buildPickerSetlist();
+  initPickerDragDrop();
 }
 
 function hidePlayPicker() {
@@ -12136,8 +12594,8 @@ var songGenres = ['Pop','Hip-Hop','Rock','R&B','Country','Electronic','Latin','I
 var songDecades = ['2020s','2010s','2000s','90s','80s','Classic'];
 
 
-var pickerFilterGenre = '';
-var pickerFilterDecade = '';
+var pickerFilterGenres = [];
+var pickerFilterDecades = [];
 var pickerFilterDuration = '';
 var pickerFilterSort = 'rank';
 
@@ -12145,127 +12603,235 @@ var filterDefs = {
   genre: {
     title: 'Genre',
     btnId: 'filter-genre-btn',
+    multi: true,
+    allLabel: 'All Genres',
     items: [
-      {id: '', label: 'All Genres'},
-      {id: 'Pop', label: 'Pop'},
-      {id: 'Hip-Hop', label: 'Hip-Hop'},
-      {id: 'Rock', label: 'Rock'},
-      {id: 'R&B', label: 'R&B'},
-      {id: 'Country', label: 'Country'},
-      {id: 'Electronic', label: 'Electronic'},
-      {id: 'Latin', label: 'Latin'},
-      {id: 'Indie', label: 'Indie'}
+      {id: 'Pop',        label: 'Pop',        emoji: '\uD83C\uDFA4', bg: '#ec4899'},
+      {id: 'Hip-Hop',    label: 'Hip-Hop',    emoji: '\uD83C\uDFA7', bg: '#8b5cf6'},
+      {id: 'Rock',       label: 'Rock',       emoji: '\uD83C\uDFB8', bg: '#ef4444'},
+      {id: 'R&B',        label: 'R&B',        emoji: '\uD83D\uDC9C', bg: '#a855f7'},
+      {id: 'Country',    label: 'Country',    emoji: '\uD83E\uDD20', bg: '#d97706'},
+      {id: 'Electronic', label: 'Electronic', emoji: '\uD83D\uDD0A', bg: '#06b6d4'},
+      {id: 'Latin',      label: 'Latin',      emoji: '\uD83D\uDC83', bg: '#f97316'},
+      {id: 'Indie',      label: 'Indie',      emoji: '\uD83C\uDF3F', bg: '#22c55e'}
     ]
   },
   decade: {
     title: 'Decade',
     btnId: 'filter-decade-btn',
+    multi: true,
+    allLabel: 'All Decades',
     items: [
-      {id: '', label: 'All Decades'},
-      {id: '2020s', label: '2020s'},
-      {id: '2010s', label: '2010s'},
-      {id: '2000s', label: '2000s'},
-      {id: '90s', label: '90s'},
-      {id: '80s', label: '80s'},
-      {id: 'Classic', label: 'Classic'}
+      {id: '2020s',   label: '2020s',   emoji: '\uD83D\uDCF1', bg: '#8b5cf6'},
+      {id: '2010s',   label: '2010s',   emoji: '\uD83D\uDCF8', bg: '#ec4899'},
+      {id: '2000s',   label: '2000s',   emoji: '\uD83D\uDCBF', bg: '#06b6d4'},
+      {id: '90s',     label: '90s',     emoji: '\uD83D\uDCFC', bg: '#22c55e'},
+      {id: '80s',     label: '80s',     emoji: '\uD83D\uDD79', bg: '#f59e0b'},
+      {id: 'Classic', label: 'Classic', emoji: '\uD83C\uDFBB', bg: '#92400e'}
     ]
   },
   duration: {
     title: 'Song Length',
     btnId: 'filter-duration-btn',
+    multi: false,
+    allLabel: 'Any Length',
     items: [
-      {id: '', label: 'Any Length'},
-      {id: 'short', label: 'Under 3 min'},
-      {id: 'medium', label: '3\u20134 min'},
-      {id: 'long', label: 'Over 4 min'}
+      {id: '',       label: 'Any Length',   emoji: '\u23F1', bg: '#374151'},
+      {id: 'short',  label: 'Under 3 min', emoji: '\u26A1', bg: '#22c55e'},
+      {id: 'medium', label: '3\u20134 min', emoji: '\u23F3', bg: '#f59e0b'},
+      {id: 'long',   label: 'Over 4 min',  emoji: '\uD83C\uDFBC', bg: '#ef4444'}
     ]
   },
   sort: {
     title: 'Sort By',
     btnId: 'filter-sort-btn',
+    multi: false,
+    allLabel: 'Popularity',
     items: [
-      {id: 'rank', label: 'Popularity'},
-      {id: 'title', label: 'Title A\u2013Z'},
-      {id: 'artist', label: 'Artist A\u2013Z'},
-      {id: 'duration', label: 'Duration'},
-      {id: 'recent', label: 'Recently Added'}
+      {id: 'rank',     label: 'Popularity',     emoji: '\uD83D\uDD25', bg: '#ef4444'},
+      {id: 'title',    label: 'Title A\u2013Z',  emoji: '\uD83D\uDD24', bg: '#3b82f6'},
+      {id: 'artist',   label: 'Artist A\u2013Z', emoji: '\uD83D\uDC64', bg: '#8b5cf6'},
+      {id: 'duration', label: 'Duration',        emoji: '\u23F1',       bg: '#06b6d4'},
+      {id: 'recent',   label: 'New',             emoji: '\u2728',       bg: '#f59e0b'}
     ]
   }
 };
 
 function openFilterPicker(type) {
   var def = filterDefs[type];
-  var currentVal;
-  if (type === 'genre') currentVal = pickerFilterGenre;
-  else if (type === 'decade') currentVal = pickerFilterDecade;
-  else if (type === 'duration') currentVal = pickerFilterDuration;
-  else currentVal = pickerFilterSort;
-
   var overlay = document.getElementById('option-picker-overlay');
   var panel = document.getElementById('option-picker-panel');
   overlay.style.display = 'flex';
   panel.innerHTML = '';
+  panel.className = 'option-picker-panel filter-panel';
 
   var title = document.createElement('div');
   title.className = 'option-picker-title';
   title.textContent = def.title;
   panel.appendChild(title);
 
-  var choices = document.createElement('div');
-  choices.className = 'option-picker-choices';
+  var grid = document.createElement('div');
+  grid.className = 'filter-grid';
+
+  // Track local selections for multi-select
+  var localSel = [];
+  if (def.multi) {
+    if (type === 'genre') localSel = pickerFilterGenres.slice();
+    else localSel = pickerFilterDecades.slice();
+  }
+
   for (var i = 0; i < def.items.length; i++) {
     var item = def.items[i];
-    var choice = document.createElement('div');
-    choice.className = 'option-picker-choice' + (item.id === currentVal ? ' selected' : '');
-    choice.innerHTML =
-      '<div style="flex:1">' +
-        '<div class="option-picker-choice-label">' + item.label + '</div>' +
-      '</div>';
-    choice.onclick = (function(t, it) {
-      return function() {
-        if (t === 'genre') pickerFilterGenre = it.id;
-        else if (t === 'decade') pickerFilterDecade = it.id;
-        else if (t === 'duration') pickerFilterDuration = it.id;
-        else pickerFilterSort = it.id;
-        updateFilterButtons();
-        closeOptionPicker();
-        applyPickerFilters();
-      };
-    })(type, item);
-    choices.appendChild(choice);
+    var tile = document.createElement('div');
+    tile.className = 'filter-grid-tile';
+    tile.style.background = item.bg;
+
+    // Determine selected state
+    var isSelected = false;
+    if (def.multi) {
+      isSelected = localSel.indexOf(item.id) !== -1;
+    } else {
+      var curVal = (type === 'duration') ? pickerFilterDuration : pickerFilterSort;
+      isSelected = item.id === curVal;
+    }
+    if (isSelected) tile.className += ' selected';
+
+    tile.innerHTML =
+      '<div class="filter-tile-check">\u2713</div>' +
+      '<div class="filter-tile-emoji">' + item.emoji + '</div>' +
+      '<div class="filter-tile-label">' + item.label + '</div>';
+
+    if (def.multi) {
+      tile.onclick = (function(it, t) {
+        return function() {
+          var idx = localSel.indexOf(it.id);
+          if (idx === -1) {
+            localSel.push(it.id);
+          } else {
+            localSel.splice(idx, 1);
+          }
+          // Refresh selected state on all tiles
+          var tiles = grid.querySelectorAll('.filter-grid-tile');
+          for (var j = 0; j < tiles.length; j++) {
+            var tid = def.items[j].id;
+            if (localSel.indexOf(tid) !== -1) {
+              tiles[j].classList.add('selected');
+            } else {
+              tiles[j].classList.remove('selected');
+            }
+          }
+        };
+      })(item, type);
+    } else {
+      tile.onclick = (function(t, it) {
+        return function() {
+          if (t === 'duration') pickerFilterDuration = it.id;
+          else pickerFilterSort = it.id;
+          updateFilterButtons();
+          closeOptionPicker();
+          applyPickerFilters();
+        };
+      })(type, item);
+    }
+    grid.appendChild(tile);
   }
-  panel.appendChild(choices);
+  panel.appendChild(grid);
+
+  // Multi-select gets Apply / Clear buttons
+  if (def.multi) {
+    var actions = document.createElement('div');
+    actions.className = 'filter-actions';
+
+    var clearBtn = document.createElement('button');
+    clearBtn.className = 'filter-clear-btn';
+    clearBtn.textContent = 'Clear';
+    clearBtn.onclick = function() {
+      localSel.length = 0;
+      if (type === 'genre') pickerFilterGenres = [];
+      else pickerFilterDecades = [];
+      updateFilterButtons();
+      closeOptionPicker();
+      applyPickerFilters();
+    };
+
+    var applyBtn = document.createElement('button');
+    applyBtn.className = 'filter-apply-btn';
+    applyBtn.textContent = 'Apply';
+    applyBtn.onclick = function() {
+      if (type === 'genre') pickerFilterGenres = localSel.slice();
+      else pickerFilterDecades = localSel.slice();
+      updateFilterButtons();
+      closeOptionPicker();
+      applyPickerFilters();
+    };
+
+    actions.appendChild(clearBtn);
+    actions.appendChild(applyBtn);
+    panel.appendChild(actions);
+  }
 }
 
 function updateFilterButtons() {
-  var types = ['genre', 'decade', 'duration', 'sort'];
-  var vals = [pickerFilterGenre, pickerFilterDecade, pickerFilterDuration, pickerFilterSort];
-  for (var i = 0; i < types.length; i++) {
-    var def = filterDefs[types[i]];
-    var btn = document.getElementById(def.btnId);
-    if (!btn) continue;
-    var val = vals[i];
-    var label = '';
-    for (var j = 0; j < def.items.length; j++) {
-      if (def.items[j].id === val) { label = def.items[j].label; break; }
-    }
-    btn.innerHTML = label + ' <span class="picker-filter-arrow">&#9662;</span>';
-    if (val && types[i] !== 'sort') {
-      btn.className = 'picker-filter filter-active';
+  // Genre button
+  var genreBtn = document.getElementById('filter-genre-btn');
+  if (genreBtn) {
+    if (pickerFilterGenres.length === 0) {
+      genreBtn.textContent = 'All Genres';
+      genreBtn.className = 'picker-filter';
+    } else if (pickerFilterGenres.length === 1) {
+      genreBtn.textContent = pickerFilterGenres[0];
+      genreBtn.className = 'picker-filter filter-active';
     } else {
-      btn.className = 'picker-filter';
+      genreBtn.textContent = pickerFilterGenres[0] + ' +' + (pickerFilterGenres.length - 1);
+      genreBtn.className = 'picker-filter filter-active';
     }
+  }
+  // Decade button
+  var decadeBtn = document.getElementById('filter-decade-btn');
+  if (decadeBtn) {
+    if (pickerFilterDecades.length === 0) {
+      decadeBtn.textContent = 'All Decades';
+      decadeBtn.className = 'picker-filter';
+    } else if (pickerFilterDecades.length === 1) {
+      decadeBtn.textContent = pickerFilterDecades[0];
+      decadeBtn.className = 'picker-filter filter-active';
+    } else {
+      decadeBtn.textContent = pickerFilterDecades[0] + ' +' + (pickerFilterDecades.length - 1);
+      decadeBtn.className = 'picker-filter filter-active';
+    }
+  }
+  // Duration button
+  var durBtn = document.getElementById('filter-duration-btn');
+  if (durBtn) {
+    var durDef = filterDefs.duration;
+    var durLabel = durDef.allLabel;
+    for (var j = 0; j < durDef.items.length; j++) {
+      if (durDef.items[j].id === pickerFilterDuration) { durLabel = durDef.items[j].label; break; }
+    }
+    durBtn.textContent = durLabel;
+    durBtn.className = pickerFilterDuration ? 'picker-filter filter-active' : 'picker-filter';
+  }
+  // Sort button
+  var sortBtn = document.getElementById('filter-sort-btn');
+  if (sortBtn) {
+    var sortDef = filterDefs.sort;
+    var sortLabel = sortDef.allLabel;
+    for (var j = 0; j < sortDef.items.length; j++) {
+      if (sortDef.items[j].id === pickerFilterSort) { sortLabel = sortDef.items[j].label; break; }
+    }
+    sortBtn.textContent = sortLabel;
+    sortBtn.className = 'picker-filter';
   }
 }
 
 function applyPickerFilters() {
-  var genre = pickerFilterGenre;
-  var decade = pickerFilterDecade;
+  var genres = pickerFilterGenres;
+  var decades = pickerFilterDecades;
   var dur = pickerFilterDuration;
   var sort = pickerFilterSort;
   var filtered = allSongs.filter(function(s) {
-    if (genre && s.genre !== genre) return false;
-    if (decade && s.decade !== decade) return false;
+    if (genres.length > 0 && genres.indexOf(s.genre) === -1) return false;
+    if (decades.length > 0 && decades.indexOf(s.decade) === -1) return false;
     if (dur === 'short' && s.duration >= 180) return false;
     if (dur === 'medium' && (s.duration < 180 || s.duration > 240)) return false;
     if (dur === 'long' && s.duration <= 240) return false;
@@ -12283,13 +12849,8 @@ function applyPickerFilters() {
     filtered.sort(function(a, b) { return a.rank - b.rank; });
   }
   buildGrid(filtered);
-  // Re-measure page heights and reset
-  var vp = document.querySelector('.grid-viewport');
-  if (vp) {
-    pageHeight = vp.clientHeight;
-    var gridPages = document.querySelectorAll('.grid-page');
-    for (var i = 0; i < gridPages.length; i++) gridPages[i].style.height = pageHeight + 'px';
-  }
+  // Re-measure after the filtered layout changes so the next page step stays aligned.
+  syncGridPageMetrics();
   constrainGridNav();
   currentPage = 0;
   goToPage(0);
@@ -12385,6 +12946,20 @@ function buildSoloGrid(grid) {
     }
   }
 
+  // Track how many song tiles to determine the middle one
+  var songCount = 0;
+  for (var sc = 0; sc < showSlots.length; sc++) {
+    if (showSlots[sc].type === 'song') songCount++;
+  }
+  var songIdx = 0;
+  var middleSongIdx = Math.floor(songCount / 2);
+
+  // Add has-songs class and click handler to row if there are songs
+  if (songCount > 0) {
+    songsRow.className = 'play-grid-songs-row has-songs';
+    songsRow.onclick = function() { showPlayPicker(); };
+  }
+
   for (var sl = 0; sl < showSlots.length; sl++) {
     var slot = showSlots[sl];
     var tile = document.createElement('div');
@@ -12395,6 +12970,10 @@ function buildSoloGrid(grid) {
       var secs = (s.duration || 0) % 60;
       var dur = mins + ':' + (secs < 10 ? '0' : '') + secs;
       tile.style.position = 'relative';
+      var editLabel = '';
+      if (songIdx === middleSongIdx) {
+        editLabel = '<div class="play-grid-edit-label"><span>Edit Setlist</span></div>';
+      }
       tile.innerHTML =
         '<div class="play-grid-song-art">' +
           '<img src="' + (s.file || '') + '" alt="" style="' + (s.file ? '' : 'display:none') + '">' +
@@ -12405,17 +12984,8 @@ function buildSoloGrid(grid) {
           '<div class="song-artist">' + (s.artist || 'Unknown') + '</div>' +
           '<div class="song-meta">' + dur + '  &#183;  ' + (s.genre || '') + '  &#183;  ' + (s.bpm || '') + ' BPM</div>' +
         '</div>' +
-        '<div class="play-grid-song-actions">' +
-          '<button class="play-grid-song-action-btn song-action-replace" data-idx="' + slot.idx + '"><svg viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg></button>' +
-          '<button class="play-grid-song-action-btn song-action-remove" data-idx="' + slot.idx + '"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button>' +
-        '</div>';
-      // Bind action buttons
-      (function(idx) {
-        var replaceBtn = tile.querySelector('.song-action-replace');
-        var removeBtn = tile.querySelector('.song-action-remove');
-        if (replaceBtn) replaceBtn.onclick = function(e) { e.stopPropagation(); showPlayPicker(); };
-        if (removeBtn) removeBtn.onclick = function(e) { e.stopPropagation(); removeSoloSong(idx); };
-      })(slot.idx);
+        editLabel;
+      songIdx++;
     } else if (slot.type === 'add') {
       tile.style.border = '2px dashed rgba(255,255,255,0.25)';
       tile.style.background = 'rgba(255,255,255,0.04)';
@@ -12836,6 +13406,7 @@ function buildExpPickerContent(panel) {
 function closeOptionPicker() {
   document.getElementById('option-picker-overlay').style.display = 'none';
   var panel = document.getElementById('option-picker-panel');
+  panel.className = 'option-picker-panel';
   panel.style.width = '';
   panel.style.maxHeight = '';
 }
@@ -14978,10 +15549,24 @@ function parseMode() {
   // Load saved flags from localStorage (dev) or Vuplex (prod)
   onboardFlags = _loadOnboardFlags();
 
-  // ?step=N — set by C# WebViewPage enum
+  // ?step=N or ?step=name — set by C# WebViewPage enum or named slugs
   if ('step' in map) {
-    var stepNum = parseInt(map.step, 10);
-    if (!isNaN(stepNum)) currentStep = stepNum;
+    var stepNames = {legal: 1, perms: 2, tutorial: 3, menu: 4};
+    var stepNum = stepNames[map.step] || parseInt(map.step, 10);
+    if (!isNaN(stepNum)) {
+      currentStep = stepNum;
+      // Also set onboard flags so localStorage-based checks pass
+      var stepOrder = ['legal', 'perms_explainer', 'tutorial_play'];
+      for (var s = 0; s < stepOrder.length; s++) {
+        if (s < stepNum - 1) {
+          onboardFlags[stepOrder[s]] = true;
+        } else {
+          delete onboardFlags[stepOrder[s]];
+        }
+      }
+      if (onboardFlags.legal) onboardFlags.legal_version = LEGAL_VERSION;
+      _saveOnboardFlags();
+    }
   }
 
   // ?layout=N — override home grid layout (0-321, clamped after tilings generate)
