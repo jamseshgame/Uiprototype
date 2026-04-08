@@ -2,7 +2,21 @@
 
 Single-file HTML/CSS/JS UI prototype for **Jamsesh**, a VR music rhythm game running inside Vuplex WebView on Meta Quest headsets. Fixed 1920x1920 pixel viewport.
 
-## Changelog (2026-04-01)
+## Changelog
+
+### 2026-04-09
+
+- **Song picker grid overhaul** — changed from 5-column to 4-column layout with CSS `padding-top: 100%` aspect ratio (replaces unsupported `aspect-ratio`). Absolute-positioned cover images with improved text shadows
+- **Emoji filter tiles** — filter popups replaced with colourful emoji-based grid tiles. Genre and Decade are now multi-select with Apply/Clear buttons; Duration and Sort remain single-select
+- **Drag-and-drop setlist** — drag songs from the picker grid into setlist slots, reorder setlist tiles by dragging, or drag tiles out to remove. Visual ghost + drop-target highlights
+- **Row-level "Edit Setlist"** — solo play grid no longer shows per-tile replace/remove buttons. Hovering the songs row darkens all tiles and shows a centered "Edit Setlist" label; clicking opens the picker
+- **Setlist picker arrows** — horizontal left/right arrows replace the old nav section; 4 visible slots (down from 6)
+- **Dynamic grid pagination** — row-based paging with computed metrics (`getGridPagingMetrics`, `syncGridPageMetrics`). Step size adapts to visible rows so page-down never skips content
+- **CSS variable buttons** — button/tab borders now use `--btn-tab` and `--btn-tab-border` variables instead of hardcoded values
+- **Named step routing** — `?step=` URL param now accepts named slugs (`legal`, `perms`, `tutorial`, `menu`) and auto-sets onboard flags for all prior steps
+- **Song cover sync** — `updateSongCover()` now uses `data-song-index` attributes to update all visible instances of a song tile simultaneously
+
+### 2026-04-01
 
 - **Per-page colour themes** — each tab has its own gradient background, wave/particle colours (Home=purple, Social=green, Spaces=blue, Play=cyan, Creator=amber, Store=pink, Season=gold, Profile=purple)
 - **Page-aware buttons** — all buttons use CSS variables that auto-adapt to each page's accent colour. Zero grey buttons across entire UI
