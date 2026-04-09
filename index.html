@@ -13008,13 +13008,19 @@ function buildSoloGrid(grid) {
     pageSongs.push(setlist[si]);
   }
 
-  // Always 3 slots: songs first, then add tiles to fill
+  // Layout: 1 song → [empty, song, add]; otherwise songs then add tiles
   var showSlots = [];
-  for (var si2 = 0; si2 < pageSongs.length; si2++) {
-    showSlots.push({type: 'song', song: pageSongs[si2], idx: start + si2});
-  }
-  for (var fi = pageSongs.length; fi < SOLO_SONGS_PER_PAGE; fi++) {
+  if (pageSongs.length === 1) {
+    showSlots.push({type: 'empty'});
+    showSlots.push({type: 'song', song: pageSongs[0], idx: start});
     showSlots.push({type: 'add'});
+  } else {
+    for (var si2 = 0; si2 < pageSongs.length; si2++) {
+      showSlots.push({type: 'song', song: pageSongs[si2], idx: start + si2});
+    }
+    for (var fi = pageSongs.length; fi < SOLO_SONGS_PER_PAGE; fi++) {
+      showSlots.push({type: 'add'});
+    }
   }
 
   var songCount = 0;
@@ -13068,6 +13074,11 @@ function buildSoloGrid(grid) {
           '<div style="font-size:72px;color:#ffffff;font-weight:300;line-height:1">+</div>' +
           '<div style="font-size:28px;font-weight:700;color:rgba(255,255,255,0.7)">Add Song</div>' +
         '</div>';
+    } else if (slot.type === 'empty') {
+      tile.style.background = 'transparent';
+      tile.style.border = 'none';
+      tile.style.pointerEvents = 'none';
+      tile.innerHTML = '<div style="padding-top:100%"></div>';
     }
     songsRow.appendChild(tile);
   }
