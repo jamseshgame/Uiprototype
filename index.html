@@ -346,13 +346,13 @@
   /* Front face — pick image */
   .coin-front {
     transform: translateZ(3px);
-    background: url('JamPick.png') center center / contain no-repeat;
+    background: url('branding/JamPick.png') center center / contain no-repeat;
     filter: drop-shadow(0 2px 6px rgba(0,0,0,0.4));
   }
   /* Back face — pick image mirrored */
   .coin-back {
     transform: rotateY(180deg) translateZ(3px);
-    background: url('JamPick.png') center center / contain no-repeat;
+    background: url('branding/JamPick.png') center center / contain no-repeat;
     filter: drop-shadow(0 2px 6px rgba(0,0,0,0.4));
   }
   /* Edge slices — thin purple strip matching the pick border */
@@ -1165,6 +1165,7 @@
     cursor: pointer;
     display: flex;
     flex-direction: column;
+    position: relative;
     transition: background 0.15s, box-shadow 0.2s, border-color 0.2s;
     border: 1px solid var(--btn-panel-border);
   }
@@ -1201,6 +1202,84 @@
     align-items: center;
     justify-content: center;
   }
+  /* Jamsesh signature texture — derived from JamPick */
+  .jamsesh-signature {
+    background:
+      repeating-linear-gradient(
+        -55deg,
+        rgba(255,255,255,0.06) 0px,
+        rgba(255,255,255,0.06) 12px,
+        transparent 12px,
+        transparent 24px
+      ),
+      linear-gradient(135deg, #6b21a8 0%, #7c3aed 25%, #4f46e5 50%, #2563eb 75%, #0ea5e9 100%) !important;
+    border-color: rgba(0,224,255,0.5) !important;
+    color: #ffffff !important;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    box-shadow:
+      0 0 0 1px rgba(0,224,255,0.3),
+      0 0 20px rgba(124,58,237,0.4),
+      inset 0 1px 0 rgba(255,255,255,0.15);
+  }
+
+  .play-start-attract {
+    animation: playNudge 8s ease-in-out infinite;
+  }
+  .play-start-attract:active {
+    animation: none;
+  }
+  .play-grid-song.active-song {
+    box-shadow: 0 0 0 3px #ffffff, 0 0 16px rgba(255,255,255,0.4);
+  }
+  .song-badges {
+    position: absolute;
+    bottom: 12px;
+    left: 12px;
+    z-index: 3;
+    display: flex;
+    gap: 6px;
+  }
+  .song-badge {
+    background: rgba(0,0,0,0.7);
+    border-radius: 10px;
+    padding: 6px 14px;
+    font-size: 18px;
+    font-weight: 700;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .song-badge svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+  }
+  .song-remove-btn {
+    position: absolute;
+    bottom: 16px;
+    right: 16px;
+    z-index: 3;
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(0,0,0,0.6);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  .play-grid-song:hover .song-remove-btn,
+  .play-grid-song:active .song-remove-btn {
+    opacity: 1;
+  }
+  .song-remove-btn:active {
+    background: rgba(255,0,0,0.3);
+  }
   .play-grid-song-info {
     padding: 16px;
     display: flex;
@@ -1208,68 +1287,34 @@
     gap: 4px;
   }
   .play-grid-song-info .song-title {
-    font-size: 22px;
-    font-weight: 700;
+    font-size: 26px;
+    font-weight: 800;
     color: #ffffff;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.8);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
   .play-grid-song-info .song-artist {
-    font-size: 18px;
-    color: #aaaaaa;
+    font-size: 20px;
+    color: rgba(255,255,255,0.8);
+    text-shadow: 0 1px 4px rgba(0,0,0,0.8);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
   .play-grid-song-info .song-meta {
     font-size: 16px;
-    color: #666666;
+    color: rgba(255,255,255,0.55);
+    text-shadow: 0 1px 4px rgba(0,0,0,0.8);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
-  /* Songs row hover — darken all tiles together */
-  .play-grid-songs-row.has-songs {
-    cursor: pointer;
-  }
+  /* Individual song tile hover */
   .play-grid-songs-row.has-songs .play-grid-song {
     position: relative;
-  }
-  .play-grid-songs-row.has-songs .play-grid-song::after {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0);
-    border-radius: var(--panel-radius);
-    transition: background 0.2s;
-    z-index: 4;
-    pointer-events: none;
-  }
-  .play-grid-songs-row.has-songs:hover .play-grid-song::after {
-    background: rgba(0,0,0,0.55);
-  }
-  .play-grid-edit-label {
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 5;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.2s;
-  }
-  .play-grid-songs-row.has-songs:hover .play-grid-edit-label {
-    opacity: 1;
-  }
-  .play-grid-edit-label span {
-    font-size: 32px;
-    font-weight: 800;
-    color: #ffffff;
-    text-align: center;
-    text-shadow: 0 2px 12px rgba(0,0,0,0.6);
   }
 
   .play-grid-option {
@@ -1279,7 +1324,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 4px;
     cursor: pointer;
     transition: background 0.15s, box-shadow 0.2s, border-color 0.2s;
     border: 1px solid var(--btn-panel-border);
@@ -1290,17 +1335,17 @@
     box-shadow: 0 0 12px var(--btn-primary-glow);
   }
   .play-grid-option svg {
-    width: 48px;
-    height: 48px;
+    width: 36px;
+    height: 36px;
     fill: #ffffff;
   }
   .play-grid-option-label {
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 700;
     color: #aaaaaa;
   }
   .play-grid-option-value {
-    font-size: 28px;
+    font-size: 24px;
     font-weight: 700;
     color: #ffffff;
   }
@@ -1317,12 +1362,12 @@
   .play-grid-songs-row {
     display: flex;
     gap: 24px;
-    flex: 1;
-    min-height: 0;
+    flex-shrink: 0;
   }
   .play-grid-songs-row .play-grid-song {
     flex: 1;
     min-width: 0;
+    align-self: flex-start;
   }
   .play-grid-pagination {
     display: flex;
@@ -1376,8 +1421,8 @@
   .play-grid-options-row {
     display: flex;
     gap: 24px;
-    flex-shrink: 0;
-    height: 160px;
+    flex: 2;
+    min-height: 0;
   }
   .play-grid-options-row .play-grid-option {
     flex: 1;
@@ -7402,7 +7447,7 @@
 
   /* ── Meta Store Page (demo only) ── */
   .meta-store-screen {
-    background: url('large-crowd-celebrates-music-festival-concert-people-enjoy-show-stadium-confetti-night-atmosphere-silhouettes-raise-hands-385686498.webp') center center / cover no-repeat;
+    background: url('demo/meta-store-bg.webp') center center / cover no-repeat;
     justify-content: center;
     align-items: center;
     padding: 0;
@@ -7644,7 +7689,7 @@
 
   /* ── Quest Home Screen (demo only) ── */
   .quest-home {
-    background: #1a1a2e url('Immersive-Home-ef80975639e678b3.webp') center center / cover no-repeat;
+    background: #1a1a2e url('demo/quest-home-bg.webp') center center / cover no-repeat;
     justify-content: center;
     padding: 0;
   }
@@ -8558,11 +8603,18 @@
 
 /* click bounce */
 
-.home-grid > *:active,
-.play-grid > *:active {
+.home-grid > *:active {
 
   transform: scale(.95);
 
+}
+.play-grid-options-row:active,
+.play-grid-pagination:active,
+.play-go-btn:active {
+  transform: scale(.95);
+}
+.play-grid-song:active {
+  transform: scale(.95);
 }
 
 
@@ -8699,7 +8751,7 @@ button:focus,
       <span class="meta-store-nav-item">Wishlist</span>
       <span class="meta-store-nav-right">
         <span>&#128269; Search</span>
-        <span class="meta-store-nav-avatar"><img src="rael_new.png" alt=""></span>
+        <span class="meta-store-nav-avatar"><img src="avatars/rael_new.png" alt=""></span>
         <span>&#8942;</span>
       </span>
     </div>
@@ -8720,9 +8772,9 @@ button:focus,
           </div>
           <div class="meta-store-owners">
             <div class="meta-store-owner-avatars">
-              <span><img src="rael_new.png" alt=""></span>
-              <span><img src="jooleeno.jpg" alt=""></span>
-              <span><img src="ted.png" alt=""></span>
+              <span><img src="avatars/rael_new.png" alt=""></span>
+              <span><img src="avatars/jooleeno.jpg" alt=""></span>
+              <span><img src="avatars/ted.png" alt=""></span>
             </div>
             <span class="meta-store-owners-text">4 own this</span>
           </div>
@@ -8806,7 +8858,7 @@ button:focus,
         <div class="quest-icon-label">Asgard's Wrath 2</div>
       </div>
       <div class="quest-icon clickable" onclick="onboardAdvance('quest')">
-        <div class="quest-icon-tile" style="background:linear-gradient(135deg,#c0206a,#e91e90)"><img src="Logo (1080 x 1080 px).png" alt="Jamsesh"></div>
+        <div class="quest-icon-tile" style="background:linear-gradient(135deg,#c0206a,#e91e90)"><img src="branding/Logo (1080 x 1080 px).png" alt="Jamsesh"></div>
         <div class="quest-icon-label">Jamsesh</div>
       </div>
     </div>
@@ -8815,7 +8867,7 @@ button:focus,
 
 <!-- ══════════════ ONBOARDING: Boot Splash (demo only) ══════════════ -->
 <div class="onboard-screen boot-splash hidden" id="onboard-boot" onclick="onboardAdvance('boot')">
-  <img class="boot-logo" src="Logo (1080 x 1080 px).png" alt="Jamsesh Logo">
+  <img class="boot-logo" src="branding/Logo (1080 x 1080 px).png" alt="Jamsesh Logo">
 </div>
 
 <!-- ══════════════ ONBOARDING: Legal Agreement ══════════════ -->
@@ -8904,7 +8956,7 @@ button:focus,
 <header class="topbar" onclick="navigateTo('career')" style="cursor:pointer">
     <div class="topbar-main">
       <div class="profile-avatar">
-        <img src="rael_new.png" alt="Rael">
+        <img src="avatars/rael_new.png" alt="Rael">
       </div>
       <div class="profile-info">
         <div class="profile-name">Rael</div>
@@ -8991,15 +9043,15 @@ button:focus,
       <div id="career-main" style="display:flex;flex-direction:column;flex:1;min-height:0">
         <div class="career-grid">
           <div class="career-btn career-btn-name" style="grid-column:1;grid-row:1;position:relative;overflow:hidden" onclick="openNameEditor()"><div class="career-btn-neon-name" id="career-neon-name">Rael</div><div class="career-btn-banner">Name<div class="career-btn-sub">Change your username</div></div></div>
-          <div class="career-btn career-btn-picture" style="grid-column:2;grid-row:1;overflow:hidden;position:relative"><div class="career-btn-picture-wrap"><img src="rael_new.png" alt=""></div><div class="career-btn-banner">Picture<div class="career-btn-sub">Change your profile picture</div></div></div>
-          <div class="career-btn career-btn-avatar" style="grid-column:3;grid-row:1" onclick="showAvatarSection()"><img class="career-btn-avatar-img" src="AR_Glasses.png" alt=""><div class="career-btn-banner">Avatar<div class="career-btn-sub">Customise your avatar</div></div></div>
-          <div class="career-btn career-btn-news" style="grid-column:1;grid-row:2;position:relative;overflow:hidden" onclick="navigateTo('career')"><img class="career-btn-news-img" src="Gemini_Generated_Image_lj9j18lj9j18lj9j.jfif" alt=""><div class="career-btn-banner">News<div class="career-btn-sub">Update v0.25 — New battle mode added!</div></div></div>
+          <div class="career-btn career-btn-picture" style="grid-column:2;grid-row:1;overflow:hidden;position:relative"><div class="career-btn-picture-wrap"><img src="avatars/rael_new.png" alt=""></div><div class="career-btn-banner">Picture<div class="career-btn-sub">Change your profile picture</div></div></div>
+          <div class="career-btn career-btn-avatar" style="grid-column:3;grid-row:1" onclick="showAvatarSection()"><img class="career-btn-avatar-img" src="branding/AR_Glasses.png" alt=""><div class="career-btn-banner">Avatar<div class="career-btn-sub">Customise your avatar</div></div></div>
+          <div class="career-btn career-btn-news" style="grid-column:1;grid-row:2;position:relative;overflow:hidden" onclick="navigateTo('career')"><img class="career-btn-news-img" src="branding/news-banner.jfif" alt=""><div class="career-btn-banner">News<div class="career-btn-sub">Update v0.25 — New battle mode added!</div></div></div>
           <div class="career-btn" style="grid-column:2;grid-row:2;position:relative;overflow:hidden">
-            <div class="home-tile-avatar" style="width:160px;height:160px;left:10%;top:8%;animation-duration:9s;animation-delay:0s"><img src="rael_new.png" alt=""></div>
-            <div class="home-tile-avatar" style="width:120px;height:120px;left:60%;top:5%;animation-duration:11s;animation-delay:-2s"><img src="jooleeno.jpg" alt=""></div>
-            <div class="home-tile-avatar" style="width:140px;height:140px;left:50%;top:45%;animation-duration:8s;animation-delay:-4s"><img src="ted.png" alt=""></div>
-            <div class="home-tile-avatar" style="width:110px;height:110px;left:15%;top:50%;animation-duration:10s;animation-delay:-6s"><img src="abbie.png" alt=""></div>
-            <div class="home-tile-avatar" style="width:130px;height:130px;left:70%;top:55%;animation-duration:12s;animation-delay:-3s"><img src="arthen.jpg" alt=""></div>
+            <div class="home-tile-avatar" style="width:160px;height:160px;left:10%;top:8%;animation-duration:9s;animation-delay:0s"><img src="avatars/rael_new.png" alt=""></div>
+            <div class="home-tile-avatar" style="width:120px;height:120px;left:60%;top:5%;animation-duration:11s;animation-delay:-2s"><img src="avatars/jooleeno.jpg" alt=""></div>
+            <div class="home-tile-avatar" style="width:140px;height:140px;left:50%;top:45%;animation-duration:8s;animation-delay:-4s"><img src="avatars/ted.png" alt=""></div>
+            <div class="home-tile-avatar" style="width:110px;height:110px;left:15%;top:50%;animation-duration:10s;animation-delay:-6s"><img src="avatars/abbie.png" alt=""></div>
+            <div class="home-tile-avatar" style="width:130px;height:130px;left:70%;top:55%;animation-duration:12s;animation-delay:-3s"><img src="avatars/arthen.jpg" alt=""></div>
             <div class="career-btn-banner">Credits<div class="career-btn-sub">Meet the team</div></div>
           </div>
           <div class="career-btn" style="grid-column:3;grid-row:2;position:relative;overflow:hidden;cursor:default;pointer-events:none">
@@ -9692,10 +9744,10 @@ button:focus,
 </div>
 
 <!-- ══════════════ TUTORIAL GAMEPLAY (demo only) ══════════════ -->
-<div class="game-screen" id="screen-tutorial-1" style="background:#000 url('fretslide1.png') center center / cover no-repeat;cursor:pointer" onclick="tutorialAdvance(1)">
+<div class="game-screen" id="screen-tutorial-1" style="background:#000 url('tutorial/fretslide1.png') center center / cover no-repeat;cursor:pointer" onclick="tutorialAdvance(1)">
   <div id="tutorial-caption-1" style="position:absolute;bottom:120px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.75);border-radius:var(--panel-radius);padding:32px 56px;max-width:1600px;text-align:center;font-size:32px;font-weight:600;color:#ffffff;line-height:1.5">Welcome to Jamsesh Guitar Basics! We are going to get you full streaking every song in no time. I will take you through every step. Look down and move your left hand up and down the fret 3 times.</div>
 </div>
-<div class="game-screen" id="screen-tutorial-2" style="background:#000 url('fretslide2.png') center center / cover no-repeat;cursor:pointer" onclick="tutorialAdvance(2)">
+<div class="game-screen" id="screen-tutorial-2" style="background:#000 url('tutorial/fretslide2.png') center center / cover no-repeat;cursor:pointer" onclick="tutorialAdvance(2)">
   <div style="position:absolute;bottom:120px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.75);border-radius:var(--panel-radius);padding:32px 56px;max-width:1600px;text-align:center;font-size:32px;font-weight:600;color:#ffffff;line-height:1.5">Great work! Now strum the pick across the strings. Tap anywhere to continue.</div>
 </div>
 
@@ -9806,7 +9858,7 @@ button:focus,
           </div>
           <div class="results-lb-entry highlight">
             <div class="results-lb-rank">4</div>
-            <div class="results-lb-avatar"><img src="rael_new.png" alt=""></div>
+            <div class="results-lb-avatar"><img src="avatars/rael_new.png" alt=""></div>
             <div class="results-lb-info"><div class="results-lb-name">Rael</div><div class="results-lb-score-val">987,654</div></div>
           </div>
           <div class="results-lb-entry">
@@ -9849,7 +9901,7 @@ button:focus,
       <!-- Top-left: Jamsesh Picks -->
       <div class="rewards-cell">
         <div class="col-title">Jamsesh Picks</div>
-        <div class="rewards-pick-icon"><img src="JamPick.png" alt="Pick"></div>
+        <div class="rewards-pick-icon"><img src="branding/JamPick.png" alt="Pick"></div>
         <div class="rewards-earned-label">Earned</div>
         <div class="rewards-earned-value">+1,250</div>
       </div>
@@ -10437,10 +10489,10 @@ function buildSocialPage() {
   friendsWrap.className = 'friends-list-wrap';
   // PLAYFAB HOOKUP: Replace with data from Unity via sendToUnity('getFriends') / updateFriends message
   var friends = [
-    { name: 'Jooleeno', online: true, avatar: 'jooleeno.jpg' },
-    { name: 'Ted', online: true, avatar: 'ted.png' },
-    { name: 'Abbie', online: true, avatar: 'abbie.png' },
-    { name: 'Arthen', online: false, avatar: 'arthen.jpg' },
+    { name: 'Jooleeno', online: true, avatar: 'avatars/jooleeno.jpg' },
+    { name: 'Ted', online: true, avatar: 'avatars/ted.png' },
+    { name: 'Abbie', online: true, avatar: 'avatars/abbie.png' },
+    { name: 'Arthen', online: false, avatar: 'avatars/arthen.jpg' },
     { name: 'xShadowPick', online: true, avatar: 'avatars/placeholder-9.png' },
     { name: 'MelodyQueen', online: false, avatar: 'avatars/placeholder-25.png' },
     { name: 'BeatDropper99', online: false, avatar: 'avatars/placeholder-44.png' },
@@ -10486,14 +10538,14 @@ function buildSpacesGrid() {
 
   // PLAYFAB HOOKUP: Replace with data from Unity via sendToUnity('getHubs') / updateHubs message
   var hubs = [
-    { name: '18+ Only', count: '18/25', img: 'social.png' },
-    { name: 'Swifties', count: '22/25', img: 'stage.png' },
-    { name: 'K-Pop Zone', count: '25/25', img: 'lobby.png' },
-    { name: 'Jamsesh Hub', count: '8/25', img: 'social.png' },
-    { name: 'Rock Legends', count: '15/25', img: 'stage.png' },
-    { name: 'Indie Corner', count: '6/25', img: 'lobby.png' },
-    { name: 'Hip-Hop Lounge', count: '19/25', img: 'social.png' },
-    { name: 'Metal Pit', count: '12/25', img: 'stage.png' }
+    { name: '18+ Only', count: '18/25', img: 'spaces/social.png' },
+    { name: 'Swifties', count: '22/25', img: 'spaces/stage.png' },
+    { name: 'K-Pop Zone', count: '25/25', img: 'spaces/lobby.png' },
+    { name: 'Jamsesh Hub', count: '8/25', img: 'spaces/social.png' },
+    { name: 'Rock Legends', count: '15/25', img: 'spaces/stage.png' },
+    { name: 'Indie Corner', count: '6/25', img: 'spaces/lobby.png' },
+    { name: 'Hip-Hop Lounge', count: '19/25', img: 'spaces/social.png' },
+    { name: 'Metal Pit', count: '12/25', img: 'spaces/stage.png' }
   ];
   for (var i = 0; i < hubs.length; i++) {
     var h = hubs[i];
@@ -10526,9 +10578,9 @@ function buildSpacesGrid() {
   privGrid.appendChild(createPriv);
 
   var spaceItems = [
-    { name: 'Stage', desc: 'Perform live on stage', img: 'stage.png' },
-    { name: 'Social Hub', desc: 'Hang out with friends', img: 'social.png' },
-    { name: 'Pre-Song Lobby', desc: 'Warm up before you play', img: 'lobby.png' }
+    { name: 'Stage', desc: 'Perform live on stage', img: 'spaces/stage.png' },
+    { name: 'Social Hub', desc: 'Hang out with friends', img: 'spaces/social.png' },
+    { name: 'Pre-Song Lobby', desc: 'Warm up before you play', img: 'spaces/lobby.png' }
   ];
   for (var i = 0; i < spaceItems.length; i++) {
     var s = spaceItems[i];
@@ -10565,10 +10617,10 @@ var groupLogoOptions = [
 ];
 
 var availableFriends = [
-  { name: 'Jooleeno', avatar: 'jooleeno.jpg' },
-  { name: 'Ted', avatar: 'ted.png' },
-  { name: 'Abbie', avatar: 'abbie.png' },
-  { name: 'Arthen', avatar: 'arthen.jpg' },
+  { name: 'Jooleeno', avatar: 'avatars/jooleeno.jpg' },
+  { name: 'Ted', avatar: 'avatars/ted.png' },
+  { name: 'Abbie', avatar: 'avatars/abbie.png' },
+  { name: 'Arthen', avatar: 'avatars/arthen.jpg' },
   { name: 'xShadowPick', avatar: 'avatars/placeholder-9.png' },
   { name: 'MelodyQueen', avatar: 'avatars/placeholder-25.png' },
   { name: 'BeatDropper99', avatar: 'avatars/placeholder-44.png' },
@@ -10699,15 +10751,15 @@ var createSpaceType = 'public';
 var createSpaceEnv = '';
 
 var spaceEnvironments = [
-  { id: 'stage',      name: 'Stage',       img: 'stage.png' },
-  { id: 'social-hub', name: 'Social Hub',  img: 'social.png' },
-  { id: 'lobby',      name: 'Lobby',       img: 'lobby.png' },
-  { id: 'arena',      name: 'Arena',       img: 'stage.png' },
-  { id: 'beach',      name: 'Beach',       img: 'social.png' },
-  { id: 'forest',     name: 'Forest',      img: 'lobby.png' },
-  { id: 'rooftop',    name: 'Rooftop',     img: 'stage.png' },
-  { id: 'studio',     name: 'Studio',      img: 'social.png' },
-  { id: 'stadium',    name: 'Stadium',     img: 'lobby.png' }
+  { id: 'stage',      name: 'Stage',       img: 'spaces/stage.png' },
+  { id: 'social-hub', name: 'Social Hub',  img: 'spaces/social.png' },
+  { id: 'lobby',      name: 'Lobby',       img: 'spaces/lobby.png' },
+  { id: 'arena',      name: 'Arena',       img: 'spaces/stage.png' },
+  { id: 'beach',      name: 'Beach',       img: 'spaces/social.png' },
+  { id: 'forest',     name: 'Forest',      img: 'spaces/lobby.png' },
+  { id: 'rooftop',    name: 'Rooftop',     img: 'spaces/stage.png' },
+  { id: 'studio',     name: 'Studio',      img: 'spaces/social.png' },
+  { id: 'stadium',    name: 'Stadium',     img: 'spaces/lobby.png' }
 ];
 
 function openCreateSpace(type) {
@@ -10780,6 +10832,7 @@ var playMode = 'solo';
 var songInstruments = {};
 var songDiffs = {};
 var songSpaces = {};
+var activeSongIdx = 0;
 var savedSetlists = [];
 var setlistCounter = 1;
 var defaultIconStyle = 'position:absolute;bottom:0;right:0;height:80%;filter:brightness(0.3);pointer-events:none;object-fit:contain';
@@ -10815,10 +10868,9 @@ var spaceDefaults = {stage:'classic', environment:'city', crowd:'packed', effect
 
 var instruments = [
   {id:'guitar', label:'Guitar', bg:'#1d4ed8', desc:'Lead melodies and riffs', icon:'instruments/guitar.png', iconStyle:'position:absolute;bottom:-20%;right:-25%;height:160%;filter:brightness(0.3);pointer-events:none;object-fit:contain;transform:rotate(-30deg)'},
-  {id:'keys',   label:'Keys',   bg:'#7c3aed', desc:'Chords, synths and piano', icon:'instruments/keys.png'},
   {id:'drums',  label:'Drums',  bg:'#be185d', desc:'Keep the rhythm going', icon:'instruments/drums.png', iconStyle:'position:absolute;bottom:-60%;right:-15%;height:120%;filter:brightness(0.3);pointer-events:none;object-fit:contain'},
   {id:'vocals', label:'Vocals', bg:'#c026d3', desc:'Sing along to the lyrics', icon:'instruments/vocals.png', iconStyle:'position:absolute;bottom:-85%;right:-25%;height:150%;filter:brightness(0.3);pointer-events:none;object-fit:contain'},
-  {id:'bass',   label:'Bass',   bg:'#15803d', desc:'Hold down the low end', icon:'instruments/bass.png', iconStyle:'position:absolute;bottom:-20%;right:-20%;height:160%;filter:brightness(0.3);pointer-events:none;object-fit:contain;transform:rotate(-30deg)'}
+  {id:'keys',   label:'Keys',   bg:'#7c3aed', desc:'Coming Soon', icon:'instruments/keys.png'}
 ];
 
 // lobbyPlayers uses np plates defined below (initialized in initLobbyPlates)
@@ -10868,6 +10920,10 @@ var diffLevels = ['easy','medium','hard','expert'];
 var diffColors = {easy:'#059669', medium:'#ca8a04', hard:'#ea580c', expert:'#dc2626'};
 
 // ── Mode Tabs ──────────────────────────────────────────
+var modeTabImages = {
+  solo: 'home_tiles/social_1x1.webp'
+};
+
 function buildModeTabs() {
   var container = document.getElementById('play-mode-tabs');
   container.innerHTML = '';
@@ -10876,7 +10932,16 @@ function buildModeTabs() {
   for (var i = 0; i < modes.length; i++) {
     var btn = document.createElement('button');
     btn.className = 'play-mode-tab' + (modeIds[i] === playMode ? ' active' : '');
-    btn.textContent = modes[i];
+    if (modeTabImages[modeIds[i]]) {
+      btn.style.position = 'relative';
+      btn.style.overflow = 'hidden';
+      btn.innerHTML =
+        '<img src="' + modeTabImages[modeIds[i]] + '" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:0">' +
+        '<div style="position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1"></div>' +
+        '<span style="position:relative;z-index:2">' + modes[i] + '</span>';
+    } else {
+      btn.textContent = modes[i];
+    }
     btn.onclick = (function(id) { return function() { setPlayMode(id); }; })(modeIds[i]);
     container.appendChild(btn);
   }
@@ -11672,8 +11737,20 @@ function confirmSaveSetlist() {
 }
 
 function openLoadSetlist() {
+  var overlay = document.getElementById('load-overlay');
+  var title = overlay.querySelector('h2');
+  if (title) title.textContent = 'Load Setlist';
   buildLoadList();
-  document.getElementById('load-overlay').className = 'load-overlay active';
+  overlay.className = 'load-overlay active';
+}
+
+function openCommunitySetlists() {
+  var overlay = document.getElementById('load-overlay');
+  var list = document.getElementById('load-list');
+  var title = overlay.querySelector('h2');
+  if (title) title.textContent = 'Community Setlists';
+  list.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:400px;color:#666;font-size:48px;font-weight:700">Coming Soon...</div>';
+  overlay.className = 'load-overlay active';
 }
 
 function closeLoadOverlay() {
@@ -12902,8 +12979,12 @@ function buildPlayGrid() {
   var goBar = document.querySelector('.play-go-bar');
   if (playMode === 'solo') {
     grid.className = 'play-grid play-grid--solo';
-    if (goBar) goBar.style.display = 'flex';
+    if (goBar) goBar.style.display = 'none';
     buildSoloGrid(grid);
+  } else if (playMode === 'battle') {
+    grid.className = 'play-grid play-grid--solo';
+    if (goBar) goBar.style.display = 'none';
+    grid.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;width:100%;color:#666;font-size:48px;font-weight:700">Coming Soon...</div>';
   } else {
     grid.className = 'play-grid play-grid--coop';
     if (goBar) goBar.style.display = 'none';
@@ -12927,37 +13008,22 @@ function buildSoloGrid(grid) {
     pageSongs.push(setlist[si]);
   }
 
-  // Layout: 0 songs → centered add tile; 1 song → [empty][song][+]; 2+ → songs then add tiles
+  // Always 3 slots: songs first, then add tiles to fill
   var showSlots = [];
-  if (pageSongs.length === 0) {
-    showSlots.push({type: 'empty'});
+  for (var si2 = 0; si2 < pageSongs.length; si2++) {
+    showSlots.push({type: 'song', song: pageSongs[si2], idx: start + si2});
+  }
+  for (var fi = pageSongs.length; fi < SOLO_SONGS_PER_PAGE; fi++) {
     showSlots.push({type: 'add'});
-    showSlots.push({type: 'empty'});
-  } else if (pageSongs.length === 1) {
-    showSlots.push({type: 'empty'});
-    showSlots.push({type: 'song', song: pageSongs[0], idx: start});
-    showSlots.push({type: 'add'});
-  } else {
-    for (var si2 = 0; si2 < pageSongs.length; si2++) {
-      showSlots.push({type: 'song', song: pageSongs[si2], idx: start + si2});
-    }
-    for (var fi = pageSongs.length; fi < SOLO_SONGS_PER_PAGE; fi++) {
-      showSlots.push({type: 'add'});
-    }
   }
 
-  // Track how many song tiles to determine the middle one
   var songCount = 0;
   for (var sc = 0; sc < showSlots.length; sc++) {
     if (showSlots[sc].type === 'song') songCount++;
   }
-  var songIdx = 0;
-  var middleSongIdx = Math.floor(songCount / 2);
 
-  // Add has-songs class and click handler to row if there are songs
   if (songCount > 0) {
     songsRow.className = 'play-grid-songs-row has-songs';
-    songsRow.onclick = function() { showPlayPicker(); };
   }
 
   for (var sl = 0; sl < showSlots.length; sl++) {
@@ -12966,41 +13032,42 @@ function buildSoloGrid(grid) {
     tile.className = 'play-grid-song';
     if (slot.type === 'song' && slot.song) {
       var s = slot.song;
-      var mins = Math.floor((s.duration || 0) / 60);
-      var secs = (s.duration || 0) % 60;
-      var dur = mins + ':' + (secs < 10 ? '0' : '') + secs;
-      tile.style.position = 'relative';
-      var editLabel = '';
-      if (songIdx === middleSongIdx) {
-        editLabel = '<div class="play-grid-edit-label"><span>Edit Setlist</span></div>';
-      }
+      var sIdx = slot.idx;
+      if (sIdx === activeSongIdx) tile.className = 'play-grid-song active-song';
+      tile.onclick = (function(i) { return function() { selectSong(i); }; })(sIdx);
+      var instId = getSongInstrument(sIdx);
+      var diffId = getSongDifficulty(sIdx);
+      var instLabel = instId.charAt(0).toUpperCase() + instId.slice(1);
+      var diffLabel = diffId.charAt(0).toUpperCase() + diffId.slice(1);
+      var mMins = Math.floor((s.duration || 0) / 60);
+      var mSecs = (s.duration || 0) % 60;
+      var mDur = mMins + ':' + (mSecs < 10 ? '0' : '') + mSecs;
       tile.innerHTML =
         '<div class="play-grid-song-art">' +
           '<img src="' + (s.file || '') + '" alt="" style="' + (s.file ? '' : 'display:none') + '">' +
-          '<div class="song-pos">' + (slot.idx + 1) + '</div>' +
-        '</div>' +
-        '<div class="play-grid-song-info">' +
-          '<div class="song-title">' + (s.title || 'Unknown') + '</div>' +
-          '<div class="song-artist">' + (s.artist || 'Unknown') + '</div>' +
-          '<div class="song-meta">' + dur + '  &#183;  ' + (s.genre || '') + '  &#183;  ' + (s.bpm || '') + ' BPM</div>' +
-        '</div>' +
-        editLabel;
-      songIdx++;
+          '<div class="song-pos">' + (sIdx + 1) + '</div>' +
+          '<div style="position:absolute;bottom:0;left:0;right:0;padding:80px 16px 16px;background:linear-gradient(180deg,transparent 0%,rgba(0,0,0,0.9) 60%);z-index:2">' +
+            '<div style="font-size:28px;font-weight:800;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 2px 6px rgba(0,0,0,0.9)">' + (s.title || 'Unknown') + '</div>' +
+            '<div style="font-size:22px;color:rgba(255,255,255,0.75);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 4px rgba(0,0,0,0.8)">' + (s.artist || '') + '</div>' +
+            '<div style="font-size:18px;color:rgba(255,255,255,0.45);margin-top:4px">' + mDur + ' &#183; ' + (s.genre || '') + ' &#183; ' + (s.bpm || '') + ' BPM</div>' +
+            '<div class="song-badges" style="position:static;margin-top:8px">' +
+              '<div class="song-badge"><svg viewBox="0 0 24 24"><path d="M19.59 3.41c-.8-.8-2.1-.8-2.9 0L12 8.1 9.59 5.69c-.8-.8-2.1-.8-2.9 0-.8.8-.8 2.1 0 2.9L9.1 11 3.41 16.69c-.8.8-.8 2.1 0 2.9.4.4.93.59 1.45.59s1.05-.2 1.45-.59L12 13.9l2.41 2.41c.4.4.93.59 1.45.59s1.05-.2 1.45-.59c.8-.8.8-2.1 0-2.9L14.9 11l5.69-5.69c.8-.8.8-2.1 0-2.9z"/></svg>' + instLabel + '</div>' +
+              '<div class="song-badge"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.27 5.82 21 7 14.14l-5-4.87 6.91-1.01z"/></svg>' + diffLabel + '</div>' +
+            '</div>' +
+          '</div>' +
+          '<button class="song-remove-btn" onclick="event.stopPropagation();removeSoloSong(' + sIdx + ')"><svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></button>' +
+        '</div>';
     } else if (slot.type === 'add') {
       tile.style.border = '2px dashed rgba(255,255,255,0.25)';
       tile.style.background = 'rgba(255,255,255,0.04)';
-      tile.style.display = 'flex';
-      tile.style.flexDirection = 'column';
-      tile.style.alignItems = 'center';
-      tile.style.justifyContent = 'center';
-      tile.style.gap = '12px';
+      tile.style.position = 'relative';
       tile.onclick = function() { showPlayPicker(); };
-      tile.innerHTML = '<div style="font-size:72px;color:#ffffff;font-weight:300;line-height:1">+</div><div style="font-size:28px;font-weight:700;color:rgba(255,255,255,0.7)">Add Song</div>';
-    } else {
-      // Empty spacer
-      tile.style.background = 'transparent';
-      tile.style.border = 'none';
-      tile.style.pointerEvents = 'none';
+      tile.innerHTML =
+        '<div style="padding-top:100%"></div>' +
+        '<div style="position:absolute;top:0;left:0;right:0;bottom:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px">' +
+          '<div style="font-size:72px;color:#ffffff;font-weight:300;line-height:1">+</div>' +
+          '<div style="font-size:28px;font-weight:700;color:rgba(255,255,255,0.7)">Add Song</div>' +
+        '</div>';
     }
     songsRow.appendChild(tile);
   }
@@ -13029,29 +13096,72 @@ function buildSoloGrid(grid) {
     grid.appendChild(pagRow);
   }
 
-  // Setlist summary row
-  var totalSecs = 0;
-  for (var i = 0; i < setlist.length; i++) {
-    if (setlist[i]) totalSecs += (setlist[i].duration || 0);
+  // Setlist management row: Edit / Save / Load
+  var setlistRow = document.createElement('div');
+  setlistRow.className = 'play-grid-options-row';
+  var setlistBtns = [
+    { label: 'Edit Setlist', icon: '<svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>', onclick: function() { showPlayPicker(); } },
+    { label: 'Save Setlist', icon: '<svg viewBox="0 0 24 24"><path d="M17 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>', onclick: function() { openSaveSetlist(); } },
+    { label: 'Load Setlist', icon: '<svg viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/></svg>', onclick: function() { openLoadSetlist(); } },
+    { label: 'Community Setlists', icon: '<svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>', onclick: function() { openCommunitySetlists(); } }
+  ];
+  for (var sb = 0; sb < setlistBtns.length; sb++) {
+    var sBtnTile = document.createElement('div');
+    sBtnTile.className = 'play-grid-option';
+    sBtnTile.onclick = setlistBtns[sb].onclick;
+    sBtnTile.innerHTML = setlistBtns[sb].icon +
+      '<div class="play-grid-option-value">' + setlistBtns[sb].label + '</div>';
+    setlistRow.appendChild(sBtnTile);
   }
-  var tMins = Math.floor(totalSecs / 60);
-  var tSecs = totalSecs % 60;
-  var summary = document.createElement('div');
-  summary.className = 'play-grid-summary';
-  summary.innerHTML =
-    '<div class="play-grid-summary-item" style="font-weight:800">' + setlistName + '</div>' +
-    '<div class="play-grid-summary-item"><span>Songs</span> ' + setlist.length + '</div>' +
-    '<div class="play-grid-summary-item"><span>Total</span> ' + tMins + ':' + (tSecs < 10 ? '0' : '') + tSecs + '</div>';
-  grid.appendChild(summary);
+  grid.appendChild(setlistRow);
 
-  // Options row
+  // Options row (Instrument / Difficulty / Experience / Apply to All)
   buildOptionsRow(grid);
+
+  // Full-width Start button with attract animation
+  var startBtn = document.createElement('button');
+  startBtn.className = 'play-go-btn play-start-attract jamsesh-signature';
+  startBtn.id = 'play-go-btn';
+  startBtn.onclick = function() { startGame(); };
+  startBtn.textContent = 'Start';
+  startBtn.style.cssText = 'width:100%;flex:3;min-height:0;font-size:96px;font-weight:900;letter-spacing:8px';
+  grid.appendChild(startBtn);
+}
+
+function getSongInstrument(idx) {
+  return songInstruments[idx] || selectedInstrument;
+}
+function getSongDifficulty(idx) {
+  return songDiffs[idx] || selectedDifficulty;
+}
+function setSongInstrument(idx, val) {
+  songInstruments[idx] = val;
+}
+function setSongDifficulty(idx, val) {
+  songDiffs[idx] = val;
+}
+function selectSong(idx) {
+  activeSongIdx = idx;
+  // Sync globals so option pickers show the right value
+  selectedInstrument = getSongInstrument(idx);
+  selectedDifficulty = getSongDifficulty(idx);
+  buildPlayGrid();
+}
+function applyToAllSongs() {
+  var inst = getSongInstrument(activeSongIdx);
+  var diff = getSongDifficulty(activeSongIdx);
+  for (var i = 0; i < setlist.length; i++) {
+    songInstruments[i] = inst;
+    songDiffs[i] = diff;
+  }
+  buildPlayGrid();
 }
 
 function removeSoloSong(idx) {
   if (idx >= 0 && idx < setlist.length) {
     setlist.splice(idx, 1);
-    // Clamp page if needed
+    // Clamp active song and page
+    if (activeSongIdx >= setlist.length) activeSongIdx = Math.max(0, setlist.length - 1);
     var totalPages = Math.max(1, Math.ceil(setlist.length / SOLO_SONGS_PER_PAGE));
     if (soloGridPage >= totalPages) soloGridPage = totalPages - 1;
     buildPlayGrid();
@@ -13060,13 +13170,16 @@ function removeSoloSong(idx) {
 }
 
 function buildOptionsRow(container) {
-  var instNames = ['Guitar', 'Drums', 'Vocals', 'Bass', 'Mixed'];
+  var instNames = ['Guitar', 'Drums', 'Vocals', 'Keys', 'Mixed'];
   var diffNames = ['Easy', 'Normal', 'Hard', 'Expert'];
 
-  var instDisplay = selectedInstrument.charAt(0).toUpperCase() + selectedInstrument.slice(1);
+  // Use active song's settings
+  var curInst = getSongInstrument(activeSongIdx);
+  var curDiff = getSongDifficulty(activeSongIdx);
+  var instDisplay = curInst.charAt(0).toUpperCase() + curInst.slice(1);
   var instIdx = instNames.indexOf(instDisplay);
   if (instIdx < 0) instIdx = 0;
-  var diffIdx = diffNames.indexOf(selectedDifficulty.charAt(0).toUpperCase() + selectedDifficulty.slice(1));
+  var diffIdx = diffNames.indexOf(curDiff.charAt(0).toUpperCase() + curDiff.slice(1));
   if (diffIdx < 0) diffIdx = 0;
 
   var optionsRow = document.createElement('div');
@@ -13087,6 +13200,11 @@ function buildOptionsRow(container) {
       label: 'Experience', value: selectedExperience,
       icon: '<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>',
       onclick: function() { openOptionPicker('experience'); }
+    },
+    {
+      label: 'Apply to All', value: 'Songs',
+      icon: '<svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>',
+      onclick: function() { applyToAllSongs(); }
     }
   ];
 
@@ -13236,12 +13354,40 @@ function openOptionPicker(type) {
   if (type === 'instrument') {
     title.textContent = 'Select Instrument';
     panel.appendChild(title);
-    buildSimplePickerChoices(panel, 'instrument', [
-      {id: 'guitar', label: 'Guitar', desc: 'Lead and rhythm guitar'},
-      {id: 'drums', label: 'Drums', desc: 'Full drum kit'},
-      {id: 'vocals', label: 'Vocals', desc: 'Sing along'},
-      {id: 'bass', label: 'Bass', desc: 'Hold down the groove'}
-    ], selectedInstrument);
+    panel.style.width = '1200px';
+    panel.style.maxHeight = '1400px';
+    var instItems = [
+      {id: 'guitar', label: 'Guitar', img: 'instruments/guitar.png'},
+      {id: 'drums', label: 'Drums', img: 'instruments/drums.png'},
+      {id: 'vocals', label: 'Vocals', img: 'instruments/vocals.png'},
+      {id: 'keys', label: 'Coming Soon', img: 'instruments/keys.png', disabled: true}
+    ];
+    var instGrid = document.createElement('div');
+    instGrid.style.cssText = 'display:grid;grid-template-columns:repeat(2,1fr);gap:24px;width:100%';
+    for (var ii = 0; ii < instItems.length; ii++) {
+      var inst = instItems[ii];
+      var instTile = document.createElement('div');
+      instTile.style.cssText = 'position:relative;overflow:hidden;border-radius:var(--panel-radius);cursor:' + (inst.disabled ? 'default' : 'pointer') + ';padding-top:100%;border:2px solid ' + (inst.id === selectedInstrument ? '#ffffff' : 'transparent');
+      if (inst.id === selectedInstrument) instTile.style.boxShadow = '0 0 0 3px #ffffff, 0 0 12px rgba(255,255,255,0.4)';
+      if (inst.disabled) instTile.style.opacity = '0.5';
+      instTile.innerHTML =
+        '<img src="' + inst.img + '" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:0">' +
+        '<div style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);z-index:1"></div>' +
+        '<div style="position:absolute;bottom:24px;left:24px;z-index:2;font-size:36px;font-weight:800;color:#ffffff;text-shadow:0 2px 8px rgba(0,0,0,0.8)">' + inst.label + '</div>';
+      if (!inst.disabled) {
+        instTile.onclick = (function(id) {
+          return function() {
+            selectedInstrument = id;
+            setSongInstrument(activeSongIdx, id);
+            sendToUnity('instrument', id);
+            closeOptionPicker();
+            buildPlayGrid();
+          };
+        })(inst.id);
+      }
+      instGrid.appendChild(instTile);
+    }
+    panel.appendChild(instGrid);
   } else if (type === 'difficulty') {
     title.textContent = 'Select Difficulty';
     panel.appendChild(title);
@@ -13275,9 +13421,11 @@ function buildSimplePickerChoices(panel, type, items, currentVal) {
       return function() {
         if (t === 'instrument') {
           selectedInstrument = it.id;
+          setSongInstrument(activeSongIdx, it.id);
           sendToUnity('instrument', it.id);
         } else if (t === 'difficulty') {
           selectedDifficulty = it.id;
+          setSongDifficulty(activeSongIdx, it.id);
           sendToUnity('difficulty', it.id);
         }
         closeOptionPicker();
@@ -13714,7 +13862,7 @@ function closeCreatorScreen() {
 
 var creatorCameraReturnTo = 'photos';
 
-var stockPhotos = ['photos/carkey.jfif','photos/jumping.jpg','photos/doublebed.webp','photos/steak.jfif','photos/guitar.jpg','photos/houseplant.jpg'];
+var stockPhotos = ['photos/jumping.jpg','photos/doublebed.webp','photos/steak.jpg','photos/guitar.jpg','photos/houseplant.jpg'];
 
 function takeCreatorPhoto() {
   closeCreatorScreen();
@@ -13952,7 +14100,7 @@ function openCreatorNamePicker() {
   var profileName = 'Rael';
   var profileEl = document.querySelector('.topbar-username');
   if (profileEl) profileName = profileEl.textContent;
-  var profileAvatar = 'rael_new.png';
+  var profileAvatar = 'avatars/rael_new.png';
   var profileImg = document.querySelector('.profile-avatar img');
   if (profileImg) profileAvatar = profileImg.src;
 
@@ -14826,11 +14974,11 @@ function showPrivacy() {
 
 /* ── Profile Switcher ─────────────────────────────── */
 var profiles = [
-  { id: 'rael', name: 'Rael', avatar: 'rael_new.png', level: 24, xp: 6500, xpMax: 10000, coins: 5000 },
-  { id: 'jooleeno', name: 'Jooleeno', avatar: 'jooleeno.jpg', level: 12, xp: 2100, xpMax: 5000, coins: 3200 },
-  { id: 'ted', name: 'Ted', avatar: 'ted.png', level: 37, xp: 8200, xpMax: 12000, coins: 7800 },
-  { id: 'abbie', name: 'Abbie', avatar: 'abbie.png', level: 19, xp: 3400, xpMax: 7000, coins: 4500 },
-  { id: 'arthen', name: 'Arthen', avatar: 'arthen.jpg', level: 42, xp: 9800, xpMax: 15000, coins: 12400 }
+  { id: 'rael', name: 'Rael', avatar: 'avatars/rael_new.png', level: 24, xp: 6500, xpMax: 10000, coins: 5000 },
+  { id: 'jooleeno', name: 'Jooleeno', avatar: 'avatars/jooleeno.jpg', level: 12, xp: 2100, xpMax: 5000, coins: 3200 },
+  { id: 'ted', name: 'Ted', avatar: 'avatars/ted.png', level: 37, xp: 8200, xpMax: 12000, coins: 7800 },
+  { id: 'abbie', name: 'Abbie', avatar: 'avatars/abbie.png', level: 19, xp: 3400, xpMax: 7000, coins: 4500 },
+  { id: 'arthen', name: 'Arthen', avatar: 'avatars/arthen.jpg', level: 42, xp: 9800, xpMax: 15000, coins: 12400 }
 ];
 var activeProfileId = 'rael';
 
