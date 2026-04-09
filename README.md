@@ -145,19 +145,24 @@ Meta Store → Quest Home → Boot Splash → Early Access → Legal → Perms E
 ## Project Structure
 
 ```
-index.html              # The full UI prototype (~15500 lines)
-keyboard.html           # Virtual QWERTY keyboard (simple-keyboard, Vuplex bridge)
+index.html              # The full UI prototype (~16400 lines)
 songs.json              # Song library (100 tracks with metadata)
 CLAUDE.md               # AI coding assistant instructions
-AR_Glasses.png          # Genies avatar preview image
+README.md               # This file
 art/                    # Song cover artwork (001-100.jpg)
 avatar_tiles/           # Avatar asset category images (shirts, shoes, etc.)
-banners/                # Banner image PNGs for scrolling banner system
+avatars/                # Profile pictures (rael, jooleeno, ted, abbie, arthen)
 bandlogos/              # Band/group logo images for social groups
+banners/                # Banner image PNGs for scrolling banner system
+branding/               # Logo, JamPick, AR_Glasses, news banner
+demo/                   # Demo-only backgrounds (meta store, quest home)
 home_tiles/             # Per-tile home grid images (7 types x 5 sizes)
-instruments/            # Instrument icons (guitar.png, drums.png, vocals.png)
-js/                     # simple-keyboard library files
+instruments/            # Instrument icons (guitar, drums, vocals, keys, bass)
 photos/                 # Creator photos (user-captured stock photos)
+plates/                 # Lobby player plate backgrounds
+spaces/                 # Space images (001-025 + lobby, stage, social)
+tutorial/               # Tutorial gameplay screenshots
+vault/                  # Vault item images (001-025)
 src/                    # Figma Make-exported React/Vite app (reference only)
 ```
 
@@ -170,3 +175,48 @@ npm install
 npm run dev      # Vite dev server
 npm run build    # Production build
 ```
+
+## Changelog
+
+### 2026-04-09 — Play Tab Overhaul, Mode System & File Cleanup
+
+**Play Tab:**
+- Per-song instrument and difficulty selection with active song glow
+- Instrument picker redesigned as 2x2 image grid (Guitar, Drums, Vocals, Keys "Coming Soon"); Bass removed
+- Song tiles show metadata in gradient overlay block with instrument/difficulty badges
+- New layout: Setlist row (Edit / Save / Load / Community Setlists) → Options row (Instrument / Difficulty / Experience / Apply to All) → Full-width Start button with signature JamPick texture
+- Battle tab shows "Coming Soon..." placeholder
+- Community Setlists panel (Coming Soon)
+- Lesson setlists (Basic / Advanced / Expert) with JamPick x1000 rewards in Load popup
+
+**Mode System:**
+- Independent `?demo` and `?onboard` URL flags (combinable with `&`)
+- `?step=N` to jump to specific onboarding step; `?reset` to clear progress
+- Demo-only screens: Meta Quest Store page, Quest OS Home, Boot Splash, OS Camera/Mic permission popups
+- Tutorial gameplay screenshots with narration hook (demo only)
+- Onboarding tutorial: locks UI to Play tab with Guitar/Drum/Vocal Basics songs
+
+**File Organisation:**
+- Assets reorganised into subfolders: `avatars/`, `branding/`, `demo/`, `tutorial/`, `spaces/`
+- 16 unused files and 2 unused directories removed
+- Fixed broken photo references
+
+**Creator:**
+- Photos sourced from `/photos` folder; demo-only camera screen
+- Full-screen photo preview with left/right navigation and "New Art" button
+- Art generation shows 5-second loading spinners before results
+- "Create for" name picker redesigned as 3x3 image grid
+
+**Home & UI:**
+- Home tiles: background images on Store, Vault, Spaces, News, Creator tiles
+- Social tile: floating avatar bubbles animation
+- Topbar: 50% black overlay for banner contrast
+- Early Access screen: Discord link, positioned after boot splash in flow
+- Legal screen: OK button hidden until checkbox ticked
+- Save Setlist / Create Group / Create Space: on-screen keyboards removed (native OS)
+- Solo mode tab: background image support
+
+### 2026-04-09 — Song Picker Overhaul (earlier)
+- 4-column song grid with emoji filter tiles
+- Drag-and-drop setlist management
+- Row-level edit controls
