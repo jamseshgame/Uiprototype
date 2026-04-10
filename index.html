@@ -9997,6 +9997,64 @@ function handleUnityMessage(msg) {
     case 'updateHubs': updateHubsFromBackend(msg.data); break;
     case 'updateCoins': updateCoinsFromBackend(msg.data); break;
     case 'gameResults': showGameResults(msg.data); break;
+    case 'setInBandspace':
+      inBandspace = !!msg.data;
+      if (inBandspace) {
+        // Reset instrument so nothing is pre-claimed
+        selectedInstrument = '';
+        lobbyPlayers = [];
+        // Clients clear setlist — they'll receive the host's list via network.
+        // Host keeps their setlist (3 random songs from buildPlayPanel).
+        if (!isHost) setlist = [];
+        buildModeTabs();
+        setPlayMode('coop');
+        navigateTo('play');
+      } else {
+        buildModeTabs();
+      }
+      break;
+    case 'updateIsHost':
+      if (typeof msg.data === 'object' && msg.data !== null) {
+        isHost = !!msg.data.isHost;
+        hostName = msg.data.hostName || '';
+      } else {
+        isHost = !!msg.data;
+      }
+      if (playMode !== 'solo') buildPlayGrid();
+      break;
+    case 'updateInstrumentAvailability':
+      if (msg.data) {
+        instrumentAvailability.vocals = msg.data.vocals !== false;
+        instrumentAvailability.drums = msg.data.drums !== false;
+        instrumentAvailability.guitar = msg.data.guitar !== false;
+      }
+      // Refresh the instrument picker if it's currently open
+      var pickerOverlay = document.getElementById('option-picker-overlay');
+      if (pickerOverlay && pickerOverlay.style.display === 'flex') {
+        var titleEl = pickerOverlay.querySelector('.option-picker-title');
+        if (titleEl && titleEl.textContent === 'Select Instrument') {
+          openOptionPicker('instrument');
+        }
+      }
+      // Refresh play grid so option tiles show updated state
+      if (playMode !== 'solo') buildPlayGrid();
+      break;
+    case 'hostSongSelected':
+    case 'hostSetlistUpdated':
+      var hostSongs = Array.isArray(msg.data) ? msg.data : (msg.data ? [msg.data] : []);
+      var newSetlist = [];
+      for (var hs = 0; hs < hostSongs.length; hs++) {
+        var hTitle = hostSongs[hs].title || '';
+        for (var as2 = 0; as2 < allSongs.length; as2++) {
+          if (allSongs[as2].title === hTitle) {
+            newSetlist.push(allSongs[as2]);
+            break;
+          }
+        }
+      }
+      setlist = newSetlist;
+      buildPlayGrid();
+      break;
     case 'onboardProgress':
       // Unity sends PlayFab flags: {completedSteps: ['legal','perms_explainer'], legal_version: '1'}
       if (msg.data && msg.data.completedSteps) {
@@ -10129,16 +10187,21 @@ function updateGroupMembers(index, count) {
 }
 
 function updateLobbyFromBackend(data) {
-  // data: [{name,avatar,instrument,difficulty,ready}, ...]
+  // data: [{name, avatar}, ...]
   if (!data) return;
-  for (var i = 0; i < data.length && i < lobbyPlayers.length; i++) {
-    lobbyPlayers[i].name = data[i].name || lobbyPlayers[i].name;
-    lobbyPlayers[i].avatar = data[i].avatar || lobbyPlayers[i].avatar;
-    lobbyPlayers[i].instrument = data[i].instrument || lobbyPlayers[i].instrument;
-    lobbyPlayers[i].difficulty = data[i].difficulty || lobbyPlayers[i].difficulty;
-    lobbyPlayers[i].ready = data[i].ready !== undefined ? data[i].ready : lobbyPlayers[i].ready;
+  lobbyPlayers = [];
+  for (var i = 0; i < data.length; i++) {
+    lobbyPlayers.push({
+      name: data[i].name || 'Player ' + (i + 1),
+      avatar: data[i].avatar || '',
+      plate: null,
+      plateClass: null,
+      instrument: data[i].instrument || '',
+      difficulty: data[i].difficulty || '',
+      ready: data[i].ready !== undefined ? data[i].ready : false
+    });
   }
-  buildPlayGrid();
+  if (playMode !== 'solo') buildPlayGrid();
 }
 
 function updateHubsFromBackend(data) {
@@ -10829,6 +10892,10 @@ var setlistName = 'My Setlist';
 var selectedInstrument = 'guitar';
 var selectedDifficulty = 'medium';
 var playMode = 'solo';
+var inBandspace = false;
+var isHost = true;
+var hostName = '';
+var instrumentAvailability = { vocals: true, drums: true, guitar: true };
 var songInstruments = {};
 var songDiffs = {};
 var songSpaces = {};
@@ -10931,7 +10998,12 @@ function buildModeTabs() {
   var modeIds = ['solo', 'coop', 'battle'];
   for (var i = 0; i < modes.length; i++) {
     var btn = document.createElement('button');
+    var isDisabled = inBandspace ? modeIds[i] === 'solo' : modeIds[i] !== 'solo';
     btn.className = 'play-mode-tab' + (modeIds[i] === playMode ? ' active' : '');
+    if (isDisabled) {
+      btn.style.opacity = '0.35';
+      btn.style.pointerEvents = 'none';
+    }
     if (modeTabImages[modeIds[i]]) {
       btn.style.position = 'relative';
       btn.style.overflow = 'hidden';
@@ -11654,6 +11726,8 @@ function switchResultsTab(tab) {
 }
 
 function startGame() {
+  // In coop mode, only the host can start the game
+  if (inBandspace && playMode !== 'solo' && !isHost) return;
   var titles = [];
   for (var i = 0; i < setlist.length; i++) {
     titles.push(setlist[i].title);
@@ -12607,6 +12681,8 @@ function constrainGridNav() {
 }
 
 function showPlayPicker() {
+  // In coop mode, only the host can browse/pick songs
+  if (inBandspace && playMode !== 'solo' && !isHost) return;
   document.getElementById('play-main-layout').style.display = 'none';
   document.getElementById('play-picker').className = 'play-picker active';
   // Reset filters
@@ -12940,13 +13016,16 @@ function applyPickerFilters() {
 
 function buildPlayPanel(songs) {
   allSongs = songs;
-  // Pick 3 random songs for the setlist
-  var shuffled = songs.slice();
-  for (var i = shuffled.length - 1; i > 0; i--) {
-    var j = Math.floor(Math.random() * (i + 1));
-    var tmp = shuffled[i]; shuffled[i] = shuffled[j]; shuffled[j] = tmp;
+  // Pick 3 random songs for the setlist — but not if we're a client
+  // in bandspace (the host's setlist will arrive via network).
+  if (!(inBandspace && !isHost)) {
+    var shuffled = songs.slice();
+    for (var i = shuffled.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = shuffled[i]; shuffled[i] = shuffled[j]; shuffled[j] = tmp;
+    }
+    setlist = shuffled.slice(0, 3);
   }
-  setlist = shuffled.slice(0, 3);
   generateDefaultSetlists();
   initLobbyPlates();
   buildModeTabs();
@@ -13187,9 +13266,8 @@ function buildOptionsRow(container) {
   // Use active song's settings
   var curInst = getSongInstrument(activeSongIdx);
   var curDiff = getSongDifficulty(activeSongIdx);
-  var instDisplay = curInst.charAt(0).toUpperCase() + curInst.slice(1);
+  var instDisplay = curInst ? curInst.charAt(0).toUpperCase() + curInst.slice(1) : '';
   var instIdx = instNames.indexOf(instDisplay);
-  if (instIdx < 0) instIdx = 0;
   var diffIdx = diffNames.indexOf(curDiff.charAt(0).toUpperCase() + curDiff.slice(1));
   if (diffIdx < 0) diffIdx = 0;
 
@@ -13198,7 +13276,7 @@ function buildOptionsRow(container) {
 
   var optData = [
     {
-      label: 'Instrument', value: instNames[instIdx],
+      label: 'Instrument', value: instIdx >= 0 ? instNames[instIdx] : 'Choose...',
       icon: '<svg viewBox="0 0 24 24"><path d="M19.59 3.41c-.8-.8-2.1-.8-2.9 0L12 8.1 9.59 5.69c-.8-.8-2.1-.8-2.9 0-.8.8-.8 2.1 0 2.9L9.1 11 3.41 16.69c-.8.8-.8 2.1 0 2.9.4.4.93.59 1.45.59s1.05-.2 1.45-.59L12 13.9l2.41 2.41c.4.4.93.59 1.45.59s1.05-.2 1.45-.59c.8-.8.8-2.1 0-2.9L14.9 11l5.69-5.69c.8-.8.8-2.1 0-2.9z"/></svg>',
       onclick: function() { openOptionPicker('instrument'); }
     },
@@ -13253,16 +13331,21 @@ function buildCoopGrid(grid) {
       // Song tile (left)
       var songTile = document.createElement('div');
       songTile.className = 'coop-song-tile';
-      songTile.onclick = (function(idx) { return function() { showPlayPicker(); }; })(i);
+      if (isHost) {
+        songTile.onclick = (function(idx) { return function() { showPlayPicker(); }; })(i);
+      } else {
+        songTile.style.cursor = 'default';
+      }
       songTile.innerHTML =
         '<div class="coop-song-art"><img src="' + (s.file || 'art/001.jpg') + '" alt=""></div>' +
         '<div class="coop-song-info">' +
           '<div class="song-title">' + (s.title || 'Unknown') + '</div>' +
           '<div class="song-artist">' + (s.artist || 'Unknown') + '</div>' +
-        '</div>';
+        '</div>' +
+        (!isHost ? '<div style="font-size:14px;color:#888888;margin-top:4px">Host picks songs</div>' : '');
       row.appendChild(songTile);
 
-      // Friend grid (right) — 3x3 with lobbyPlayers
+      // Friend grid (right) — players in the session
       var friendGrid = document.createElement('div');
       friendGrid.className = 'coop-friend-grid';
       for (var j = 0; j < 9; j++) {
@@ -13270,9 +13353,10 @@ function buildCoopGrid(grid) {
         var cell = document.createElement('div');
         cell.className = 'coop-friend-cell';
         if (p) {
+          var nameColor = (hostName && p.name === hostName) ? '#fbbf24' : '#ffffff';
           cell.innerHTML =
-            '<img src="' + p.avatar + '" alt="">' +
-            '<div class="friend-name">' + p.name + '</div>';
+            (p.avatar ? '<img src="' + p.avatar + '" alt="">' : '<div style="width:48px;height:48px;border-radius:50%;background:#333333"></div>') +
+            '<div class="friend-name" style="color:' + nameColor + '">' + p.name + (hostName && p.name === hostName ? ' &#9733;' : '') + '</div>';
         }
         friendGrid.appendChild(cell);
       }
@@ -13281,13 +13365,18 @@ function buildCoopGrid(grid) {
       // Empty add-song row
       var addTile = document.createElement('div');
       addTile.className = 'coop-song-tile';
-      addTile.style.cursor = 'pointer';
       addTile.style.justifyContent = 'center';
       addTile.style.alignItems = 'center';
       addTile.style.border = '2px dashed #444444';
       addTile.style.background = 'transparent';
-      addTile.innerHTML = '<div style="font-size:48px;color:#444444">+</div>';
-      addTile.onclick = function() { showPlayPicker(); };
+      if (isHost) {
+        addTile.style.cursor = 'pointer';
+        addTile.innerHTML = '<div style="font-size:48px;color:#444444">+</div>';
+        addTile.onclick = function() { showPlayPicker(); };
+      } else {
+        addTile.style.cursor = 'default';
+        addTile.innerHTML = '<div style="font-size:24px;color:#444444">Waiting for host...</div>';
+      }
       row.appendChild(addTile);
       var emptyGrid = document.createElement('div');
       emptyGrid.className = 'coop-friend-grid';
@@ -13335,10 +13424,17 @@ function buildCoopGrid(grid) {
   // Go bar row (Save / Start / Load)
   var goRow = document.createElement('div');
   goRow.className = 'coop-bottom-row';
-  goRow.innerHTML =
-    '<button class="play-bar-btn" onclick="openSaveSetlist()"><svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor"><path d="M17 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>Save</button>' +
-    '<button class="play-go-btn" onclick="startGame()"><svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>Start</button>' +
-    '<button class="play-bar-btn" onclick="openLoadSetlist()"><svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor"><path d="M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/></svg>Load</button>';
+  if (isHost) {
+    goRow.innerHTML =
+      '<button class="play-bar-btn" onclick="openSaveSetlist()"><svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor"><path d="M17 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>Save</button>' +
+      '<button class="play-go-btn" onclick="startGame()"><svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>Start</button>' +
+      '<button class="play-bar-btn" onclick="openLoadSetlist()"><svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor"><path d="M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/></svg>Load</button>';
+  } else {
+    goRow.innerHTML =
+      '<div style="flex:1"></div>' +
+      '<div style="color:#888888;font-size:20px;text-align:center;padding:16px 0">Waiting for host to start...</div>' +
+      '<div style="flex:1"></div>';
+  }
   bottomBar.appendChild(goRow);
   grid.appendChild(bottomBar);
 }
@@ -13422,11 +13518,31 @@ function buildSimplePickerChoices(panel, type, items, currentVal) {
   for (var i = 0; i < items.length; i++) {
     var item = items[i];
     var choice = document.createElement('div');
-    choice.className = 'option-picker-choice' + (item.id === currentVal ? ' selected' : '');
+
+    // In coop/battle mode, check instrument availability from network state
+    var isTaken = false;
+    if (type === 'instrument' && inBandspace && playMode !== 'solo') {
+      var avail = instrumentAvailability[item.id];
+      // undefined means no tracking for this instrument (e.g. bass) — treat as available
+      if (avail === false) {
+        isTaken = true;
+      }
+    }
+
+    var isSelected = item.id === currentVal && !isTaken;
+    choice.className = 'option-picker-choice' + (isSelected ? ' selected' : '');
+    if (isTaken) {
+      choice.style.opacity = '0.35';
+      choice.style.pointerEvents = 'none';
+    }
+
+    var descText = item.desc;
+    if (isTaken) descText = 'Taken by another player';
+
     choice.innerHTML =
       '<div style="flex:1">' +
         '<div class="option-picker-choice-label">' + item.label + '</div>' +
-        '<div class="option-picker-choice-desc">' + item.desc + '</div>' +
+        '<div class="option-picker-choice-desc">' + descText + '</div>' +
       '</div>';
     choice.onclick = (function(t, it) {
       return function() {
