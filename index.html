@@ -13032,9 +13032,13 @@ function buildPlayPanel(songs) {
   buildPlayGrid();
   buildLeaderboard();
 
-  // Push initial config state so Unity config matches the UI defaults
-  sendToUnity('selectInstrument', selectedInstrument);
-  sendToUnity('selectDifficulty', selectedDifficulty);
+  // Push initial config state so Unity config matches the UI defaults.
+  // In bandspace, don't send defaults — instrument should stay Unknown
+  // until the user actively picks one.
+  if (!inBandspace) {
+    sendToUnity('selectInstrument', selectedInstrument);
+    sendToUnity('selectDifficulty', selectedDifficulty);
+  }
   syncSetlistToUnity();
 }
 
@@ -13473,15 +13477,28 @@ function openOptionPicker(type) {
     instGrid.style.cssText = 'display:grid;grid-template-columns:repeat(2,1fr);gap:24px;width:100%';
     for (var ii = 0; ii < instItems.length; ii++) {
       var inst = instItems[ii];
+
+      // In coop/battle mode, check if this instrument is taken by another player
+      var isTaken = false;
+      if (inBandspace && playMode !== 'solo') {
+        var avail = instrumentAvailability[inst.id];
+        if (avail === false) isTaken = true;
+      }
+
+      var isSelected = inst.id === selectedInstrument && !isTaken;
+      var isDisabled = inst.disabled || isTaken;
+
       var instTile = document.createElement('div');
-      instTile.style.cssText = 'position:relative;overflow:hidden;border-radius:var(--panel-radius);cursor:' + (inst.disabled ? 'default' : 'pointer') + ';padding-top:100%;border:2px solid ' + (inst.id === selectedInstrument ? '#ffffff' : 'transparent');
-      if (inst.id === selectedInstrument) instTile.style.boxShadow = '0 0 0 3px #ffffff, 0 0 12px rgba(255,255,255,0.4)';
-      if (inst.disabled) instTile.style.opacity = '0.5';
+      instTile.style.cssText = 'position:relative;overflow:hidden;border-radius:var(--panel-radius);cursor:' + (isDisabled ? 'default' : 'pointer') + ';padding-top:100%;border:2px solid ' + (isSelected ? '#ffffff' : 'transparent');
+      if (isSelected) instTile.style.boxShadow = '0 0 0 3px #ffffff, 0 0 12px rgba(255,255,255,0.4)';
+      if (isDisabled) instTile.style.opacity = '0.35';
+
+      var labelText = isTaken ? inst.label + ' (Taken)' : inst.label;
       instTile.innerHTML =
         '<img src="' + inst.img + '" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:0">' +
         '<div style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);z-index:1"></div>' +
-        '<div style="position:absolute;bottom:24px;left:24px;z-index:2;font-size:36px;font-weight:800;color:#ffffff;text-shadow:0 2px 8px rgba(0,0,0,0.8)">' + inst.label + '</div>';
-      if (!inst.disabled) {
+        '<div style="position:absolute;bottom:24px;left:24px;z-index:2;font-size:36px;font-weight:800;color:#ffffff;text-shadow:0 2px 8px rgba(0,0,0,0.8)">' + labelText + '</div>';
+      if (!isDisabled) {
         instTile.onclick = (function(id) {
           return function() {
             selectedInstrument = id;
