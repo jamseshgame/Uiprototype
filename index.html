@@ -9699,7 +9699,7 @@ button:focus,
       <div class="create-group-logo" id="create-group-logo" onclick="openLogoPicker()">
         <span class="logo-plus">+</span>
       </div>
-      <input class="save-input" id="create-group-name" type="text" placeholder="Group Name" style="flex:1">
+      <input class="save-input" id="create-group-name" type="text" placeholder="Group Name" inputmode="none" onclick="requestKeyboardForInput('create-group-name')" style="flex:1">
     </div>
     <div class="create-group-columns">
       <div class="create-group-col">
@@ -10550,8 +10550,7 @@ function buildSocialPage() {
   var friendsWrap = document.getElementById('social-friends-list');
   friendsWrap.innerHTML = '';
   friendsWrap.className = 'friends-list-wrap';
-  // PLAYFAB HOOKUP: Replace with data from Unity via sendToUnity('getFriends') / updateFriends message
-  var friends = [
+  var friends = window._backendFriends || [
     { name: 'Jooleeno', online: true, avatar: 'avatars/jooleeno.jpg' },
     { name: 'Ted', online: true, avatar: 'avatars/ted.png' },
     { name: 'Abbie', online: true, avatar: 'avatars/abbie.png' },
@@ -10705,6 +10704,7 @@ function openCreateGroup() {
 function closeCreateGroup(e) {
   if (e && e.target !== document.getElementById('create-group-overlay')) return;
   document.getElementById('create-group-overlay').className = 'create-group-overlay';
+  sendToUnity('closeKeyboard', {});
 }
 
 function renderCreateGroupLists() {
@@ -10718,8 +10718,9 @@ function renderCreateGroupLists() {
     addedNames[createGroupMembers[m].name] = true;
   }
 
-  for (var i = 0; i < availableFriends.length; i++) {
-    var f = availableFriends[i];
+  var friendSource = window._backendFriends || availableFriends;
+  for (var i = 0; i < friendSource.length; i++) {
+    var f = friendSource[i];
     if (addedNames[f.name]) continue;
     var row = document.createElement('div');
     row.className = 'create-group-friend';
@@ -10776,9 +10777,21 @@ function confirmCreateGroup() {
   sendToUnity('createGroup', {
     name: name,
     logo: createGroupLogo,
-    members: createGroupMembers.map(function(f) { return f.name; })
+    members: createGroupMembers.map(function(f) { return { name: f.name, platformId: f.platformId || '' }; })
   });
   closeCreateGroup();
+}
+
+// ── Keyboard Bridge ─────────────────────────────────────
+function requestKeyboardForInput(inputId) {
+  var el = document.getElementById(inputId);
+  if (el) el.blur();
+  sendToUnity('requestKeyboard', { inputId: inputId, value: (el ? el.value : '') });
+}
+
+function setKeyboardText(inputId, text) {
+  var el = document.getElementById(inputId);
+  if (el) el.value = text;
 }
 
 // ── Logo Picker ─────────────────────────────────────────
