@@ -1531,6 +1531,17 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    flex: 1;
+  }
+  .coop-friend-cell .friend-host-badge {
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: #111;
+    background: #ffd24a;
+    padding: 3px 8px;
+    border-radius: 999px;
+    flex-shrink: 0;
   }
   .coop-bottom-bar {
     display: flex;
@@ -10044,16 +10055,20 @@ function handleUnityMessage(msg) {
       var hostSongs = Array.isArray(msg.data) ? msg.data : (msg.data ? [msg.data] : []);
       var newSetlist = [];
       for (var hs = 0; hs < hostSongs.length; hs++) {
-        var hTitle = hostSongs[hs].title || '';
+        var hEntry = hostSongs[hs];
+        if (!hEntry) continue;
+        var hTitle = hEntry.title || '';
+        var matched = null;
         for (var as2 = 0; as2 < allSongs.length; as2++) {
-          if (allSongs[as2].title === hTitle) {
-            newSetlist.push(allSongs[as2]);
-            break;
-          }
+          if (allSongs[as2].title === hTitle) { matched = allSongs[as2]; break; }
         }
+        // Always push something — fall back to a stub so the grid populates
+        // immediately even before allSongs is ready / if a title doesn't match.
+        newSetlist.push(matched || { title: hTitle, artist: hEntry.artist || '', file: '' });
       }
       setlist = newSetlist;
       buildPlayGrid();
+      if (typeof buildRightPanel === 'function') buildRightPanel();
       break;
     case 'onboardProgress':
       // Unity sends PlayFab flags: {completedSteps: ['legal','perms_explainer'], legal_version: '1'}
@@ -13370,10 +13385,11 @@ function buildCoopGrid(grid) {
         var cell = document.createElement('div');
         cell.className = 'coop-friend-cell';
         if (p) {
-          var nameColor = (hostName && p.name === hostName) ? '#fbbf24' : '#ffffff';
+          var isThisHost = hostName && p.name === hostName;
           cell.innerHTML =
             (p.avatar ? '<img src="' + p.avatar + '" alt="">' : '<div style="width:48px;height:48px;border-radius:50%;background:#333333"></div>') +
-            '<div class="friend-name" style="color:' + nameColor + '">' + p.name + (hostName && p.name === hostName ? ' &#9733;' : '') + '</div>';
+            '<div class="friend-name">' + p.name + '</div>' +
+            (isThisHost ? '<div class="friend-host-badge">HOST</div>' : '');
         }
         friendGrid.appendChild(cell);
       }
