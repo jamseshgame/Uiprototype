@@ -855,8 +855,8 @@
   .play-panel {
     display: flex;
     flex-direction: column;
-    background: var(--bg-surface);
-    border: 1px solid var(--border-subtle);
+    background: var(--btn-panel);
+    border: 1px solid var(--btn-panel-border);
     border-radius: var(--panel-radius);
     overflow: hidden;
   }
@@ -970,8 +970,8 @@
     gap: 12px;
     padding: 0 16px;
     border-radius: var(--panel-radius);
-    border: 1px solid var(--btn-tab-border);
-    background: var(--btn-tab);
+    border: 1px solid var(--btn-panel-border);
+    background: var(--btn-panel-hover);
     height: 100%;
     position: relative;
     overflow: hidden;
@@ -1063,7 +1063,7 @@
     border-radius: var(--panel-radius);
     border: 1px solid var(--btn-tab-border);
     background: var(--btn-tab);
-    color: var(--text-primary);
+    color: #ffffff;
     font-size: 30px;
     font-weight: 700;
     cursor: pointer;
@@ -1427,6 +1427,138 @@
   .play-grid-options-row .play-grid-option {
     flex: 1;
     min-width: 0;
+  }
+
+  /* ── Solo songs area (main section) ───────────────── */
+  .play-songs-area {
+    flex: 6.5;
+    display: flex;
+    gap: 16px;
+    min-width: 0;
+    min-height: 0;
+    background: var(--btn-panel);
+    border: 1px solid var(--btn-panel-border);
+    border-radius: var(--panel-radius);
+    padding: 20px;
+    box-sizing: border-box;
+  }
+  .play-songs-grid {
+    flex: 1;
+    display: grid;
+    gap: 16px;
+    min-width: 0;
+    min-height: 0;
+  }
+  .play-songs-grid--empty  { grid-template-columns: 1fr;       grid-template-rows: 1fr; }
+  .play-songs-grid--one    { grid-template-columns: 1fr 1fr;   grid-template-rows: 1fr; }
+  .play-songs-grid--four   { grid-template-columns: 1fr 1fr;   grid-template-rows: 1fr 1fr; }
+  .play-songs-grid .play-grid-song { align-self: stretch; min-height: 0; min-width: 0; }
+  .play-songs-grid .play-grid-song-art { padding-top: 0; flex: 1; min-height: 0; width: 100%; }
+  .play-songs-empty-cell { visibility: hidden; pointer-events: none; }
+  .play-songs-page-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    flex-shrink: 0;
+    width: 72px;
+  }
+  .play-songs-page-nav-btn {
+    flex: 1;
+    min-height: 0;
+    border-radius: var(--panel-radius);
+    border: 1px solid var(--btn-panel-border);
+    background: var(--btn-panel);
+    color: #ffffff;
+    font-size: 32px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+  }
+  .play-songs-page-nav-btn:hover:not(:disabled) { background: var(--btn-panel-hover); }
+  .play-songs-page-nav-btn:disabled { opacity: 0.3; cursor: default; }
+
+  .play-manage-tile {
+    flex: 1;
+    min-width: 0;
+    min-height: 0;
+    background: var(--btn-panel);
+    border: 1px solid var(--btn-panel-border);
+    border-radius: var(--panel-radius);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    cursor: pointer;
+    color: #ffffff;
+    transition: background 0.15s, box-shadow 0.2s, border-color 0.2s;
+  }
+  .play-manage-tile:hover {
+    background: var(--btn-panel-hover);
+    border-color: var(--btn-primary-border);
+    box-shadow: 0 0 12px var(--btn-primary-glow);
+  }
+  .play-manage-tile svg { width: 64px; height: 64px; fill: #ffffff; }
+  .play-manage-tile-label { font-size: 32px; font-weight: 700; color: #ffffff; }
+
+  .play-add-song-tile {
+    background: transparent;
+    border: 2px dashed rgba(255,255,255,0.25);
+    border-radius: var(--panel-radius);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    cursor: pointer;
+    color: rgba(255,255,255,0.7);
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+    min-height: 0;
+  }
+  .play-add-song-tile:hover {
+    background: rgba(255,255,255,0.04);
+    border-color: rgba(255,255,255,0.5);
+    color: #ffffff;
+  }
+  .play-add-song-tile .plus-icon { font-size: 96px; font-weight: 300; line-height: 1; }
+  .play-add-song-tile .plus-label { font-size: 32px; font-weight: 700; }
+
+  /* Manage popup 2x2 grid (matches instrument picker style) */
+  .manage-picker-tile {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--panel-radius);
+    cursor: pointer;
+    padding-top: 100%;
+    border: 2px solid transparent;
+    background: var(--btn-panel);
+    transition: background 0.15s, border-color 0.15s, box-shadow 0.2s;
+  }
+  .manage-picker-tile:hover {
+    background: var(--btn-panel-hover);
+    border-color: var(--btn-primary-border);
+    box-shadow: 0 0 12px var(--btn-primary-glow);
+  }
+  .manage-picker-inner {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    padding: 24px;
+  }
+  .manage-picker-inner svg { width: 80px; height: 80px; fill: #ffffff; }
+  .manage-picker-inner .manage-picker-label {
+    font-size: 36px;
+    font-weight: 800;
+    color: #ffffff;
+    text-align: center;
   }
 
   /* Coop/Battle grid layout */
@@ -3692,7 +3824,7 @@
     margin: 0 12px;
     z-index: 4;
     border-color: rgba(0,224,255,0.25);
-    animation: playNudge 8s ease-in-out infinite;
+    animation: playPulse 3s ease-in-out infinite;
   }
   .nav-item[data-page="play"].active {
     animation: none;
@@ -3701,18 +3833,29 @@
   @keyframes playNudge {
     0%, 62% { box-shadow: none; border-color: rgba(0,224,255,0.25); }
     70% {
-      box-shadow: 0 0 18px rgba(0,224,255,0.35), 0 0 40px rgba(168,85,247,0.15);
-      border-color: rgba(0,224,255,0.6);
+      box-shadow: 0 0 40px rgba(0,224,255,0.7), 0 0 90px rgba(168,85,247,0.4), 0 0 140px rgba(0,224,255,0.25);
+      border-color: rgba(0,224,255,0.9);
     }
     78% {
       box-shadow: none;
       border-color: rgba(168,85,247,0.5);
     }
     86% {
-      box-shadow: 0 0 14px rgba(168,85,247,0.3), 0 0 30px rgba(0,224,255,0.1);
-      border-color: rgba(168,85,247,0.6);
+      box-shadow: 0 0 36px rgba(168,85,247,0.65), 0 0 80px rgba(0,224,255,0.35), 0 0 120px rgba(168,85,247,0.2);
+      border-color: rgba(168,85,247,0.9);
     }
     100% { box-shadow: none; border-color: rgba(0,224,255,0.25); }
+  }
+
+  @keyframes playPulse {
+    0%, 100% {
+      box-shadow: 0 0 0 rgba(0,224,255,0);
+      border-color: rgba(0,224,255,0.25);
+    }
+    50% {
+      box-shadow: 0 0 40px rgba(0,224,255,0.7), 0 0 90px rgba(168,85,247,0.4), 0 0 140px rgba(0,224,255,0.25);
+      border-color: rgba(0,224,255,0.9);
+    }
   }
 
   .nav-item:hover,
@@ -3738,8 +3881,8 @@
     justify-content: center;
   }
   .nav-icon svg {
-    width: 48px;
-    height: 48px;
+    width: 49px;
+    height: 49px;
     fill: currentColor;
     flex-shrink: 0;
   }
@@ -3747,7 +3890,7 @@
   .nav-item.active .nav-icon { color: #000000; }
 
   .nav-label {
-    font-size: 20px;
+    font-size: 21px;
     font-weight: 700;
     color: #ffffff;
     transition: color 0.2s;
@@ -9001,7 +9144,7 @@ button:focus,
     <div class="content-overlay"></div>
     <div class="page active" id="page-home">
       <div class="home-grid" id="home-grid"></div>
-      <button class="home-layout-btn" id="home-layout-btn" onclick="openLayoutPicker()"></button>
+      <button class="home-layout-btn" id="home-layout-btn" onclick="openLayoutPicker()" style="display:none"></button>
     </div>
 
     <div class="page" id="page-play">
@@ -9584,8 +9727,8 @@ button:focus,
       <span class="nav-label">Spaces</span>
     </div>
     <div class="nav-item" data-page="play" onclick="navigateTo('play')">
-      <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="currentColor"/></svg></span>
-      <span class="nav-label">Play</span>
+      <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 4h18v3H3V4zm1 4h3v12H4V8zm13 0h3v12h-3V8zm-9 3h8v9H8v-9z" fill="currentColor"/></svg></span>
+      <span class="nav-label">Main Stage</span>
     </div>
     <div class="nav-item" data-page="creator" onclick="navigateTo('creator')">
       <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M12 22C6.49 22 2 17.51 2 12S6.49 2 12 2s10 4.49 10 10-4.49 10-10 10zm0-18c-4.41 0-8 3.59-8 8s3.59 8 8 8 8-3.59 8-8-3.59-8-8-8zm-5.5 11.5c-.28 0-.5-.22-.5-.5s.22-.5.5-.5.5.22.5.5-.22.5-.5.5zm2-5c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm4-2c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm4 2c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm1.5 5c-.28 0-.5-.22-.5-.5s.22-.5.5-.5.5.22.5.5-.22.5-.5.5z" fill="currentColor"/><path d="M22 12c0 .55-.45 1-1 1h-2l-3.2 3.2c-.39.39-1.01.39-1.4 0l-.4-.4c-.39-.39-.39-1.01 0-1.4L17.6 11H21c.55 0 1 .45 1 1z" fill="currentColor"/></svg></span>
@@ -10134,6 +10277,7 @@ function updateSongsFromBackend(data) {
     showPlayLoading(false);
     buildGrid(allSongs);
     buildPlayPanel(allSongs);
+    buildStoreGrid();
   }
 }
 
@@ -11015,15 +11159,13 @@ var diffLevels = ['easy','medium','hard','expert'];
 var diffColors = {easy:'#059669', medium:'#ca8a04', hard:'#ea580c', expert:'#dc2626'};
 
 // ── Mode Tabs ──────────────────────────────────────────
-var modeTabImages = {
-  solo: 'home_tiles/social_1x1.webp'
-};
+var modeTabImages = {};
 
 function buildModeTabs() {
   var container = document.getElementById('play-mode-tabs');
   container.innerHTML = '';
-  var modes = ['Solo', 'Group', 'Battle'];
-  var modeIds = ['solo', 'coop', 'battle'];
+  var modes = ['Solo', 'Group'];
+  var modeIds = ['solo', 'coop'];
   for (var i = 0; i < modes.length; i++) {
     var btn = document.createElement('button');
     var isDisabled = inBandspace ? modeIds[i] === 'solo' : modeIds[i] !== 'solo';
@@ -13079,7 +13221,6 @@ function syncSetlistToUnity() {
 }
 
 var soloGridPage = 0;
-var SOLO_SONGS_PER_PAGE = 3;
 var selectedExperience = 'Stage';
 
 function buildPlayGrid() {
@@ -13092,10 +13233,6 @@ function buildPlayGrid() {
     grid.className = 'play-grid play-grid--solo';
     if (goBar) goBar.style.display = 'none';
     buildSoloGrid(grid);
-  } else if (playMode === 'battle') {
-    grid.className = 'play-grid play-grid--solo';
-    if (goBar) goBar.style.display = 'none';
-    grid.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;width:100%;color:#666;font-size:48px;font-weight:700">Coming Soon...</div>';
   } else {
     grid.className = 'play-grid play-grid--coop';
     if (goBar) goBar.style.display = 'none';
@@ -13104,150 +13241,190 @@ function buildPlayGrid() {
 }
 
 function buildSoloGrid(grid) {
-  // Songs row with pagination
-  var songsRow = document.createElement('div');
-  songsRow.className = 'play-grid-songs-row';
+  // Songs area (full width, grows to absorb space freed by shorter Start button)
+  var songsArea = document.createElement('div');
+  songsArea.className = 'play-songs-area';
+  buildSoloSongsArea(songsArea);
+  grid.appendChild(songsArea);
 
-  var totalPages = Math.max(1, Math.ceil(setlist.length / SOLO_SONGS_PER_PAGE));
-  if (soloGridPage >= totalPages) soloGridPage = totalPages - 1;
-  var start = soloGridPage * SOLO_SONGS_PER_PAGE;
-  var end = Math.min(start + SOLO_SONGS_PER_PAGE, setlist.length);
-
-  // Build song tiles for this page
-  var pageSongs = [];
-  for (var si = start; si < end; si++) {
-    pageSongs.push(setlist[si]);
-  }
-
-  // Layout: 1 song → [empty, song, add]; otherwise songs then add tiles
-  var showSlots = [];
-  if (pageSongs.length === 1) {
-    showSlots.push({type: 'empty'});
-    showSlots.push({type: 'song', song: pageSongs[0], idx: start});
-    showSlots.push({type: 'add'});
-  } else {
-    for (var si2 = 0; si2 < pageSongs.length; si2++) {
-      showSlots.push({type: 'song', song: pageSongs[si2], idx: start + si2});
-    }
-    for (var fi = pageSongs.length; fi < SOLO_SONGS_PER_PAGE; fi++) {
-      showSlots.push({type: 'add'});
-    }
-  }
-
-  var songCount = 0;
-  for (var sc = 0; sc < showSlots.length; sc++) {
-    if (showSlots[sc].type === 'song') songCount++;
-  }
-
-  if (songCount > 0) {
-    songsRow.className = 'play-grid-songs-row has-songs';
-  }
-
-  for (var sl = 0; sl < showSlots.length; sl++) {
-    var slot = showSlots[sl];
-    var tile = document.createElement('div');
-    tile.className = 'play-grid-song';
-    if (slot.type === 'song' && slot.song) {
-      var s = slot.song;
-      var sIdx = slot.idx;
-      if (sIdx === activeSongIdx) tile.className = 'play-grid-song active-song';
-      tile.onclick = (function(i) { return function() { selectSong(i); }; })(sIdx);
-      var instId = getSongInstrument(sIdx);
-      var diffId = getSongDifficulty(sIdx);
-      var instLabel = instId.charAt(0).toUpperCase() + instId.slice(1);
-      var diffLabel = diffId.charAt(0).toUpperCase() + diffId.slice(1);
-      var mMins = Math.floor((s.duration || 0) / 60);
-      var mSecs = (s.duration || 0) % 60;
-      var mDur = mMins + ':' + (mSecs < 10 ? '0' : '') + mSecs;
-      tile.innerHTML =
-        '<div class="play-grid-song-art">' +
-          '<img src="' + (s.file || '') + '" alt="" style="' + (s.file ? '' : 'display:none') + '">' +
-          '<div class="song-pos">' + (sIdx + 1) + '</div>' +
-          '<div style="position:absolute;bottom:0;left:0;right:0;padding:80px 16px 16px;background:linear-gradient(180deg,transparent 0%,rgba(0,0,0,0.9) 60%);z-index:2">' +
-            '<div style="font-size:28px;font-weight:800;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 2px 6px rgba(0,0,0,0.9)">' + (s.title || 'Unknown') + '</div>' +
-            '<div style="font-size:22px;color:rgba(255,255,255,0.75);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 4px rgba(0,0,0,0.8)">' + (s.artist || '') + '</div>' +
-            '<div style="font-size:18px;color:rgba(255,255,255,0.45);margin-top:4px">' + mDur + ' &#183; ' + (s.genre || '') + ' &#183; ' + (s.bpm || '') + ' BPM</div>' +
-            '<div class="song-badges" style="position:static;margin-top:8px">' +
-              '<div class="song-badge"><svg viewBox="0 0 24 24"><path d="M19.59 3.41c-.8-.8-2.1-.8-2.9 0L12 8.1 9.59 5.69c-.8-.8-2.1-.8-2.9 0-.8.8-.8 2.1 0 2.9L9.1 11 3.41 16.69c-.8.8-.8 2.1 0 2.9.4.4.93.59 1.45.59s1.05-.2 1.45-.59L12 13.9l2.41 2.41c.4.4.93.59 1.45.59s1.05-.2 1.45-.59c.8-.8.8-2.1 0-2.9L14.9 11l5.69-5.69c.8-.8.8-2.1 0-2.9z"/></svg>' + instLabel + '</div>' +
-              '<div class="song-badge"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.27 5.82 21 7 14.14l-5-4.87 6.91-1.01z"/></svg>' + diffLabel + '</div>' +
-            '</div>' +
-          '</div>' +
-          '<button class="song-remove-btn" onclick="event.stopPropagation();removeSoloSong(' + sIdx + ')"><svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></button>' +
-        '</div>';
-    } else if (slot.type === 'add') {
-      tile.style.border = '2px dashed rgba(255,255,255,0.25)';
-      tile.style.background = 'rgba(255,255,255,0.04)';
-      tile.style.position = 'relative';
-      tile.onclick = function() { showPlayPicker(); };
-      tile.innerHTML =
-        '<div style="padding-top:100%"></div>' +
-        '<div style="position:absolute;top:0;left:0;right:0;bottom:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px">' +
-          '<div style="font-size:72px;color:#ffffff;font-weight:300;line-height:1">+</div>' +
-          '<div style="font-size:28px;font-weight:700;color:rgba(255,255,255,0.7)">Add Song</div>' +
-        '</div>';
-    } else if (slot.type === 'empty') {
-      tile.style.background = 'transparent';
-      tile.style.border = 'none';
-      tile.style.pointerEvents = 'none';
-      tile.innerHTML = '<div style="padding-top:100%"></div>';
-    }
-    songsRow.appendChild(tile);
-  }
-  grid.appendChild(songsRow);
-
-  // Pagination row
-  if (totalPages > 1) {
-    var pagRow = document.createElement('div');
-    pagRow.className = 'play-grid-pagination';
-    var prevBtn = document.createElement('button');
-    prevBtn.className = 'play-grid-nav-btn';
-    prevBtn.innerHTML = '&#9664;';
-    prevBtn.disabled = soloGridPage === 0;
-    prevBtn.onclick = function() { soloGridPage--; buildPlayGrid(); };
-    var label = document.createElement('div');
-    label.className = 'page-label';
-    label.textContent = (soloGridPage + 1) + ' / ' + totalPages;
-    var nextBtn = document.createElement('button');
-    nextBtn.className = 'play-grid-nav-btn';
-    nextBtn.innerHTML = '&#9654;';
-    nextBtn.disabled = soloGridPage >= totalPages - 1;
-    nextBtn.onclick = function() { soloGridPage++; buildPlayGrid(); };
-    pagRow.appendChild(prevBtn);
-    pagRow.appendChild(label);
-    pagRow.appendChild(nextBtn);
-    grid.appendChild(pagRow);
-  }
-
-  // Setlist management row: Edit / Save / Load
-  var setlistRow = document.createElement('div');
-  setlistRow.className = 'play-grid-options-row';
-  var setlistBtns = [
-    { label: 'Edit Setlist', icon: '<svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>', onclick: function() { showPlayPicker(); } },
-    { label: 'Save Setlist', icon: '<svg viewBox="0 0 24 24"><path d="M17 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>', onclick: function() { openSaveSetlist(); } },
-    { label: 'Load Setlist', icon: '<svg viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/></svg>', onclick: function() { openLoadSetlist(); } },
-    { label: 'Community Setlists', icon: '<svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>', onclick: function() { openCommunitySetlists(); } }
-  ];
-  for (var sb = 0; sb < setlistBtns.length; sb++) {
-    var sBtnTile = document.createElement('div');
-    sBtnTile.className = 'play-grid-option';
-    sBtnTile.onclick = setlistBtns[sb].onclick;
-    sBtnTile.innerHTML = setlistBtns[sb].icon +
-      '<div class="play-grid-option-value">' + setlistBtns[sb].label + '</div>';
-    setlistRow.appendChild(sBtnTile);
-  }
-  grid.appendChild(setlistRow);
-
-  // Options row (Instrument / Difficulty / Experience / Apply to All)
+  // Options row (Instrument / Difficulty / Experience / Apply to All / Save-Load Setlist)
   buildOptionsRow(grid);
 
-  // Full-width Start button with attract animation
+  // Start button — half the previous height
   var startBtn = document.createElement('button');
   startBtn.className = 'play-go-btn play-start-attract jamsesh-signature';
   startBtn.id = 'play-go-btn';
   startBtn.onclick = function() { startGame(); };
   startBtn.textContent = 'Start';
-  startBtn.style.cssText = 'width:100%;flex:3;min-height:0;font-size:96px;font-weight:900;letter-spacing:8px';
+  startBtn.style.cssText = 'width:100%;flex:1.5;min-height:0;font-size:64px;font-weight:900;letter-spacing:6px';
   grid.appendChild(startBtn);
+}
+
+function makeSoloAddTile() {
+  var tile = document.createElement('div');
+  tile.className = 'play-add-song-tile';
+  tile.onclick = function() { showPlayPicker(); };
+  tile.innerHTML =
+    '<div class="plus-icon">+</div>' +
+    '<div class="plus-label">Add Songs</div>';
+  return tile;
+}
+
+function makeSoloSongTile(sIdx) {
+  var s = setlist[sIdx];
+  var tile = document.createElement('div');
+  tile.className = 'play-grid-song';
+  if (sIdx === activeSongIdx) tile.className = 'play-grid-song active-song';
+  tile.onclick = (function(i) { return function() { selectSong(i); }; })(sIdx);
+  var instId = getSongInstrument(sIdx);
+  var diffId = getSongDifficulty(sIdx);
+  var instLabel = instId.charAt(0).toUpperCase() + instId.slice(1);
+  var diffLabel = diffId.charAt(0).toUpperCase() + diffId.slice(1);
+  var mMins = Math.floor((s.duration || 0) / 60);
+  var mSecs = (s.duration || 0) % 60;
+  var mDur = mMins + ':' + (mSecs < 10 ? '0' : '') + mSecs;
+  tile.innerHTML =
+    '<div class="play-grid-song-art">' +
+      '<img src="' + (s.file || '') + '" alt="" style="' + (s.file ? '' : 'display:none') + '">' +
+      '<div class="song-pos">' + (sIdx + 1) + '</div>' +
+      '<div style="position:absolute;bottom:0;left:0;right:0;padding:80px 16px 16px;background:linear-gradient(180deg,transparent 0%,rgba(0,0,0,0.9) 60%);z-index:2">' +
+        '<div style="font-size:28px;font-weight:800;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 2px 6px rgba(0,0,0,0.9)">' + (s.title || 'Unknown') + '</div>' +
+        '<div style="font-size:22px;color:rgba(255,255,255,0.75);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 4px rgba(0,0,0,0.8)">' + (s.artist || '') + '</div>' +
+        '<div style="font-size:18px;color:rgba(255,255,255,0.45);margin-top:4px">' + mDur + ' &#183; ' + (s.genre || '') + ' &#183; ' + (s.bpm || '') + ' BPM</div>' +
+        '<div class="song-badges" style="position:static;margin-top:8px">' +
+          '<div class="song-badge"><svg viewBox="0 0 24 24"><path d="M19.59 3.41c-.8-.8-2.1-.8-2.9 0L12 8.1 9.59 5.69c-.8-.8-2.1-.8-2.9 0-.8.8-.8 2.1 0 2.9L9.1 11 3.41 16.69c-.8.8-.8 2.1 0 2.9.4.4.93.59 1.45.59s1.05-.2 1.45-.59L12 13.9l2.41 2.41c.4.4.93.59 1.45.59s1.05-.2 1.45-.59c.8-.8.8-2.1 0-2.9L14.9 11l5.69-5.69c.8-.8.8-2.1 0-2.9z"/></svg>' + instLabel + '</div>' +
+          '<div class="song-badge"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.27 5.82 21 7 14.14l-5-4.87 6.91-1.01z"/></svg>' + diffLabel + '</div>' +
+        '</div>' +
+      '</div>' +
+      '<button class="song-remove-btn" onclick="event.stopPropagation();removeSoloSong(' + sIdx + ')"><svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></button>' +
+    '</div>';
+  return tile;
+}
+
+function buildSoloSongsArea(container) {
+  container.innerHTML = '';
+  var songCount = setlist.length;
+
+  // ── 0 songs: one big + Add Songs tile ──
+  if (songCount === 0) {
+    var gEmpty = document.createElement('div');
+    gEmpty.className = 'play-songs-grid play-songs-grid--empty';
+    gEmpty.appendChild(makeSoloAddTile());
+    container.appendChild(gEmpty);
+    return;
+  }
+
+  // ── 1 song: 1x2 grid [song][+] ──
+  if (songCount === 1) {
+    var gOne = document.createElement('div');
+    gOne.className = 'play-songs-grid play-songs-grid--one';
+    gOne.appendChild(makeSoloSongTile(0));
+    gOne.appendChild(makeSoloAddTile());
+    container.appendChild(gOne);
+    return;
+  }
+
+  // ── 2-3 songs: 2x2 grid with + always at bottom-right; empties fill between ──
+  if (songCount < 4) {
+    var gFour = document.createElement('div');
+    gFour.className = 'play-songs-grid play-songs-grid--four';
+    for (var i = 0; i < songCount; i++) gFour.appendChild(makeSoloSongTile(i));
+    // Empty cells pad up to slot 3, + goes in slot 4 (bottom-right)
+    for (var eIdx = songCount; eIdx < 3; eIdx++) {
+      var emptyCell = document.createElement('div');
+      emptyCell.className = 'play-songs-empty-cell';
+      gFour.appendChild(emptyCell);
+    }
+    gFour.appendChild(makeSoloAddTile());
+    container.appendChild(gFour);
+    return;
+  }
+
+  // ── 4 songs: 2x2 grid full, no + tile, no pagination ──
+  if (songCount === 4) {
+    var gFull = document.createElement('div');
+    gFull.className = 'play-songs-grid play-songs-grid--four';
+    for (var fi = 0; fi < 4; fi++) gFull.appendChild(makeSoloSongTile(fi));
+    container.appendChild(gFull);
+    return;
+  }
+
+  // ── 5+ songs: 2x2 paginated, + on last page after last song ──
+  var totalTiles = songCount + 1; // +1 for the add tile on the final page
+  var totalPages = Math.ceil(totalTiles / 4);
+  if (soloGridPage >= totalPages) soloGridPage = totalPages - 1;
+  if (soloGridPage < 0) soloGridPage = 0;
+
+  var gPage = document.createElement('div');
+  gPage.className = 'play-songs-grid play-songs-grid--four';
+  var startIdx = soloGridPage * 4;
+  var endIdx = Math.min(startIdx + 4, totalTiles);
+  for (var pi = startIdx; pi < endIdx; pi++) {
+    if (pi < songCount) {
+      gPage.appendChild(makeSoloSongTile(pi));
+    } else {
+      gPage.appendChild(makeSoloAddTile());
+    }
+  }
+  // Pad last page to 4 cells
+  var onPage = endIdx - startIdx;
+  for (var ePad = onPage; ePad < 4; ePad++) {
+    var emptyPad = document.createElement('div');
+    emptyPad.className = 'play-songs-empty-cell';
+    gPage.appendChild(emptyPad);
+  }
+  container.appendChild(gPage);
+
+  // Vertical pagination arrows on the right
+  var nav = document.createElement('div');
+  nav.className = 'play-songs-page-nav';
+  var upBtn = document.createElement('button');
+  upBtn.className = 'play-songs-page-nav-btn';
+  upBtn.innerHTML = '&#9650;';
+  upBtn.disabled = soloGridPage === 0;
+  upBtn.onclick = function() { soloGridPage--; buildPlayGrid(); };
+  var downBtn = document.createElement('button');
+  downBtn.className = 'play-songs-page-nav-btn';
+  downBtn.innerHTML = '&#9660;';
+  downBtn.disabled = soloGridPage >= totalPages - 1;
+  downBtn.onclick = function() { soloGridPage++; buildPlayGrid(); };
+  nav.appendChild(upBtn);
+  nav.appendChild(downBtn);
+  container.appendChild(nav);
+}
+
+function openManagePopup() {
+  var overlay = document.getElementById('option-picker-overlay');
+  var panel = document.getElementById('option-picker-panel');
+  overlay.style.display = 'flex';
+  panel.innerHTML = '';
+  panel.className = 'option-picker-panel';
+  panel.style.width = '1200px';
+  panel.style.maxHeight = '1400px';
+
+  var title = document.createElement('div');
+  title.className = 'option-picker-title';
+  title.textContent = 'Manage Setlist';
+  panel.appendChild(title);
+
+  var items = [
+    { label: 'Edit Setlist', icon: '<svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>', fn: function() { closeOptionPicker(); showPlayPicker(); } },
+    { label: 'Save Setlist', icon: '<svg viewBox="0 0 24 24"><path d="M17 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>', fn: function() { closeOptionPicker(); openSaveSetlist(); } },
+    { label: 'Load Setlist', icon: '<svg viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/></svg>', fn: function() { closeOptionPicker(); openLoadSetlist(); } },
+    { label: 'Community', icon: '<svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>', fn: function() { closeOptionPicker(); openCommunitySetlists(); } }
+  ];
+
+  var g = document.createElement('div');
+  g.style.cssText = 'display:grid;grid-template-columns:repeat(2,1fr);gap:24px;width:100%';
+  for (var i = 0; i < items.length; i++) {
+    var it = items[i];
+    var t = document.createElement('div');
+    t.className = 'manage-picker-tile';
+    t.innerHTML = '<div class="manage-picker-inner">' + it.icon + '<div class="manage-picker-label">' + it.label + '</div></div>';
+    t.onclick = it.fn;
+    g.appendChild(t);
+  }
+  panel.appendChild(g);
 }
 
 function getSongInstrument(idx) {
@@ -13282,10 +13459,8 @@ function applyToAllSongs() {
 function removeSoloSong(idx) {
   if (idx >= 0 && idx < setlist.length) {
     setlist.splice(idx, 1);
-    // Clamp active song and page
+    // Clamp active song; buildSoloSongsArea clamps soloGridPage on rebuild.
     if (activeSongIdx >= setlist.length) activeSongIdx = Math.max(0, setlist.length - 1);
-    var totalPages = Math.max(1, Math.ceil(setlist.length / SOLO_SONGS_PER_PAGE));
-    if (soloGridPage >= totalPages) soloGridPage = totalPages - 1;
     buildPlayGrid();
     syncSetlistToUnity();
   }
@@ -13326,6 +13501,11 @@ function buildOptionsRow(container) {
       label: 'Apply to All', value: 'Songs',
       icon: '<svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>',
       onclick: function() { applyToAllSongs(); }
+    },
+    {
+      label: 'Save / Load', value: 'Setlist',
+      icon: '<svg viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/></svg>',
+      onclick: function() { openManagePopup(); }
     }
   ];
 
@@ -13781,7 +13961,6 @@ var vaultItems = [
 
 function buildVaultGrid() {
   var grid = document.getElementById('vault-grid');
-  grid.innerHTML = '';
   // Pick 9 items for 3x3 grid
   var shown = [];
   var seenCats = {};
@@ -13798,8 +13977,7 @@ function buildVaultGrid() {
     for (var j = 0; j < shown.length; j++) { if (shown[j].name === vaultItems[i].name) { found = true; break; } }
     if (!found) shown.push(vaultItems[i]);
   }
-  for (var i = 0; i < shown.length; i++) {
-    var v = shown[i];
+  buildTiledGrid(grid, shown, function(v, w, h, gc) {
     var tile = document.createElement('div');
     tile.className = 'space-tile';
     tile.style.background = 'url(' + v.file + ') center center / cover no-repeat #1a1a1a';
@@ -13814,8 +13992,8 @@ function buildVaultGrid() {
         '<div style="font-size:32px;font-weight:800;color:#ffffff;">' + v.name + '</div>' +
         '<div style="font-size:20px;color:rgba(255,255,255,0.7);">' + v.cat + '</div>' +
       '</div>';
-    grid.appendChild(tile);
-  }
+    return tile;
+  });
 
   // ── Creator grid ──
   var creatorGrid = document.getElementById('vault-creator-grid');
@@ -14361,18 +14539,66 @@ function switchStoreTab(tab) {
   }
 }
 
+// Shared glow palette (matches home-grid colors)
+var tiledGlowColors = [
+  { c: 'rgba(255,200,0,0.4)', f: 'drop-shadow(0 0 6px rgba(255,200,0,0.8)) drop-shadow(0 0 20px rgba(255,200,0,0.4))', fh: 'drop-shadow(0 0 10px rgba(255,200,0,1)) drop-shadow(0 0 30px rgba(255,200,0,0.5))' },
+  { c: 'rgba(168,85,247,0.4)', f: 'drop-shadow(0 0 6px rgba(168,85,247,0.8)) drop-shadow(0 0 20px rgba(168,85,247,0.4))', fh: 'drop-shadow(0 0 10px rgba(168,85,247,1)) drop-shadow(0 0 30px rgba(168,85,247,0.5))' },
+  { c: 'rgba(0,255,180,0.4)', f: 'drop-shadow(0 0 6px rgba(0,255,180,0.8)) drop-shadow(0 0 20px rgba(0,255,180,0.4))', fh: 'drop-shadow(0 0 10px rgba(0,255,180,1)) drop-shadow(0 0 30px rgba(0,255,180,0.5))' },
+  { c: 'rgba(255,80,200,0.4)', f: 'drop-shadow(0 0 6px rgba(255,80,200,0.8)) drop-shadow(0 0 20px rgba(255,80,200,0.4))', fh: 'drop-shadow(0 0 10px rgba(255,80,200,1)) drop-shadow(0 0 30px rgba(255,80,200,0.5))' },
+  { c: 'rgba(0,224,255,0.4)', f: 'drop-shadow(0 0 6px rgba(0,224,255,0.8)) drop-shadow(0 0 20px rgba(0,224,255,0.4))', fh: 'drop-shadow(0 0 10px rgba(0,224,255,1)) drop-shadow(0 0 30px rgba(0,224,255,0.5))' },
+  { c: 'rgba(60,130,255,0.4)', f: 'drop-shadow(0 0 6px rgba(60,130,255,0.8)) drop-shadow(0 0 20px rgba(60,130,255,0.4))', fh: 'drop-shadow(0 0 10px rgba(60,130,255,1)) drop-shadow(0 0 30px rgba(60,130,255,0.5))' },
+  { c: 'rgba(255,180,80,0.4)', f: 'drop-shadow(0 0 6px rgba(255,180,80,0.8)) drop-shadow(0 0 20px rgba(255,180,80,0.4))', fh: 'drop-shadow(0 0 10px rgba(255,180,80,1)) drop-shadow(0 0 30px rgba(255,180,80,0.5))' }
+];
+
+// Places `items` into the active home-style tiling inside `container`.
+// makeTile(item, w, h, gc) -> DOM element (or null to skip).
+function buildTiledGrid(container, items, makeTile) {
+  if (!container) return;
+  container.innerHTML = '';
+  if (!allTilings || allTilings.length === 0) return;
+  var layoutIdx = currentLayout;
+  if (layoutIdx < 0 || layoutIdx >= allTilings.length) layoutIdx = 0;
+  var tiling = allTilings[layoutIdx];
+  if (!tiling) return;
+
+  // Sort slots by priority: largest area first, then top-left.
+  var slots = [];
+  for (var s = 0; s < tiling.length; s++) {
+    slots.push({ t: tiling[s], area: tiling[s].w * tiling[s].h });
+  }
+  slots.sort(function(a, b) {
+    if (b.area !== a.area) return b.area - a.area;
+    if (a.t.r !== b.t.r) return a.t.r - b.t.r;
+    return a.t.c - b.t.c;
+  });
+
+  var count = Math.min(slots.length, items.length);
+  for (var i = 0; i < count; i++) {
+    var t = slots[i].t;
+    var gc = tiledGlowColors[i % tiledGlowColors.length];
+    var tile = makeTile(items[i], t.w, t.h, gc);
+    if (!tile) continue;
+    tile.style.gridColumn = (t.c + 1) + ' / span ' + t.w;
+    tile.style.gridRow = (t.r + 1) + ' / span ' + t.h;
+    tile.style.filter = gc.f;
+    (function(el, normal, hover) {
+      el.addEventListener('mouseenter', function() { el.style.filter = hover; }, false);
+      el.addEventListener('mouseleave', function() { el.style.filter = normal; }, false);
+    })(tile, gc.f, gc.fh);
+    container.appendChild(tile);
+  }
+}
+
 function buildStoreGrid() {
-  // ── Songs tab: 9 random songs with $2.99 price ──
+  // ── Songs tab: random songs into tiled layout ──
   var songsGrid = document.getElementById('store-songs-grid');
-  songsGrid.innerHTML = '';
   var shuffled = allSongs.slice();
   for (var i = shuffled.length - 1; i > 0; i--) {
     var j = Math.floor(Math.random() * (i + 1));
     var tmp = shuffled[i]; shuffled[i] = shuffled[j]; shuffled[j] = tmp;
   }
   var storeSongs = shuffled.slice(0, 9);
-  for (var i = 0; i < storeSongs.length; i++) {
-    var s = storeSongs[i];
+  buildTiledGrid(songsGrid, storeSongs, function(s, w, h, gc) {
     var tile = document.createElement('div');
     tile.className = 'space-tile';
     tile.style.background = 'url(' + (s.file || 'art/001.jpg') + ') center center / cover no-repeat #1a1a1a';
@@ -14388,35 +14614,36 @@ function buildStoreGrid() {
         '<div style="font-size:32px;font-weight:800;color:#ffffff;">' + (s.title || 'Unknown') + '</div>' +
         '<div style="font-size:20px;color:rgba(255,255,255,0.7);">' + (s.artist || 'Unknown') + '</div>' +
       '</div>';
-    songsGrid.appendChild(tile);
-  }
+    return tile;
+  });
 
-  // ── Packs tab: 6 random packs + 3 empty slots ──
+  // ── Packs tab: 6 packs + 3 locked into tiled layout ──
   var packsGrid = document.getElementById('store-packs-grid');
-  packsGrid.innerHTML = '';
   var packData = [
-    {name:'Starter Bundle', picks:500, items:['Neon Arena','Electric Guitar'], price:'$4.99', color:'#1a3a5c'},
-    {name:'Rock Legend Pack', picks:1200, items:['Fire Stage','Gold Mic'], price:'$9.99', color:'#4a1a1a'},
-    {name:'Party Pack', picks:800, items:['Beach Party','Drum Kit'], price:'$7.99', color:'#1a4a2a'},
-    {name:'Premium Bundle', picks:2500, items:['Diamond','Rainbow Road'], price:'$14.99', color:'#3a1a4a'},
-    {name:'Galaxy Pack', picks:1000, items:['Galaxy Skybox','Synthesizer'], price:'$8.99', color:'#1a2a4a'},
-    {name:'Seasonal Pass', picks:3000, items:['Northern Lights','Cloud Stage'], price:'$19.99', color:'#4a3a1a'}
+    {name:'Starter Bundle', picks:500, items:['Neon Arena','Electric Guitar'], price:'$4.99', color:'#1a3a5c', locked:false},
+    {name:'Rock Legend Pack', picks:1200, items:['Fire Stage','Gold Mic'], price:'$9.99', color:'#4a1a1a', locked:false},
+    {name:'Party Pack', picks:800, items:['Beach Party','Drum Kit'], price:'$7.99', color:'#1a4a2a', locked:false},
+    {name:'Premium Bundle', picks:2500, items:['Diamond','Rainbow Road'], price:'$14.99', color:'#3a1a4a', locked:false},
+    {name:'Galaxy Pack', picks:1000, items:['Galaxy Skybox','Synthesizer'], price:'$8.99', color:'#1a2a4a', locked:false},
+    {name:'Seasonal Pass', picks:3000, items:['Northern Lights','Cloud Stage'], price:'$19.99', color:'#4a3a1a', locked:false},
+    {locked:true, unlock:'Unlocks on 9/28'},
+    {locked:true, unlock:'Unlocks on 10/15'},
+    {locked:true, unlock:'Unlocks on 11/1'}
   ];
-  for (var i = 0; i < 9; i++) {
+  buildTiledGrid(packsGrid, packData, function(p, w, h, gc) {
     var tile = document.createElement('div');
     tile.className = 'space-tile';
     tile.style.position = 'relative';
     tile.style.overflow = 'hidden';
-    if (i < packData.length) {
-      var p = packData[i];
+    tile.style.display = 'flex';
+    tile.style.flexDirection = 'column';
+    tile.style.alignItems = 'center';
+    tile.style.justifyContent = 'center';
+    tile.style.gap = '12px';
+    if (!p.locked) {
       tile.style.background = p.color;
       tile.style.cursor = 'pointer';
-      tile.style.display = 'flex';
-      tile.style.flexDirection = 'column';
-      tile.style.alignItems = 'center';
-      tile.style.justifyContent = 'center';
       tile.style.padding = '24px';
-      tile.style.gap = '12px';
       tile.onclick = (function(pack) {
         return function() { sendToUnity('storeBuyPack', {name: pack.name}); };
       })(p);
@@ -14427,23 +14654,16 @@ function buildStoreGrid() {
         '<div style="font-size:24px;color:#ffffff;text-align:center">' + p.picks + ' Picks</div>' +
         '<div style="font-size:20px;color:rgba(255,255,255,0.6);text-align:center">' + p.items[0] + ' + ' + p.items[1] + '</div>';
     } else {
-      var unlockDates = ['Unlocks on 9/28', 'Unlocks on 10/15', 'Unlocks on 11/1'];
       tile.style.background = '#1a1a1a';
-      tile.style.display = 'flex';
-      tile.style.flexDirection = 'column';
-      tile.style.alignItems = 'center';
-      tile.style.justifyContent = 'center';
-      tile.style.gap = '12px';
       tile.innerHTML =
         '<div style="font-size:48px;line-height:1">&#128274;</div>' +
-        '<div style="font-size:28px;font-weight:700;color:#ffffff">' + unlockDates[i - 6] + '</div>';
+        '<div style="font-size:28px;font-weight:700;color:#ffffff">' + p.unlock + '</div>';
     }
-    packsGrid.appendChild(tile);
-  }
+    return tile;
+  });
 
-  // ── Items tab: category sections ──
+  // ── Items tab: category sections into tiled layout ──
   var itemsGrid = document.getElementById('store-items-grid');
-  itemsGrid.innerHTML = '';
   var storeCategories = [
     {cat:'Spaces',      icon:'&#127760;', file:'art/010.jpg'},
     {cat:'Stages',      icon:'&#127926;', file:'art/020.jpg'},
@@ -14455,8 +14675,7 @@ function buildStoreGrid() {
     {cat:'Theme',       icon:'&#127912;', file:'art/080.jpg'},
     {cat:'Frame',       icon:'&#128247;', file:'art/090.jpg'}
   ];
-  for (var i = 0; i < storeCategories.length; i++) {
-    var c = storeCategories[i];
+  buildTiledGrid(itemsGrid, storeCategories, function(c, w, h, gc) {
     var tile = document.createElement('div');
     tile.className = 'space-tile';
     tile.style.background = 'url(' + c.file + ') center center / cover no-repeat #1a1a1a';
@@ -14471,8 +14690,8 @@ function buildStoreGrid() {
         '<div style="font-size:64px;line-height:1">' + c.icon + '</div>' +
         '<div style="font-size:36px;font-weight:800;color:#ffffff">' + c.cat + '</div>' +
       '</div>';
-    itemsGrid.appendChild(tile);
-  }
+    return tile;
+  });
 }
 
 // ── Themes ──────────────────────────────────────────────
@@ -14502,7 +14721,7 @@ var themes = [
 var currentTheme = 'light-mode';
 var userCoins = 5000;
 var allTilings = [];
-var currentLayout = 283;
+var currentLayout = 317;
 var unlockedThemes = ['wireframe-light', 'wireframe-dark', 'neon-pink', 'cyber-cyan', 'sunset-blaze', 'light-mode', 'rainforest', 'neon-arcade', 'hunter', 'nebula', 'liquid-glass'];
 var pendingPurchaseId = null;
 
@@ -15472,11 +15691,18 @@ function generateAllTilings() {
   return results;
 }
 
-// Default tile priority — override via ?tiles=season,store,vault,...
-var homeTilePriority = ['season', 'store', 'vault', 'creator', 'spaces', 'news', 'social'];
+// Default tile priority — override via ?tiles=mainstage,store,vault,...
+var homeTilePriority = ['mainstage', 'store', 'vault', 'creator', 'spaces', 'news', 'social'];
 
 // All tile definitions keyed by ID
 var homeTileDefs = {
+  mainstage: { id: 'mainstage', title: 'Play Now', sub: 'Head to the Main Stage', detail: '', ext: 'png',
+    glow: {
+      c: 'rgba(0,224,255,0.4)',
+      f: 'drop-shadow(0 0 8px rgba(0,224,255,0.9)) drop-shadow(0 0 22px rgba(168,85,247,0.5))',
+      fh: 'drop-shadow(0 0 14px rgba(0,224,255,1)) drop-shadow(0 0 34px rgba(168,85,247,0.7))'
+    },
+    action: function() { navigateTo('play'); } },
   season:  { id: 'season',  title: 'Grammys Season', sub: '8 Days Left', detail: '40% Complete', ext: 'jpg', action: function() { navigateTo('season'); } },
   store:   { id: 'store',   title: 'Store', sub: 'Golden Stratocaster', detail: '10,000 Picks - 7 days left', ext: 'jfif', action: function() { navigateTo('store'); } },
   vault:   { id: 'vault',   title: 'Vault', sub: '2 New Items Unlocked', detail: 'Check out your new gear', ext: 'webp', action: function() { navigateTo('store', {tab: 'vault'}); } },
@@ -15554,7 +15780,7 @@ function buildHomeGrid(layoutIndex) {
     var t = tiling[i];
     var ht = slotAssignments[i];
     if (!ht) continue;
-    var gc = glowColors[i % glowColors.length];
+    var gc = ht.glow || glowColors[i % glowColors.length];
     var sizeKey = getSizeKey(t.w, t.h);
     var bgSrc = 'home_tiles/' + ht.id + '_' + sizeKey + '.' + ht.ext;
 
@@ -15585,12 +15811,19 @@ function buildHomeGrid(layoutIndex) {
 
     var overlayColor = gc.c.replace(/[\d.]+\)$/, '0.25)');
     var overlayMid = gc.c.replace(/[\d.]+\)$/, '0.4)');
+    var big = (t.w === 3 && t.h === 2);
+    var tSize = big ? 96 : 48;
+    var sSize = big ? 68 : 34;
+    var dSize = big ? 48 : 24;
+    var tShadow = big ? '4px' : '2px';
+    var sShadow = big ? '2px' : '1px';
+    var tLetter = big ? '2px' : '1px';
     tile.innerHTML =
       '<img src="' + bgSrc + '" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:0;border-radius:var(--panel-radius)" alt="">' +
       '<div style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:1;background:linear-gradient(180deg,' + overlayColor + ' 0%,' + overlayMid + ' 40%,rgba(0,0,0,0.7) 100%);border-radius:var(--panel-radius)"></div>' +
-      '<div style="font-size:48px;font-weight:900;color:#ffffff;text-shadow:-2px -2px 0 rgba(0,0,0,0.8),2px -2px 0 rgba(0,0,0,0.8),-2px 2px 0 rgba(0,0,0,0.8),2px 2px 0 rgba(0,0,0,0.8);position:relative;z-index:3;letter-spacing:1px;text-transform:uppercase">' + ht.title + '</div>' +
-      '<div style="font-size:34px;font-weight:700;color:rgba(255,255,255,0.9);text-shadow:-1px -1px 0 rgba(0,0,0,0.7),1px -1px 0 rgba(0,0,0,0.7),-1px 1px 0 rgba(0,0,0,0.7),1px 1px 0 rgba(0,0,0,0.7);position:relative;z-index:3">' + ht.sub + '</div>' +
-      '<div style="font-size:24px;font-weight:600;color:rgba(255,255,255,0.7);text-shadow:-1px -1px 0 rgba(0,0,0,0.6),1px -1px 0 rgba(0,0,0,0.6),-1px 1px 0 rgba(0,0,0,0.6),1px 1px 0 rgba(0,0,0,0.6);position:relative;z-index:3">' + ht.detail + '</div>';
+      '<div style="font-size:' + tSize + 'px;font-weight:900;color:#ffffff;text-shadow:-' + tShadow + ' -' + tShadow + ' 0 rgba(0,0,0,0.8),' + tShadow + ' -' + tShadow + ' 0 rgba(0,0,0,0.8),-' + tShadow + ' ' + tShadow + ' 0 rgba(0,0,0,0.8),' + tShadow + ' ' + tShadow + ' 0 rgba(0,0,0,0.8);position:relative;z-index:3;letter-spacing:' + tLetter + ';text-transform:none">' + ht.title + '</div>' +
+      '<div style="font-size:' + sSize + 'px;font-weight:700;color:rgba(255,255,255,0.9);text-shadow:-' + sShadow + ' -' + sShadow + ' 0 rgba(0,0,0,0.7),' + sShadow + ' -' + sShadow + ' 0 rgba(0,0,0,0.7),-' + sShadow + ' ' + sShadow + ' 0 rgba(0,0,0,0.7),' + sShadow + ' ' + sShadow + ' 0 rgba(0,0,0,0.7);position:relative;z-index:3;text-transform:none">' + ht.sub + '</div>' +
+      '<div style="font-size:' + dSize + 'px;font-weight:600;color:rgba(255,255,255,0.7);text-shadow:-' + sShadow + ' -' + sShadow + ' 0 rgba(0,0,0,0.6),' + sShadow + ' -' + sShadow + ' 0 rgba(0,0,0,0.6),-' + sShadow + ' ' + sShadow + ' 0 rgba(0,0,0,0.6),' + sShadow + ' ' + sShadow + ' 0 rgba(0,0,0,0.6);position:relative;z-index:3;text-transform:none">' + ht.detail + '</div>';
 
     wrap.appendChild(tile);
     container.appendChild(wrap);
@@ -15650,6 +15883,8 @@ function updateLayoutBtn(layoutIndex) {
 function selectLayout(index) {
   currentLayout = index;
   buildHomeGrid(index);
+  buildStoreGrid();
+  buildVaultGrid();
   updateLayoutBtn(index);
   var thumbs = document.querySelectorAll('.layout-thumb');
   for (var i = 0; i < thumbs.length; i++) {
@@ -15841,13 +16076,16 @@ var LEGAL_VERSION = '1';
 var demoEnabled = false;     // ?demo — show demo-only screens
 var onboardEnabled = false;  // ?onboard — force onboarding even if completed
 var skipAll = false;         // ?skip — bypass everything, straight to full menu
+var layoutPickerEnabled = false; // ?layoutPicker — reveal the home layout picker button
 var onboardFlags = {};       // { legal: true, perms_explainer: true }
 
 function parseMode() {
   var params = window.location.search.substring(1).split('&');
   var map = {};
   for (var i = 0; i < params.length; i++) {
-    var kv = params[i].split('=');
+    var p = params[i];
+    if (p.charAt(0) === '?') p = p.substring(1); // tolerate stray '?' after '&'
+    var kv = p.split('=');
     if (kv[0]) map[kv[0]] = kv[1] || '';
   }
 
@@ -15861,6 +16099,7 @@ function parseMode() {
   demoEnabled = 'demo' in map;
   onboardEnabled = 'onboard' in map;
   skipAll = 'skip' in map;
+  layoutPickerEnabled = 'layoutPicker' in map;
 
   // ?onboard clears saved flags to force re-run
   if (onboardEnabled) {
@@ -16201,6 +16440,12 @@ function init() {
   // Parse URL mode and load onboarding flags
   parseMode();
 
+  // Reveal layout picker button only when ?layoutPicker is in URL
+  if (layoutPickerEnabled) {
+    var lpBtn = document.getElementById('home-layout-btn');
+    if (lpBtn) lpBtn.style.display = '';
+  }
+
   // Hide main UI while early access / onboarding screens are showing
   var topbar = document.querySelector('.topbar');
   var navbar = document.querySelector('.navbar');
@@ -16213,6 +16458,10 @@ function init() {
   // Hide grid nav on start (home is blank, picker shows it when needed)
   var gridNavs = document.querySelectorAll('.grid-nav');
   for (var i = 0; i < gridNavs.length; i++) gridNavs[i].style.display = 'none';
+
+  // Tilings must exist before any layout-driven grid builds below
+  allTilings = generateAllTilings();
+  if (currentLayout < 0 || currentLayout >= allTilings.length) currentLayout = 317;
 
   // Initialize play panel structure; Unity bridge pushes real songs + art
   buildPlayPanel([]);
@@ -16238,9 +16487,6 @@ function init() {
   buildVaultGrid();
   buildCreatorGrids();
   buildSeasonGrid();
-  allTilings = generateAllTilings();
-  // Clamp layout to valid range
-  if (currentLayout < 0 || currentLayout >= allTilings.length) currentLayout = 283;
   buildHomeGrid(currentLayout);
   applyTheme(currentTheme);
 

@@ -4,6 +4,17 @@ Single-file HTML/CSS/JS UI prototype for **Jamsesh**, a VR music rhythm game run
 
 ## Changelog
 
+### 2026-04-20
+
+- **"Main Stage" nav rebrand** — renamed Play tab to Main Stage with a proscenium stage icon and a 3s breathing cyan→purple attract glow
+- **Main Stage tab overhaul** — dedicated songs panel with state-aware grid: 0 songs → single big `+`; 1 song → 1×2 `[song][+]`; 2–3 songs → 2×2 with `+` at bottom-right; 4 songs → 2×2 full; 5+ songs → 2×2 paginated with vertical ▲/▼ arrows on the right. Mode tabs reduced to Solo / Group. Start button halved in height; songs area absorbs the freed space. `Save / Load Setlist` joins Instrument / Difficulty / Experience / Apply-to-All in a unified 5-tile options row and opens a 2×2 picker (Edit / Save / Load / Community)
+- **"Play Now" home tile** — new highest-priority mainstage tile (cyan→purple glow matching the nav button); replaces Grammys Season as the featured home slot
+- **Home tile text** — forced uppercase removed; 3×2 tiles double their title/subtitle/detail font sizes with matching shadow and letter-spacing scale
+- **Default home layout** — changed from 283 → 317 (applies to everyone via the static initial value and the out-of-range fallback)
+- **Store tiling** — all four tabs (Songs, Packs, Items, Vault) now use the home-grid tiling mechanic. `?layout=N` reshapes the store too; layout picker rebuilds propagate, and real songs repopulate the tiled Songs tab after `updateSongsFromBackend`
+- **Leaderboard styling** — panel and namecards use `--btn-panel` / `--btn-panel-hover` so they match the rest of the main-panel elements; modifier buttons (Guitar / Medium / Worldwide) forced to white text across all themes
+- **`?layoutPicker` URL flag** — layout-picker button hidden by default and only revealed when the flag is present. URL parser now also tolerates stray `?` after `&`
+
 ### 2026-04-09
 
 - **Song picker grid overhaul** — changed from 5-column to 4-column layout with CSS `padding-top: 100%` aspect ratio (replaces unsupported `aspect-ratio`). Absolute-positioned cover images with improved text shadows
