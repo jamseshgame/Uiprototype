@@ -4,6 +4,16 @@ Single-file HTML/CSS/JS UI prototype for **Jamsesh**, a VR music rhythm game run
 
 ## Changelog
 
+### 2026-04-21
+
+- **Empty default setlist** — Main Stage now starts with zero songs (big "+ Add Songs" tile) instead of 3 random picks. `generateDefaultSetlists()` is no longer called, so the preset Rock Classics / Chill Vibes / Party Mix / Throwbacks / Hot Hits entries are gone
+- **Manage popup simplified** — "Edit Setlist" and "Community" tiles removed; popup is now a 1×2 grid of **Save Setlist** / **Load Setlist** with a full-width **Back** button at the bottom
+- **Load Setlist — 3 tabs** — Personal / Jamsesh / Community. Jamsesh and Community show a large "Coming Soon..." placeholder; Personal shows only user-saved setlists (built-in lesson setlists removed from this view)
+- **Leaderboard picker** — instrument rotation skips Keys ("Coming Soon")
+- **Leaderboard colours** — position, name, and score forced white across all themes; stars forced gold (`#ffd700`); top-3 position no longer recoloured
+- **Load item text** — setlist name and song count rows forced white
+- **Per-tile "Mixed" fix** — song-tile instrument badges resolve a `mixed` setlist selection to the individual song's own instrument (e.g. Guitar Basics → `Guitar`), so "Mixed" never appears on a single tile. The setlist-level `Instrument: Mixed` indicator in the options row is unchanged
+
 ### 2026-04-20
 
 - **"Main Stage" nav rebrand** — renamed Play tab to Main Stage with a proscenium stage icon and a 3s breathing cyan→purple attract glow

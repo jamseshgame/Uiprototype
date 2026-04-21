@@ -954,13 +954,13 @@
   .play-lb-pos {
     font-size: 24px;
     font-weight: 800;
-    color: var(--text-secondary);
+    color: #ffffff;
     width: 48px;
     text-align: center;
     flex-shrink: 0;
   }
 
-  .play-lb-row:nth-child(-n+3) .play-lb-pos { color: var(--gold); }
+  .play-lb-row:nth-child(-n+3) .play-lb-pos { color: #ffffff; }
 
   .play-lb-tile {
     flex: 1;
@@ -993,7 +993,7 @@
     gap: 2px;
     font-size: 16px;
     line-height: 1;
-    color: var(--gold);
+    color: #ffd700;
   }
 
   .play-lb-name {
@@ -1003,13 +1003,13 @@
     overflow: hidden;
     text-overflow: ellipsis;
     line-height: 1.2;
-    color: var(--text-primary);
+    color: #ffffff;
   }
 
   .play-lb-score {
     font-size: 17px;
     font-weight: 700;
-    color: var(--cyan);
+    color: #ffffff;
     line-height: 1.2;
   }
 
@@ -4805,14 +4805,14 @@
   .load-item-info .load-item-name {
     font-size: 28px;
     font-weight: 700;
-    color: var(--text-primary);
+    color: #ffffff;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
   .load-item-info .load-item-count {
     font-size: 20px;
-    color: var(--text-secondary);
+    color: #ffffff;
     margin-top: 4px;
   }
 
@@ -9829,6 +9829,11 @@ button:focus,
 
 <div class="load-overlay" id="load-overlay">
   <div class="load-title">Load Setlist</div>
+  <div class="play-mode-tabs" id="load-tabs" style="flex-shrink:0">
+    <button class="play-mode-tab active" onclick="switchLoadTab('my')">Personal</button>
+    <button class="play-mode-tab" onclick="switchLoadTab('jamsesh')">Jamsesh</button>
+    <button class="play-mode-tab" onclick="switchLoadTab('community')">Community</button>
+  </div>
   <div class="load-list" id="load-list"></div>
   <div class="load-pagination" id="load-pagination"></div>
   <div style="display:flex;gap:var(--grid-gap);flex-shrink:0">
@@ -11980,21 +11985,28 @@ function confirmSaveSetlist() {
   document.getElementById('save-overlay').className = 'save-overlay';
 }
 
+var loadActiveTab = 'my';
+
 function openLoadSetlist() {
   var overlay = document.getElementById('load-overlay');
-  var title = overlay.querySelector('h2');
-  if (title) title.textContent = 'Load Setlist';
+  loadActiveTab = 'my';
+  var tabs = document.querySelectorAll('#load-tabs .play-mode-tab');
+  var ids = ['my', 'jamsesh', 'community'];
+  for (var i = 0; i < tabs.length; i++) {
+    tabs[i].className = 'play-mode-tab' + (ids[i] === loadActiveTab ? ' active' : '');
+  }
   buildLoadList();
   overlay.className = 'load-overlay active';
 }
 
-function openCommunitySetlists() {
-  var overlay = document.getElementById('load-overlay');
-  var list = document.getElementById('load-list');
-  var title = overlay.querySelector('h2');
-  if (title) title.textContent = 'Community Setlists';
-  list.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:400px;color:#666;font-size:48px;font-weight:700">Coming Soon...</div>';
-  overlay.className = 'load-overlay active';
+function switchLoadTab(tab) {
+  loadActiveTab = tab;
+  var tabs = document.querySelectorAll('#load-tabs .play-mode-tab');
+  var ids = ['my', 'jamsesh', 'community'];
+  for (var i = 0; i < tabs.length; i++) {
+    tabs[i].className = 'play-mode-tab' + (ids[i] === tab ? ' active' : '');
+  }
+  buildLoadList();
 }
 
 function closeLoadOverlay() {
@@ -12044,18 +12056,18 @@ function buildLoadList() {
   var pagDiv = document.getElementById('load-pagination');
   pagDiv.innerHTML = '';
 
+  // Jamsesh / Community tabs are placeholders for now
+  if (loadActiveTab === 'jamsesh' || loadActiveTab === 'community') {
+    list.innerHTML = '<div style="grid-column:1/-1;grid-row:1/-1;display:flex;align-items:center;justify-content:center;color:#888;font-size:64px;font-weight:800">Coming Soon...</div>';
+    return;
+  }
+
   var lockStyle = 'opacity:0.3;pointer-events:none;filter:saturate(0) brightness(0.4);';
 
-  // During tutorial: only show lesson setlists
-  // After tutorial: show lessons + saved setlists
+  // Personal tab: only user-saved setlists
   var showItems = [];
-  for (var l = 0; l < lessonSetlists.length; l++) {
-    showItems.push({type: 'lesson', data: lessonSetlists[l]});
-  }
-  if (!isTutorialMode()) {
-    for (var i = 0; i < savedSetlists.length; i++) {
-      showItems.push({type: 'saved', idx: i, data: savedSetlists[i]});
-    }
+  for (var i = 0; i < savedSetlists.length; i++) {
+    showItems.push({type: 'saved', idx: i, data: savedSetlists[i]});
   }
 
   if (showItems.length === 0) {
@@ -12442,7 +12454,10 @@ var instIcons = {guitar:'&#127928;', keys:'&#127929;', drums:'&#129345;', vocals
 var diffIcons = {easy:'&#127922;', medium:'&#127919;', hard:'&#128293;', expert:'&#128128;'};
 
 function rotatePickerInstrument() {
-  pickerInstIdx = (pickerInstIdx + 1) % instruments.length;
+  // Skip Keys ("Coming Soon") in the leaderboard picker rotation
+  do {
+    pickerInstIdx = (pickerInstIdx + 1) % instruments.length;
+  } while (instruments[pickerInstIdx].id === 'keys');
   var inst = instruments[pickerInstIdx];
   selectedInstrument = inst.id;
   document.getElementById('picker-inst-btn').innerHTML = (instIcons[inst.id] || '') + ' ' + inst.label;
@@ -13186,17 +13201,11 @@ function applyPickerFilters() {
 
 function buildPlayPanel(songs) {
   allSongs = songs;
-  // Pick 3 random songs for the setlist — but not if we're a client
-  // in bandspace (the host's setlist will arrive via network).
+  // Start with an empty setlist — user adds songs via the picker.
+  // (In bandspace, a client's setlist still arrives via network.)
   if (!(inBandspace && !isHost)) {
-    var shuffled = songs.slice();
-    for (var i = shuffled.length - 1; i > 0; i--) {
-      var j = Math.floor(Math.random() * (i + 1));
-      var tmp = shuffled[i]; shuffled[i] = shuffled[j]; shuffled[j] = tmp;
-    }
-    setlist = shuffled.slice(0, 3);
+    setlist = [];
   }
-  generateDefaultSetlists();
   initLobbyPlates();
   buildModeTabs();
   buildPlayGrid();
@@ -13277,6 +13286,8 @@ function makeSoloSongTile(sIdx) {
   if (sIdx === activeSongIdx) tile.className = 'play-grid-song active-song';
   tile.onclick = (function(i) { return function() { selectSong(i); }; })(sIdx);
   var instId = getSongInstrument(sIdx);
+  // 'mixed' is a setlist-level concept — resolve to the song's own instrument for the per-tile badge
+  if (instId === 'mixed') instId = s.instrument || 'guitar';
   var diffId = getSongDifficulty(sIdx);
   var instLabel = instId.charAt(0).toUpperCase() + instId.slice(1);
   var diffLabel = diffId.charAt(0).toUpperCase() + diffId.slice(1);
@@ -13400,7 +13411,7 @@ function openManagePopup() {
   panel.innerHTML = '';
   panel.className = 'option-picker-panel';
   panel.style.width = '1200px';
-  panel.style.maxHeight = '1400px';
+  panel.style.maxHeight = '900px';
 
   var title = document.createElement('div');
   title.className = 'option-picker-title';
@@ -13408,10 +13419,8 @@ function openManagePopup() {
   panel.appendChild(title);
 
   var items = [
-    { label: 'Edit Setlist', icon: '<svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>', fn: function() { closeOptionPicker(); showPlayPicker(); } },
     { label: 'Save Setlist', icon: '<svg viewBox="0 0 24 24"><path d="M17 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>', fn: function() { closeOptionPicker(); openSaveSetlist(); } },
-    { label: 'Load Setlist', icon: '<svg viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/></svg>', fn: function() { closeOptionPicker(); openLoadSetlist(); } },
-    { label: 'Community', icon: '<svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>', fn: function() { closeOptionPicker(); openCommunitySetlists(); } }
+    { label: 'Load Setlist', icon: '<svg viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/></svg>', fn: function() { closeOptionPicker(); openLoadSetlist(); } }
   ];
 
   var g = document.createElement('div');
@@ -13425,6 +13434,13 @@ function openManagePopup() {
     g.appendChild(t);
   }
   panel.appendChild(g);
+
+  var backBtn = document.createElement('button');
+  backBtn.className = 'play-bar-btn';
+  backBtn.style.cssText = 'width:100%;margin-top:24px;flex-shrink:0';
+  backBtn.innerHTML = '<svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>Back';
+  backBtn.onclick = function() { closeOptionPicker(); };
+  panel.appendChild(backBtn);
 }
 
 function getSongInstrument(idx) {
