@@ -10229,7 +10229,59 @@ function handleUnityMessage(msg) {
         console.log('[Mode] Synced from PlayFab:', JSON.stringify(onboardFlags));
       }
       break;
+    case 'creatorPhotos': updateCreatorPhotosFromUnity(msg.data); break;
+    case 'creatorArt': updateCreatorArtFromUnity(msg.data); break;
+    case 'creatorPhotoAdded': onCreatorPhotoAdded(msg.data); break;
+    case 'creatorArtGenerated': onCreatorArtGenerated(msg.data); break;
+    case 'creatorArtError': onCreatorArtError(msg.data); break;
     default: console.log('[Unity\u2192Jamsesh] Unhandled:', msg);
+  }
+}
+
+// ── Creator: Unity → HTML ────────────────────────────
+function updateCreatorPhotosFromUnity(urls) {
+  creatorPhotos = Array.isArray(urls) ? urls.slice() : [];
+  buildCreatorPhotosGrid();
+  // If the photo picker is currently open, refresh it so a new capture shows.
+  var pick = document.getElementById('creator-art-pick-screen');
+  if (pick && pick.className.indexOf('active') !== -1) openArtPhotoPicker();
+}
+
+function updateCreatorArtFromUnity(urls) {
+  creatorArtLogos = Array.isArray(urls) ? urls.slice() : [];
+  buildCreatorArtGrid();
+}
+
+function onCreatorPhotoAdded(url) {
+  // Unity has already saved the photo; the authoritative list arrives via
+  // 'creatorPhotos' immediately after this. Close the camera screen (if any)
+  // and route back to the picker if we came from the Art flow.
+  closeCreatorScreen();
+  if (creatorCameraReturnTo === 'artpicker') {
+    openArtPhotoPicker();
+  }
+}
+
+function onCreatorArtGenerated(url) {
+  var t = document.getElementById('cr-tile-0');
+  if (t) {
+    var loading = document.getElementById('cr-loading-0');
+    if (loading && loading.parentNode) loading.parentNode.removeChild(loading);
+    t.innerHTML = '<img src="' + url + '" alt="">';
+  }
+}
+
+function onCreatorArtError(data) {
+  var msg = (data && data.error) ? data.error : 'Unknown error';
+  var t = document.getElementById('cr-tile-0');
+  if (t) {
+    t.innerHTML =
+      '<div style="position:absolute;top:0;left:0;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px;background:#2a1a1a;color:#ffb0b0;font-size:22px;text-align:center">' +
+        '<div style="font-weight:700">Art generation failed</div>' +
+        '<div style="opacity:0.8">' + msg + '</div>' +
+      '</div>';
+  } else {
+    console.warn('[Creator] Art error:', msg);
   }
 }
 
@@ -10440,6 +10492,9 @@ function navigateTo(pageName) {
   if (typeof setPageColors === 'function') setPageColors(pageName);
 
   sendToUnity('navigate', pageName);
+
+  // Ask Unity to refresh the Creator gallery lists when the page is opened.
+  if (pageName === 'creator') sendToUnity('creatorPageOpened', {});
 }
 
 // ── Song Grid ──────────────────────────────────────────
@@ -14217,8 +14272,10 @@ function openCreatorCamera() {
   if (isDemoMode()) {
     document.getElementById('creator-camera-screen').className = 'creator-screen active';
   } else {
-    // Normal mode: skip camera screen, add random photo directly
-    takeCreatorPhoto();
+    // Normal mode: ask Unity to activate passthrough capture.
+    // The user pulls the trigger in VR; Unity sends 'creatorPhotoAdded' +
+    // 'creatorPhotos' when the capture completes (or nothing on cancel).
+    sendToUnity('creatorOpenCamera', {});
   }
 }
 
@@ -14282,8 +14339,11 @@ function usePhotoForArt() {
   }
 }
 
+var creatorSelectedPhotoForArt = null;
+
 function openArtConfig(photoSrc) {
   closeCreatorScreen();
+  creatorSelectedPhotoForArt = photoSrc;
   var screen = document.getElementById('creator-art-config-screen');
   screen.className = 'creator-screen active';
 
@@ -14334,6 +14394,36 @@ function openArtConfig(photoSrc) {
   document.getElementById('creator-prompt-input').value = '';
 }
 
+function buildCreatorArtPrompt() {
+  var parts = [];
+
+  var freeform = document.getElementById('creator-prompt-input').value;
+  if (freeform) freeform = freeform.replace(/^\s+|\s+$/g, '');
+  if (freeform) parts.push(freeform);
+
+  var words = [];
+  for (var k in creatorSelectedWords) {
+    if (creatorSelectedWords[k]) words.push(k);
+  }
+  if (words.length) parts.push('Style influences: ' + words.join(', '));
+
+  var shapeHints = {
+    wide: 'Wide banner composition.',
+    portrait: 'Portrait (vertical) composition.',
+    square: 'Square composition suitable for an album cover or group logo.',
+    circle: 'Circular, centered composition suitable for an avatar or profile image.'
+  };
+  if (shapeHints[creatorSelectedShape]) parts.push(shapeHints[creatorSelectedShape]);
+
+  if (creatorSelectedName) {
+    if (creatorNameType === 'solo') parts.push('For artist "' + creatorSelectedName + '".');
+    else parts.push('For band "' + creatorSelectedName + '".');
+  }
+
+  parts.push('Bold contrast, striking visual style, cohesive color palette. Keep the main subject recognizable.');
+  return parts.join(' ');
+}
+
 function createArt() {
   closeCreatorScreen();
   var screen = document.getElementById('creator-art-results-screen');
@@ -14341,47 +14431,35 @@ function createArt() {
 
   var grid = document.getElementById('creator-results-grid');
   grid.innerHTML = '';
-  // Show loading spinners first
-  var resultImages = ['art/003.jpg','art/015.jpg','art/027.jpg','art/039.jpg'];
-  for (var i = 0; i < 4; i++) {
-    var tile = document.createElement('div');
-    tile.className = 'creator-result-tile';
-    tile.id = 'cr-tile-' + i;
-    tile.innerHTML =
-      '<div style="position:absolute;top:0;left:0;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;z-index:2;background:#1a1a1a" id="cr-loading-' + i + '">' +
-        '<div style="width:60px;height:60px;border:5px solid #333;border-top-color:#ffffff;border-radius:50%;animation:spin 1s linear infinite"></div>' +
-        '<div style="font-size:24px;font-weight:600;color:#888">Generating...</div>' +
-      '</div>';
-    grid.appendChild(tile);
-  }
 
-  // After 5 seconds, reveal the art
-  setTimeout(function() {
-    for (var j = 0; j < 4; j++) {
-      var t = document.getElementById('cr-tile-' + j);
-      if (!t) continue;
-      var loading = document.getElementById('cr-loading-' + j);
-      if (loading) loading.parentNode.removeChild(loading);
-      t.innerHTML =
-        '<img src="' + resultImages[j] + '" alt="">' +
-        '<div class="creator-result-check" id="cr-check-' + j + '">&#10003;</div>';
-      t.onclick = (function(idx) {
-        return function() {
-          var check = document.getElementById('cr-check-' + idx);
-          if (check.className.indexOf('checked') !== -1) {
-            check.className = 'creator-result-check';
-          } else {
-            check.className = 'creator-result-check checked';
-          }
-        };
-      })(j);
-    }
-  }, 5000);
+  // Single result tile — API returns one image.
+  var tile = document.createElement('div');
+  tile.className = 'creator-result-tile';
+  tile.id = 'cr-tile-0';
+  tile.innerHTML =
+    '<div style="position:absolute;top:0;left:0;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;z-index:2;background:#1a1a1a" id="cr-loading-0">' +
+      '<div style="width:60px;height:60px;border:5px solid #333;border-top-color:#ffffff;border-radius:50%;animation:spin 1s linear infinite"></div>' +
+      '<div style="font-size:24px;font-weight:600;color:#888">Generating...</div>' +
+    '</div>';
+  grid.appendChild(tile);
+
+  var prompt = buildCreatorArtPrompt();
+
+  if (isDemoMode()) {
+    // Demo: simulate API latency, then show a stock result.
+    setTimeout(function() { onCreatorArtGenerated('art/003.jpg'); }, 3000);
+  } else {
+    sendToUnity('creatorGenerateArt', {
+      photoPath: creatorSelectedPhotoForArt || '',
+      prompt: prompt
+    });
+  }
 }
 
 function saveCreatorResults() {
+  // Generated art is already written to disk by Unity and will appear in the
+  // Art tab on next render. This button just dismisses the result screen.
   closeCreatorScreen();
-  sendToUnity('creatorSave', {});
 }
 
 var creatorPreviewSrc = '';
@@ -14429,7 +14507,7 @@ function deleteCreatorArt() {
     }
     closeCreatorScreen();
     buildCreatorPhotosGrid();
-    sendToUnity('creatorDeletePhoto', {src: creatorPreviewSrc});
+    sendToUnity('creatorDeletePhoto', {path: creatorPreviewSrc});
   } else {
     for (var i = 0; i < creatorArtLogos.length; i++) {
       if (creatorArtLogos[i] === creatorPreviewSrc) {
@@ -14439,7 +14517,7 @@ function deleteCreatorArt() {
     }
     closeCreatorScreen();
     buildCreatorArtGrid();
-    sendToUnity('creatorDeleteArt', {src: creatorPreviewSrc});
+    sendToUnity('creatorDeleteArt', {path: creatorPreviewSrc});
   }
 }
 
