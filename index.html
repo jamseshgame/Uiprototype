@@ -14125,7 +14125,11 @@ var creatorWords = [
   {label:'Country', bg:'#3a3020'}, {label:'Reggae', bg:'#1a3a1a'}, {label:'Blues', bg:'#1a2a4a'},
   {label:'Neon', bg:'#0a3a3a'}, {label:'Grunge', bg:'#2a2020'}, {label:'Retro', bg:'#3a2a10'},
   {label:'Minimalist', bg:'#2a2a2a'}, {label:'Abstract', bg:'#30204a'}, {label:'Psychedelic', bg:'#2a1040'},
-  {label:'Graffiti', bg:'#20302a'}, {label:'Pixel Art', bg:'#1a2a3a'}
+  {label:'Graffiti', bg:'#20302a'}, {label:'Pixel Art', bg:'#1a2a3a'},
+  {label:'Concert Poster', bg:'#4a2010'}, {label:'Risograph', bg:'#30302a'}, {label:'Oil Painting', bg:'#3a2a15'},
+  {label:'Bauhaus', bg:'#402020'}, {label:'Engraving', bg:'#2a2015'}, {label:'Sumi-e', bg:'#1a1a2a'},
+  {label:'Synthwave', bg:'#30104a'}, {label:'Watercolor', bg:'#1a3040'}, {label:'Art Deco', bg:'#3a3010'},
+  {label:'Collage', bg:'#2a252a'}
 ];
 
 function switchCreatorTab(tab) {
@@ -14420,7 +14424,6 @@ function buildCreatorArtPrompt() {
     else parts.push('For band "' + creatorSelectedName + '".');
   }
 
-  parts.push('Bold contrast, striking visual style, cohesive color palette. Keep the main subject recognizable.');
   return parts.join(' ');
 }
 
