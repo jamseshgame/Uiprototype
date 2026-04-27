@@ -10338,9 +10338,11 @@ function showGameResults(data) {
   var black = document.getElementById('onboard-black');
   black.className = 'visible';
   setTimeout(function() {
+    document.getElementById('screen-results2').classList.remove('active');
     document.getElementById('screen-results1').classList.add('active');
     setTimeout(function() { black.className = ''; }, 50);
   }, 200);
+  _setUrlStep('results1');
 }
 
 function updateProfile(data) {
@@ -11834,9 +11836,11 @@ function startGame() {
     titles.push(setlist[i].title);
   }
   sendToUnity('startGame', {instrument: selectedInstrument, difficulty: selectedDifficulty, setlist: titles});
-  // Reset tabs to group
+  showResults1();
+}
+
+function showResults1() {
   switchResultsTab('group');
-  // Populate results with first setlist song if available
   if (setlist.length > 0) {
     var song = setlist[0];
     var artEl = document.getElementById('results-album-art');
@@ -11846,13 +11850,14 @@ function startGame() {
     if (titleEl) titleEl.textContent = song.title || 'Unknown';
     if (artistEl) artistEl.textContent = song.artist || 'Unknown';
   }
-  // Fade straight to results screen (no gameplay mockup)
   var black = document.getElementById('onboard-black');
   black.className = 'visible';
   setTimeout(function() {
+    document.getElementById('screen-results2').classList.remove('active');
     document.getElementById('screen-results1').classList.add('active');
     setTimeout(function() { black.className = ''; }, 50);
   }, 200);
+  _setUrlStep('results1');
 }
 
 function showResults2() {
@@ -11863,16 +11868,11 @@ function showResults2() {
     document.getElementById('screen-results2').classList.add('active');
     setTimeout(function() { black.className = ''; }, 50);
   }, 200);
+  _setUrlStep('results2');
 }
 
 function backToResults1() {
-  var black = document.getElementById('onboard-black');
-  black.className = 'visible';
-  setTimeout(function() {
-    document.getElementById('screen-results2').classList.remove('active');
-    document.getElementById('screen-results1').classList.add('active');
-    setTimeout(function() { black.className = ''; }, 50);
-  }, 200);
+  showResults1();
 }
 
 function retryGame() {
@@ -11883,9 +11883,11 @@ function exitResults() {
   var black = document.getElementById('onboard-black');
   black.className = 'visible';
   setTimeout(function() {
+    document.getElementById('screen-results1').classList.remove('active');
     document.getElementById('screen-results2').classList.remove('active');
     setTimeout(function() { black.className = ''; }, 50);
   }, 200);
+  _setUrlStep('menu');
 }
 
 // ── Save/Load Setlist ──────────────────────────────────
@@ -15739,6 +15741,7 @@ var demoEnabled = false;     // ?demo — show demo-only screens
 var onboardEnabled = false;  // ?onboard — force onboarding even if completed
 var skipAll = false;         // ?skip — bypass everything, straight to full menu
 var layoutPickerEnabled = false; // ?layoutPicker — reveal the home layout picker button
+var screenOverride = '';     // ?step=results1|results2 — direct-link to a results screen
 var onboardFlags = {};       // { legal: true, perms_explainer: true }
 
 function parseMode() {
@@ -15773,21 +15776,32 @@ function parseMode() {
 
   // ?step=N or ?step=name — set by C# WebViewPage enum or named slugs
   if ('step' in map) {
-    var stepNames = {legal: 1, perms: 2, tutorial: 3, menu: 4};
-    var stepNum = stepNames[map.step] || parseInt(map.step, 10);
-    if (!isNaN(stepNum)) {
-      currentStep = stepNum;
-      // Also set onboard flags so localStorage-based checks pass
-      var stepOrder = ['legal', 'perms_explainer', 'tutorial_play'];
-      for (var s = 0; s < stepOrder.length; s++) {
-        if (s < stepNum - 1) {
-          onboardFlags[stepOrder[s]] = true;
-        } else {
-          delete onboardFlags[stepOrder[s]];
-        }
-      }
-      if (onboardFlags.legal) onboardFlags.legal_version = LEGAL_VERSION;
+    if (map.step === 'results1' || map.step === 'results2') {
+      // Direct-link to a results screen — treat as past onboarding
+      screenOverride = map.step;
+      currentStep = 4;
+      onboardFlags.legal = true;
+      onboardFlags.legal_version = LEGAL_VERSION;
+      onboardFlags.perms_explainer = true;
+      onboardFlags.tutorial_play = true;
       _saveOnboardFlags();
+    } else {
+      var stepNames = {legal: 1, perms: 2, tutorial: 3, menu: 4};
+      var stepNum = stepNames[map.step] || parseInt(map.step, 10);
+      if (!isNaN(stepNum)) {
+        currentStep = stepNum;
+        // Also set onboard flags so localStorage-based checks pass
+        var stepOrder = ['legal', 'perms_explainer', 'tutorial_play'];
+        for (var s = 0; s < stepOrder.length; s++) {
+          if (s < stepNum - 1) {
+            onboardFlags[stepOrder[s]] = true;
+          } else {
+            delete onboardFlags[stepOrder[s]];
+          }
+        }
+        if (onboardFlags.legal) onboardFlags.legal_version = LEGAL_VERSION;
+        _saveOnboardFlags();
+      }
     }
   }
 
@@ -15850,6 +15864,17 @@ function isOnboardMode() {
 
 // Entry point: kicks off the first screen based on ?step=N from C#
 function startFlow() {
+  // ?step=results1|results2 — direct-link straight into a results screen
+  if (screenOverride === 'results1' || screenOverride === 'results2') {
+    _showMainUI();
+    var which = screenOverride;
+    setTimeout(function() {
+      if (which === 'results1') showResults1();
+      else showResults2();
+    }, 50);
+    return;
+  }
+
   // ?skip — bypass everything immediately
   if (skipAll) {
     _setUrlStep('menu');
