@@ -465,7 +465,7 @@
 
   .grid-page {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     grid-template-rows: auto auto auto;
     gap: var(--grid-gap);
     overflow: hidden;
@@ -1255,30 +1255,61 @@
     height: 20px;
     fill: currentColor;
   }
-  .song-remove-btn {
+  .song-hover-actions {
     position: absolute;
-    bottom: 16px;
-    right: 16px;
+    top: 20px;
+    right: 20px;
     z-index: 3;
-    width: 72px;
-    height: 72px;
+    display: flex;
+    gap: 16px;
+    opacity: 0;
+    transition: opacity 0.15s;
+    pointer-events: none;
+  }
+  .play-grid-song:hover .song-hover-actions,
+  .play-grid-song:active .song-hover-actions,
+  .song-tile:hover .song-hover-actions,
+  .song-tile:active .song-hover-actions {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .song-hover-btn {
+    width: 144px;
+    height: 144px;
     border-radius: 50%;
     border: none;
-    background: rgba(0,0,0,0.6);
+    background: rgba(0,0,0,0.65);
     color: #ffffff;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    opacity: 0;
-    transition: opacity 0.15s;
+    transition: background 0.15s, transform 0.1s;
   }
-  .play-grid-song:hover .song-remove-btn,
-  .play-grid-song:active .song-remove-btn {
-    opacity: 1;
+  .song-hover-btn:hover {
+    background: rgba(0,0,0,0.85);
   }
-  .song-remove-btn:active {
-    background: rgba(255,0,0,0.3);
+  .song-hover-btn:active {
+    transform: scale(0.92);
+  }
+  .song-hover-btn.song-hover-btn-remove:active {
+    background: rgba(255,0,0,0.4);
+  }
+  .song-hover-btn.song-hover-btn-play.playing {
+    background: var(--pink);
+  }
+  .song-tile .song-hover-actions {
+    top: 12px;
+    right: 12px;
+    gap: 10px;
+  }
+  .song-tile .song-hover-btn {
+    width: 86px;
+    height: 86px;
+  }
+  .song-tile .song-hover-btn svg {
+    width: 43px;
+    height: 43px;
   }
   .play-grid-song-info {
     padding: 16px;
@@ -2890,143 +2921,6 @@
     background: var(--pink);
   }
 
-  .picker-setlist {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    flex-shrink: 0;
-  }
-
-  .picker-setlist-header {
-    display: flex;
-    align-items: center;
-    gap: var(--grid-gap);
-  }
-
-  .picker-setlist-header > .play-section-header {
-    flex-shrink: 0;
-    font-size: 18px;
-  }
-
-  .picker-setlist-tiles {
-    display: flex;
-    gap: var(--grid-gap);
-    min-width: 0;
-    align-items: center;
-    flex: 1;
-  }
-
-  .picker-setlist-nav {
-    display: flex;
-    justify-content: center;
-    gap: var(--grid-gap);
-  }
-
-  .picker-setlist-row {
-    display: flex;
-    align-items: center;
-    gap: var(--grid-gap);
-  }
-
-  .picker-setlist-tile {
-    flex: 1;
-    aspect-ratio: 1;
-    border-radius: var(--panel-radius);
-    overflow: hidden;
-    position: relative;
-    background: var(--pink-15);
-    border: 2px solid var(--pink-30);
-  }
-
-  .picker-setlist-tile img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-  }
-
-  .picker-setlist-remove {
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(255,80,200,0.85);
-    color: #fff;
-    font-size: 28px;
-    font-weight: 800;
-    cursor: pointer;
-    opacity: 0;
-    transition: opacity 0.15s;
-    z-index: 3;
-  }
-
-  .picker-setlist-tile:hover .picker-setlist-remove { opacity: 1; }
-  .picker-setlist-tile:active .picker-setlist-remove { opacity: 1; }
-
-  .picker-setlist-tile.picker-setlist-empty {
-    border-style: dashed;
-    filter: brightness(0.35);
-  }
-
-  .picker-setlist-arrow {
-    padding: 4px 20px;
-    border-radius: var(--panel-radius);
-    border: none;
-    background: var(--bg-surface);
-    color: var(--text-secondary);
-    font-size: 22px;
-    font-weight: 800;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.15s;
-    font-family: 'Inter', sans-serif;
-  }
-
-  .picker-setlist-arrow:hover {
-    background: var(--bg-surface-hover);
-    color: var(--text-primary);
-  }
-
-  .picker-setlist-arrow:disabled {
-    filter: brightness(0.25);
-    pointer-events: none;
-  }
-
-  /* ── Picker Drag & Drop ──────────────────────── */
-  .picker-drag-ghost {
-    position: fixed;
-    width: 100px;
-    height: 100px;
-    border-radius: var(--panel-radius);
-    overflow: hidden;
-    pointer-events: none;
-    z-index: 9999;
-    opacity: 0.85;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 0 2px var(--pink);
-    transform: translate(-50%, -50%);
-  }
-  .picker-drag-ghost img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-  }
-  .picker-setlist-tile.dragging {
-    opacity: 0.3;
-    transition: opacity 0.15s;
-  }
-  .song-tile.dragging {
-    opacity: 0.3;
-    transition: opacity 0.15s;
-  }
-  .picker-setlist-tile.drop-target {
-    border-color: rgba(255,80,200,1);
-    box-shadow: 0 0 0 3px rgba(255,80,200,0.8), 0 0 30px rgba(255,80,200,0.7), 0 0 60px rgba(255,80,200,0.4);
-    background: rgba(255,80,200,0.55);
-  }
 
   .picker-filters {
     display: flex;
@@ -9174,13 +9068,6 @@ button:focus,
               </div>
               <div class="grid-nav" id="grid-nav-right"></div>
             </div>
-            <div class="picker-setlist">
-              <div class="picker-setlist-header">
-                <div class="play-section-header">Setlist</div>
-              </div>
-              <div class="picker-setlist-tiles" id="picker-setlist-tiles"></div>
-              <div class="picker-setlist-nav" id="picker-setlist-nav"></div>
-            </div>
           </div>
           <div class="play-picker-lb">
             <button class="lb-type-btn" id="picker-inst-btn" onclick="rotatePickerInstrument()">&#127928; Guitar</button>
@@ -10502,9 +10389,9 @@ var currentPage = 0;
 var totalPages = 0;
 var SONGS_PER_PAGE = 12;
 var pageHeight = 0;
-var GRID_COLUMNS = 4;
+var GRID_COLUMNS = 3;
 var GRID_DEFAULT_ROWS = 3;
-var GRID_DEFAULT_STEP_ROWS = 2;
+var GRID_DEFAULT_STEP_ROWS = 3;
 
 function getGridGap() {
   var page = document.querySelector('.grid-page');
@@ -10513,28 +10400,12 @@ function getGridGap() {
 }
 
 function getGridPagingMetrics() {
-  var viewport = document.querySelector('.grid-viewport');
   var gap = getGridGap();
   var pageRows = GRID_DEFAULT_ROWS;
-  var stepRows = GRID_DEFAULT_STEP_ROWS;
-
-  if (viewport && viewport.clientWidth && viewport.clientHeight) {
-    var tileSize = (viewport.clientWidth - gap * (GRID_COLUMNS - 1)) / GRID_COLUMNS;
-    var rowStride = tileSize + gap;
-    if (tileSize > 0 && rowStride > 0) {
-      var visibleRows = viewport.clientHeight / rowStride;
-      pageRows = Math.max(1, Math.ceil(visibleRows));
-      stepRows = Math.max(1, Math.floor(visibleRows));
-    }
-  }
-
-  if (pageRows > 1 && stepRows >= pageRows) stepRows = pageRows - 1;
-  if (stepRows < 1) stepRows = 1;
-
   return {
     gap: gap,
     pageRows: pageRows,
-    stepRows: stepRows,
+    stepRows: pageRows,
     pageSize: pageRows * GRID_COLUMNS
   };
 }
@@ -10628,16 +10499,16 @@ function buildGrid(songs) {
           '<div class="tile-artist">' + song.artist + '</div>' +
           '<div class="tile-meta"><span>' + durTxt + '</span><span>' + song.bpm + ' BPM</span></div>' +
         '</div>' +
-        '<div class="song-tile-actions">' +
-          '<button class="song-tile-btn song-tile-preview">&#9654;</button>' +
-          '<button class="song-tile-btn song-tile-add">+</button>' +
+        '<div class="song-hover-actions">' +
+          '<button class="song-hover-btn song-hover-btn-play" title="Preview"><svg width="72" height="72" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>' +
+          '<button class="song-hover-btn song-hover-btn-add" title="Add"><svg width="72" height="72" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></button>' +
         '</div>';
       (function(s, t) {
-        t.querySelector('.song-tile-preview').onclick = function(e) {
+        t.querySelector('.song-hover-btn-play').onclick = function(e) {
           e.stopPropagation();
           sendToUnity('previewSong', s.title);
         };
-        t.querySelector('.song-tile-add').onclick = function(e) {
+        t.querySelector('.song-hover-btn-add').onclick = function(e) {
           e.stopPropagation();
           addSongToSetlist(s);
         };
@@ -12394,7 +12265,7 @@ function togglePreview(idx) {
   if (previewIdx === idx && previewAudio && !previewAudio.paused) {
     previewAudio.pause();
     previewIdx = -1;
-    buildRightPanel();
+    buildPlayGrid();
     return;
   }
   if (previewAudio) { previewAudio.pause(); }
@@ -12405,8 +12276,8 @@ function togglePreview(idx) {
   previewAudio.volume = 0.5;
   previewAudio.play().catch(function() {});
   previewIdx = idx;
-  previewAudio.onended = function() { previewIdx = -1; buildRightPanel(); };
-  buildRightPanel();
+  previewAudio.onended = function() { previewIdx = -1; buildPlayGrid(); };
+  buildPlayGrid();
 }
 
 var lbTypes = [
@@ -12587,328 +12458,10 @@ function addSongToSetlist(song) {
     setlist.push(song);
   }
   buildPlayGrid();
-  buildPickerSetlist();
   syncSetlistToUnity();
+  hidePlayPicker();
 }
 
-var PICKER_SETLIST_SLOTS = 4;
-var pickerSetlistPage = 0;
-
-function buildPickerSetlist() {
-  var container = document.getElementById('picker-setlist-tiles');
-  var nav = document.getElementById('picker-setlist-nav');
-  if (!container) return;
-
-  // Build into a wrapper row: [left arrow] [tiles] [right arrow]
-  var parent = container.parentNode;
-  // Remove old row wrapper if present
-  var oldRow = parent.querySelector('.picker-setlist-row');
-  if (oldRow) parent.removeChild(oldRow);
-
-  container.innerHTML = '';
-  if (nav) nav.innerHTML = '';
-  container.style.display = 'none';
-
-  var total = setlist.length;
-  var maxPage = Math.max(0, Math.ceil(total / PICKER_SETLIST_SLOTS) - 1);
-  if (pickerSetlistPage > maxPage) pickerSetlistPage = maxPage;
-  var startIdx = pickerSetlistPage * PICKER_SETLIST_SLOTS;
-
-  var row = document.createElement('div');
-  row.className = 'picker-setlist-row';
-
-  // Left arrow
-  var left = document.createElement('button');
-  left.className = 'picker-setlist-arrow';
-  left.innerHTML = '&#9664;';
-  left.disabled = total <= PICKER_SETLIST_SLOTS || pickerSetlistPage === 0;
-  left.onclick = function() { pickerSetlistPage--; buildPickerSetlist(); };
-  row.appendChild(left);
-
-  // Tiles container
-  var tilesWrap = document.createElement('div');
-  tilesWrap.className = 'picker-setlist-tiles';
-  tilesWrap.id = 'picker-setlist-tiles-inner';
-
-  for (var i = 0; i < PICKER_SETLIST_SLOTS; i++) {
-    var songIdx = startIdx + i;
-    var tile = document.createElement('div');
-    if (songIdx < total) {
-      tile.className = 'picker-setlist-tile';
-      tile._setlistIdx = songIdx;
-      tile.innerHTML =
-        '<img src="' + setlist[songIdx].file + '" alt="">' +
-        '<div class="picker-setlist-remove">&#10005;</div>';
-      (function(idx) {
-        tile.querySelector('.picker-setlist-remove').onclick = function(e) {
-          e.stopPropagation();
-          removeFromSetlist(idx);
-          buildPickerSetlist();
-        };
-      })(songIdx);
-    } else {
-      tile.className = 'picker-setlist-tile picker-setlist-empty';
-    }
-    tilesWrap.appendChild(tile);
-  }
-  row.appendChild(tilesWrap);
-
-  // Right arrow
-  var right = document.createElement('button');
-  right.className = 'picker-setlist-arrow';
-  right.innerHTML = '&#9654;';
-  right.disabled = total <= PICKER_SETLIST_SLOTS || pickerSetlistPage >= maxPage;
-  right.onclick = function() { pickerSetlistPage++; buildPickerSetlist(); };
-  row.appendChild(right);
-
-  parent.insertBefore(row, nav);
-}
-
-// ── Picker Drag & Drop ──────────────────────────────
-var pickerDragInited = false;
-var pickerDrag = {
-  active: false,
-  pending: false,
-  source: '',
-  song: null,
-  fromIdx: -1,
-  startX: 0,
-  startY: 0,
-  ghost: null,
-  indicator: null,
-  dropIdx: -1,
-  srcEl: null,
-  suppressClick: false
-};
-var PICKER_DRAG_THRESHOLD = 8;
-
-function initPickerDragDrop() {
-  if (pickerDragInited) return;
-  pickerDragInited = true;
-
-  var track = document.getElementById('grid-track');
-  var slParent = document.querySelector('.picker-setlist');
-
-  if (track) {
-    track.addEventListener('mousedown', function(e) {
-      pickerGridMousedown(e);
-    });
-    track.addEventListener('click', function(e) {
-      if (pickerDrag.suppressClick) {
-        e.stopPropagation();
-        e.preventDefault();
-        pickerDrag.suppressClick = false;
-      }
-    }, true);
-  }
-
-  if (slParent) {
-    slParent.addEventListener('mousedown', function(e) {
-      pickerSlMousedown(e);
-    });
-    slParent.addEventListener('click', function(e) {
-      if (pickerDrag.suppressClick) {
-        e.stopPropagation();
-        e.preventDefault();
-        pickerDrag.suppressClick = false;
-      }
-    }, true);
-  }
-
-  document.addEventListener('mousemove', function(e) {
-    pickerDragMove(e);
-  });
-  document.addEventListener('mouseup', function(e) {
-    pickerDragEnd(e);
-  });
-}
-
-function pickerGridMousedown(e) {
-  var el = e.target;
-  while (el && !el.classList.contains('song-tile')) {
-    if (el.classList.contains('song-tile-btn') || el.classList.contains('song-tile-actions')) return;
-    el = el.parentElement;
-  }
-  if (!el || !el._song) return;
-  e.preventDefault();
-
-  pickerDrag.pending = true;
-  pickerDrag.source = 'grid';
-  pickerDrag.song = el._song;
-  pickerDrag.fromIdx = -1;
-  pickerDrag.startX = e.clientX;
-  pickerDrag.startY = e.clientY;
-  pickerDrag.active = false;
-  pickerDrag.dropIdx = -1;
-  pickerDrag.srcEl = el;
-}
-
-function pickerSlMousedown(e) {
-  var el = e.target;
-  while (el && !el.classList.contains('picker-setlist-tile')) {
-    if (el.classList.contains('picker-setlist-remove')) return;
-    el = el.parentElement;
-  }
-  if (!el || el.classList.contains('picker-setlist-empty')) return;
-  if (typeof el._setlistIdx === 'undefined') return;
-  e.preventDefault();
-
-  pickerDrag.pending = true;
-  pickerDrag.source = 'setlist';
-  pickerDrag.song = setlist[el._setlistIdx];
-  pickerDrag.fromIdx = el._setlistIdx;
-  pickerDrag.startX = e.clientX;
-  pickerDrag.startY = e.clientY;
-  pickerDrag.active = false;
-  pickerDrag.dropIdx = -1;
-  pickerDrag.srcEl = el;
-}
-
-function pickerDragMove(e) {
-  if (!pickerDrag.pending && !pickerDrag.active) return;
-
-  var dx = e.clientX - pickerDrag.startX;
-  var dy = e.clientY - pickerDrag.startY;
-
-  if (pickerDrag.pending && !pickerDrag.active) {
-    if (Math.sqrt(dx * dx + dy * dy) < PICKER_DRAG_THRESHOLD) return;
-    pickerDrag.active = true;
-    pickerDrag.pending = false;
-
-    var ghost = document.createElement('div');
-    ghost.className = 'picker-drag-ghost';
-    var img = document.createElement('img');
-    img.src = pickerDrag.song.file || '';
-    ghost.appendChild(img);
-    document.body.appendChild(ghost);
-    pickerDrag.ghost = ghost;
-
-    if (pickerDrag.srcEl) {
-      pickerDrag.srcEl.classList.add('dragging');
-    }
-  }
-
-  if (!pickerDrag.active) return;
-
-  if (pickerDrag.ghost) {
-    pickerDrag.ghost.style.left = e.clientX + 'px';
-    pickerDrag.ghost.style.top = e.clientY + 'px';
-  }
-
-  pickerUpdateDrop(e);
-}
-
-function pickerUpdateDrop(e) {
-  var container = document.getElementById('picker-setlist-tiles-inner') || document.getElementById('picker-setlist-tiles');
-  if (!container) return;
-
-  var rect = container.getBoundingClientRect();
-  var inBounds = (
-    e.clientX >= rect.left - 20 && e.clientX <= rect.right + 20 &&
-    e.clientY >= rect.top - 40 && e.clientY <= rect.bottom + 40
-  );
-
-  if (!inBounds) {
-    pickerRemoveIndicator();
-    pickerDrag.dropIdx = -1;
-    return;
-  }
-
-  var tiles = container.querySelectorAll('.picker-setlist-tile');
-  var startIdx = pickerSetlistPage * PICKER_SETLIST_SLOTS;
-  var localDropIdx = 0;
-
-  for (var i = 0; i < tiles.length; i++) {
-    if (tiles[i].classList.contains('picker-setlist-empty')) break;
-    var tileRect = tiles[i].getBoundingClientRect();
-    var midX = tileRect.left + tileRect.width / 2;
-    if (e.clientX > midX) {
-      localDropIdx = i + 1;
-    }
-  }
-
-  var globalIdx = startIdx + localDropIdx;
-  if (globalIdx > setlist.length) globalIdx = setlist.length;
-
-  // For reorder, hide indicator when drop would be a no-op
-  if (pickerDrag.source === 'setlist') {
-    var from = pickerDrag.fromIdx;
-    if (globalIdx === from || globalIdx === from + 1) {
-      pickerRemoveIndicator();
-      pickerDrag.dropIdx = -1;
-      return;
-    }
-  }
-
-  pickerDrag.dropIdx = globalIdx;
-  pickerShowIndicator(container, tiles, localDropIdx);
-}
-
-function pickerShowIndicator(container, tiles, localIdx) {
-  pickerRemoveIndicator();
-  // Highlight the tile at the drop position
-  var targetIdx = localIdx;
-  if (targetIdx >= tiles.length) targetIdx = tiles.length - 1;
-  if (targetIdx >= 0 && tiles[targetIdx]) {
-    tiles[targetIdx].classList.add('drop-target');
-  }
-}
-
-function pickerRemoveIndicator() {
-  var targets = document.querySelectorAll('.picker-setlist-tile.drop-target');
-  for (var i = 0; i < targets.length; i++) {
-    targets[i].classList.remove('drop-target');
-  }
-}
-
-function pickerDragEnd(e) {
-  if (!pickerDrag.active && !pickerDrag.pending) return;
-
-  if (pickerDrag.active) {
-    pickerDrag.suppressClick = true;
-    setTimeout(function() { pickerDrag.suppressClick = false; }, 100);
-
-    if (pickerDrag.dropIdx >= 0) {
-      var dropIdx = pickerDrag.dropIdx;
-
-      if (pickerDrag.source === 'grid') {
-        setlist.splice(dropIdx, 0, pickerDrag.song);
-      } else if (pickerDrag.source === 'setlist') {
-        var fromIdx = pickerDrag.fromIdx;
-        var song = setlist.splice(fromIdx, 1)[0];
-        if (dropIdx > fromIdx) dropIdx--;
-        setlist.splice(dropIdx, 0, song);
-      }
-
-      buildPickerSetlist();
-      buildPlayGrid();
-      syncSetlistToUnity();
-    }
-  }
-
-  pickerCleanupDrag();
-}
-
-function pickerCleanupDrag() {
-  if (pickerDrag.ghost && pickerDrag.ghost.parentNode) {
-    pickerDrag.ghost.parentNode.removeChild(pickerDrag.ghost);
-  }
-  pickerRemoveIndicator();
-
-  var dragging = document.querySelectorAll('.dragging');
-  for (var i = 0; i < dragging.length; i++) {
-    dragging[i].classList.remove('dragging');
-  }
-
-  pickerDrag.active = false;
-  pickerDrag.pending = false;
-  pickerDrag.ghost = null;
-  pickerDrag.song = null;
-  pickerDrag.source = '';
-  pickerDrag.fromIdx = -1;
-  pickerDrag.dropIdx = -1;
-  pickerDrag.srcEl = null;
-}
 
 function constrainGridNav() {
   var navEl = document.getElementById('grid-nav-right');
@@ -12931,8 +12484,6 @@ function showPlayPicker() {
   pickerFilterDuration = '';
   pickerFilterSort = 'rank';
   updateFilterButtons();
-  pickerSetlistPage = 0;
-  buildPickerSetlist();
   // Lock the page step to the rendered page height so page-down never skips rows.
   var gridNavs = document.querySelectorAll('.grid-nav');
   for (var i = 0; i < gridNavs.length; i++) gridNavs[i].style.display = 'flex';
@@ -12950,7 +12501,6 @@ function showPlayPicker() {
   pickerSelectedSong = null;
   var firstTile = document.querySelector('.song-tile');
   if (firstTile) firstTile.click();
-  initPickerDragDrop();
 }
 
 function hidePlayPicker() {
@@ -13330,7 +12880,7 @@ function makeSoloAddTile() {
   tile.onclick = function() { showPlayPicker(); };
   tile.innerHTML =
     '<div class="plus-icon">+</div>' +
-    '<div class="plus-label">Add Songs</div>';
+    '<div class="plus-label">Add Song</div>';
   return tile;
 }
 
@@ -13349,6 +12899,12 @@ function makeSoloSongTile(sIdx) {
   var mMins = Math.floor((s.duration || 0) / 60);
   var mSecs = (s.duration || 0) % 60;
   var mDur = mMins + ':' + (mSecs < 10 ? '0' : '') + mSecs;
+  var isPlaying = (previewIdx === sIdx);
+  var playIcon = isPlaying
+    ? '<svg width="72" height="72" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>'
+    : '<svg width="72" height="72" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+  var swapIcon = '<svg width="72" height="72" viewBox="0 0 24 24" fill="currentColor"><path d="M7.5 3.5L4 7l3.5 3.5V8H15V6H7.5V3.5zM20 17l-3.5-3.5V16H9v2h7.5v2.5L20 17z"/></svg>';
+  var removeIcon = '<svg width="72" height="72" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>';
   tile.innerHTML =
     '<div class="play-grid-song-art">' +
       '<img src="' + (s.file || '') + '" alt="" style="' + (s.file ? '' : 'display:none') + '">' +
@@ -13362,8 +12918,17 @@ function makeSoloSongTile(sIdx) {
           '<div class="song-badge"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.27 5.82 21 7 14.14l-5-4.87 6.91-1.01z"/></svg>' + diffLabel + '</div>' +
         '</div>' +
       '</div>' +
-      '<button class="song-remove-btn" onclick="event.stopPropagation();removeSoloSong(' + sIdx + ')"><svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></button>' +
+      '<div class="song-hover-actions">' +
+        '<button class="song-hover-btn song-hover-btn-play' + (isPlaying ? ' playing' : '') + '" title="Preview">' + playIcon + '</button>' +
+        '<button class="song-hover-btn song-hover-btn-swap" title="Swap">' + swapIcon + '</button>' +
+        '<button class="song-hover-btn song-hover-btn-remove" title="Remove">' + removeIcon + '</button>' +
+      '</div>' +
     '</div>';
+  (function(idx) {
+    tile.querySelector('.song-hover-btn-play').onclick = function(e) { e.stopPropagation(); togglePreview(idx); };
+    tile.querySelector('.song-hover-btn-swap').onclick = function(e) { e.stopPropagation(); swapSetlistSong(idx); };
+    tile.querySelector('.song-hover-btn-remove').onclick = function(e) { e.stopPropagation(); removeSoloSong(idx); };
+  })(sIdx);
   return tile;
 }
 
