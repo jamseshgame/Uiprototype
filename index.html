@@ -1311,6 +1311,38 @@
     width: 43px;
     height: 43px;
   }
+
+  .solo-drag-ghost {
+    position: fixed;
+    width: 240px;
+    height: 240px;
+    border-radius: var(--panel-radius);
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.85;
+    box-shadow: 0 16px 48px rgba(0,0,0,0.6), 0 0 0 3px var(--pink);
+    transform: translate(-50%, -50%);
+  }
+  .solo-drag-ghost img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .play-grid-song.solo-dragging {
+    opacity: 0.35;
+  }
+  .play-grid-song.solo-drop-target {
+    box-shadow: 0 0 0 4px var(--pink), 0 0 30px rgba(255,80,200,0.7), 0 0 60px rgba(255,80,200,0.4);
+  }
+  .play-grid-song.solo-draggable {
+    cursor: grab;
+  }
+  .play-grid-song.solo-dragging,
+  .play-grid-song.solo-draggable:active {
+    cursor: grabbing;
+  }
   .play-grid-song-info {
     padding: 16px;
     display: flex;
@@ -12891,7 +12923,12 @@ function makeSoloSongTile(sIdx) {
   var tile = document.createElement('div');
   tile.className = 'play-grid-song';
   if (sIdx === activeSongIdx) tile.className = 'play-grid-song active-song';
-  tile.onclick = (function(i) { return function() { selectSong(i); }; })(sIdx);
+  tile.onclick = (function(i) {
+    return function() {
+      if (soloDrag.suppressClick) { soloDrag.suppressClick = false; return; }
+      selectSong(i);
+    };
+  })(sIdx);
   var instId = getSongInstrument(sIdx);
   // 'mixed' is a setlist-level concept — resolve to the song's own instrument for the per-tile badge
   if (instId === 'mixed') instId = s.instrument || 'guitar';
@@ -12931,7 +12968,156 @@ function makeSoloSongTile(sIdx) {
     tile.querySelector('.song-hover-btn-swap').onclick = function(e) { e.stopPropagation(); swapSetlistSong(idx); };
     tile.querySelector('.song-hover-btn-remove').onclick = function(e) { e.stopPropagation(); removeSoloSong(idx); };
   })(sIdx);
+  tile._setlistIdx = sIdx;
+  if (setlist.length > 1) {
+    tile.classList.add('solo-draggable');
+    tile.addEventListener('mousedown', function(e) { soloDragMousedown(e, sIdx); });
+  }
   return tile;
+}
+
+// ── Main Stage drag-and-drop reordering ────────────────
+var soloDragInited = false;
+var soloDrag = {
+  active: false,
+  pending: false,
+  fromIdx: -1,
+  startX: 0,
+  startY: 0,
+  ghost: null,
+  dropIdx: -1,
+  srcEl: null,
+  suppressClick: false
+};
+var SOLO_DRAG_THRESHOLD = 8;
+
+function initSoloDragDrop() {
+  if (soloDragInited) return;
+  soloDragInited = true;
+  document.addEventListener('mousemove', soloDragMove);
+  document.addEventListener('mouseup', soloDragEnd);
+}
+
+function soloDragMousedown(e, fromIdx) {
+  if (setlist.length < 2) return;
+  // Ignore drags initiated on hover-action buttons
+  var t = e.target;
+  while (t && t !== e.currentTarget) {
+    if (t.classList && (t.classList.contains('song-hover-btn') || t.classList.contains('song-hover-actions'))) return;
+    t = t.parentElement;
+  }
+  e.preventDefault();
+  initSoloDragDrop();
+  soloDrag.pending = true;
+  soloDrag.active = false;
+  soloDrag.fromIdx = fromIdx;
+  soloDrag.startX = e.clientX;
+  soloDrag.startY = e.clientY;
+  soloDrag.dropIdx = -1;
+  soloDrag.srcEl = e.currentTarget;
+}
+
+function soloDragMove(e) {
+  if (!soloDrag.pending && !soloDrag.active) return;
+  var dx = e.clientX - soloDrag.startX;
+  var dy = e.clientY - soloDrag.startY;
+  if (soloDrag.pending && !soloDrag.active) {
+    if (Math.sqrt(dx * dx + dy * dy) < SOLO_DRAG_THRESHOLD) return;
+    soloDrag.active = true;
+    soloDrag.pending = false;
+    var song = setlist[soloDrag.fromIdx];
+    var ghost = document.createElement('div');
+    ghost.className = 'solo-drag-ghost';
+    if (song && song.file) {
+      var img = document.createElement('img');
+      img.src = song.file;
+      ghost.appendChild(img);
+    }
+    document.body.appendChild(ghost);
+    soloDrag.ghost = ghost;
+    if (soloDrag.srcEl) soloDrag.srcEl.classList.add('solo-dragging');
+  }
+  if (!soloDrag.active) return;
+  if (soloDrag.ghost) {
+    soloDrag.ghost.style.left = e.clientX + 'px';
+    soloDrag.ghost.style.top = e.clientY + 'px';
+  }
+  // Find drop target under cursor
+  var hover = document.elementFromPoint(e.clientX, e.clientY);
+  while (hover && !(hover.classList && hover.classList.contains('play-grid-song'))) {
+    hover = hover.parentElement;
+  }
+  var prev = document.querySelectorAll('.play-grid-song.solo-drop-target');
+  for (var p = 0; p < prev.length; p++) prev[p].classList.remove('solo-drop-target');
+  if (hover && hover._setlistIdx != null && hover._setlistIdx !== soloDrag.fromIdx) {
+    hover.classList.add('solo-drop-target');
+    soloDrag.dropIdx = hover._setlistIdx;
+  } else {
+    soloDrag.dropIdx = -1;
+  }
+}
+
+function soloDragEnd() {
+  if (!soloDrag.active && !soloDrag.pending) {
+    soloDragCleanup();
+    return;
+  }
+  if (soloDrag.active) {
+    soloDrag.suppressClick = true;
+    setTimeout(function() { soloDrag.suppressClick = false; }, 100);
+    if (soloDrag.dropIdx >= 0 && soloDrag.dropIdx !== soloDrag.fromIdx) {
+      moveSetlistSong(soloDrag.fromIdx, soloDrag.dropIdx);
+    }
+  }
+  soloDragCleanup();
+}
+
+function soloDragCleanup() {
+  if (soloDrag.ghost && soloDrag.ghost.parentNode) {
+    soloDrag.ghost.parentNode.removeChild(soloDrag.ghost);
+  }
+  var dragging = document.querySelectorAll('.play-grid-song.solo-dragging');
+  for (var i = 0; i < dragging.length; i++) dragging[i].classList.remove('solo-dragging');
+  var drops = document.querySelectorAll('.play-grid-song.solo-drop-target');
+  for (var j = 0; j < drops.length; j++) drops[j].classList.remove('solo-drop-target');
+  soloDrag.active = false;
+  soloDrag.pending = false;
+  soloDrag.ghost = null;
+  soloDrag.fromIdx = -1;
+  soloDrag.dropIdx = -1;
+  soloDrag.srcEl = null;
+}
+
+function moveSetlistSong(fromIdx, toIdx) {
+  if (fromIdx === toIdx) return;
+  if (fromIdx < 0 || fromIdx >= setlist.length) return;
+  if (toIdx < 0 || toIdx >= setlist.length) return;
+  var song = setlist.splice(fromIdx, 1)[0];
+  setlist.splice(toIdx, 0, song);
+  // Remap per-song state to follow the moved index
+  var newInst = {};
+  var newDiff = {};
+  var newSpace = {};
+  var n = setlist.length;
+  for (var newIdx = 0; newIdx < n; newIdx++) {
+    var oldIdx;
+    if (newIdx === toIdx) oldIdx = fromIdx;
+    else if (fromIdx < toIdx && newIdx >= fromIdx && newIdx < toIdx) oldIdx = newIdx + 1;
+    else if (fromIdx > toIdx && newIdx > toIdx && newIdx <= fromIdx) oldIdx = newIdx - 1;
+    else oldIdx = newIdx;
+    if (songInstruments[oldIdx] != null) newInst[newIdx] = songInstruments[oldIdx];
+    if (songDiffs[oldIdx] != null) newDiff[newIdx] = songDiffs[oldIdx];
+    if (songSpaces[oldIdx] != null) newSpace[newIdx] = songSpaces[oldIdx];
+  }
+  songInstruments = newInst;
+  songDiffs = newDiff;
+  songSpaces = newSpace;
+  // Track activeSongIdx through the move
+  if (activeSongIdx === fromIdx) activeSongIdx = toIdx;
+  else if (fromIdx < toIdx && activeSongIdx > fromIdx && activeSongIdx <= toIdx) activeSongIdx--;
+  else if (fromIdx > toIdx && activeSongIdx >= toIdx && activeSongIdx < fromIdx) activeSongIdx++;
+  buildPlayGrid();
+  syncSetlistToUnity();
 }
 
 function buildSoloSongsArea(container) {
