@@ -1268,8 +1268,10 @@
   }
   .play-grid-song:hover .song-hover-actions,
   .play-grid-song:active .song-hover-actions,
+  .play-grid-song.active-song .song-hover-actions,
   .song-tile:hover .song-hover-actions,
-  .song-tile:active .song-hover-actions {
+  .song-tile:active .song-hover-actions,
+  .song-tile.active .song-hover-actions {
     opacity: 1;
     pointer-events: auto;
   }
@@ -10534,8 +10536,8 @@ function buildGrid(songs) {
           '<div class="tile-meta"><span>' + durTxt + '</span><span>' + song.bpm + ' BPM</span></div>' +
         '</div>' +
         '<div class="song-hover-actions">' +
-          '<button class="song-hover-btn song-hover-btn-play" title="Preview"><svg width="72" height="72" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>' +
-          '<button class="song-hover-btn song-hover-btn-add" title="Add"><svg width="72" height="72" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></button>' +
+          '<button class="song-hover-btn song-hover-btn-play"><svg width="72" height="72" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>' +
+          '<button class="song-hover-btn song-hover-btn-add"><svg width="72" height="72" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></button>' +
         '</div>';
       (function(s, t) {
         t.querySelector('.song-hover-btn-play').onclick = function(e) {
@@ -12958,9 +12960,9 @@ function makeSoloSongTile(sIdx) {
         '</div>' +
       '</div>' +
       '<div class="song-hover-actions">' +
-        '<button class="song-hover-btn song-hover-btn-play' + (isPlaying ? ' playing' : '') + '" title="Preview">' + playIcon + '</button>' +
-        '<button class="song-hover-btn song-hover-btn-swap" title="Swap">' + swapIcon + '</button>' +
-        '<button class="song-hover-btn song-hover-btn-remove" title="Remove">' + removeIcon + '</button>' +
+        '<button class="song-hover-btn song-hover-btn-play' + (isPlaying ? ' playing' : '') + '">' + playIcon + '</button>' +
+        '<button class="song-hover-btn song-hover-btn-swap">' + swapIcon + '</button>' +
+        '<button class="song-hover-btn song-hover-btn-remove">' + removeIcon + '</button>' +
       '</div>' +
     '</div>';
   (function(idx) {
@@ -13120,11 +13122,47 @@ function moveSetlistSong(fromIdx, toIdx) {
   syncSetlistToUnity();
 }
 
+var soloLayoutObserver = null;
+
+// Force grid cells to be square: tile = min((W-gap)/cols, (H-gap)/rows).
+// Re-applies on container resize so tiles stay square once the page becomes
+// visible (initial measurement is 0x0 while .page is display:none).
+function sizeSoloGridSquare(grid, container, cols, rows) {
+  function apply() {
+    var rect = container.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+    var cs = getComputedStyle(container);
+    var padW = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
+    var padH = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
+    var W = rect.width - padW;
+    var H = rect.height - padH;
+    var gap = parseFloat(getComputedStyle(grid).gap) || 16;
+    var tile = Math.floor(Math.min(
+      (W - gap * (cols - 1)) / cols,
+      (H - gap * (rows - 1)) / rows
+    ));
+    if (tile <= 0) return;
+    grid.style.gridTemplateColumns = 'repeat(' + cols + ', ' + tile + 'px)';
+    grid.style.gridTemplateRows = 'repeat(' + rows + ', ' + tile + 'px)';
+    grid.style.justifyContent = 'center';
+    grid.style.alignContent = 'center';
+  }
+  apply();
+  if (soloLayoutObserver) { soloLayoutObserver.disconnect(); soloLayoutObserver = null; }
+  if (window.ResizeObserver) {
+    soloLayoutObserver = new ResizeObserver(apply);
+    soloLayoutObserver.observe(container);
+  } else {
+    requestAnimationFrame(apply);
+    setTimeout(apply, 100);
+  }
+}
+
 function buildSoloSongsArea(container) {
   container.innerHTML = '';
   var songCount = setlist.length;
 
-  // ── 0 songs: one big + Add Songs tile ──
+  // ── 0 songs: one big + Add Song tile, fills the whole area ──
   if (songCount === 0) {
     var gEmpty = document.createElement('div');
     gEmpty.className = 'play-songs-grid play-songs-grid--empty';
@@ -13133,68 +13171,72 @@ function buildSoloSongsArea(container) {
     return;
   }
 
-  // ── 1 song: 1x2 grid [song][+] ──
-  if (songCount === 1) {
-    var gOne = document.createElement('div');
-    gOne.className = 'play-songs-grid play-songs-grid--one';
-    gOne.appendChild(makeSoloSongTile(0));
-    gOne.appendChild(makeSoloAddTile());
-    container.appendChild(gOne);
-    return;
-  }
-
-  // ── 2-3 songs: 2x2 grid with + always at bottom-right; empties fill between ──
-  if (songCount < 4) {
-    var gFour = document.createElement('div');
-    gFour.className = 'play-songs-grid play-songs-grid--four';
-    for (var i = 0; i < songCount; i++) gFour.appendChild(makeSoloSongTile(i));
-    // Empty cells pad up to slot 3, + goes in slot 4 (bottom-right)
-    for (var eIdx = songCount; eIdx < 3; eIdx++) {
-      var emptyCell = document.createElement('div');
-      emptyCell.className = 'play-songs-empty-cell';
-      gFour.appendChild(emptyCell);
+  // 3 cols × up-to-2 rows = 6 tiles per page; 6+ songs paginates
+  var SOLO_COLS = 3;
+  var SOLO_PER_PAGE = SOLO_COLS * 2;
+  var pageTiles = []; // entries: {type:'song', idx} | {type:'add'}
+  var needsPagination = songCount + 1 > SOLO_PER_PAGE;
+  var totalPages = 1;
+  if (!needsPagination) {
+    for (var i = 0; i < songCount; i++) pageTiles.push({type:'song', idx:i});
+    pageTiles.push({type:'add'});
+  } else {
+    var totalTiles = songCount + 1; // songs + final add
+    totalPages = Math.ceil(totalTiles / SOLO_PER_PAGE);
+    if (soloGridPage >= totalPages) soloGridPage = totalPages - 1;
+    if (soloGridPage < 0) soloGridPage = 0;
+    var startIdx = soloGridPage * SOLO_PER_PAGE;
+    var endIdx = Math.min(startIdx + SOLO_PER_PAGE, totalTiles);
+    for (var pi = startIdx; pi < endIdx; pi++) {
+      if (pi < songCount) pageTiles.push({type:'song', idx:pi});
+      else pageTiles.push({type:'add'});
     }
-    gFour.appendChild(makeSoloAddTile());
-    container.appendChild(gFour);
+  }
+
+  // Lonely add tile on the final page → fill the area
+  if (pageTiles.length === 1 && pageTiles[0].type === 'add') {
+    var gLone = document.createElement('div');
+    gLone.className = 'play-songs-grid play-songs-grid--empty';
+    gLone.appendChild(makeSoloAddTile());
+    container.appendChild(gLone);
+    if (needsPagination) attachSoloPagination(container, totalPages);
     return;
   }
 
-  // ── 4 songs: 2x2 grid full, no + tile, no pagination ──
-  if (songCount === 4) {
-    var gFull = document.createElement('div');
-    gFull.className = 'play-songs-grid play-songs-grid--four';
-    for (var fi = 0; fi < 4; fi++) gFull.appendChild(makeSoloSongTile(fi));
-    container.appendChild(gFull);
-    return;
+  var cols = SOLO_COLS;
+  var rows = pageTiles.length <= SOLO_COLS ? 1 : 2;
+
+  // Count songs on this page so we know where the add tile lands in its row
+  var songsOnPage = 0;
+  for (var sp = 0; sp < pageTiles.length; sp++) {
+    if (pageTiles[sp].type === 'song') songsOnPage++;
   }
 
-  // ── 5+ songs: 2x2 paginated, + on last page after last song ──
-  var totalTiles = songCount + 1; // +1 for the add tile on the final page
-  var totalPages = Math.ceil(totalTiles / 4);
-  if (soloGridPage >= totalPages) soloGridPage = totalPages - 1;
-  if (soloGridPage < 0) soloGridPage = 0;
+  var grid = document.createElement('div');
+  grid.className = 'play-songs-grid play-songs-grid--square';
 
-  var gPage = document.createElement('div');
-  gPage.className = 'play-songs-grid play-songs-grid--four';
-  var startIdx = soloGridPage * 4;
-  var endIdx = Math.min(startIdx + 4, totalTiles);
-  for (var pi = startIdx; pi < endIdx; pi++) {
-    if (pi < songCount) {
-      gPage.appendChild(makeSoloSongTile(pi));
+  for (var t = 0; t < pageTiles.length; t++) {
+    var spec = pageTiles[t];
+    var el;
+    if (spec.type === 'song') {
+      el = makeSoloSongTile(spec.idx);
     } else {
-      gPage.appendChild(makeSoloAddTile());
+      el = makeSoloAddTile();
+      // Add tile spans the empty cells remaining on its row so the row is flush.
+      var addPosInRow = songsOnPage % cols;
+      var span = addPosInRow === 0 ? cols : cols - addPosInRow;
+      if (span > 1) el.style.gridColumn = 'span ' + span;
     }
+    grid.appendChild(el);
   }
-  // Pad last page to 4 cells
-  var onPage = endIdx - startIdx;
-  for (var ePad = onPage; ePad < 4; ePad++) {
-    var emptyPad = document.createElement('div');
-    emptyPad.className = 'play-songs-empty-cell';
-    gPage.appendChild(emptyPad);
-  }
-  container.appendChild(gPage);
+  container.appendChild(grid);
+  sizeSoloGridSquare(grid, container, cols, rows);
 
-  // Vertical pagination arrows on the right
+  if (!needsPagination) return;
+  attachSoloPagination(container, totalPages);
+}
+
+function attachSoloPagination(container, totalPages) {
   var nav = document.createElement('div');
   nav.className = 'play-songs-page-nav';
   var upBtn = document.createElement('button');
