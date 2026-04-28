@@ -103,7 +103,7 @@ npm run build    # Vite production build
 - **Solo mode layout** (top to bottom): Song tiles row → Setlist management row (Edit/Save/Load/Community) → Options row (Instrument/Difficulty/Experience/Apply to All) → Full-width Start button with `jamsesh-signature` texture and `playNudge` attract animation
 - **Per-song settings**: Each song tile tracks its own instrument and difficulty via `songInstruments[idx]` and `songDiffs[idx]`. Clicking a tile calls `selectSong(idx)` to set `activeSongIdx` (active tile gets white outer glow). The options row shows/changes settings for the active song only.
 - **Apply to All**: 4th tile in the options row copies the active song's instrument + difficulty to every song in the setlist via `applyToAllSongs()`
-- **Song tiles**: Show cover art, position number, title/artist/metadata in a gradient overlay block, instrument/difficulty badges (bottom-left), and a trash button (bottom-right, visible on hover)
+- **Song tiles**: Show cover art, position number, title/artist/metadata in a gradient overlay block, instrument/difficulty badges (bottom-left), and a 3-button hover cluster (top-right): `.song-hover-btn-play` (preview audio via `togglePreview`), `.song-hover-btn-swap` (opens picker via `swapSetlistSong`), `.song-hover-btn-remove` (calls `removeSoloSong`). The play button toggles to a pause icon and turns pink while a snippet is playing; `togglePreview` calls `buildPlayGrid()` so the icon stays in sync.
 - **Mode tabs**: Can have background images via `modeTabImages` object (Solo currently has one)
 - Option tiles open popup panels via `openOptionPicker(type)`:
   - **Instrument**: 2x2 image grid (Guitar, Drums, Vocals, Keys "Coming Soon") → sets `selectedInstrument` and per-song via `setSongInstrument()`
@@ -113,11 +113,12 @@ npm run build    # Vite production build
 - **Lesson setlists**: `lessonSetlists[]` array (Basic, Advanced, Expert) shown at top of Load Setlist popup with JamPick x1000 rewards per row
 
 ### Song Picker Grid
-- `SONGS_PER_PAGE = 20` songs per grid page
+- **3×3 grid, 9 songs per page**, discrete (non-overlapping) paging. Driven by `GRID_COLUMNS = 3` and `GRID_DEFAULT_ROWS = 3`. `getGridPagingMetrics()` returns `pageRows === stepRows`, so each down/up arrow click advances by a full page.
 - `buildGrid(songs)` renders the paginated song grid with `buildNavButtons()` for pagination
 - `constrainGridNav()` measures grid page height dynamically — must run after picker is visible
 - `applyPickerFilters()` applies genre/decade/duration/sort filters
 - `showPlayPicker()` hides play-main-layout and shows the picker; `hidePlayPicker()` reverses
+- **Picker tile hover buttons**: each `.song-tile` carries the same `.song-hover-actions` cluster used on the Main Stage tiles, but smaller (86×86) and limited to two buttons — `.song-hover-btn-play` (calls `sendToUnity('previewSong', …)`) and `.song-hover-btn-add` (calls `addSongToSetlist`). `addSongToSetlist` immediately calls `hidePlayPicker()`, so adding/swapping returns the user to the setlist main screen — there is no in-picker setlist preview.
 
 ### Gameplay & Results Flow
 - `startGame()` populates results from setlist, fades to gameplay screen via `#onboard-black` overlay
