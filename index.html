@@ -10390,7 +10390,17 @@ function showGameResults(data) {
 }
 
 function updateProfile(data) {
-  if (data.name) document.querySelector('.profile-name').textContent = data.name;
+  if (data.name) {
+    document.querySelector('.profile-name').textContent = data.name;
+    var neonName = document.getElementById('career-neon-name');
+    if (neonName) neonName.textContent = data.name;
+    // Keep the creator "Solo - <name>" picker label in sync until the user
+    // explicitly picks a group/none (creatorNameType stays 'solo' by default).
+    if (creatorNameType === 'solo') {
+      creatorSelectedName = data.name;
+      updateCreatorNameBtn();
+    }
+  }
   if (data.level != null) document.querySelector('.level-badge').textContent = data.level;
   if (data.xp != null && data.xpMax != null) {
     var pct = Math.min(100, Math.round((data.xp / data.xpMax) * 100));
@@ -11943,8 +11953,12 @@ function switchResultsTab(tab) {
   resultsScoreTab = tab;
   resultsLbTab = tab;
 
-  // Update title
-  document.getElementById('results-group-name').textContent = tab === 'group' ? 'Jamsesh Hunters' : 'Rael';
+  // Update title — pull the live profile name for the "Me" tab so it tracks
+  // the username pushed from Unity instead of the hardcoded default.
+  var meName = 'Rael';
+  var meEl = document.querySelector('.profile-name');
+  if (meEl && meEl.textContent) meName = meEl.textContent;
+  document.getElementById('results-group-name').textContent = tab === 'group' ? 'Jamsesh Hunters' : meName;
 
   // Update score tabs
   var scoreTabs = document.getElementById('score-tabs').children;
@@ -14517,7 +14531,7 @@ function openCreatorNamePicker() {
   grid.style.height = '1200px';
 
   var profileName = 'Rael';
-  var profileEl = document.querySelector('.topbar-username');
+  var profileEl = document.querySelector('.profile-name');
   if (profileEl) profileName = profileEl.textContent;
   var profileAvatar = 'avatars/rael_new.png';
   var profileImg = document.querySelector('.profile-avatar img');
