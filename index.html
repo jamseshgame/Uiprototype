@@ -456,19 +456,25 @@
     flex: 1;
     overflow: hidden;
     position: relative;
+    /* Padding so :hover translateY+scale glow doesn't get clipped at the edges */
+    padding: 12px;
+    cursor: grab;
   }
+  .grid-viewport.grid-dragging { cursor: grabbing; }
 
   .grid-track {
     width: 100%;
-    transition: transform 0.4s ease;
+    will-change: transform;
+  }
+  .grid-track.grid-track-animated {
+    transition: transform 0.25s ease;
   }
 
   .grid-page {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: auto auto auto;
     gap: var(--grid-gap);
-    overflow: hidden;
+    justify-content: center;
   }
 
   .song-tile {
@@ -10421,13 +10427,13 @@ function navigateTo(pageName) {
 }
 
 // ── Song Grid ──────────────────────────────────────────
-var currentPage = 0;
-var totalPages = 0;
-var SONGS_PER_PAGE = 12;
-var pageHeight = 0;
 var GRID_COLUMNS = 3;
-var GRID_DEFAULT_ROWS = 3;
-var GRID_DEFAULT_STEP_ROWS = 3;
+var GRID_VISIBLE_ROWS = 3;
+var pickerScrollOffset = 0;     // current Y translation in px (0 = top)
+var pickerScrollMax = 0;        // total content height - viewport height
+var pickerTileSize = 0;         // computed square tile size in px
+var pickerSizeObserver = null;
+var pickerGamepadInited = false;
 
 function getGridGap() {
   var page = document.querySelector('.grid-page');
@@ -10435,59 +10441,19 @@ function getGridGap() {
   return parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--grid-gap')) || 0;
 }
 
-function getGridPagingMetrics() {
-  var gap = getGridGap();
-  var pageRows = GRID_DEFAULT_ROWS;
-  return {
-    gap: gap,
-    pageRows: pageRows,
-    stepRows: pageRows,
-    pageSize: pageRows * GRID_COLUMNS
-  };
-}
-
-function getRenderedGridPageHeight() {
-  var firstPage = document.querySelector('.grid-page');
-  if (!firstPage) return 0;
-
-  var measuredHeight = Math.ceil(firstPage.getBoundingClientRect().height);
-  if (measuredHeight > 0) return measuredHeight;
-
-  var measuredTile = firstPage.querySelector('.song-tile');
-  if (!measuredTile) return 0;
-
-  var gap = parseFloat(getComputedStyle(firstPage).gap) || 0;
-  return Math.ceil(3 * measuredTile.offsetHeight + 2 * gap);
-}
-
-function syncGridPageMetrics() {
-  pageHeight = getRenderedGridPageHeight();
-  if (!pageHeight) return 0;
-
-  var gridPages = document.querySelectorAll('.grid-page');
-  for (var i = 0; i < gridPages.length; i++) {
-    gridPages[i].style.height = pageHeight + 'px';
-  }
-
-  return pageHeight;
-}
-
 function buildNavButtons(container, id) {
   container.innerHTML = '';
-
-  // Up one page
   var prev = document.createElement('button');
   prev.className = 'grid-nav-btn';
   prev.innerHTML = '&#9650;';
-  prev.onclick = function() { gridPage(-1); };
+  prev.onclick = function() { pickerScrollByRow(-1); };
   prev.id = id + '-prev';
   container.appendChild(prev);
 
-  // Down one page
   var next = document.createElement('button');
   next.className = 'grid-nav-btn';
   next.innerHTML = '&#9660;';
-  next.onclick = function() { gridPage(1); };
+  next.onclick = function() { pickerScrollByRow(1); };
   next.id = id + '-next';
   container.appendChild(next);
 }
@@ -10495,90 +10461,231 @@ function buildNavButtons(container, id) {
 function buildGrid(songs) {
   var track = document.getElementById('grid-track');
   track.innerHTML = '';
-  var paging = getGridPagingMetrics();
-  SONGS_PER_PAGE = paging.pageSize;
+  var grid = document.createElement('div');
+  grid.className = 'grid-page';
+  grid.id = 'grid-content';
 
-  var totalRows = Math.ceil(songs.length / GRID_COLUMNS);
-  var startRows = [];
-  if (totalRows > 0) {
-    for (var startRow = 0; startRow < totalRows; startRow += paging.stepRows) {
-      startRows.push(startRow);
-      if (startRow + paging.pageRows >= totalRows) break;
-    }
+  for (var i = 0; i < songs.length; i++) {
+    var song = songs[i];
+    var tile = document.createElement('div');
+    tile.className = 'song-tile';
+    tile.setAttribute('data-song-index', i);
+    tile._song = song;
+    tile.onclick = (function(s) {
+      return function() { selectPickerSong(s, this); };
+    })(song);
+    var dm = Math.floor(song.duration / 60);
+    var ds = song.duration % 60;
+    var durTxt = dm + ':' + (ds < 10 ? '0' : '') + ds;
+    tile.innerHTML =
+      '<img src="' + song.file + '" alt="" loading="lazy">' +
+      '<span class="tile-rank">#' + song.rank + '</span>' +
+      '<div class="tile-info">' +
+        '<div class="tile-title">' + song.title + '</div>' +
+        '<div class="tile-artist">' + song.artist + '</div>' +
+        '<div class="tile-meta"><span>' + durTxt + '</span><span>' + song.bpm + ' BPM</span></div>' +
+      '</div>' +
+      '<div class="song-hover-actions">' +
+        '<button class="song-hover-btn song-hover-btn-play"><svg width="72" height="72" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>' +
+        '<button class="song-hover-btn song-hover-btn-add"><svg width="72" height="72" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></button>' +
+      '</div>';
+    (function(s, t) {
+      t.querySelector('.song-hover-btn-play').onclick = function(e) {
+        e.stopPropagation();
+        sendToUnity('previewSong', s.title);
+      };
+      t.querySelector('.song-hover-btn-add').onclick = function(e) {
+        e.stopPropagation();
+        addSongToSetlist(s);
+      };
+    })(song, tile);
+    grid.appendChild(tile);
   }
-  totalPages = startRows.length;
+  track.appendChild(grid);
 
-  for (var p = 0; p < totalPages; p++) {
-    var page = document.createElement('div');
-    page.className = 'grid-page';
-    page.style.gridTemplateRows = 'repeat(' + paging.pageRows + ', auto)';
-    var start = startRows[p] * GRID_COLUMNS;
-    var end = Math.min(start + SONGS_PER_PAGE, songs.length);
-
-    for (var i = start; i < end; i++) {
-      var song = songs[i];
-      var tile = document.createElement('div');
-      tile.className = 'song-tile';
-      tile.setAttribute('data-song-index', i);
-      tile._song = song;
-      tile.onclick = (function(s) {
-        return function() { selectPickerSong(s, this); };
-      })(song);
-      var dm = Math.floor(song.duration / 60);
-      var ds = song.duration % 60;
-      var durTxt = dm + ':' + (ds < 10 ? '0' : '') + ds;
-      tile.innerHTML =
-        '<img src="' + song.file + '" alt="" loading="lazy">' +
-        '<span class="tile-rank">#' + song.rank + '</span>' +
-        '<div class="tile-info">' +
-          '<div class="tile-title">' + song.title + '</div>' +
-          '<div class="tile-artist">' + song.artist + '</div>' +
-          '<div class="tile-meta"><span>' + durTxt + '</span><span>' + song.bpm + ' BPM</span></div>' +
-        '</div>' +
-        '<div class="song-hover-actions">' +
-          '<button class="song-hover-btn song-hover-btn-play"><svg width="72" height="72" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>' +
-          '<button class="song-hover-btn song-hover-btn-add"><svg width="72" height="72" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></button>' +
-        '</div>';
-      (function(s, t) {
-        t.querySelector('.song-hover-btn-play').onclick = function(e) {
-          e.stopPropagation();
-          sendToUnity('previewSong', s.title);
-        };
-        t.querySelector('.song-hover-btn-add').onclick = function(e) {
-          e.stopPropagation();
-          addSongToSetlist(s);
-        };
-      })(song, tile);
-      page.appendChild(tile);
-    }
-    track.appendChild(page);
-  }
-
-  // Page height will be measured when picker is first opened
   buildNavButtons(document.getElementById('grid-nav-right'), 'right');
+  sizePickerGrid();
+  pickerScrollOffset = 0;
+  setPickerScroll(0, false);
+  setupPickerScrollObserver();
+  setupPickerDrag();
+  setupPickerGamepad();
+}
+
+// Compute square tile size so 3 cols × 3 rows fit inside the viewport.
+function sizePickerGrid() {
+  var viewport = document.querySelector('.grid-viewport');
+  var grid = document.getElementById('grid-content');
+  if (!viewport || !grid) return;
+  var rect = viewport.getBoundingClientRect();
+  if (!rect.width || !rect.height) return;
+  var cs = getComputedStyle(viewport);
+  var padW = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
+  var padH = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
+  var W = rect.width - padW;
+  var H = rect.height - padH;
+  var gap = getGridGap();
+  var tile = Math.floor(Math.min(
+    (W - gap * (GRID_COLUMNS - 1)) / GRID_COLUMNS,
+    (H - gap * (GRID_VISIBLE_ROWS - 1)) / GRID_VISIBLE_ROWS
+  ));
+  if (tile <= 0) return;
+  pickerTileSize = tile;
+  grid.style.gridTemplateColumns = 'repeat(' + GRID_COLUMNS + ', ' + tile + 'px)';
+  grid.style.gridAutoRows = tile + 'px';
+  recomputePickerScrollMax();
+}
+
+function recomputePickerScrollMax() {
+  var viewport = document.querySelector('.grid-viewport');
+  var grid = document.getElementById('grid-content');
+  if (!viewport || !grid) return;
+  var cs = getComputedStyle(viewport);
+  var padH = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
+  var vH = viewport.getBoundingClientRect().height - padH;
+  var gH = grid.getBoundingClientRect().height;
+  pickerScrollMax = Math.max(0, gH - vH);
+  if (pickerScrollOffset > pickerScrollMax) setPickerScroll(pickerScrollMax, false);
   updateNavState();
 }
 
-function goToPage(idx) {
-  if (idx < 0 || idx >= totalPages) return;
-  if (!pageHeight) syncGridPageMetrics();
-  currentPage = idx;
-  document.getElementById('grid-track').style.transform = 'translateY(-' + (currentPage * pageHeight) + 'px)';
+function setPickerScroll(offset, animate) {
+  if (offset < 0) offset = 0;
+  if (offset > pickerScrollMax) offset = pickerScrollMax;
+  pickerScrollOffset = offset;
+  var track = document.getElementById('grid-track');
+  if (!track) return;
+  if (animate) track.classList.add('grid-track-animated');
+  else track.classList.remove('grid-track-animated');
+  track.style.transform = 'translateY(' + (-offset) + 'px)';
   updateNavState();
 }
 
-function gridPage(dir) { goToPage(currentPage + dir); }
+function pickerScrollBy(dy, animate) { setPickerScroll(pickerScrollOffset + dy, animate); }
+
+function pickerScrollByRow(dir) {
+  var step = pickerTileSize + getGridGap();
+  setPickerScroll(pickerScrollOffset + dir * step, true);
+}
 
 function updateNavState() {
   var navs = document.querySelectorAll('.grid-nav');
   for (var n = 0; n < navs.length; n++) {
-    var atTop = (currentPage === 0);
-    var atBottom = (currentPage === totalPages - 1);
     var prev = navs[n].querySelector('[id$="-prev"]');
     var next = navs[n].querySelector('[id$="-next"]');
-    if (prev) prev.disabled = atTop;
-    if (next) next.disabled = atBottom;
+    if (prev) prev.disabled = pickerScrollOffset <= 0;
+    if (next) next.disabled = pickerScrollOffset >= pickerScrollMax - 0.5;
   }
+}
+
+function setupPickerScrollObserver() {
+  var viewport = document.querySelector('.grid-viewport');
+  if (!viewport) return;
+  if (pickerSizeObserver) { pickerSizeObserver.disconnect(); pickerSizeObserver = null; }
+  if (window.ResizeObserver) {
+    pickerSizeObserver = new ResizeObserver(function() {
+      sizePickerGrid();
+    });
+    pickerSizeObserver.observe(viewport);
+  }
+}
+
+// ── Click-and-drag scroll ───────────────────────────────
+var pickerDragInited = false;
+var pickerDragState = {
+  active: false,
+  pending: false,
+  dragged: false,
+  startY: 0,
+  startOffset: 0,
+  suppressClick: false
+};
+var PICKER_DRAG_THRESHOLD = 6;
+
+function setupPickerDrag() {
+  if (pickerDragInited) return;
+  pickerDragInited = true;
+  var viewport = document.querySelector('.grid-viewport');
+  if (!viewport) return;
+
+  viewport.addEventListener('mousedown', function(e) {
+    // Don't start drag if click originated on a button (preview/add hover btn or nav)
+    var t = e.target;
+    while (t && t !== viewport) {
+      if (t.tagName === 'BUTTON') return;
+      t = t.parentElement;
+    }
+    pickerDragState.pending = true;
+    pickerDragState.dragged = false;
+    pickerDragState.startY = e.clientY;
+    pickerDragState.startOffset = pickerScrollOffset;
+  });
+
+  document.addEventListener('mousemove', function(e) {
+    if (!pickerDragState.pending && !pickerDragState.active) return;
+    var dy = e.clientY - pickerDragState.startY;
+    if (pickerDragState.pending && Math.abs(dy) >= PICKER_DRAG_THRESHOLD) {
+      pickerDragState.pending = false;
+      pickerDragState.active = true;
+      pickerDragState.dragged = true;
+      viewport.classList.add('grid-dragging');
+    }
+    if (pickerDragState.active) {
+      setPickerScroll(pickerDragState.startOffset - dy, false);
+      e.preventDefault();
+    }
+  });
+
+  document.addEventListener('mouseup', function() {
+    if (pickerDragState.active) {
+      pickerDragState.suppressClick = true;
+      setTimeout(function() { pickerDragState.suppressClick = false; }, 150);
+    }
+    pickerDragState.active = false;
+    pickerDragState.pending = false;
+    viewport.classList.remove('grid-dragging');
+  });
+
+  // Capture-phase click suppressor: kills any click that follows a drag
+  viewport.addEventListener('click', function(e) {
+    if (pickerDragState.suppressClick) {
+      e.stopPropagation();
+      e.preventDefault();
+      pickerDragState.suppressClick = false;
+    }
+  }, true);
+}
+
+// ── Quest controller analog stick scroll ────────────────
+function setupPickerGamepad() {
+  if (pickerGamepadInited) return;
+  pickerGamepadInited = true;
+  var lastTs = 0;
+  function poll(ts) {
+    var dt = lastTs ? Math.min(50, ts - lastTs) : 16;
+    lastTs = ts;
+    var picker = document.getElementById('play-picker');
+    if (picker && picker.classList.contains('active') && navigator.getGamepads) {
+      var pads = navigator.getGamepads();
+      var ay = 0;
+      for (var i = 0; i < pads.length; i++) {
+        var p = pads[i];
+        if (!p || !p.axes) continue;
+        // Read both stick Y axes; whichever is deflected wins
+        var y1 = p.axes[1] || 0;
+        var y3 = p.axes[3] || 0;
+        if (Math.abs(y1) > Math.abs(ay)) ay = y1;
+        if (Math.abs(y3) > Math.abs(ay)) ay = y3;
+      }
+      if (Math.abs(ay) > 0.15) {
+        // Cubic ramp for finer control near center; ~1200 px/s at full deflection
+        var v = ay * Math.abs(ay) * ay;
+        pickerScrollBy(v * 1200 * dt / 1000, false);
+      }
+    }
+    requestAnimationFrame(poll);
+  }
+  requestAnimationFrame(poll);
 }
 
 // ── Spaces Grid ─────────────────────────────────────────
@@ -12466,12 +12573,12 @@ function addSongToSetlist(song) {
 
 function constrainGridNav() {
   var navEl = document.getElementById('grid-nav-right');
-  if (navEl) {
-    var viewport = document.querySelector('.grid-viewport');
-    var contentH = viewport ? viewport.clientHeight : (pageHeight || getRenderedGridPageHeight());
-    if (!contentH) return;
-    navEl.style.maxHeight = contentH + 'px';
-  }
+  if (!navEl) return;
+  var viewport = document.querySelector('.grid-viewport');
+  if (!viewport) return;
+  var contentH = viewport.clientHeight;
+  if (!contentH) return;
+  navEl.style.maxHeight = contentH + 'px';
 }
 
 function showPlayPicker() {
@@ -12485,19 +12592,11 @@ function showPlayPicker() {
   pickerFilterDuration = '';
   pickerFilterSort = 'rank';
   updateFilterButtons();
-  // Lock the page step to the rendered page height so page-down never skips rows.
   var gridNavs = document.querySelectorAll('.grid-nav');
   for (var i = 0; i < gridNavs.length; i++) gridNavs[i].style.display = 'flex';
-  // Rebuild the grid after the picker layout has taken its final width and height.
+  // buildGrid sizes the grid, resets scroll, and wires drag/gamepad
   buildGrid(allSongs);
-  syncGridPageMetrics();
   constrainGridNav();
-  currentPage = 0;
-  goToPage(0);
-  if (totalPages > 0) {
-    buildNavButtons(document.getElementById('grid-nav-right'), 'right');
-    updateNavState();
-  }
   // Auto-select first song tile
   pickerSelectedSong = null;
   var firstTile = document.querySelector('.song-tile');
@@ -12793,12 +12892,7 @@ function applyPickerFilters() {
     filtered.sort(function(a, b) { return a.rank - b.rank; });
   }
   buildGrid(filtered);
-  // Re-measure after the filtered layout changes so the next page step stays aligned.
-  syncGridPageMetrics();
   constrainGridNav();
-  currentPage = 0;
-  goToPage(0);
-  updateNavState();
   // Auto-select first tile
   pickerSelectedSong = null;
   var firstTile = document.querySelector('.song-tile');
