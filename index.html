@@ -10108,6 +10108,10 @@ function handleUnityMessage(msg) {
       }
       if (playMode !== 'solo') buildPlayGrid();
       break;
+    case 'sessionInProgress':
+      joinedDuringActiveSong = !!msg.data;
+      if (inBandspace && playMode !== 'solo') buildPlayGrid();
+      break;
     case 'updateInstrumentAvailability':
       if (msg.data) {
         instrumentAvailability.vocals = msg.data.vocals !== false;
@@ -11141,6 +11145,12 @@ var playMode = 'solo';
 var inBandspace = false;
 var isHost = true;
 var hostName = '';
+// Set true when Unity tells us we entered a bandspace where a song is already in
+// progress. Renders a read-only setlist + "Spectate" button instead of the normal
+// instrument-pick lobby. Cleared automatically when sessionInProgress=false arrives,
+// which Unity sends on the next bandspace entry where the host's SongHasStarted is
+// false (i.e. between songs or after results).
+var joinedDuringActiveSong = false;
 var instrumentAvailability = { vocals: true, drums: true, guitar: true };
 var songInstruments = {};
 var songDiffs = {};
@@ -13485,7 +13495,79 @@ function buildOptionsRow(container) {
 var coopGridPage = 0;
 var COOP_SONGS_PER_PAGE = 2;
 
+function buildLateJoinSpectateView(grid) {
+  // Banner
+  var banner = document.createElement('div');
+  banner.style.cssText = 'background:linear-gradient(135deg,#7c3aed 0%,#ec4899 100%);' +
+    'color:#ffffff;padding:32px;border-radius:var(--panel-radius);' +
+    'text-align:center;font-size:40px;font-weight:800;letter-spacing:3px;' +
+    'margin-bottom:24px;box-shadow:0 0 24px rgba(124,58,237,0.4)';
+  banner.innerHTML = 'SESSION IN PROGRESS' +
+    '<div style="font-size:20px;font-weight:500;letter-spacing:1px;margin-top:8px;opacity:0.85">' +
+    'The band is already performing. Join as a spectator to watch.</div>';
+  grid.appendChild(banner);
+
+  // Read-only setlist
+  var setlistArea = document.createElement('div');
+  setlistArea.className = 'coop-songs-area';
+  setlistArea.style.cssText = 'flex:1;overflow-y:auto';
+
+  if (setlist.length === 0) {
+    var empty = document.createElement('div');
+    empty.style.cssText = 'color:#888888;font-size:22px;text-align:center;padding:48px 0';
+    empty.textContent = 'Loading setlist...';
+    setlistArea.appendChild(empty);
+  } else {
+    for (var lj = 0; lj < setlist.length; lj++) {
+      var s = setlist[lj];
+      if (!s) continue;
+      var row = document.createElement('div');
+      row.className = 'coop-song-row';
+      var songTile = document.createElement('div');
+      songTile.className = 'coop-song-tile';
+      songTile.style.cursor = 'default';
+      songTile.innerHTML =
+        '<div class="coop-song-art"><img src="' + (s.file || 'art/001.jpg') + '" alt=""></div>' +
+        '<div class="coop-song-info">' +
+          '<div class="song-title">' + (s.title || 'Unknown') + '</div>' +
+          '<div class="song-artist">' + (s.artist || 'Unknown') + '</div>' +
+        '</div>';
+      row.appendChild(songTile);
+      setlistArea.appendChild(row);
+    }
+  }
+  grid.appendChild(setlistArea);
+
+  // Spectate button (replaces the normal Save / Start / Load row)
+  var spectateBtn = document.createElement('button');
+  spectateBtn.className = 'play-go-btn jamsesh-signature';
+  spectateBtn.style.cssText = 'width:100%;flex:0 0 auto;min-height:120px;font-size:48px;' +
+    'font-weight:900;letter-spacing:6px;margin-top:16px';
+  spectateBtn.innerHTML = '<svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor" style="margin-right:12px">' +
+    '<path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>' +
+    '</svg>Spectate';
+  spectateBtn.onclick = function() {
+    var titles = [];
+    for (var t = 0; t < setlist.length; t++) {
+      if (setlist[t]) titles.push(setlist[t].title);
+    }
+    sendToUnity('startGame', {
+      instrument: 'spectator',
+      difficulty: selectedDifficulty || 'medium',
+      setlist: titles
+    });
+  };
+  grid.appendChild(spectateBtn);
+}
+
 function buildCoopGrid(grid) {
+  // Late-join: someone entered the bandspace after the host already started a song.
+  // Show a read-only setlist + "Spectate" button instead of the normal lobby.
+  if (joinedDuringActiveSong) {
+    buildLateJoinSpectateView(grid);
+    return;
+  }
+
   // Songs area with friend grids
   var songsArea = document.createElement('div');
   songsArea.className = 'coop-songs-area';
