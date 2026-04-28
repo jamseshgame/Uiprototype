@@ -1,2 +1,16 @@
 # Unity meta files (generated when used as a submodule in Unity projects)
 *.meta
+
+# Local-only dev folders (never tracked in either branch)
+genies/
+profile_pictures/
+mode_tabs/
+node_modules/
+
+# Tooling caches & local logs
+.claude/
+do.txt
+vite-dev.log
+vite-dev.err.log
+playwright-*.png
+pnpm-lock.yaml
