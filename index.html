@@ -1746,6 +1746,24 @@
     border-radius: 999px;
     flex-shrink: 0;
   }
+  .coop-friend-cell .friend-disconnected-badge {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: #ffffff;
+    background: #d92626;
+    padding: 3px 8px;
+    border-radius: 999px;
+    flex-shrink: 0;
+    box-shadow: 0 0 8px rgba(217, 38, 38, 0.55);
+  }
+  .coop-friend-cell.coop-friend-cell--disconnected {
+    opacity: 0.55;
+  }
+  .coop-friend-cell.coop-friend-cell--disconnected img,
+  .coop-friend-cell.coop-friend-cell--disconnected .friend-name {
+    filter: grayscale(1);
+  }
   .coop-bottom-bar {
     display: flex;
     flex-direction: column;
@@ -8819,7 +8837,256 @@ button:focus,
 
 }
 
+/* ══════════════ PAUSE MENU ══════════════ */
+.pause-menu {
+  position: absolute;
+  top: 0; left: 0;
+  width: 1920px; height: 1920px;
+  z-index: 1000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(8,4,24,0.72);
+}
+.pause-menu.active { display: flex; }
 
+.pause-menu .pause-panel {
+  --pause-bg-1: #1a0d3a;
+  --pause-bg-2: #2a1858;
+  --pause-violet: #a78bfa;
+  --pause-violet-dim: rgba(167,139,250,0.35);
+  --pause-resume: #22c55e;
+  --pause-resume-glow: rgba(34,197,94,0.55);
+  --pause-restart: #a78bfa;
+  --pause-restart-glow: rgba(167,139,250,0.55);
+  --pause-home: #ec4899;
+  --pause-home-glow: rgba(236,72,153,0.55);
+  width: 1280px;
+  max-height: 90%;
+  padding: 56px 64px;
+  border-radius: 56px;
+  background:
+    radial-gradient(ellipse at 30% 0%, rgba(167,139,250,0.22) 0%, transparent 60%),
+    linear-gradient(135deg, var(--pause-bg-1) 0%, var(--pause-bg-2) 100%);
+  border: 2px solid var(--pause-violet-dim);
+  box-shadow:
+    0 0 80px rgba(167,139,250,0.35),
+    inset 0 0 40px rgba(167,139,250,0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  color: #ffffff;
+  font-family: 'Inter', sans-serif;
+}
+
+.pause-menu .pause-title {
+  font-size: 96px;
+  font-weight: 900;
+  text-align: center;
+  letter-spacing: 6px;
+  text-shadow: 0 0 32px rgba(167,139,250,0.55), 0 4px 12px rgba(0,0,0,0.6);
+  margin: 0;
+}
+
+.pause-menu .pause-toggles {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 0 24px;
+}
+.pause-menu .pause-toggle {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  font-size: 36px;
+  font-weight: 700;
+  cursor: pointer;
+  user-select: none;
+  color: rgba(255,255,255,0.92);
+  transition: color 0.15s;
+}
+.pause-menu .pause-toggle:hover,
+.pause-menu .pause-toggle:active { color: #ffffff; }
+.pause-menu .pause-toggle-box {
+  width: 48px; height: 48px;
+  border: 3px solid var(--pause-violet);
+  border-radius: 10px;
+  background: rgba(0,0,0,0.45);
+  position: relative;
+  flex-shrink: 0;
+  transition: background 0.15s, box-shadow 0.15s;
+}
+.pause-menu .pause-toggle.checked .pause-toggle-box {
+  background: var(--pause-violet);
+  box-shadow: 0 0 16px var(--pause-violet-dim);
+}
+.pause-menu .pause-toggle.checked .pause-toggle-box::after {
+  content: '';
+  position: absolute;
+  left: 14px; top: 4px;
+  width: 14px; height: 28px;
+  border: solid #1a0d3a;
+  border-width: 0 5px 5px 0;
+  transform: rotate(45deg);
+}
+
+.pause-menu .pause-leaderboard {
+  background: rgba(0,0,0,0.32);
+  border: 1px solid var(--pause-violet-dim);
+  border-radius: 28px;
+  padding: 20px 24px;
+}
+.pause-menu .pause-lb-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+.pause-menu .pause-lb-title {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--pause-violet);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+.pause-menu .pause-lb-live {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #ef4444;
+  letter-spacing: 2px;
+}
+.pause-menu .pause-lb-live::before {
+  content: '';
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: #ef4444;
+  box-shadow: 0 0 12px rgba(239,68,68,0.7);
+  animation: pauseLbLive 1.2s ease-in-out infinite;
+}
+@keyframes pauseLbLive {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+.pause-menu .pause-lb-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 480px;
+  overflow-y: auto;
+}
+.pause-menu .pause-lb-row {
+  display: grid;
+  grid-template-columns: 56px 72px 1fr 56px 56px 160px;
+  gap: 16px;
+  align-items: center;
+  padding: 10px 14px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 14px;
+  transition: background 0.15s;
+}
+.pause-menu .pause-lb-row.you {
+  background: rgba(167,139,250,0.18);
+  outline: 1px solid var(--pause-violet-dim);
+}
+.pause-menu .pause-lb-pos {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--pause-violet);
+  text-align: center;
+}
+.pause-menu .pause-lb-avatar {
+  width: 64px; height: 64px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #2a1858;
+  border: 2px solid var(--pause-violet-dim);
+}
+.pause-menu .pause-lb-avatar img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.pause-menu .pause-lb-name {
+  font-size: 26px;
+  font-weight: 700;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pause-menu .pause-lb-host,
+.pause-menu .pause-lb-inst {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+}
+.pause-menu .pause-lb-host {
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  color: #1a0d3a;
+  font-weight: 900;
+  font-size: 14px;
+  letter-spacing: 1px;
+  visibility: hidden;
+}
+.pause-menu .pause-lb-host.is-host { visibility: visible; }
+.pause-menu .pause-lb-inst {
+  background: rgba(167,139,250,0.18);
+  border: 1px solid var(--pause-violet-dim);
+}
+.pause-menu .pause-lb-inst svg {
+  width: 28px; height: 28px;
+  fill: var(--pause-violet);
+}
+.pause-menu .pause-lb-score {
+  font-size: 26px;
+  font-weight: 800;
+  text-align: right;
+  color: #ffffff;
+  font-variant-numeric: tabular-nums;
+}
+
+.pause-menu .pause-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 24px;
+  margin-top: 4px;
+}
+.pause-menu .pause-btn {
+  padding: 28px 24px;
+  font-size: 40px;
+  font-weight: 900;
+  border-radius: 28px;
+  border: none;
+  cursor: pointer;
+  letter-spacing: 4px;
+  font-family: 'Inter', sans-serif;
+  color: #ffffff;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease;
+}
+.pause-menu .pause-btn:hover,
+.pause-menu .pause-btn:active {
+  transform: translateY(-4px);
+  filter: brightness(1.12);
+}
+.pause-menu .pause-btn-resume {
+  background: var(--pause-resume);
+  box-shadow: 0 8px 28px var(--pause-resume-glow), inset 0 1px 0 rgba(255,255,255,0.25);
+}
+.pause-menu .pause-btn-restart {
+  background: var(--pause-restart);
+  box-shadow: 0 8px 28px var(--pause-restart-glow), inset 0 1px 0 rgba(255,255,255,0.25);
+}
+.pause-menu .pause-btn-home {
+  background: var(--pause-home);
+  box-shadow: 0 8px 28px var(--pause-home-glow), inset 0 1px 0 rgba(255,255,255,0.25);
+}
 
 </style>
 </head>
@@ -10047,6 +10314,26 @@ button:focus,
   </div>
 </div>
 
+<!-- ══════════════ PAUSE MENU ══════════════ -->
+<div class="pause-menu" id="pause-menu">
+  <div class="pause-panel">
+    <div class="pause-title">Paused</div>
+    <div class="pause-toggles" id="pause-toggles" style="display:none"></div>
+    <div class="pause-leaderboard">
+      <div class="pause-lb-header">
+        <div class="pause-lb-title">Live Leaderboard</div>
+        <div class="pause-lb-live">LIVE</div>
+      </div>
+      <div class="pause-lb-list" id="pause-lb-list"></div>
+    </div>
+    <div class="pause-actions">
+      <button class="pause-btn pause-btn-resume" onclick="pauseResume()">Resume</button>
+      <button class="pause-btn pause-btn-restart" onclick="pauseRestart()">Restart</button>
+      <button class="pause-btn pause-btn-home" onclick="pauseHome()">Home</button>
+    </div>
+  </div>
+</div>
+
 </div><!-- /viewport -->
 
 <script>
@@ -10083,6 +10370,9 @@ function handleUnityMessage(msg) {
     case 'updateHubs': updateHubsFromBackend(msg.data); break;
     case 'updateCoins': updateCoinsFromBackend(msg.data); break;
     case 'gameResults': showGameResults(msg.data); break;
+    case 'openPause': showPause((msg.data && msg.data.instrument) || 'guitar'); break;
+    case 'closePause': hidePause(); break;
+    case 'updatePauseLeaderboard': updatePauseLeaderboard(msg.data); break;
     case 'setInBandspace':
       inBandspace = !!msg.data;
       if (inBandspace) {
@@ -10107,6 +10397,10 @@ function handleUnityMessage(msg) {
         isHost = !!msg.data;
       }
       if (playMode !== 'solo') buildPlayGrid();
+      break;
+    case 'sessionInProgress':
+      joinedDuringActiveSong = !!msg.data;
+      if (inBandspace && playMode !== 'solo') buildPlayGrid();
       break;
     case 'updateInstrumentAvailability':
       if (msg.data) {
@@ -10330,7 +10624,7 @@ function updateGroupMembers(index, count) {
 }
 
 function updateLobbyFromBackend(data) {
-  // data: [{name, avatar}, ...]
+  // data: [{name, avatar, disconnected}, ...]
   if (!data) return;
   lobbyPlayers = [];
   for (var i = 0; i < data.length; i++) {
@@ -10341,7 +10635,8 @@ function updateLobbyFromBackend(data) {
       plateClass: null,
       instrument: data[i].instrument || '',
       difficulty: data[i].difficulty || '',
-      ready: data[i].ready !== undefined ? data[i].ready : false
+      ready: data[i].ready !== undefined ? data[i].ready : false,
+      disconnected: !!data[i].disconnected
     });
   }
   if (playMode !== 'solo') buildPlayGrid();
@@ -10386,7 +10681,17 @@ function showGameResults(data) {
 }
 
 function updateProfile(data) {
-  if (data.name) document.querySelector('.profile-name').textContent = data.name;
+  if (data.name) {
+    document.querySelector('.profile-name').textContent = data.name;
+    var neonName = document.getElementById('career-neon-name');
+    if (neonName) neonName.textContent = data.name;
+    // Keep the creator "Solo - <name>" picker label in sync until the user
+    // explicitly picks a group/none (creatorNameType stays 'solo' by default).
+    if (creatorNameType === 'solo') {
+      creatorSelectedName = data.name;
+      updateCreatorNameBtn();
+    }
+  }
   if (data.level != null) document.querySelector('.level-badge').textContent = data.level;
   if (data.xp != null && data.xpMax != null) {
     var pct = Math.min(100, Math.round((data.xp / data.xpMax) * 100));
@@ -10397,33 +10702,62 @@ function updateProfile(data) {
 }
 
 // ── Navigation ─────────────────────────────────────────
-function navigateTo(pageName) {
-  var pages = document.querySelectorAll('.page');
-  for (var i = 0; i < pages.length; i++) pages[i].classList.remove('active');
-  var target = document.getElementById('page-' + pageName);
-  if (target) target.classList.add('active');
+// Guard against overlapping transitions. Spam-clicking the navbar would
+// otherwise re-trigger compositor layer alloc/free before the previous one
+// settles — the exact pattern that appears to provoke the WebView GPU-thread
+// MTE abort on Quest's Adreno driver.
+var _navTransitioning = false;
 
+function navigateTo(pageName) {
+  var target = document.getElementById('page-' + pageName);
+  if (!target) return;
+  if (_navTransitioning) return;
+
+  var current = document.querySelector('.page.active');
+
+  // Navbar + sub-section housekeeping runs immediately; none of these drive
+  // compositor layer churn on the page we're swapping to.
   var navItems = document.querySelectorAll('.nav-item');
   for (var i = 0; i < navItems.length; i++) {
     navItems[i].classList.remove('active');
     if (navItems[i].getAttribute('data-page') === pageName) navItems[i].classList.add('active');
   }
-
-  // Reset sub-sections
   hideSettingsSub();
   resetPlayPicker();
-
-  // Grid nav always hidden by default (sub-sections show it as needed)
   var gridNavs = document.querySelectorAll('.grid-nav');
   for (var i = 0; i < gridNavs.length; i++) gridNavs[i].style.display = 'none';
-
-  // Update particle/wave colours for this page
   if (typeof setPageColors === 'function') setPageColors(pageName);
-
   sendToUnity('navigate', pageName);
-
-  // Ask Unity to refresh the Creator gallery lists when the page is opened.
   if (pageName === 'creator') sendToUnity('creatorPageOpened', {});
+
+  // Same-page tap: no swap needed.
+  if (current === target) return;
+
+  _navTransitioning = true;
+
+  // Quiet the particle rAF loop so Chromium isn't producing fresh canvas
+  // frames while it's mid-alloc/free of compositor layers for the swap.
+  window._particlesPaused = true;
+
+  // Stage 1: bring the new page into the layout tree but keep it invisible.
+  // Chromium allocates its compositor layers now, while the old page is
+  // still resident — this avoids the alloc-while-freeing collision.
+  target.style.visibility = 'hidden';
+  target.classList.add('active');
+
+  // Stage 2: after two rAFs (~22ms @ 90Hz) the new layers are live; swap
+  // visibility and free the old page. Old layers are released *after* the
+  // new ones exist, smoothing the GPU buffer churn.
+  requestAnimationFrame(function() {
+    requestAnimationFrame(function() {
+      target.style.visibility = '';
+      if (current && current !== target) current.classList.remove('active');
+      setTimeout(function() {
+        window._particlesPaused = false;
+        _navTransitioning = false;
+      }, 100);
+    });
+  });
 }
 
 // ── Song Grid ──────────────────────────────────────────
@@ -11107,6 +11441,12 @@ var playMode = 'solo';
 var inBandspace = false;
 var isHost = true;
 var hostName = '';
+// Set true when Unity tells us we entered a bandspace where a song is already in
+// progress. Renders a read-only setlist + "Spectate" button instead of the normal
+// instrument-pick lobby. Cleared automatically when sessionInProgress=false arrives,
+// which Unity sends on the next bandspace entry where the host's SongHasStarted is
+// false (i.e. between songs or after results).
+var joinedDuringActiveSong = false;
 var instrumentAvailability = { vocals: true, drums: true, guitar: true };
 var songInstruments = {};
 var songDiffs = {};
@@ -11899,8 +12239,12 @@ function switchResultsTab(tab) {
   resultsScoreTab = tab;
   resultsLbTab = tab;
 
-  // Update title
-  document.getElementById('results-group-name').textContent = tab === 'group' ? 'Jamsesh Hunters' : 'Rael';
+  // Update title — pull the live profile name for the "Me" tab so it tracks
+  // the username pushed from Unity instead of the hardcoded default.
+  var meName = 'Rael';
+  var meEl = document.querySelector('.profile-name');
+  if (meEl && meEl.textContent) meName = meEl.textContent;
+  document.getElementById('results-group-name').textContent = tab === 'group' ? 'Jamsesh Hunters' : meName;
 
   // Update score tabs
   var scoreTabs = document.getElementById('score-tabs').children;
@@ -11995,6 +12339,136 @@ function exitResults() {
     setTimeout(function() { black.className = ''; }, 50);
   }, 200);
   _setUrlStep('menu');
+}
+
+// ── Pause Menu ─────────────────────────────────────────
+var PAUSE_INSTRUMENTS = ['guitar', 'drums', 'vocals', 'keys', 'bass'];
+var pauseInstrument = '';
+var pauseToggleState = { anchored: false, freeXRot: false };
+
+var INST_SVG = {
+  guitar: '<svg viewBox="0 0 24 24"><path d="M19.59 3.41c-.8-.8-2.1-.8-2.9 0L12 8.1 9.59 5.69c-.8-.8-2.1-.8-2.9 0-.8.8-.8 2.1 0 2.9L9.1 11 3.41 16.69c-.8.8-.8 2.1 0 2.9.4.4.93.59 1.45.59s1.05-.2 1.45-.59L12 13.9l2.41 2.41c.4.4.93.59 1.45.59s1.05-.2 1.45-.59c.8-.8.8-2.1 0-2.9L14.9 11l5.69-5.69c.8-.8.8-2.1 0-2.9z"/></svg>',
+  drums: '<svg viewBox="0 0 24 24"><path d="M12 3C7 3 3 4.79 3 7v10c0 2.21 4 4 9 4s9-1.79 9-4V7c0-2.21-4-4-9-4zm0 2c4.42 0 7 1.43 7 2s-2.58 2-7 2-7-1.43-7-2 2.58-2 7-2zm-7 4.36C6.45 10.36 9.05 11 12 11s5.55-.64 7-1.64v3.28c-1.45 1-4.05 1.64-7 1.64s-5.55-.64-7-1.64V9.36zm0 6c1.45 1 4.05 1.64 7 1.64s5.55-.64 7-1.64V17c0 .57-2.58 2-7 2s-7-1.43-7-2v-1.64z"/></svg>',
+  vocals: '<svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.49 6-3.31 6-6.72h-1.7z"/></svg>',
+  keys: '<svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM8 20H4v-9h4v9zm6 0h-4v-9h4v9zm6 0h-4v-9h4v9zM4 9V4h16v5H4z"/></svg>',
+  bass: '<svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>'
+};
+
+function showPause(instrument) {
+  if (PAUSE_INSTRUMENTS.indexOf(instrument) < 0) instrument = 'guitar';
+  pauseInstrument = instrument;
+  var menu = document.getElementById('pause-menu');
+  if (!menu) return;
+
+  // Per-instrument toggles (only Guitar has any for now)
+  var togglesEl = document.getElementById('pause-toggles');
+  togglesEl.innerHTML = '';
+  if (instrument === 'guitar') {
+    togglesEl.style.display = 'flex';
+    togglesEl.appendChild(makePauseToggle('anchored', 'Anchored Spawn'));
+    togglesEl.appendChild(makePauseToggle('freeXRot', 'Free X Rotation'));
+  } else {
+    togglesEl.style.display = 'none';
+  }
+
+  buildPauseLeaderboard(instrument);
+  menu.className = 'pause-menu active';
+  _setUrlStep('pause-' + instrument);
+  sendToUnity('pauseOpened', { instrument: instrument });
+}
+
+function hidePause() {
+  var menu = document.getElementById('pause-menu');
+  if (menu) menu.className = 'pause-menu';
+}
+
+function pauseResume() {
+  hidePause();
+  _setUrlStep('menu');
+  sendToUnity('resumeGame', {});
+}
+
+function pauseRestart() {
+  hidePause();
+  _setUrlStep('menu');
+  sendToUnity('restartGame', {});
+}
+
+function pauseHome() {
+  hidePause();
+  _setUrlStep('menu');
+  sendToUnity('exitToHome', {});
+  navigateTo('home');
+}
+
+function makePauseToggle(id, label) {
+  var t = document.createElement('div');
+  t.className = 'pause-toggle' + (pauseToggleState[id] ? ' checked' : '');
+  t.innerHTML = '<div class="pause-toggle-box"></div><span>' + label + '</span>';
+  t.onclick = (function(toggleId) {
+    return function() {
+      pauseToggleState[toggleId] = !pauseToggleState[toggleId];
+      t.classList.toggle('checked');
+      sendToUnity('pauseToggle', { id: toggleId, value: pauseToggleState[toggleId] });
+    };
+  })(id);
+  return t;
+}
+
+function buildPauseLeaderboard(instrument) {
+  var list = document.getElementById('pause-lb-list');
+  if (!list) return;
+  list.innerHTML = '';
+  var entries = window._pauseLbEntries || generatePauseLeaderboard(instrument);
+  for (var i = 0; i < entries.length && i < 10; i++) {
+    var e = entries[i];
+    var row = document.createElement('div');
+    row.className = 'pause-lb-row' + (e.isYou ? ' you' : '');
+    var hostCls = e.host ? ' is-host' : '';
+    var instSvg = INST_SVG[e.instrument] || INST_SVG.guitar;
+    row.innerHTML =
+      '<div class="pause-lb-pos">' + (i + 1) + '</div>' +
+      '<div class="pause-lb-avatar"><img src="' + (e.avatar || '') + '" alt=""></div>' +
+      '<div class="pause-lb-name">' + (e.name || '') + '</div>' +
+      '<div class="pause-lb-host' + hostCls + '">HOST</div>' +
+      '<div class="pause-lb-inst">' + instSvg + '</div>' +
+      '<div class="pause-lb-score">' + (e.score || 0).toLocaleString() + '</div>';
+    list.appendChild(row);
+  }
+}
+
+function generatePauseLeaderboard(instrument) {
+  var pool = ['xShredMaster','BeatDropQueen','NeonRiff','AxelStorm','VoxHunter',
+    'FretBoss','SynthWave99','PickSlinger','CrashKid','LoopMachine'];
+  var instPool = ['guitar', 'drums', 'vocals', 'keys', 'bass'];
+  var seed = 1337;
+  function rng() { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; }
+  var entries = [];
+  var base = 850000;
+  // The current player ("you") sits in the middle of the pack
+  var youPos = Math.floor(rng() * 6) + 2; // 2..7
+  for (var i = 0; i < 10; i++) {
+    var name = pool[i];
+    var isYou = (i === youPos);
+    if (isYou) name = 'Rael';
+    entries.push({
+      name: name,
+      avatar: '',
+      score: base - i * 18000 - Math.floor(rng() * 5000),
+      host: i === 0,
+      instrument: isYou ? instrument : instPool[Math.floor(rng() * instPool.length)],
+      isYou: isYou
+    });
+  }
+  entries.sort(function(a, b) { return b.score - a.score; });
+  return entries;
+}
+
+function updatePauseLeaderboard(entries) {
+  // Unity bridge hook for live updates
+  window._pauseLbEntries = entries;
+  var menu = document.getElementById('pause-menu');
+  if (menu && menu.classList.contains('active')) buildPauseLeaderboard(pauseInstrument);
 }
 
 // ── Save/Load Setlist ──────────────────────────────────
@@ -13450,7 +13924,79 @@ function buildOptionsRow(container) {
 var coopGridPage = 0;
 var COOP_SONGS_PER_PAGE = 2;
 
+function buildLateJoinSpectateView(grid) {
+  // Banner
+  var banner = document.createElement('div');
+  banner.style.cssText = 'background:linear-gradient(135deg,#7c3aed 0%,#ec4899 100%);' +
+    'color:#ffffff;padding:32px;border-radius:var(--panel-radius);' +
+    'text-align:center;font-size:40px;font-weight:800;letter-spacing:3px;' +
+    'margin-bottom:24px;box-shadow:0 0 24px rgba(124,58,237,0.4)';
+  banner.innerHTML = 'SESSION IN PROGRESS' +
+    '<div style="font-size:20px;font-weight:500;letter-spacing:1px;margin-top:8px;opacity:0.85">' +
+    'The band is already performing. Join as a spectator to watch.</div>';
+  grid.appendChild(banner);
+
+  // Read-only setlist
+  var setlistArea = document.createElement('div');
+  setlistArea.className = 'coop-songs-area';
+  setlistArea.style.cssText = 'flex:1;overflow-y:auto';
+
+  if (setlist.length === 0) {
+    var empty = document.createElement('div');
+    empty.style.cssText = 'color:#888888;font-size:22px;text-align:center;padding:48px 0';
+    empty.textContent = 'Loading setlist...';
+    setlistArea.appendChild(empty);
+  } else {
+    for (var lj = 0; lj < setlist.length; lj++) {
+      var s = setlist[lj];
+      if (!s) continue;
+      var row = document.createElement('div');
+      row.className = 'coop-song-row';
+      var songTile = document.createElement('div');
+      songTile.className = 'coop-song-tile';
+      songTile.style.cursor = 'default';
+      songTile.innerHTML =
+        '<div class="coop-song-art"><img src="' + (s.file || 'art/001.jpg') + '" alt=""></div>' +
+        '<div class="coop-song-info">' +
+          '<div class="song-title">' + (s.title || 'Unknown') + '</div>' +
+          '<div class="song-artist">' + (s.artist || 'Unknown') + '</div>' +
+        '</div>';
+      row.appendChild(songTile);
+      setlistArea.appendChild(row);
+    }
+  }
+  grid.appendChild(setlistArea);
+
+  // Spectate button (replaces the normal Save / Start / Load row)
+  var spectateBtn = document.createElement('button');
+  spectateBtn.className = 'play-go-btn jamsesh-signature';
+  spectateBtn.style.cssText = 'width:100%;flex:0 0 auto;min-height:120px;font-size:48px;' +
+    'font-weight:900;letter-spacing:6px;margin-top:16px';
+  spectateBtn.innerHTML = '<svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor" style="margin-right:12px">' +
+    '<path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>' +
+    '</svg>Spectate';
+  spectateBtn.onclick = function() {
+    var titles = [];
+    for (var t = 0; t < setlist.length; t++) {
+      if (setlist[t]) titles.push(setlist[t].title);
+    }
+    sendToUnity('startGame', {
+      instrument: 'spectator',
+      difficulty: selectedDifficulty || 'medium',
+      setlist: titles
+    });
+  };
+  grid.appendChild(spectateBtn);
+}
+
 function buildCoopGrid(grid) {
+  // Late-join: someone entered the bandspace after the host already started a song.
+  // Show a read-only setlist + "Spectate" button instead of the normal lobby.
+  if (joinedDuringActiveSong) {
+    buildLateJoinSpectateView(grid);
+    return;
+  }
+
   // Songs area with friend grids
   var songsArea = document.createElement('div');
   songsArea.className = 'coop-songs-area';
@@ -13491,10 +14037,12 @@ function buildCoopGrid(grid) {
         cell.className = 'coop-friend-cell';
         if (p) {
           var isThisHost = hostName && p.name === hostName;
+          if (p.disconnected) cell.classList.add('coop-friend-cell--disconnected');
           cell.innerHTML =
             (p.avatar ? '<img src="' + p.avatar + '" alt="">' : '<div style="width:48px;height:48px;border-radius:50%;background:#333333"></div>') +
             '<div class="friend-name">' + p.name + '</div>' +
-            (isThisHost ? '<div class="friend-host-badge">HOST</div>' : '');
+            (isThisHost ? '<div class="friend-host-badge">HOST</div>' : '') +
+            (p.disconnected ? '<div class="friend-disconnected-badge">DISCONNECTED</div>' : '');
         }
         friendGrid.appendChild(cell);
       }
@@ -14384,7 +14932,7 @@ function openCreatorNamePicker() {
   grid.style.height = '1200px';
 
   var profileName = 'Rael';
-  var profileEl = document.querySelector('.topbar-username');
+  var profileEl = document.querySelector('.profile-name');
   if (profileEl) profileName = profileEl.textContent;
   var profileAvatar = '';
   var profileImg = document.querySelector('.profile-avatar img');
@@ -16037,8 +16585,11 @@ function parseMode() {
 
   // ?step=N or ?step=name — set by C# WebViewPage enum or named slugs
   if ('step' in map) {
-    if (map.step === 'results1' || map.step === 'results2') {
-      // Direct-link to a results screen — treat as past onboarding
+    var pauseSlug = map.step && map.step.indexOf('pause-') === 0
+      ? map.step.substring(6) : '';
+    var isPauseSlug = pauseSlug && PAUSE_INSTRUMENTS.indexOf(pauseSlug) >= 0;
+    if (map.step === 'results1' || map.step === 'results2' || isPauseSlug) {
+      // Direct-link to a results / pause screen — treat as past onboarding
       screenOverride = map.step;
       currentStep = 4;
       onboardFlags.legal = true;
@@ -16133,6 +16684,14 @@ function startFlow() {
       if (which === 'results1') showResults1();
       else showResults2();
     }, 50);
+    return;
+  }
+
+  // ?step=pause-<instrument> — direct-link straight into the pause menu
+  if (screenOverride && screenOverride.indexOf('pause-') === 0) {
+    var inst = screenOverride.substring(6);
+    _showMainUI();
+    setTimeout(function() { showPause(inst); }, 50);
     return;
   }
 
@@ -16696,6 +17255,13 @@ bgGrad.addColorStop(0.7, "#2e1248");
 bgGrad.addColorStop(1, "#4a1050");
 
 function drawParticles() {
+  // Skip canvas work while a page transition is in flight. Keeps the rAF loop
+  // alive (cheap function call) so it resumes automatically when the flag clears.
+  if (window._particlesPaused) {
+    requestAnimationFrame(drawParticles);
+    return;
+  }
+
   frameCount++;
 
   ctx.fillStyle = bgGrad;
