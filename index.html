@@ -1746,6 +1746,24 @@
     border-radius: 999px;
     flex-shrink: 0;
   }
+  .coop-friend-cell .friend-disconnected-badge {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: #ffffff;
+    background: #d92626;
+    padding: 3px 8px;
+    border-radius: 999px;
+    flex-shrink: 0;
+    box-shadow: 0 0 8px rgba(217, 38, 38, 0.55);
+  }
+  .coop-friend-cell.coop-friend-cell--disconnected {
+    opacity: 0.55;
+  }
+  .coop-friend-cell.coop-friend-cell--disconnected img,
+  .coop-friend-cell.coop-friend-cell--disconnected .friend-name {
+    filter: grayscale(1);
+  }
   .coop-bottom-bar {
     display: flex;
     flex-direction: column;
@@ -10334,7 +10352,7 @@ function updateGroupMembers(index, count) {
 }
 
 function updateLobbyFromBackend(data) {
-  // data: [{name, avatar}, ...]
+  // data: [{name, avatar, disconnected}, ...]
   if (!data) return;
   lobbyPlayers = [];
   for (var i = 0; i < data.length; i++) {
@@ -10345,7 +10363,8 @@ function updateLobbyFromBackend(data) {
       plateClass: null,
       instrument: data[i].instrument || '',
       difficulty: data[i].difficulty || '',
-      ready: data[i].ready !== undefined ? data[i].ready : false
+      ready: data[i].ready !== undefined ? data[i].ready : false,
+      disconnected: !!data[i].disconnected
     });
   }
   if (playMode !== 'solo') buildPlayGrid();
@@ -10411,33 +10430,62 @@ function updateProfile(data) {
 }
 
 // ── Navigation ─────────────────────────────────────────
-function navigateTo(pageName) {
-  var pages = document.querySelectorAll('.page');
-  for (var i = 0; i < pages.length; i++) pages[i].classList.remove('active');
-  var target = document.getElementById('page-' + pageName);
-  if (target) target.classList.add('active');
+// Guard against overlapping transitions. Spam-clicking the navbar would
+// otherwise re-trigger compositor layer alloc/free before the previous one
+// settles — the exact pattern that appears to provoke the WebView GPU-thread
+// MTE abort on Quest's Adreno driver.
+var _navTransitioning = false;
 
+function navigateTo(pageName) {
+  var target = document.getElementById('page-' + pageName);
+  if (!target) return;
+  if (_navTransitioning) return;
+
+  var current = document.querySelector('.page.active');
+
+  // Navbar + sub-section housekeeping runs immediately; none of these drive
+  // compositor layer churn on the page we're swapping to.
   var navItems = document.querySelectorAll('.nav-item');
   for (var i = 0; i < navItems.length; i++) {
     navItems[i].classList.remove('active');
     if (navItems[i].getAttribute('data-page') === pageName) navItems[i].classList.add('active');
   }
-
-  // Reset sub-sections
   hideSettingsSub();
   resetPlayPicker();
-
-  // Grid nav always hidden by default (sub-sections show it as needed)
   var gridNavs = document.querySelectorAll('.grid-nav');
   for (var i = 0; i < gridNavs.length; i++) gridNavs[i].style.display = 'none';
-
-  // Update particle/wave colours for this page
   if (typeof setPageColors === 'function') setPageColors(pageName);
-
   sendToUnity('navigate', pageName);
-
-  // Ask Unity to refresh the Creator gallery lists when the page is opened.
   if (pageName === 'creator') sendToUnity('creatorPageOpened', {});
+
+  // Same-page tap: no swap needed.
+  if (current === target) return;
+
+  _navTransitioning = true;
+
+  // Quiet the particle rAF loop so Chromium isn't producing fresh canvas
+  // frames while it's mid-alloc/free of compositor layers for the swap.
+  window._particlesPaused = true;
+
+  // Stage 1: bring the new page into the layout tree but keep it invisible.
+  // Chromium allocates its compositor layers now, while the old page is
+  // still resident — this avoids the alloc-while-freeing collision.
+  target.style.visibility = 'hidden';
+  target.classList.add('active');
+
+  // Stage 2: after two rAFs (~22ms @ 90Hz) the new layers are live; swap
+  // visibility and free the old page. Old layers are released *after* the
+  // new ones exist, smoothing the GPU buffer churn.
+  requestAnimationFrame(function() {
+    requestAnimationFrame(function() {
+      target.style.visibility = '';
+      if (current && current !== target) current.classList.remove('active');
+      setTimeout(function() {
+        window._particlesPaused = false;
+        _navTransitioning = false;
+      }, 100);
+    });
+  });
 }
 
 // ── Song Grid ──────────────────────────────────────────
@@ -13622,10 +13670,12 @@ function buildCoopGrid(grid) {
         cell.className = 'coop-friend-cell';
         if (p) {
           var isThisHost = hostName && p.name === hostName;
+          if (p.disconnected) cell.classList.add('coop-friend-cell--disconnected');
           cell.innerHTML =
             (p.avatar ? '<img src="' + p.avatar + '" alt="">' : '<div style="width:48px;height:48px;border-radius:50%;background:#333333"></div>') +
             '<div class="friend-name">' + p.name + '</div>' +
-            (isThisHost ? '<div class="friend-host-badge">HOST</div>' : '');
+            (isThisHost ? '<div class="friend-host-badge">HOST</div>' : '') +
+            (p.disconnected ? '<div class="friend-disconnected-badge">DISCONNECTED</div>' : '');
         }
         friendGrid.appendChild(cell);
       }
@@ -16853,6 +16903,13 @@ bgGrad.addColorStop(0.7, "#2e1248");
 bgGrad.addColorStop(1, "#4a1050");
 
 function drawParticles() {
+  // Skip canvas work while a page transition is in flight. Keeps the rAF loop
+  // alive (cheap function call) so it resumes automatically when the flag clears.
+  if (window._particlesPaused) {
+    requestAnimationFrame(drawParticles);
+    return;
+  }
+
   frameCount++;
 
   ctx.fillStyle = bgGrad;
