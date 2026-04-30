@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1920, height=1920, initial-scale=1.0, user-scalable=no">
+<title>Jamsesh — Results</title>
+<style>
+  /*
+    End-of-song results page. Mounted by LobbyWebView in place of index.html
+    when the gameplay-end flag is set. Visually identical to index.html's
+    screen-results1/screen-results2 but ships none of the lobby app — no song
+    library, themes, banners, avatars, navbar, particles, creator, etc. Keep
+    this file standalone so the page stays small.
+
+    ES5-only to stay compatible with Vuplex's Chromium 91 on Quest. Don't add
+    arrow functions / template literals / let|const / async-await.
+  */
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --panel-radius: 28px;
+    --grid-gap: 16px;
+    /* Mirrors index.html: tile-h derived from page geometry, then nav-btn-h
+       is half. Hardcoded here so we don't pull in the rest of the lobby grid
+       maths. */
+    --tile-h: 260px;
+    --nav-btn-h: 130px;
+  }
+
+  html, body {
+    width: 1920px;
+    height: 1920px;
+    background: #0d0a16;
+    color: #f0ecf8;
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    -webkit-user-select: none;
+    user-select: none;
+    overflow: hidden;
+  }
+
+  .viewport {
+    position: relative;
+    width: 1920px;
+    height: 1920px;
+  }
+
+  /* Screen container (matches .game-screen in index.html) */
+  .game-screen {
+    position: absolute;
+    top: 0; left: 0;
+    width: 1920px; height: 1920px;
+    z-index: 1;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #111111;
+  }
+  .game-screen.active { display: flex; }
+
+  /* Fade overlay for screen 1 ↔ screen 2 transitions */
+  #onboard-black {
+    position: absolute;
+    top: 0; left: 0;
+    width: 1920px; height: 1920px;
+    background: #000000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 200ms ease;
+    z-index: 1001;
+  }
+  #onboard-black.visible { opacity: 1; }
+
+  /* Shared panel */
+  .results-panel {
+    width: 1872px;
+    height: 1776px;
+    background: #0a0a0a;
+    border-radius: var(--panel-radius);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px;
+    position: relative;
+  }
+
+  /* ── Results Screen 1 ── */
+  .results-title {
+    font-size: 48px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 36px;
+    text-align: center;
+  }
+  .results-title span { color: #ffffff; }
+
+  .results-body {
+    display: flex;
+    gap: 48px;
+    width: 100%;
+    flex: 1;
+    min-height: 0;
+  }
+
+  .results-left-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+    min-height: 0;
+  }
+
+  /* Score column */
+  .results-score-col {
+    flex: 1;
+    background: #1a1a1a;
+    border-radius: var(--panel-radius);
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .results-score-col .col-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 16px;
+  }
+  .results-tabs {
+    display: flex;
+    gap: var(--grid-gap);
+    margin-bottom: 24px;
+    width: 100%;
+  }
+  .results-tab {
+    flex: 1;
+    height: var(--nav-btn-h);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--panel-radius);
+    border: 1px solid transparent;
+    font-size: 30px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: background 0.15s, color 0.15s;
+    text-align: center;
+  }
+  .results-tab.active {
+    background: #ffffff;
+    color: #000000;
+    border-color: #ffffff;
+    box-shadow: 0 0 0 2px #ffffff;
+  }
+  .results-tab:not(.active) {
+    background: #333333;
+    color: #ffffff;
+  }
+  .results-big-score {
+    font-size: 72px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 12px;
+  }
+  .results-stars {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+  .results-star {
+    font-size: 48px;
+    color: #ffffff;
+  }
+  .results-star.empty { color: #444444; }
+
+  .results-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 12px;
+    width: 100%;
+    flex: 1;
+    min-height: 0;
+  }
+  .results-stat {
+    border-radius: var(--panel-radius);
+    padding: 16px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .results-stat .stat-label {
+    font-size: 18px;
+    font-weight: 600;
+    color: #ffffff;
+    opacity: 0.7;
+    margin-bottom: 8px;
+  }
+  .results-stat .stat-value {
+    font-size: 44px;
+    font-weight: 700;
+    color: #ffffff;
+  }
+  .results-stat.accuracy { background: #333333; }
+  .results-stat.combo { background: #333333; }
+  .results-stat.perfect { background: #333333; }
+  .results-stat.notes { background: #333333; }
+
+  /* Album art section (top of left column) */
+  .results-album-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #1a1a1a;
+    border-radius: var(--panel-radius);
+    padding: 32px;
+  }
+  .results-album-art {
+    width: 400px;
+    height: 400px;
+    border-radius: var(--panel-radius);
+    object-fit: cover;
+    margin-bottom: 24px;
+    box-shadow: 0 8px 12px rgba(0,0,0,0.5);
+    background: #222222;
+  }
+  .results-song-title {
+    font-size: 32px;
+    font-weight: 700;
+    color: #ffffff;
+    text-align: center;
+    margin-bottom: 8px;
+  }
+  .results-song-artist {
+    font-size: 24px;
+    color: #aaaaaa;
+    text-align: center;
+    margin-bottom: 4px;
+  }
+  .results-song-diff {
+    font-size: 20px;
+    color: #888888;
+    text-align: center;
+  }
+  .results-instrument {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    font-size: 20px;
+    color: #888888;
+  }
+  .results-instrument svg {
+    width: 28px;
+    height: 28px;
+    fill: currentColor;
+  }
+
+  /* Leaderboard column */
+  .results-lb-col {
+    flex: 1;
+    background: #1a1a1a;
+    border-radius: var(--panel-radius);
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+  }
+  .results-lb-col .col-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 16px;
+    text-align: center;
+  }
+  .results-lb-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    flex: 1;
+    min-height: 0;
+  }
+  .results-lb-entry {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 24px;
+    border-radius: var(--panel-radius);
+    background: #2a2a2a;
+    flex: 1;
+    min-height: 0;
+  }
+  .results-lb-entry.highlight {
+    background: #333333;
+    border: 2px solid #ffffff;
+  }
+  .results-lb-rank {
+    font-size: 28px;
+    font-weight: 700;
+    color: #ffffff;
+    width: 40px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .results-lb-avatar {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: #444444;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    color: #ffffff;
+    font-weight: 700;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+  .results-lb-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .results-lb-info { flex: 1; }
+  .results-lb-name {
+    font-size: 24px;
+    font-weight: 700;
+    color: #ffffff;
+  }
+  .results-lb-score-val {
+    font-size: 20px;
+    color: #aaaaaa;
+  }
+
+  /* Bottom buttons */
+  .results-buttons {
+    display: flex;
+    gap: 48px;
+    margin-top: 36px;
+    width: 100%;
+  }
+  .results-btn {
+    height: var(--nav-btn-h);
+    flex: 1;
+    border-radius: var(--panel-radius);
+    border: 1px solid transparent;
+    font-size: 30px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.15s, background 0.15s;
+  }
+  .results-btn:hover { transform: scale(1.05); }
+  .results-btn:active { transform: scale(0.97); }
+  .results-btn.retry {
+    background: #333333;
+    color: #ffffff;
+  }
+  .results-btn.continue {
+    background: #ffffff;
+    color: #000000;
+    border-color: #ffffff;
+    box-shadow: 0 0 0 2px #ffffff;
+  }
+
+  /* ── Results Screen 2 (Rewards) ── */
+  .rewards-title {
+    font-size: 48px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 36px;
+    text-align: center;
+  }
+  .rewards-title span { color: #ffffff; }
+
+  .rewards-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 48px;
+    width: 100%;
+    flex: 1;
+    min-height: 0;
+  }
+  .rewards-cell {
+    background: #1a1a1a;
+    border-radius: var(--panel-radius);
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    min-height: 0;
+  }
+  .rewards-cell .col-title {
+    font-size: 56px;
+    font-weight: 700;
+    color: #ffffff;
+  }
+  .rewards-pick-icon {
+    width: 320px;
+    height: 320px;
+    border-radius: 50%;
+    background: #333333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    padding: 48px;
+  }
+  .rewards-pick-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  .rewards-earned-label {
+    font-size: 22px;
+    color: #aaaaaa;
+  }
+  .rewards-earned-value {
+    font-size: 56px;
+    font-weight: 700;
+    color: #ffffff;
+  }
+
+  .rewards-badge-item {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 20px 24px;
+    background: #2a2a2a;
+    border: 2px solid #444444;
+    border-radius: var(--panel-radius);
+    width: 100%;
+    flex: 1;
+    min-height: 0;
+  }
+  .rewards-badge-icon {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: #444444;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    flex-shrink: 0;
+    position: relative;
+  }
+  .rewards-badge-new {
+    position: absolute;
+    top: -6px; right: -6px;
+    background: #ffffff;
+    color: #000000;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: var(--panel-radius);
+  }
+  .rewards-badge-info { flex: 1; }
+  .rewards-badge-name {
+    font-size: 24px;
+    font-weight: 700;
+    color: #ffffff;
+  }
+  .rewards-badge-desc {
+    font-size: 18px;
+    color: #888888;
+  }
+
+  .rewards-level-circle {
+    width: 320px;
+    height: 320px;
+    border-radius: 50%;
+    border: 6px solid #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .rewards-level-label {
+    font-size: 22px;
+    color: #aaaaaa;
+  }
+  .rewards-level-num {
+    font-size: 96px;
+    font-weight: 700;
+    color: #ffffff;
+  }
+  .rewards-xp-earned-label {
+    font-size: 22px;
+    color: #aaaaaa;
+  }
+  .rewards-xp-earned-value {
+    font-size: 56px;
+    font-weight: 700;
+    color: #ffffff;
+  }
+  .rewards-xp-bar-wrap {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .rewards-xp-bar {
+    width: 100%;
+    height: 16px;
+    background: #333333;
+    border-radius: var(--panel-radius);
+    overflow: hidden;
+  }
+  .rewards-xp-bar-fill {
+    height: 100%;
+    background: #ffffff;
+    border-radius: var(--panel-radius);
+    width: 67%;
+  }
+  .rewards-xp-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 16px;
+    color: #aaaaaa;
+  }
+</style>
+</head>
+<body>
+<div class="viewport">
+
+  <!-- ══════════════ RESULTS SCREEN 1 ══════════════ -->
+  <div class="game-screen active" id="screen-results1">
+    <div class="results-panel">
+      <div class="results-title">You crushed it, <span id="results-group-name">Jamsesh Hunters</span>!</div>
+      <div class="results-body">
+
+        <!-- Left column: album art + score stacked -->
+        <div class="results-left-col">
+          <div class="results-album-col">
+            <img class="results-album-art" id="results-album-art" src="art/001.jpg" alt="Album">
+            <div class="results-song-title" id="results-song-title">The Fate of Ophelia</div>
+            <div class="results-song-artist" id="results-song-artist">Taylor Swift</div>
+            <div class="results-song-diff">Expert</div>
+            <div class="results-instrument"><svg viewBox="0 0 24 24"><path d="M19.59 3.41c-.8-.8-2.1-.8-2.9 0L12 8.1 9.59 5.69c-.8-.8-2.1-.8-2.9 0-.8.8-.8 2.1 0 2.9L9.1 11 3.41 16.69c-.8.8-.8 2.1 0 2.9.4.4.93.59 1.45.59s1.05-.2 1.45-.59L12 13.9l2.41 2.41c.4.4.93.59 1.45.59s1.05-.2 1.45-.59c.8-.8.8-2.1 0-2.9L14.9 11l5.69-5.69c.8-.8.8-2.1 0-2.9z"/></svg>Guitar</div>
+          </div>
+          <div class="results-score-col">
+            <div class="col-title">Score</div>
+            <div class="results-tabs" id="score-tabs">
+              <div class="results-tab active" onclick="switchResultsTab('group')">Group</div>
+              <div class="results-tab" onclick="switchResultsTab('me')">Me</div>
+            </div>
+            <div class="results-big-score" id="results-big-score">987,654</div>
+            <div class="results-stars" id="results-stars">
+              <div class="results-star">&#9733;</div>
+              <div class="results-star">&#9733;</div>
+              <div class="results-star">&#9733;</div>
+              <div class="results-star">&#9733;</div>
+              <div class="results-star empty">&#9734;</div>
+            </div>
+            <div class="results-stats" id="results-stats">
+              <div class="results-stat accuracy"><div class="stat-label">Accuracy</div><div class="stat-value">98.5%</div></div>
+              <div class="results-stat combo"><div class="stat-label">Max Combo</div><div class="stat-value">342</div></div>
+              <div class="results-stat perfect"><div class="stat-label">Perfect Hits</div><div class="stat-value">98.5%</div></div>
+              <div class="results-stat notes"><div class="stat-label">Notes Hit</div><div class="stat-value">98.5%</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right column: full-height leaderboard -->
+        <div class="results-lb-col">
+          <div class="col-title">Leaderboard</div>
+          <div class="results-tabs" id="lb-tabs">
+            <div class="results-tab active" onclick="switchResultsTab('group')">Group</div>
+            <div class="results-tab" onclick="switchResultsTab('me')">Me</div>
+          </div>
+          <!-- Group leaderboard -->
+          <div class="results-lb-list" id="lb-group">
+            <div class="results-lb-entry">
+              <div class="results-lb-rank">1</div>
+              <div class="results-lb-avatar"><img src="avatars/placeholder-12.png" alt=""></div>
+              <div class="results-lb-info"><div class="results-lb-name">Neon Phantoms</div><div class="results-lb-score-val">1,245,678</div></div>
+            </div>
+            <div class="results-lb-entry highlight">
+              <div class="results-lb-rank">2</div>
+              <div class="results-lb-avatar"><img src="avatars/placeholder-33.png" alt=""></div>
+              <div class="results-lb-info"><div class="results-lb-name">Jamsesh Hunters</div><div class="results-lb-score-val">1,123,456</div></div>
+            </div>
+            <div class="results-lb-entry">
+              <div class="results-lb-rank">3</div>
+              <div class="results-lb-avatar"><img src="avatars/placeholder-47.png" alt=""></div>
+              <div class="results-lb-info"><div class="results-lb-name">Electric Dreams</div><div class="results-lb-score-val">1,098,765</div></div>
+            </div>
+            <div class="results-lb-entry">
+              <div class="results-lb-rank">4</div>
+              <div class="results-lb-avatar"><img src="avatars/placeholder-5.png" alt=""></div>
+              <div class="results-lb-info"><div class="results-lb-name">Rhythm Rebels</div><div class="results-lb-score-val">987,654</div></div>
+            </div>
+            <div class="results-lb-entry">
+              <div class="results-lb-rank">5</div>
+              <div class="results-lb-avatar"><img src="avatars/placeholder-20.png" alt=""></div>
+              <div class="results-lb-info"><div class="results-lb-name">Sonic Wolves</div><div class="results-lb-score-val">945,210</div></div>
+            </div>
+            <div class="results-lb-entry">
+              <div class="results-lb-rank">6</div>
+              <div class="results-lb-avatar"><img src="avatars/placeholder-60.png" alt=""></div>
+              <div class="results-lb-info"><div class="results-lb-name">Bass Bandits</div><div class="results-lb-score-val">912,033</div></div>
+            </div>
+            <div class="results-lb-entry">
+              <div class="results-lb-rank">7</div>
+              <div class="results-lb-avatar"><img src="avatars/placeholder-31.png" alt=""></div>
+              <div class="results-lb-info"><div class="results-lb-name">Velvet Crush</div><div class="results-lb-score-val">889,441</div></div>
+            </div>
+            <div class="results-lb-entry">
+              <div class="results-lb-rank">8</div>
+              <div class="results-lb-avatar"><img src="avatars/placeholder-15.png" alt=""></div>
+              <div class="results-lb-info"><div class="results-lb-name">Star Strummers</div><div class="results-lb-score-val">854,112</div></div>
+            </div>
+          </div>
+          <!-- Me leaderboard -->
+          <div class="results-lb-list" id="lb-me" style="display:none">
+            <div class="results-lb-entry">
+              <div class="results-lb-rank">1</div>
+              <div class="results-lb-avatar"><img src="avatars/placeholder-9.png" alt=""></div>
+              <div class="results-lb-info"><div class="results-lb-name">xShadowPick</div><div class="results-lb-score-val">1,312,400</div></div>
+            </div>
+            <div class="results-lb-entry">
+              <div class="results-lb-rank">2</div>
+              <div class="results-lb-avatar"><img src="avatars/placeholder-25.png" alt=""></div>
+              <div class="results-lb-info"><div class="results-lb-name">MelodyQueen</div><div class="results-lb-score-val">1,198,320</div></div>
+            </div>
+            <div class="results-lb-entry">
+              <div class="results-lb-rank">3</div>
+              <div class="results-lb-avatar"><img src="avatars/placeholder-44.png" alt=""></div>
+              <div class="results-lb-info"><div class="results-lb-name">BeatDropper99</div><div class="results-lb-score-val">1,087,650</div></div>
+            </div>
+            <div class="results-lb-entry highlight">
+              <div class="results-lb-rank">4</div>
+              <div class="results-lb-avatar"><img src="avatars/rael_new.png" alt=""></div>
+              <div class="results-lb-info"><div class="results-lb-name">Rael</div><div class="results-lb-score-val">987,654</div></div>
+            </div>
+            <div class="results-lb-entry">
+              <div class="results-lb-rank">5</div>
+              <div class="results-lb-avatar"><img src="avatars/placeholder-52.png" alt=""></div>
+              <div class="results-lb-info"><div class="results-lb-name">FretNinja</div><div class="results-lb-score-val">965,880</div></div>
+            </div>
+            <div class="results-lb-entry">
+              <div class="results-lb-rank">6</div>
+              <div class="results-lb-avatar"><img src="avatars/placeholder-38.png" alt=""></div>
+              <div class="results-lb-info"><div class="results-lb-name">GrooveMonkey</div><div class="results-lb-score-val">943,210</div></div>
+            </div>
+            <div class="results-lb-entry">
+              <div class="results-lb-rank">7</div>
+              <div class="results-lb-avatar"><img src="avatars/placeholder-18.png" alt=""></div>
+              <div class="results-lb-info"><div class="results-lb-name">RiffLord420</div><div class="results-lb-score-val">921,550</div></div>
+            </div>
+            <div class="results-lb-entry">
+              <div class="results-lb-rank">8</div>
+              <div class="results-lb-avatar"><img src="avatars/placeholder-67.png" alt=""></div>
+              <div class="results-lb-info"><div class="results-lb-name">PickSlinger</div><div class="results-lb-score-val">898,770</div></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="results-buttons">
+        <button class="results-btn retry" onclick="retryGame()">Retry</button>
+        <button class="results-btn continue" onclick="showResults2()">Continue</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ RESULTS SCREEN 2 (Rewards) ══════════════ -->
+  <div class="game-screen" id="screen-results2">
+    <div class="results-panel">
+      <div class="rewards-title">Your <span>Rewards</span></div>
+      <div class="rewards-body">
+
+        <!-- Top-left: Jamsesh Picks -->
+        <div class="rewards-cell">
+          <div class="col-title">Jamsesh Picks</div>
+          <div class="rewards-pick-icon"><img src="branding/JamPick.png" alt="Pick"></div>
+          <div class="rewards-earned-label">Earned</div>
+          <div class="rewards-earned-value">+1,250</div>
+        </div>
+
+        <!-- Top-right: Badges -->
+        <div class="rewards-cell" style="justify-content:flex-start">
+          <div class="col-title">Badges</div>
+          <div class="rewards-badge-item">
+            <div class="rewards-badge-icon">&#127908;<div class="rewards-badge-new">NEW</div></div>
+            <div class="rewards-badge-info"><div class="rewards-badge-name">50 Songs Performed</div><div class="rewards-badge-desc">Just unlocked!</div></div>
+          </div>
+          <div class="rewards-badge-item">
+            <div class="rewards-badge-icon">&#127911;</div>
+            <div class="rewards-badge-info"><div class="rewards-badge-name">Level 10 Group</div><div class="rewards-badge-desc">Group milestone</div></div>
+          </div>
+          <div class="rewards-badge-item">
+            <div class="rewards-badge-icon">&#127926;<div class="rewards-badge-new">NEW</div></div>
+            <div class="rewards-badge-info"><div class="rewards-badge-name">Level 20 Vocals</div><div class="rewards-badge-desc">Just unlocked!</div></div>
+          </div>
+        </div>
+
+        <!-- Bottom-left: XP -->
+        <div class="rewards-cell">
+          <div class="col-title">XP</div>
+          <div class="rewards-level-circle">
+            <div class="rewards-level-label">Level</div>
+            <div class="rewards-level-num">42</div>
+          </div>
+          <div class="rewards-xp-earned-label">Earned</div>
+          <div class="rewards-xp-earned-value">+3,500</div>
+          <div class="rewards-xp-bar-wrap">
+            <div class="rewards-xp-bar"><div class="rewards-xp-bar-fill"></div></div>
+            <div class="rewards-xp-labels"><span>6,700 XP</span><span>10,000 XP</span></div>
+          </div>
+        </div>
+
+        <!-- Bottom-right: Grammys Season -->
+        <div class="rewards-cell">
+          <div class="col-title">Grammys Season</div>
+          <div class="rewards-level-circle">
+            <div class="rewards-level-label">Season</div>
+            <div class="rewards-level-num">3</div>
+          </div>
+          <div class="rewards-xp-earned-label">Progress</div>
+          <div class="rewards-xp-earned-value">+2,800</div>
+          <div class="rewards-xp-bar-wrap">
+            <div class="rewards-xp-bar"><div class="rewards-xp-bar-fill" style="width:48%"></div></div>
+            <div class="rewards-xp-labels"><span>4,800 SP</span><span>10,000 SP</span></div>
+          </div>
+        </div>
+
+      </div>
+      <div class="results-buttons">
+        <button class="results-btn retry" onclick="backToResults1()">Back</button>
+        <button class="results-btn continue" onclick="exitResults()">Continue</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="onboard-black"></div>
+</div>
+
+<script>
+// ── Vuplex bridge ──────────────────────────────────────────
+function sendToUnity(type, data) {
+  var msg = JSON.stringify({ type: type, data: data || {} });
+  if (window.vuplex) window.vuplex.postMessage(msg);
+  else console.log('[Jamsesh→Unity]', msg);
+}
+
+function attachVuplex() {
+  window.vuplex.addEventListener('message', function(event) {
+    try { handleUnityMessage(JSON.parse(event.data)); }
+    catch (e) { console.warn('Failed to parse Unity message:', e); }
+  });
+}
+if (window.vuplex) attachVuplex();
+else window.addEventListener('vuplexready', attachVuplex);
+
+function handleUnityMessage(msg) {
+  if (!msg || !msg.type) return;
+  // The lighter page only consumes gameResults — every other Push from
+  // WebViewBridge is silently dropped, since the lobby's index.html will
+  // re-receive them when the user returns.
+  if (msg.type === 'gameResults') applyGameResults(msg.data);
+  else if (msg.type === 'updateProfile' && msg.data && msg.data.name) _profileName = msg.data.name;
+}
+
+// ── Tab state (mirrors index.html switchResultsTab) ────────
+var resultsTab = 'group';
+
+// Mock per-tab data — the lighter page doesn't have access to live group/me
+// stats so we mirror the placeholder values used by index.html until the
+// payload from Unity overwrites them.
+var groupScoreData = { score: '987,654', stars: 4, accuracy: '98.5%', combo: '342', perfect: '98.5%', notes: '98.5%' };
+var meScoreData = { score: '245,890', stars: 3, accuracy: '92.1%', combo: '187', perfect: '88.3%', notes: '94.7%' };
+
+// Tracks the most-recent profile name pushed from Unity so the "Me" tab can
+// label the title correctly. Starts as the index.html default.
+var _profileName = 'Rael';
+
+function switchResultsTab(tab) {
+  resultsTab = tab;
+
+  document.getElementById('results-group-name').textContent =
+    tab === 'group' ? 'Jamsesh Hunters' : _profileName;
+
+  var scoreTabs = document.getElementById('score-tabs').children;
+  for (var i = 0; i < scoreTabs.length; i++) scoreTabs[i].className = 'results-tab';
+  scoreTabs[tab === 'group' ? 0 : 1].className = 'results-tab active';
+
+  var data = tab === 'group' ? groupScoreData : meScoreData;
+  document.getElementById('results-big-score').textContent = data.score;
+
+  var starsEl = document.getElementById('results-stars');
+  var starsHtml = '';
+  for (var s = 0; s < 5; s++) {
+    if (s < data.stars) starsHtml += '<div class="results-star">&#9733;</div>';
+    else starsHtml += '<div class="results-star empty">&#9734;</div>';
+  }
+  starsEl.innerHTML = starsHtml;
+
+  var statsEl = document.getElementById('results-stats');
+  statsEl.innerHTML =
+    '<div class="results-stat accuracy"><div class="stat-label">Accuracy</div><div class="stat-value">' + data.accuracy + '</div></div>' +
+    '<div class="results-stat combo"><div class="stat-label">Max Combo</div><div class="stat-value">' + data.combo + '</div></div>' +
+    '<div class="results-stat perfect"><div class="stat-label">Perfect Hits</div><div class="stat-value">' + data.perfect + '</div></div>' +
+    '<div class="results-stat notes"><div class="stat-label">Notes Hit</div><div class="stat-value">' + data.notes + '</div></div>';
+
+  var lbTabs = document.getElementById('lb-tabs').children;
+  for (var j = 0; j < lbTabs.length; j++) lbTabs[j].className = 'results-tab';
+  lbTabs[tab === 'group' ? 0 : 1].className = 'results-tab active';
+
+  document.getElementById('lb-group').style.display = tab === 'group' ? 'flex' : 'none';
+  document.getElementById('lb-me').style.display = tab === 'me' ? 'flex' : 'none';
+}
+
+// ── Apply Unity results payload ────────────────────────────
+function _fmtNum(n) { return (n == null) ? '0' : Number(n).toLocaleString(); }
+
+function applyGameResults(data) {
+  if (!data) return;
+
+  if (data.song) {
+    var artEl = document.getElementById('results-album-art');
+    var titleEl = document.getElementById('results-song-title');
+    var artistEl = document.getElementById('results-song-artist');
+    if (artEl && data.song.file) artEl.src = data.song.file;
+    if (titleEl) titleEl.textContent = data.song.title || 'Unknown';
+    if (artistEl) artistEl.textContent = data.song.artist || 'Unknown';
+  }
+
+  meScoreData = {
+    score: _fmtNum(data.score),
+    stars: data.stars || 0,
+    accuracy: data.accuracy || '0%',
+    combo: _fmtNum(data.combo),
+    perfect: _fmtNum(data.perfect),
+    notes: (data.notes != null) ? String(data.notes) : '0/0'
+  };
+
+  // Hide the Group/Me tabs in solo — there's no group context, the placeholder
+  // group scores would just be misleading. Mirrors the index.html behaviour.
+  var isGroupPlay = !!data.isGroupPlay;
+  var scoreTabsEl = document.getElementById('score-tabs');
+  var lbTabsEl = document.getElementById('lb-tabs');
+  if (scoreTabsEl) scoreTabsEl.style.display = isGroupPlay ? '' : 'none';
+  if (lbTabsEl) lbTabsEl.style.display = isGroupPlay ? '' : 'none';
+
+  switchResultsTab(isGroupPlay ? 'group' : 'me');
+}
+
+// ── Screen transitions (mirror index.html with local fade) ─
+function showResults1() {
+  var black = document.getElementById('onboard-black');
+  black.className = 'visible';
+  setTimeout(function() {
+    document.getElementById('screen-results2').classList.remove('active');
+    document.getElementById('screen-results1').classList.add('active');
+    setTimeout(function() { black.className = ''; }, 50);
+  }, 200);
+}
+
+function showResults2() {
+  var black = document.getElementById('onboard-black');
+  black.className = 'visible';
+  setTimeout(function() {
+    document.getElementById('screen-results1').classList.remove('active');
+    document.getElementById('screen-results2').classList.add('active');
+    setTimeout(function() { black.className = ''; }, 50);
+  }, 200);
+}
+
+function backToResults1() {
+  showResults1();
+}
+
+// ── Buttons → Unity ────────────────────────────────────────
+function retryGame() {
+  // Routes through GameplayUI.OnRestartPressed via WebViewBridge.
+  sendToUnity('gameRetry');
+}
+
+function exitResults() {
+  // Same path the native results screen uses — advances setlist if there's a
+  // next song, otherwise returns to the appropriate lobby. Fade the panel
+  // first so the context change is masked while Unity does its work.
+  sendToUnity('exitResults');
+  var black = document.getElementById('onboard-black');
+  black.className = 'visible';
+  setTimeout(function() {
+    document.getElementById('screen-results1').classList.remove('active');
+    document.getElementById('screen-results2').classList.remove('active');
+    setTimeout(function() { black.className = ''; }, 50);
+  }, 200);
+}
+</script>
+</body>
+</html>

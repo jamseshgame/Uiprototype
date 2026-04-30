@@ -71,7 +71,11 @@
     --topbar-h: var(--navbar-h);
   }
 
-  html { background: transparent; }
+  /* Solid backdrop for the WebView render surface. The panel/surface CSS variables
+     (--bg-panel, --bg-surface) are translucent rgba whites — without a solid html
+     background, the OVROverlay underlay shows the world (passthrough/scene) through
+     every transparent pixel, making the panel look "see-through". */
+  html { background: #0d0a16; }
 
   /* ── Font hierarchy: Inter (body) / Chakra Petch (accents & headings) ── */
   /* Logo / Accents */
@@ -1274,10 +1278,11 @@
   }
   .play-grid-song:hover .song-hover-actions,
   .play-grid-song:active .song-hover-actions,
-  .play-grid-song.active-song .song-hover-actions,
   .song-tile:hover .song-hover-actions,
   .song-tile:active .song-hover-actions,
-  .song-tile.active .song-hover-actions {
+  .song-tile.active .song-hover-actions,
+  .coop-song-tile:hover .song-hover-actions,
+  .coop-song-tile:active .song-hover-actions {
     opacity: 1;
     pointer-events: auto;
   }
@@ -1306,16 +1311,19 @@
   .song-hover-btn.song-hover-btn-play.playing {
     background: var(--pink);
   }
-  .song-tile .song-hover-actions {
+  .song-tile .song-hover-actions,
+  .coop-song-tile .song-hover-actions {
     top: 12px;
     right: 12px;
     gap: 10px;
   }
-  .song-tile .song-hover-btn {
+  .song-tile .song-hover-btn,
+  .coop-song-tile .song-hover-btn {
     width: 86px;
     height: 86px;
   }
-  .song-tile .song-hover-btn svg {
+  .song-tile .song-hover-btn svg,
+  .coop-song-tile .song-hover-btn svg {
     width: 43px;
     height: 43px;
   }
@@ -10659,7 +10667,7 @@ function updateCoinsFromBackend(data) {
 }
 
 function showGameResults(data) {
-  // data: {score,stars,accuracy,combo,perfect,notes,song:{title,artist,file}}
+  // data: {score,stars,accuracy,combo,perfect,notes,isGroupPlay,song:{title,artist,file}}
   if (!data) return;
   if (data.song) {
     var artEl = document.getElementById('results-album-art');
@@ -10669,7 +10677,25 @@ function showGameResults(data) {
     if (titleEl) titleEl.textContent = data.song.title || 'Unknown';
     if (artistEl) artistEl.textContent = data.song.artist || 'Unknown';
   }
-  switchResultsTab('me');
+  // switchResultsTab() reads meScoreData/groupScoreData — without overwriting
+  // them here, the panel keeps showing the hardcoded mock values.
+  function _fmtNum(n) { return (n == null) ? '0' : Number(n).toLocaleString(); }
+  meScoreData = {
+    score: _fmtNum(data.score),
+    stars: data.stars || 0,
+    accuracy: data.accuracy || '0%',
+    combo: _fmtNum(data.combo),
+    perfect: _fmtNum(data.perfect),
+    notes: (data.notes != null) ? String(data.notes) : '0/0'
+  };
+  // Hide the Group/Me tabs in solo play — there's no group context, so the
+  // "Group" tab would just show stale mock data.
+  var isGroupPlay = !!data.isGroupPlay;
+  var scoreTabsEl = document.getElementById('score-tabs');
+  var lbTabsEl = document.getElementById('lb-tabs');
+  if (scoreTabsEl) scoreTabsEl.style.display = isGroupPlay ? '' : 'none';
+  if (lbTabsEl) lbTabsEl.style.display = isGroupPlay ? '' : 'none';
+  switchResultsTab(isGroupPlay ? 'group' : 'me');
   var black = document.getElementById('onboard-black');
   black.className = 'visible';
   setTimeout(function() {
@@ -10936,9 +10962,17 @@ var pickerDragState = {
 };
 var PICKER_DRAG_THRESHOLD = 6;
 
+// Disabled on Quest: the controller laser-pointer emits tiny mousemove deltas
+// during a click that cross PICKER_DRAG_THRESHOLD, which then suppresses the
+// click via the capture-phase suppressor below — buttons stop responding.
+// Flip to true once we have a Quest-aware drag gate (higher threshold + delay,
+// or restrict to hand-tracked input).
+var PICKER_DRAG_ENABLED = false;
+
 function setupPickerDrag() {
   if (pickerDragInited) return;
   pickerDragInited = true;
+  if (!PICKER_DRAG_ENABLED) return;
   var viewport = document.querySelector('.grid-viewport');
   if (!viewport) return;
 
@@ -12365,6 +12399,11 @@ function retryGame() {
 }
 
 function exitResults() {
+  // Tell Unity to run the same continue/return flow as the native results screen
+  // (advances setlist if there's a next song, otherwise returns to the appropriate
+  // lobby). Done before the fade so Unity's context change has a head start while
+  // the panel is masked by black.
+  sendToUnity('exitResults', {});
   var black = document.getElementById('onboard-black');
   black.className = 'visible';
   setTimeout(function() {
@@ -14054,13 +14093,41 @@ function buildCoopGrid(grid) {
       } else {
         songTile.style.cursor = 'default';
       }
+      // Hover action cluster (host-only) — same Play / Swap / Remove cluster
+      // the solo setlist uses, so the two modes have parity. Non-hosts can't
+      // mutate the setlist, so we omit the cluster entirely for them.
+      var coopHoverHtml = '';
+      if (isHost) {
+        var isPlaying = (previewIdx === i);
+        var coopPlayIcon = isPlaying
+          ? '<svg width="72" height="72" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>'
+          : '<svg width="72" height="72" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+        var coopSwapIcon = '<svg width="72" height="72" viewBox="0 0 24 24" fill="currentColor"><path d="M7.5 3.5L4 7l3.5 3.5V8H15V6H7.5V3.5zM20 17l-3.5-3.5V16H9v2h7.5v2.5L20 17z"/></svg>';
+        var coopRemoveIcon = '<svg width="72" height="72" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>';
+        coopHoverHtml =
+          '<div class="song-hover-actions">' +
+            '<button class="song-hover-btn song-hover-btn-play' + (isPlaying ? ' playing' : '') + '">' + coopPlayIcon + '</button>' +
+            '<button class="song-hover-btn song-hover-btn-swap">' + coopSwapIcon + '</button>' +
+            '<button class="song-hover-btn song-hover-btn-remove">' + coopRemoveIcon + '</button>' +
+          '</div>';
+      }
       songTile.innerHTML =
-        '<div class="coop-song-art"><img src="' + (s.file || 'art/001.jpg') + '" alt=""></div>' +
+        '<div class="coop-song-art">' +
+          '<img src="' + (s.file || 'art/001.jpg') + '" alt="">' +
+          coopHoverHtml +
+        '</div>' +
         '<div class="coop-song-info">' +
           '<div class="song-title">' + (s.title || 'Unknown') + '</div>' +
           '<div class="song-artist">' + (s.artist || 'Unknown') + '</div>' +
         '</div>' +
         (!isHost ? '<div style="font-size:14px;color:#888888;margin-top:4px">Host picks songs</div>' : '');
+      if (isHost) {
+        (function(idx) {
+          songTile.querySelector('.song-hover-btn-play').onclick = function(e) { e.stopPropagation(); togglePreview(idx); };
+          songTile.querySelector('.song-hover-btn-swap').onclick = function(e) { e.stopPropagation(); swapSetlistSong(idx); };
+          songTile.querySelector('.song-hover-btn-remove').onclick = function(e) { e.stopPropagation(); removeFromSetlist(idx); };
+        })(i);
+      }
       row.appendChild(songTile);
 
       // Friend grid (right) — players in the session
