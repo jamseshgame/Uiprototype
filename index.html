@@ -1659,7 +1659,12 @@
     min-width: 0;
     min-height: 0;
   }
-  .coop-top-split > .play-songs-area {
+  .coop-top-split > .play-songs-area:first-child {
+    /* Songs half is wider than the players half (~60/40 split). */
+    flex: 1.5;
+    min-width: 0;
+  }
+  .coop-top-split > .play-songs-area:last-child {
     flex: 1;
     min-width: 0;
   }
@@ -13758,7 +13763,7 @@ function syncSetlistToUnity() {
 }
 
 var soloGridPage = 0;
-var selectedExperience = 'Stage';
+var selectedExperience = 'Original';
 
 function buildPlayGrid() {
   var grid = document.getElementById('play-grid');
@@ -14783,15 +14788,6 @@ function addCoopPlayer(friend) {
 }
 
 // ── Option Picker Popup ──
-var expPickerTab = 'stage';
-var selectedExpItems = {
-  stage: 'Main Stage',
-  gem: 'Ruby',
-  highway: 'Neon Highway',
-  skin: 'Default',
-  skybox: 'Sunset'
-};
-
 function openOptionPicker(type) {
   var overlay = document.getElementById('option-picker-overlay');
   var panel = document.getElementById('option-picker-panel');
@@ -14861,10 +14857,37 @@ function openOptionPicker(type) {
       {id: 'expert', label: 'Expert', desc: 'Full song, no mercy'}
     ], selectedDifficulty);
   } else if (type === 'experience') {
-    title.textContent = 'Experience';
+    title.textContent = 'Instrument Skin';
     panel.appendChild(title);
-    buildExpPickerTabs(panel);
-    buildExpPickerContent(panel);
+    panel.style.width = '1200px';
+    panel.style.maxHeight = '1400px';
+    var skinItems = [
+      {id: 'Original', label: 'Original', img: 'instruments/drums.png'},
+      {id: 'Crystal',  label: 'Crystal',  img: 'instruments/skins/crystal.png'}
+    ];
+    var skinGrid = document.createElement('div');
+    skinGrid.style.cssText = 'display:grid;grid-template-columns:repeat(2,1fr);gap:24px;width:100%';
+    for (var si = 0; si < skinItems.length; si++) {
+      var skin = skinItems[si];
+      var isSelected = skin.id === selectedExperience;
+      var skinTile = document.createElement('div');
+      skinTile.style.cssText = 'position:relative;overflow:hidden;border-radius:var(--panel-radius);cursor:pointer;padding-top:100%;border:2px solid ' + (isSelected ? '#ffffff' : 'transparent');
+      if (isSelected) skinTile.style.boxShadow = '0 0 0 3px #ffffff, 0 0 12px rgba(255,255,255,0.4)';
+      skinTile.innerHTML =
+        '<img src="' + skin.img + '" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:0">' +
+        '<div style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);z-index:1"></div>' +
+        '<div style="position:absolute;bottom:24px;left:24px;z-index:2;font-size:36px;font-weight:800;color:#ffffff;text-shadow:0 2px 8px rgba(0,0,0,0.8)">' + skin.label + '</div>';
+      skinTile.onclick = (function(id) {
+        return function() {
+          selectedExperience = id;
+          sendToUnity('experience', {tab: 'skin', id: id});
+          closeOptionPicker();
+          buildPlayGrid();
+        };
+      })(skin.id);
+      skinGrid.appendChild(skinTile);
+    }
+    panel.appendChild(skinGrid);
   }
 }
 
@@ -14918,120 +14941,6 @@ function buildSimplePickerChoices(panel, type, items, currentVal) {
     choices.appendChild(choice);
   }
   panel.appendChild(choices);
-}
-
-function buildExpPickerTabs(panel) {
-  var tabsDef = [
-    {id: 'stage', label: 'Stage'},
-    {id: 'gem', label: 'Gem'},
-    {id: 'highway', label: 'Highway'},
-    {id: 'skin', label: 'Inst. Skin'},
-    {id: 'skybox', label: 'Skybox'}
-  ];
-  var tabsRow = document.createElement('div');
-  tabsRow.className = 'option-picker-tabs';
-  tabsRow.id = 'exp-picker-tabs';
-  for (var i = 0; i < tabsDef.length; i++) {
-    var t = tabsDef[i];
-    var btn = document.createElement('button');
-    btn.className = 'option-picker-tab' + (t.id === expPickerTab ? ' active' : '');
-    btn.textContent = t.label;
-    btn.onclick = (function(tabId) {
-      return function() {
-        expPickerTab = tabId;
-        // Rebuild tabs + content
-        var p = document.getElementById('option-picker-panel');
-        var oldTabs = document.getElementById('exp-picker-tabs');
-        var oldContent = document.getElementById('exp-picker-content');
-        if (oldTabs) p.removeChild(oldTabs);
-        if (oldContent) p.removeChild(oldContent);
-        buildExpPickerTabs(p);
-        buildExpPickerContent(p);
-      };
-    })(t.id);
-    tabsRow.appendChild(btn);
-  }
-  panel.appendChild(tabsRow);
-}
-
-function buildExpPickerContent(panel) {
-  var allExpItems = {
-    stage: [
-      {id: 'Main Stage', label: 'Main Stage', icon: '&#127926;'},
-      {id: 'Neon Arena', label: 'Neon Arena', icon: '&#127760;'},
-      {id: 'Desert Stage', label: 'Desert Stage', icon: '&#127964;'},
-      {id: 'Beach Party', label: 'Beach Party', icon: '&#127958;'},
-      {id: 'Crystal Platform', label: 'Crystal Platform', icon: '&#128142;'},
-      {id: 'Fire Stage', label: 'Fire Stage', icon: '&#128293;'},
-      {id: 'Ice Rink', label: 'Ice Rink', icon: '&#10052;'},
-      {id: 'Cloud Stage', label: 'Cloud Stage', icon: '&#9729;'},
-      {id: 'Club Basement', label: 'Club Basement', icon: '&#127911;'}
-    ],
-    gem: [
-      {id: 'Ruby', label: 'Ruby', icon: '&#128308;'},
-      {id: 'Sapphire', label: 'Sapphire', icon: '&#128309;'},
-      {id: 'Emerald', label: 'Emerald', icon: '&#128994;'},
-      {id: 'Diamond', label: 'Diamond', icon: '&#128142;'},
-      {id: 'Topaz', label: 'Topaz', icon: '&#128993;'},
-      {id: 'Amethyst', label: 'Amethyst', icon: '&#128995;'}
-    ],
-    highway: [
-      {id: 'Neon Highway', label: 'Neon Highway', icon: '&#128739;'},
-      {id: 'Rainbow Road', label: 'Rainbow Road', icon: '&#127752;'},
-      {id: 'Dark Highway', label: 'Dark Highway', icon: '&#127753;'},
-      {id: 'Lava Highway', label: 'Lava Highway', icon: '&#128293;'},
-      {id: 'Crystal Road', label: 'Crystal Road', icon: '&#128142;'},
-      {id: 'Starlight Path', label: 'Starlight Path', icon: '&#11088;'}
-    ],
-    skin: [
-      {id: 'Default', label: 'Default', icon: '&#127928;'},
-      {id: 'Holo Chrome', label: 'Holo Chrome', icon: '&#129689;'},
-      {id: 'Crystal Charm', label: 'Crystal Charm', icon: '&#128161;'},
-      {id: 'Chrome', label: 'Chrome', icon: '&#129717;'},
-      {id: 'Flame Wrap', label: 'Flame Wrap', icon: '&#128293;'},
-      {id: 'Holographic', label: 'Holographic', icon: '&#127752;'}
-    ],
-    skybox: [
-      {id: 'Sunset', label: 'Sunset', icon: '&#127748;'},
-      {id: 'Galaxy', label: 'Galaxy', icon: '&#127756;'},
-      {id: 'Northern Lights', label: 'Northern Lights', icon: '&#127776;'},
-      {id: 'Storm', label: 'Storm', icon: '&#9889;'},
-      {id: 'Deep Space', label: 'Deep Space', icon: '&#128640;'},
-      {id: 'Tropical', label: 'Tropical', icon: '&#127796;'}
-    ]
-  };
-
-  var items = allExpItems[expPickerTab] || [];
-  var currentVal = selectedExpItems[expPickerTab] || '';
-
-  var grid = document.createElement('div');
-  grid.className = 'option-picker-grid';
-  grid.id = 'exp-picker-content';
-
-  for (var i = 0; i < items.length; i++) {
-    var item = items[i];
-    var choice = document.createElement('div');
-    choice.className = 'option-picker-choice' + (item.id === currentVal ? ' selected' : '');
-    choice.style.flexDirection = 'column';
-    choice.style.alignItems = 'center';
-    choice.style.justifyContent = 'center';
-    choice.style.textAlign = 'center';
-    choice.style.padding = '24px 16px';
-    choice.innerHTML =
-      '<div style="font-size:48px;line-height:1;margin-bottom:8px">' + item.icon + '</div>' +
-      '<div class="option-picker-choice-label" style="font-size:22px">' + item.label + '</div>';
-    choice.onclick = (function(it) {
-      return function() {
-        selectedExpItems[expPickerTab] = it.id;
-        selectedExperience = it.id;
-        sendToUnity('experience', {tab: expPickerTab, id: it.id});
-        closeOptionPicker();
-        buildPlayGrid();
-      };
-    })(item);
-    grid.appendChild(choice);
-  }
-  panel.appendChild(grid);
 }
 
 function closeOptionPicker() {
