@@ -1644,11 +1644,291 @@
   .play-grid--coop {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 24px;
     padding: 24px;
     flex: 1;
     min-height: 0;
   }
+  /* Top half: 50/50 split — songs (left) + players (right). Each half reuses
+     the play-songs-area styling, so the dynamic-grid logic from solo mode
+     drops in cleanly. */
+  .coop-top-split {
+    flex: 6.5;
+    display: flex;
+    gap: 24px;
+    min-width: 0;
+    min-height: 0;
+  }
+  .coop-top-split > .play-songs-area {
+    flex: 1;
+    min-width: 0;
+  }
+  .coop-players-grid {
+    flex: 1;
+    display: grid;
+    gap: 16px;
+    min-width: 0;
+    min-height: 0;
+  }
+  .coop-players-grid--empty { grid-template-columns: 1fr; grid-template-rows: 1fr; }
+
+  /* ── Group tab players list ──────────────────────────── */
+  .coop-players-list {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 0;
+    min-width: 0;
+  }
+  .coop-player-row {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 14px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--btn-panel-border);
+    border-radius: var(--panel-radius);
+    overflow: hidden;
+  }
+  .coop-player-row--self {
+    border-color: rgba(255,255,255,0.4);
+    background: rgba(255,255,255,0.08);
+  }
+  .coop-player-row--empty {
+    border-style: dashed;
+    opacity: 0.25;
+    background: transparent;
+  }
+  .coop-player-row--add {
+    border-style: dashed;
+    background: transparent;
+    cursor: pointer;
+    color: rgba(255,255,255,0.7);
+    justify-content: center;
+    gap: 12px;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+  }
+  .coop-player-row--add:hover,
+  .coop-player-row--add:active {
+    background: rgba(255,255,255,0.04);
+    border-color: rgba(255,255,255,0.5);
+    color: #ffffff;
+  }
+  .coop-player-row--add .add-icon { font-size: 36px; line-height: 1; font-weight: 300; }
+  .coop-player-row--add .add-label { font-size: 22px; font-weight: 700; }
+  .coop-player-row .player-avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+    background: #1a1a1a;
+  }
+  .coop-player-row .player-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .coop-player-row .player-name-wrap {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .coop-player-row .player-name {
+    font-size: 20px;
+    font-weight: 700;
+    color: #ffffff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+  }
+  .coop-player-row .you-badge,
+  .coop-player-row .player-host-badge {
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    padding: 3px 8px;
+    border-radius: 999px;
+    flex-shrink: 0;
+  }
+  .coop-player-row .you-badge {
+    color: #ffffff;
+    background: rgba(255,255,255,0.15);
+  }
+  .coop-player-row .player-host-badge {
+    color: #111;
+    background: #ffd24a;
+  }
+  .coop-player-row .player-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .coop-player-row .player-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  .coop-player-row .player-icon--diff svg {
+    width: 32px;
+    height: 32px;
+  }
+  .coop-player-status-pill {
+    padding: 4px 14px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    flex-shrink: 0;
+    min-width: 96px;
+    text-align: center;
+  }
+  .coop-player-status-pill--choosing {
+    background: rgba(250, 204, 21, 0.12);
+    color: #facc15;
+    border: 1px solid rgba(250, 204, 21, 0.4);
+  }
+  .coop-player-status-pill--ready {
+    background: rgba(52, 211, 153, 0.12);
+    color: #34d399;
+    border: 1px solid rgba(52, 211, 153, 0.4);
+  }
+  .coop-player-row .player-remove-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255,255,255,0.1);
+    color: #ffffff;
+    font-size: 22px;
+    font-weight: 700;
+    cursor: pointer;
+    flex-shrink: 0;
+    opacity: 0;
+    transition: opacity 0.15s, background 0.15s;
+    font-family: 'Inter', sans-serif;
+    line-height: 1;
+  }
+  .coop-player-row:hover .player-remove-btn,
+  .coop-player-row:active .player-remove-btn { opacity: 1; }
+  .coop-player-row .player-remove-btn:hover { background: rgba(217, 38, 38, 0.7); }
+  /* Reserves the same horizontal slot on rows where the user can't be
+     removed (self / host) so trailing icons + pills stay aligned across
+     every row. */
+  .coop-player-row .player-remove-btn--hidden,
+  .coop-player-row:hover .player-remove-btn--hidden {
+    visibility: hidden;
+    pointer-events: none;
+    opacity: 0;
+  }
+  .coop-player-tile {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--panel-radius);
+    background: #1a1a1a;
+    border: 2px solid transparent;
+    cursor: pointer;
+    align-self: stretch;
+    min-height: 0;
+    min-width: 0;
+    transition: border-color 0.15s, box-shadow 0.2s;
+  }
+  .coop-player-tile.active-player {
+    border-color: #ffffff;
+    box-shadow: 0 0 0 3px #ffffff, 0 0 18px rgba(255,255,255,0.4);
+  }
+  .coop-player-tile-art {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    overflow: hidden;
+  }
+  .coop-player-tile-art img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .coop-player-tile-info {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    padding: 80px 16px 16px;
+    background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.9) 60%);
+    z-index: 2;
+  }
+  .coop-player-tile-info .player-name {
+    font-size: 28px;
+    font-weight: 800;
+    color: #ffffff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.9);
+  }
+  .coop-player-tile-info .player-meta {
+    font-size: 20px;
+    color: rgba(255,255,255,0.75);
+    margin-top: 4px;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+  }
+  .coop-player-host-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    z-index: 3;
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: #111;
+    background: #ffd24a;
+    padding: 4px 10px;
+    border-radius: 999px;
+  }
+  .coop-player-tile .song-hover-actions {
+    z-index: 3;
+    top: 16px;
+    right: 16px;
+  }
+  .coop-player-tile:hover .song-hover-actions,
+  .coop-player-tile:active .song-hover-actions {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .coop-player-tile .song-hover-btn { width: 86px; height: 86px; }
+  .coop-player-tile .song-hover-btn svg { width: 43px; height: 43px; }
+  .coop-add-player-tile {
+    background: transparent;
+    border: 2px dashed rgba(255,255,255,0.25);
+    border-radius: var(--panel-radius);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    cursor: pointer;
+    color: rgba(255,255,255,0.7);
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+    min-height: 0;
+    align-self: stretch;
+  }
+  .coop-add-player-tile:hover {
+    background: rgba(255,255,255,0.04);
+    border-color: rgba(255,255,255,0.5);
+    color: #ffffff;
+  }
+  .coop-add-player-tile .plus-icon { font-size: 96px; font-weight: 300; line-height: 1; }
+  .coop-add-player-tile .plus-label { font-size: 32px; font-weight: 700; }
+  /* Legacy coop-songs-area kept for late-join spectate view */
   .coop-songs-area {
     flex: 1;
     display: flex;
@@ -1793,14 +2073,14 @@
   .option-picker-overlay {
     position: absolute;
     top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.7);
+    background: #06061a;
     z-index: 999;
     display: flex;
     align-items: center;
     justify-content: center;
   }
   .option-picker-panel {
-    background: rgba(10,10,30,0.95);
+    background: #0a0a1e;
     border: 1px solid var(--btn-tab-border);
     border-radius: var(--panel-radius);
     padding: 48px;
@@ -11616,7 +11896,7 @@ function buildModeTabs() {
   var modeIds = ['solo', 'coop'];
   for (var i = 0; i < modes.length; i++) {
     var btn = document.createElement('button');
-    var isDisabled = inBandspace ? modeIds[i] === 'solo' : modeIds[i] !== 'solo';
+    var isDisabled = inBandspace && modeIds[i] === 'solo';
     btn.className = 'play-mode-tab' + (modeIds[i] === playMode ? ' active' : '');
     if (isDisabled) {
       btn.style.opacity = '0.35';
@@ -14071,160 +14351,435 @@ function buildCoopGrid(grid) {
     return;
   }
 
-  // Songs area with friend grids
-  var songsArea = document.createElement('div');
-  songsArea.className = 'coop-songs-area';
+  // Top split: songs (left) + players (right). Both halves reuse the solo
+  // dynamic-grid pattern so adds/swaps/removes resize the tiles the same way.
+  var topSplit = document.createElement('div');
+  topSplit.className = 'coop-top-split';
 
-  var totalPages = Math.max(1, Math.ceil(setlist.length / COOP_SONGS_PER_PAGE));
-  if (coopGridPage >= totalPages) coopGridPage = totalPages - 1;
-  var start = coopGridPage * COOP_SONGS_PER_PAGE;
+  var songsHalf = document.createElement('div');
+  songsHalf.className = 'play-songs-area';
+  buildCoopSongsArea(songsHalf);
+  topSplit.appendChild(songsHalf);
 
-  for (var i = start; i < start + COOP_SONGS_PER_PAGE; i++) {
-    var row = document.createElement('div');
-    row.className = 'coop-song-row';
+  var playersHalf = document.createElement('div');
+  playersHalf.className = 'play-songs-area';
+  buildCoopPlayersArea(playersHalf);
+  topSplit.appendChild(playersHalf);
 
-    if (i < setlist.length && setlist[i]) {
-      var s = setlist[i];
-      // Song tile (left)
-      var songTile = document.createElement('div');
-      songTile.className = 'coop-song-tile';
-      if (isHost) {
-        songTile.onclick = (function(idx) { return function() { showPlayPicker(); }; })(i);
-      } else {
-        songTile.style.cursor = 'default';
-      }
-      // Hover action cluster (host-only) — same Play / Swap / Remove cluster
-      // the solo setlist uses, so the two modes have parity. Non-hosts can't
-      // mutate the setlist, so we omit the cluster entirely for them.
-      var coopHoverHtml = '';
-      if (isHost) {
-        var isPlaying = (previewIdx === i);
-        var coopPlayIcon = isPlaying
-          ? '<svg width="72" height="72" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>'
-          : '<svg width="72" height="72" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
-        var coopSwapIcon = '<svg width="72" height="72" viewBox="0 0 24 24" fill="currentColor"><path d="M7.5 3.5L4 7l3.5 3.5V8H15V6H7.5V3.5zM20 17l-3.5-3.5V16H9v2h7.5v2.5L20 17z"/></svg>';
-        var coopRemoveIcon = '<svg width="72" height="72" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>';
-        coopHoverHtml =
-          '<div class="song-hover-actions">' +
-            '<button class="song-hover-btn song-hover-btn-play' + (isPlaying ? ' playing' : '') + '">' + coopPlayIcon + '</button>' +
-            '<button class="song-hover-btn song-hover-btn-swap">' + coopSwapIcon + '</button>' +
-            '<button class="song-hover-btn song-hover-btn-remove">' + coopRemoveIcon + '</button>' +
-          '</div>';
-      }
-      songTile.innerHTML =
-        '<div class="coop-song-art">' +
-          '<img src="' + (s.file || 'art/001.jpg') + '" alt="">' +
-          coopHoverHtml +
-        '</div>' +
-        '<div class="coop-song-info">' +
-          '<div class="song-title">' + (s.title || 'Unknown') + '</div>' +
-          '<div class="song-artist">' + (s.artist || 'Unknown') + '</div>' +
-        '</div>' +
-        (!isHost ? '<div style="font-size:14px;color:#888888;margin-top:4px">Host picks songs</div>' : '');
-      if (isHost) {
-        (function(idx) {
-          songTile.querySelector('.song-hover-btn-play').onclick = function(e) { e.stopPropagation(); togglePreview(idx); };
-          songTile.querySelector('.song-hover-btn-swap').onclick = function(e) { e.stopPropagation(); swapSetlistSong(idx); };
-          songTile.querySelector('.song-hover-btn-remove').onclick = function(e) { e.stopPropagation(); removeFromSetlist(idx); };
-        })(i);
-      }
-      row.appendChild(songTile);
+  grid.appendChild(topSplit);
 
-      // Friend grid (right) — players in the session
-      var friendGrid = document.createElement('div');
-      friendGrid.className = 'coop-friend-grid';
-      for (var j = 0; j < 9; j++) {
-        var p = lobbyPlayers[j];
-        var cell = document.createElement('div');
-        cell.className = 'coop-friend-cell';
-        if (p) {
-          var isThisHost = hostName && p.name === hostName;
-          if (p.disconnected) cell.classList.add('coop-friend-cell--disconnected');
-          cell.innerHTML =
-            (p.avatar ? '<img src="' + p.avatar + '" alt="">' : '<div style="width:48px;height:48px;border-radius:50%;background:#333333"></div>') +
-            '<div class="friend-name">' + p.name + '</div>' +
-            (isThisHost ? '<div class="friend-host-badge">HOST</div>' : '') +
-            (p.disconnected ? '<div class="friend-disconnected-badge">DISCONNECTED</div>' : '');
-        }
-        friendGrid.appendChild(cell);
-      }
-      row.appendChild(friendGrid);
-    } else {
-      // Empty add-song row
-      var addTile = document.createElement('div');
-      addTile.className = 'coop-song-tile';
-      addTile.style.justifyContent = 'center';
-      addTile.style.alignItems = 'center';
-      addTile.style.border = '2px dashed #444444';
-      addTile.style.background = 'transparent';
-      if (isHost) {
-        addTile.style.cursor = 'pointer';
-        addTile.innerHTML = '<div style="font-size:48px;color:#444444">+</div>';
-        addTile.onclick = function() { showPlayPicker(); };
-      } else {
-        addTile.style.cursor = 'default';
-        addTile.innerHTML = '<div style="font-size:24px;color:#444444">Waiting for host...</div>';
-      }
-      row.appendChild(addTile);
-      var emptyGrid = document.createElement('div');
-      emptyGrid.className = 'coop-friend-grid';
-      for (var k = 0; k < 9; k++) {
-        var emptyCell = document.createElement('div');
-        emptyCell.className = 'coop-friend-cell';
-        emptyGrid.appendChild(emptyCell);
-      }
-      row.appendChild(emptyGrid);
-    }
-    songsArea.appendChild(row);
-  }
-  grid.appendChild(songsArea);
+  // Options row — same Instrument / Difficulty / Experience / Apply / Save+Load tiles as solo
+  buildOptionsRow(grid);
 
-  // Pagination row
-  if (totalPages > 1) {
-    var pagRow = document.createElement('div');
-    pagRow.className = 'play-grid-pagination';
-    var prevBtn = document.createElement('button');
-    prevBtn.className = 'play-grid-nav-btn';
-    prevBtn.innerHTML = '&#9664;';
-    prevBtn.disabled = coopGridPage === 0;
-    prevBtn.onclick = function() { coopGridPage--; buildPlayGrid(); };
-    var label = document.createElement('div');
-    label.className = 'page-label';
-    label.textContent = (coopGridPage + 1) + ' / ' + totalPages;
-    var nextBtn = document.createElement('button');
-    nextBtn.className = 'play-grid-nav-btn';
-    nextBtn.innerHTML = '&#9654;';
-    nextBtn.disabled = coopGridPage >= totalPages - 1;
-    nextBtn.onclick = function() { coopGridPage++; buildPlayGrid(); };
-    pagRow.appendChild(prevBtn);
-    pagRow.appendChild(label);
-    pagRow.appendChild(nextBtn);
-    grid.appendChild(pagRow);
-  }
-
-  // Bottom bar: options row + go-bar row
-  var bottomBar = document.createElement('div');
-  bottomBar.className = 'coop-bottom-bar';
-
-  // Options row
-  buildOptionsRow(bottomBar);
-
-  // Go bar row (Save / Start / Load)
-  var goRow = document.createElement('div');
-  goRow.className = 'coop-bottom-row';
+  // Full-width signature Ready button — Group lobby uses Ready, not Start.
+  // Host: when all players are Ready, this kicks off the game.
+  // Client: toggles their own ready status.
+  var startBtn = document.createElement('button');
+  startBtn.className = 'play-go-btn play-start-attract jamsesh-signature';
+  startBtn.id = 'play-go-btn';
+  startBtn.onclick = function() { handleCoopReady(); };
   if (isHost) {
-    goRow.innerHTML =
-      '<button class="play-bar-btn" onclick="openSaveSetlist()"><svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor"><path d="M17 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>Save</button>' +
-      '<button class="play-go-btn" onclick="startGame()"><svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>Start</button>' +
-      '<button class="play-bar-btn" onclick="openLoadSetlist()"><svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor"><path d="M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/></svg>Load</button>';
+    startBtn.textContent = 'Ready';
   } else {
-    goRow.innerHTML =
-      '<div style="flex:1"></div>' +
-      '<div style="color:#888888;font-size:20px;text-align:center;padding:16px 0">Waiting for host to start...</div>' +
-      '<div style="flex:1"></div>';
+    var selfIdx = getSelfRosterIdx();
+    var rosterNow = getCoopRoster();
+    var meReady = selfIdx >= 0 && rosterNow[selfIdx] && rosterNow[selfIdx].status === 'ready';
+    startBtn.textContent = meReady ? 'Cancel Ready' : 'Ready';
   }
-  bottomBar.appendChild(goRow);
-  grid.appendChild(bottomBar);
+  startBtn.style.cssText = 'width:100%;flex:1.5;min-height:0;font-size:64px;font-weight:900;letter-spacing:6px';
+  grid.appendChild(startBtn);
+}
+
+// ── Group tab dynamic-grid helpers ─────────────────────────────
+// Featured layout: when 2-6 tiles are present, the active tile occupies a
+// 2x2 block in the top-left of a 3x3 grid and the remaining tiles fill the
+// right column then the bottom row. At 7-9 tiles the layout flips to a
+// uniform 3x3 grid since there's no more room for the featured slot.
+var coopMax = 9;
+var coopPlayersLayoutObserver = null;
+var coopSongsLayoutObserver = null;
+var mainStageRoster = []; // Players added on Main Stage (not yet in a bandspace)
+var activePlayerIdx = -1;
+
+function getCoopRoster() {
+  return inBandspace ? lobbyPlayers : mainStageRoster;
+}
+
+// Place tiles into `grid` using the featured layout described above.
+// `activeIdx` is the index in `tiles` that should occupy the 2x2 active slot.
+function applyFeaturedLayout(grid, tiles, activeIdx) {
+  if (!tiles.length) return;
+  if (tiles.length >= 7) {
+    for (var u = 0; u < tiles.length; u++) grid.appendChild(tiles[u]);
+    return;
+  }
+  // Slot order: right column top→bottom, then bottom row right→left
+  var slots = [
+    {c: 3, r: 1},
+    {c: 3, r: 2},
+    {c: 3, r: 3},
+    {c: 2, r: 3},
+    {c: 1, r: 3}
+  ];
+  var aIdx = activeIdx;
+  if (aIdx < 0 || aIdx >= tiles.length) aIdx = 0;
+  var aEl = tiles[aIdx];
+  aEl.style.gridColumn = '1 / span 2';
+  aEl.style.gridRow = '1 / span 2';
+  grid.appendChild(aEl);
+  var si = 0;
+  for (var t = 0; t < tiles.length; t++) {
+    if (t === aIdx) continue;
+    var pos = slots[si++];
+    tiles[t].style.gridColumn = '' + pos.c;
+    tiles[t].style.gridRow = '' + pos.r;
+    grid.appendChild(tiles[t]);
+  }
+}
+
+// Generic square-grid sizing used by both songs and players halves so the
+// 3x3 grid stays a square inside its container regardless of width.
+function sizeFeaturedGrid(grid, container, observerRefName) {
+  function apply() {
+    var rect = container.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+    var cs = getComputedStyle(container);
+    var padW = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
+    var padH = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
+    var W = rect.width - padW;
+    var H = rect.height - padH;
+    var gap = parseFloat(getComputedStyle(grid).gap) || 16;
+    var cell = Math.floor(Math.min(
+      (W - gap * 2) / 3,
+      (H - gap * 2) / 3
+    ));
+    if (cell <= 0) return;
+    grid.style.gridTemplateColumns = 'repeat(3, ' + cell + 'px)';
+    grid.style.gridTemplateRows = 'repeat(3, ' + cell + 'px)';
+    grid.style.justifyContent = 'center';
+    grid.style.alignContent = 'center';
+  }
+  apply();
+  var prev = window[observerRefName];
+  if (prev) { prev.disconnect(); window[observerRefName] = null; }
+  if (window.ResizeObserver) {
+    window[observerRefName] = new ResizeObserver(apply);
+    window[observerRefName].observe(container);
+  } else {
+    requestAnimationFrame(apply);
+    setTimeout(apply, 100);
+  }
+}
+
+function buildCoopSongsArea(container) {
+  container.innerHTML = '';
+  var songCount = Math.min(setlist.length, coopMax);
+
+  // 0 songs: lone + Add Song tile
+  if (songCount === 0) {
+    var gEmpty = document.createElement('div');
+    gEmpty.className = 'play-songs-grid play-songs-grid--empty';
+    gEmpty.appendChild(makeSoloAddTile());
+    container.appendChild(gEmpty);
+    return;
+  }
+
+  var tileEls = [];
+  var activeTileIdx = -1;
+  for (var i = 0; i < songCount; i++) {
+    var el = makeSoloSongTile(i);
+    if (i === activeSongIdx) activeTileIdx = tileEls.length;
+    tileEls.push(el);
+  }
+  if (songCount < coopMax) {
+    tileEls.push(makeSoloAddTile());
+  }
+
+  if (activeTileIdx < 0) activeTileIdx = 0;
+  var grid = document.createElement('div');
+  grid.className = 'play-songs-grid play-songs-grid--featured';
+  applyFeaturedLayout(grid, tileEls, activeTileIdx);
+  container.appendChild(grid);
+  sizeFeaturedGrid(grid, container, 'coopSongsLayoutObserver');
+}
+
+// Two-tile pair sizing: both cells equal squares, centered in the container.
+function sizePairGrid(grid, container) {
+  function apply() {
+    var rect = container.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+    var cs = getComputedStyle(container);
+    var padW = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
+    var padH = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
+    var W = rect.width - padW;
+    var H = rect.height - padH;
+    var gap = parseFloat(getComputedStyle(grid).gap) || 16;
+    var cell = Math.floor(Math.min((W - gap) / 2, H));
+    if (cell <= 0) return;
+    grid.style.gridTemplateColumns = 'repeat(2, ' + cell + 'px)';
+    grid.style.gridTemplateRows = cell + 'px';
+    grid.style.justifyContent = 'center';
+    grid.style.alignContent = 'center';
+  }
+  apply();
+  if (coopSongsLayoutObserver) { coopSongsLayoutObserver.disconnect(); coopSongsLayoutObserver = null; }
+  if (window.ResizeObserver) {
+    coopSongsLayoutObserver = new ResizeObserver(apply);
+    coopSongsLayoutObserver.observe(container);
+  } else {
+    requestAnimationFrame(apply);
+    setTimeout(apply, 100);
+  }
+}
+
+// Group tab players list. Renders 10 fixed slots: filled rows for each player
+// in the roster (self auto-inserted on Main Stage), one "+ Add Player" row at
+// the next empty slot if the user can invite, and dim placeholder rows beyond
+// that. Includes instrument + difficulty icons and a Choosing/Ready pill per
+// player so the lobby state is visible at a glance.
+var COOP_PLAYERS_MAX = 10;
+var DIFF_ICON_COLORS = { easy:'#34d399', medium:'#facc15', hard:'#fb923c', expert:'#f87171' };
+
+function ensureSelfInRoster() {
+  // Self is implicitly the first entry on Main Stage; in a bandspace the host
+  // controls roster contents so we don't synthesize anything.
+  if (inBandspace) return;
+  if (mainStageRoster.length > 0 && mainStageRoster[0].isSelf) return;
+  var me = getActiveProfile();
+  mainStageRoster.unshift({
+    name: me.name,
+    avatar: me.avatar,
+    instrument: selectedInstrument || 'guitar',
+    difficulty: selectedDifficulty || 'medium',
+    status: 'choosing',
+    isSelf: true,
+    plate: null,
+    plateClass: null,
+    ready: false
+  });
+}
+
+function buildCoopPlayersArea(container) {
+  container.innerHTML = '';
+  ensureSelfInRoster();
+  var roster = getCoopRoster();
+  var canAdd = (!inBandspace || isHost) && roster.length < COOP_PLAYERS_MAX;
+
+  var list = document.createElement('div');
+  list.className = 'coop-players-list';
+
+  for (var i = 0; i < COOP_PLAYERS_MAX; i++) {
+    var row;
+    if (i < roster.length) {
+      row = buildCoopPlayerRow(roster[i], i);
+    } else if (i === roster.length && canAdd) {
+      row = buildCoopAddPlayerRow();
+    } else {
+      row = document.createElement('div');
+      row.className = 'coop-player-row coop-player-row--empty';
+    }
+    list.appendChild(row);
+  }
+  container.appendChild(list);
+}
+
+function buildCoopPlayerRow(p, idx) {
+  var row = document.createElement('div');
+  row.className = 'coop-player-row';
+  if (p.isSelf) row.className += ' coop-player-row--self';
+
+  // For self, reflect the live picker selections so changing instrument /
+  // difficulty in the options row updates the row immediately, before Ready.
+  var instId = p.isSelf ? (selectedInstrument || p.instrument || 'guitar') : (p.instrument || 'guitar');
+  var diffId = p.isSelf ? (selectedDifficulty || p.difficulty || 'easy') : (p.difficulty || 'easy');
+  var diffColor = DIFF_ICON_COLORS[diffId] || '#888';
+  var isTheHost = hostName && p.name === hostName;
+  var statusReady = p.status === 'ready';
+  var statusClass = statusReady ? 'coop-player-status-pill--ready' : 'coop-player-status-pill--choosing';
+  var statusLabel = statusReady ? 'Ready' : 'Choosing';
+  var canRemove = !p.isSelf && !isTheHost && (!inBandspace || isHost);
+
+  var avatarSrc = p.avatar || '';
+  var avatarHtml = avatarSrc
+    ? '<img src="' + avatarSrc + '" alt="">'
+    : '<div style="width:100%;height:100%;background:#333"></div>';
+
+  row.innerHTML =
+    '<div class="player-avatar">' + avatarHtml + '</div>' +
+    '<div class="player-name-wrap">' +
+      '<div class="player-name">' + (p.name || 'Unknown') + '</div>' +
+      (p.isSelf ? '<span class="you-badge">YOU</span>' : '') +
+      (isTheHost ? '<span class="player-host-badge">HOST</span>' : '') +
+    '</div>' +
+    '<div class="player-icon player-icon--inst"><img src="instruments/' + instId + '.png" alt=""></div>' +
+    '<div class="player-icon player-icon--diff" style="color:' + diffColor + '">' +
+      '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.27 5.82 21 7 14.14l-5-4.87 6.91-1.01z"/></svg>' +
+    '</div>' +
+    '<div class="coop-player-status-pill ' + statusClass + '">' + statusLabel + '</div>' +
+    '<button class="player-remove-btn' + (canRemove ? '' : ' player-remove-btn--hidden') + '" type="button">&times;</button>';
+
+  if (canRemove) {
+    (function(i) {
+      row.querySelector('.player-remove-btn').onclick = function(e) {
+        e.stopPropagation();
+        removeCoopPlayer(i);
+      };
+    })(idx);
+  }
+  return row;
+}
+
+function buildCoopAddPlayerRow() {
+  var row = document.createElement('div');
+  row.className = 'coop-player-row coop-player-row--add';
+  row.innerHTML = '<div class="add-icon">+</div><div class="add-label">Add Player</div>';
+  row.onclick = function() { openAddPlayerPicker(); };
+  return row;
+}
+
+function getSelfRosterIdx() {
+  var roster = getCoopRoster();
+  for (var i = 0; i < roster.length; i++) {
+    if (roster[i] && roster[i].isSelf) return i;
+  }
+  return -1;
+}
+
+function handleCoopReady() {
+  // Host's "Ready" button kicks off the session — no waiting on clients here
+  // (Unity owns the all-ready gating in the real flow).
+  if (isHost) { startGame(); return; }
+
+  // Client: toggle own ready status so the lobby pill flips.
+  var roster = getCoopRoster();
+  var selfIdx = getSelfRosterIdx();
+  if (selfIdx < 0) return;
+  var self = roster[selfIdx];
+  self.instrument = selectedInstrument || self.instrument;
+  self.difficulty = selectedDifficulty || self.difficulty;
+  self.status = (self.status === 'ready') ? 'choosing' : 'ready';
+  self.ready = self.status === 'ready';
+  sendToUnity('playerReady', { ready: self.ready });
+  buildPlayGrid();
+}
+
+function removeCoopPlayer(idx) {
+  var roster = getCoopRoster();
+  if (idx < 0 || idx >= roster.length) return;
+  var p = roster[idx];
+  if (!p || p.isSelf) return; // never let the user kick themselves
+  if (hostName && p.name === hostName) return; // and never the host
+  if (inBandspace) {
+    sendToUnity('kickPlayer', { name: p.name });
+    lobbyPlayers.splice(idx, 1);
+  } else {
+    mainStageRoster.splice(idx, 1);
+  }
+  buildPlayGrid();
+}
+
+// Friend picker for Main Stage "+ Add Player".
+// Uses the shared option-picker overlay so it inherits the same styling
+// the instrument / difficulty pickers use.
+function openAddPlayerPicker() {
+  var overlay = document.getElementById('option-picker-overlay');
+  var panel = document.getElementById('option-picker-panel');
+  overlay.style.display = 'flex';
+  panel.innerHTML = '';
+  panel.style.width = '1400px';
+  panel.style.maxHeight = '1400px';
+
+  var title = document.createElement('div');
+  title.className = 'option-picker-title';
+  title.textContent = inBandspace ? 'Invite Friend' : 'Add Player';
+  panel.appendChild(title);
+
+  var pool = (window._backendFriends && window._backendFriends.length) ? window._backendFriends : [
+    { name: 'Jooleeno', online: true, avatar: 'avatars/jooleeno.jpg' },
+    { name: 'Ted', online: true, avatar: 'avatars/ted.png' },
+    { name: 'Abbie', online: true, avatar: 'avatars/abbie.png' },
+    { name: 'Arthen', online: false, avatar: 'avatars/arthen.jpg' },
+    { name: 'xShadowPick', online: true, avatar: 'avatars/placeholder-9.png' },
+    { name: 'MelodyQueen', online: false, avatar: 'avatars/placeholder-25.png' },
+    { name: 'BeatDropper99', online: false, avatar: 'avatars/placeholder-44.png' },
+    { name: 'FretNinja', online: true, avatar: 'avatars/placeholder-52.png' },
+    { name: 'GrooveMonkey', online: false, avatar: 'avatars/placeholder-38.png' }
+  ];
+
+  // Exclude friends already in the roster
+  var roster = getCoopRoster();
+  var inRoster = {};
+  for (var r = 0; r < roster.length; r++) {
+    if (roster[r] && roster[r].name) inRoster[roster[r].name] = true;
+  }
+
+  var fgrid = document.createElement('div');
+  fgrid.style.cssText = 'display:grid;grid-template-columns:repeat(3,1fr);gap:24px;width:100%';
+  var renderedAny = false;
+  for (var f = 0; f < pool.length; f++) {
+    var fr = pool[f];
+    if (inRoster[fr.name]) continue;
+    renderedAny = true;
+    var cell = document.createElement('div');
+    cell.style.cssText = 'position:relative;overflow:hidden;border-radius:var(--panel-radius);cursor:pointer;padding-top:100%;border:2px solid transparent;background:#1a1a1a;transition:border-color 0.15s, box-shadow 0.2s';
+    cell.onmouseover = function() { this.style.borderColor = '#ffffff'; this.style.boxShadow = '0 0 12px rgba(255,255,255,0.4)'; };
+    cell.onmouseout = function() { this.style.borderColor = 'transparent'; this.style.boxShadow = 'none'; };
+    cell.innerHTML =
+      '<img src="' + fr.avatar + '" alt="" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover">' +
+      '<div style="position:absolute;left:0;right:0;bottom:0;padding:60px 12px 12px;background:linear-gradient(180deg,transparent 0%,rgba(0,0,0,0.9) 60%);z-index:2">' +
+        '<div style="font-size:24px;font-weight:800;color:#fff;text-shadow:0 2px 6px rgba(0,0,0,0.9)">' + fr.name + '</div>' +
+        '<div style="font-size:16px;color:' + (fr.online ? '#34d399' : '#888') + ';margin-top:4px">' + (fr.online ? 'Online' : 'Offline') + '</div>' +
+      '</div>';
+    cell.onclick = (function(friend) {
+      return function() {
+        addCoopPlayer(friend);
+        closeOptionPicker();
+      };
+    })(fr);
+    fgrid.appendChild(cell);
+  }
+  if (!renderedAny) {
+    fgrid.style.gridTemplateColumns = '1fr';
+    fgrid.innerHTML = '<div style="color:#888;font-size:24px;text-align:center;padding:48px 0">No friends available to add</div>';
+  }
+  panel.appendChild(fgrid);
+
+  var backBtn = document.createElement('button');
+  backBtn.className = 'play-bar-btn';
+  backBtn.style.cssText = 'width:100%;margin-top:24px;flex-shrink:0';
+  backBtn.innerHTML = '<svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>Back';
+  backBtn.onclick = function() { closeOptionPicker(); };
+  panel.appendChild(backBtn);
+}
+
+function addCoopPlayer(friend) {
+  if (inBandspace) {
+    sendToUnity('invitePlayer', { name: friend.name });
+    // Locally append so the prototype UI updates without Unity in the loop.
+    lobbyPlayers.push({
+      name: friend.name,
+      avatar: friend.avatar,
+      plate: null,
+      plateClass: null,
+      instrument: 'guitar',
+      difficulty: 'medium',
+      status: 'choosing',
+      ready: false
+    });
+    buildPlayGrid();
+    return;
+  }
+  mainStageRoster.push({
+    name: friend.name,
+    avatar: friend.avatar,
+    plate: null,
+    plateClass: null,
+    instrument: 'guitar',
+    difficulty: 'medium',
+    status: 'choosing',
+    ready: false
+  });
+  buildPlayGrid();
 }
 
 // ── Option Picker Popup ──
@@ -16680,6 +17235,7 @@ var skipAll = false;         // ?skip — bypass everything, straight to full me
 var layoutPickerEnabled = false; // ?layoutPicker — reveal the home layout picker button
 var screenOverride = '';     // ?step=results1|results2 — direct-link to a results screen
 var onboardFlags = {};       // { legal: true, perms_explainer: true }
+var groupBootRole = '';      // ?host | ?client — pre-load the Group tab as host/client
 
 function parseMode() {
   var params = window.location.search.substring(1).split('&');
@@ -16761,7 +17317,13 @@ function parseMode() {
     }
   }
 
-  console.log('[Mode] demo=' + demoEnabled + ', onboard=' + onboardEnabled + ', layout=' + currentLayout + ', flags=' + JSON.stringify(onboardFlags));
+  // ?host / ?client — simulate a bandspace lobby. Drops the user straight
+  // into the Group tab with a populated roster so the lobby list is testable
+  // outside the Unity flow.
+  if ('host' in map) groupBootRole = 'host';
+  else if ('client' in map) groupBootRole = 'client';
+
+  console.log('[Mode] demo=' + demoEnabled + ', onboard=' + onboardEnabled + ', layout=' + currentLayout + ', role=' + (groupBootRole || 'none') + ', flags=' + JSON.stringify(onboardFlags));
 }
 
 function _loadOnboardFlags() {
@@ -17149,6 +17711,57 @@ function init() {
 
   // Start the onboarding/demo flow
   startFlow();
+
+  // ?host / ?client — populate the lobby and jump to the Group tab so the
+  // multiplayer lobby UI is testable outside of a Unity session.
+  if (groupBootRole) applyGroupBootRole();
+}
+
+function applyGroupBootRole() {
+  var role = groupBootRole;
+  if (!role) return;
+
+  inBandspace = true;
+  isHost = (role === 'host');
+
+  var me = getActiveProfile();
+  var selfEntry = {
+    name: me.name,
+    avatar: me.avatar,
+    instrument: selectedInstrument || 'guitar',
+    difficulty: selectedDifficulty || 'medium',
+    status: 'choosing',
+    isSelf: true,
+    plate: null,
+    plateClass: null,
+    ready: false
+  };
+
+  var others = [
+    {name:'xShredMaster',  avatar:'art/001.jpg', instrument:'guitar', difficulty:'expert', status:'ready',    plate:null, plateClass:null, ready:true},
+    {name:'BeatDropQueen', avatar:'art/002.jpg', instrument:'drums',  difficulty:'hard',   status:'ready',    plate:null, plateClass:'plate-holo', ready:true},
+    {name:'NeonRiff',      avatar:'art/003.jpg', instrument:'vocals', difficulty:'medium', status:'choosing', plate:null, plateClass:null, ready:false},
+    {name:'AxelStorm',     avatar:'art/004.jpg', instrument:'keys',   difficulty:'expert', status:'choosing', plate:null, plateClass:null, ready:false},
+    {name:'VoxHunter',     avatar:'art/006.jpg', instrument:'vocals', difficulty:'hard',   status:'ready',    plate:null, plateClass:null, ready:true},
+    {name:'FretBoss',      avatar:'art/007.jpg', instrument:'guitar', difficulty:'expert', status:'ready',    plate:null, plateClass:'plate-radiate', ready:true},
+    {name:'SynthWave99',   avatar:'art/008.jpg', instrument:'keys',   difficulty:'medium', status:'choosing', plate:null, plateClass:null, ready:false},
+    {name:'PickSlinger',   avatar:'art/009.jpg', instrument:'guitar', difficulty:'easy',   status:'ready',    plate:null, plateClass:null, ready:true},
+    {name:'CrashKid',      avatar:'art/011.jpg', instrument:'drums',  difficulty:'hard',   status:'choosing', plate:null, plateClass:null, ready:false}
+  ];
+
+  if (role === 'host') {
+    lobbyPlayers = [selfEntry].concat(others);
+    hostName = me.name;
+  } else {
+    var hostEntry = others[0];
+    hostEntry.isHost = true;
+    hostName = hostEntry.name;
+    lobbyPlayers = [hostEntry, selfEntry].concat(others.slice(1));
+  }
+  if (lobbyPlayers.length > 10) lobbyPlayers = lobbyPlayers.slice(0, 10);
+
+  setPlayMode('coop');
+  navigateTo('play');
 }
 
 /* ── Stat Ticker ──────────────────────────────────── */
