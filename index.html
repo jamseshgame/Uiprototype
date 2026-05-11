@@ -10702,7 +10702,18 @@ function handleUnityMessage(msg) {
         setPlayMode('coop');
         navigateTo('play');
       } else {
-        buildModeTabs();
+        // Returning to the open lobby — drop coop-only state, force the Play
+        // tab back to Solo (so the Group panel doesn't keep rendering with a
+        // stale roster), and route the user to Home so they land somewhere
+        // intentional instead of staying on whatever bandspace screen they
+        // last had open.
+        lobbyPlayers = [];
+        if (playMode !== 'solo') {
+          setPlayMode('solo');
+        } else {
+          buildModeTabs();
+        }
+        navigateTo('home');
       }
       break;
     case 'updateIsHost':
@@ -11496,27 +11507,20 @@ function buildSocialPage() {
 }
 
 function buildSpacesGrid() {
+  // Spaces is temporarily reduced to a single "Jamsesh Hub" tile (returns to the
+  // open lobby on click). Mock hubs, Create New, and the private spaces preset
+  // tiles are hidden until each one has a real Unity-side destination wired.
+  var spacesTabs = document.getElementById('spaces-tabs');
+  if (spacesTabs) spacesTabs.style.display = 'none';
+  var privateTab = document.getElementById('spaces-tab-private');
+  if (privateTab) privateTab.style.display = 'none';
+
   // ── Public (Hubs) ──
   var pubGrid = document.getElementById('spaces-grid-public');
   pubGrid.innerHTML = '';
 
-  // Create New tile
-  var createPub = document.createElement('div');
-  createPub.className = 'space-tile-create';
-  createPub.onclick = function() { openCreateSpace('public'); };
-  createPub.innerHTML = '<div class="space-tile-create-plus">+</div><div class="space-tile-create-label">Create New</div>';
-  pubGrid.appendChild(createPub);
-
-  // PLAYFAB HOOKUP: Replace with data from Unity via sendToUnity('getHubs') / updateHubs message
   var hubs = [
-    { name: '18+ Only', count: '18/25', img: 'spaces/social.png' },
-    { name: 'Swifties', count: '22/25', img: 'spaces/stage.png' },
-    { name: 'K-Pop Zone', count: '25/25', img: 'spaces/lobby.png' },
-    { name: 'Jamsesh Hub', count: '8/25', img: 'spaces/social.png' },
-    { name: 'Rock Legends', count: '15/25', img: 'spaces/stage.png' },
-    { name: 'Indie Corner', count: '6/25', img: 'spaces/lobby.png' },
-    { name: 'Hip-Hop Lounge', count: '19/25', img: 'spaces/social.png' },
-    { name: 'Metal Pit', count: '12/25', img: 'spaces/stage.png' }
+    { name: 'Jamsesh Hub', count: '8/25', img: 'spaces/social.png' }
   ];
   for (var i = 0; i < hubs.length; i++) {
     var h = hubs[i];
@@ -11538,39 +11542,10 @@ function buildSpacesGrid() {
   }
 
   // ── Private ──
+  // Tab is hidden above; defensively clear the grid so any future Unity-pushed
+  // updates can't paint into a stale list.
   var privGrid = document.getElementById('spaces-grid-private');
-  privGrid.innerHTML = '';
-
-  // Create New tile
-  var createPriv = document.createElement('div');
-  createPriv.className = 'space-tile-create';
-  createPriv.onclick = function() { openCreateSpace('private'); };
-  createPriv.innerHTML = '<div class="space-tile-create-plus">+</div><div class="space-tile-create-label">Create New</div>';
-  privGrid.appendChild(createPriv);
-
-  var spaceItems = [
-    { name: 'Stage', desc: 'Perform live on stage', img: 'spaces/stage.png' },
-    { name: 'Social Hub', desc: 'Hang out with friends', img: 'spaces/social.png' },
-    { name: 'Pre-Song Lobby', desc: 'Warm up before you play', img: 'spaces/lobby.png' }
-  ];
-  for (var i = 0; i < spaceItems.length; i++) {
-    var s = spaceItems[i];
-    var tile = document.createElement('div');
-    tile.className = 'space-tile';
-    tile.style.background = 'url(' + s.img + ') center center / cover no-repeat';
-    tile.style.position = 'relative';
-    tile.style.overflow = 'hidden';
-    tile.style.cursor = 'pointer';
-    tile.onclick = (function(space) {
-      return function() { sendToUnity('selectSpace', space.name); };
-    })(s);
-    tile.innerHTML =
-      '<div style="position:absolute;bottom:0;left:0;right:0;padding:24px;background:linear-gradient(0deg,rgba(0,0,0,0.95) 0%,rgba(0,0,0,0.9) 40%,rgba(0,0,0,0.6) 70%,transparent 100%);">' +
-        '<div style="font-size:40px;font-weight:800;color:#ffffff;">' + s.name + '</div>' +
-        '<div style="font-size:24px;color:rgba(255,255,255,0.7);">' + s.desc + '</div>' +
-      '</div>';
-    privGrid.appendChild(tile);
-  }
+  if (privGrid) privGrid.innerHTML = '';
 }
 
 // ── Create Group ────────────────────────────────────────
@@ -11920,8 +11895,12 @@ var modeTabImages = {};
 function buildModeTabs() {
   var container = document.getElementById('play-mode-tabs');
   container.innerHTML = '';
-  var modes = ['Solo', 'Group'];
-  var modeIds = ['solo', 'coop'];
+  // Group only exists inside a bandspace — in the open lobby the user has no
+  // band/session, so only Solo should be selectable. The Solo tab itself is
+  // greyed out (not removed) inside a bandspace so the player can see that
+  // their picked instrument scope is the band.
+  var modes = inBandspace ? ['Solo', 'Group'] : ['Solo'];
+  var modeIds = inBandspace ? ['solo', 'coop'] : ['solo'];
   for (var i = 0; i < modes.length; i++) {
     var btn = document.createElement('button');
     var isDisabled = inBandspace && modeIds[i] === 'solo';
