@@ -9386,8 +9386,10 @@ button:focus,
    painting on current Horizon OS builds. These rules disable the
    heaviest always-on paint sources when window.vuplex is detected
    (body.vr-mode class set at script start). Browser/demo unaffected.
+   The particle canvas is kept visible — it renders a single static
+   frame in VR mode (the rAF loop is short-circuited in drawParticles
+   below) so the atmospheric backdrop survives without per-frame cost.
 */
-body.vr-mode #jamseshParticles { display: none !important; }
 body.vr-mode .nav-item[data-page="play"] { animation: none !important; }
 body.vr-mode .home-grid i,
 body.vr-mode .play-grid i { animation: none !important; }
@@ -17929,7 +17931,7 @@ function drawParticles() {
   // Skip canvas work while a page transition is in flight. Keeps the rAF loop
   // alive (cheap function call) so it resumes automatically when the flag clears.
   if (window._particlesPaused) {
-    requestAnimationFrame(drawParticles);
+    if (!window.vuplex) requestAnimationFrame(drawParticles);
     return;
   }
 
@@ -18008,18 +18010,16 @@ function drawParticles() {
     }
   }
 
-  requestAnimationFrame(drawParticles);
+  // In Vuplex on Quest, render exactly one frame then stop — keeps the
+  // atmospheric backdrop without the per-frame canvas2D cost that drove
+  // the Adreno GPU crashes. Browser/demo keeps the live animation.
+  if (!window.vuplex) {
+    requestAnimationFrame(drawParticles);
+  }
 }
 
 setPageColors('home');
-
-// Skip the particle rAF loop entirely inside Vuplex on Quest — the canvas
-// is also hidden via the body.vr-mode CSS rule, but stopping the loop
-// avoids the per-frame canvas2D work that was a major paint hotspot
-// driving the Adreno GPU crashes. Browser/demo still gets the full effect.
-if (!window.vuplex) {
-  drawParticles();
-}
+drawParticles();
 
 </script>
 </body>
