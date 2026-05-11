@@ -9381,6 +9381,17 @@ button:focus,
   box-shadow: 0 8px 28px var(--pause-home-glow), inset 0 1px 0 rgba(255,255,255,0.25);
 }
 
+/* ── VR mode (Vuplex on Quest) paint-pressure reductions ───────────
+   The Adreno GPU + embedded OculusWebView crashes under sustained
+   painting on current Horizon OS builds. These rules disable the
+   heaviest always-on paint sources when window.vuplex is detected
+   (body.vr-mode class set at script start). Browser/demo unaffected.
+*/
+body.vr-mode #jamseshParticles { display: none !important; }
+body.vr-mode .nav-item[data-page="play"] { animation: none !important; }
+body.vr-mode .home-grid i,
+body.vr-mode .play-grid i { animation: none !important; }
+
 </style>
 </head>
 <body>
@@ -10630,6 +10641,16 @@ button:focus,
 </div><!-- /viewport -->
 
 <script>
+// ── VR Mode Flag ───────────────────────────────────────
+// When the page is loaded inside the Vuplex WebView on Quest, mark <body>
+// so the CSS at the end of the main <style> block can disable heavy
+// always-on paint sources (particle canvas, navbar Play pulse, floating
+// icons). window.vuplex is injected by the WebView before the page loads,
+// so it's reliably defined here. Outside VR (browser demo) this is a no-op.
+if (window.vuplex && document.body) {
+  document.body.classList.add('vr-mode');
+}
+
 // ── Vuplex Bridge ──────────────────────────────────────
 function sendToUnity(type, data) {
   var msg = JSON.stringify({ type: type, data: data });
@@ -17991,7 +18012,14 @@ function drawParticles() {
 }
 
 setPageColors('home');
-drawParticles();
+
+// Skip the particle rAF loop entirely inside Vuplex on Quest — the canvas
+// is also hidden via the body.vr-mode CSS rule, but stopping the loop
+// avoids the per-frame canvas2D work that was a major paint hotspot
+// driving the Adreno GPU crashes. Browser/demo still gets the full effect.
+if (!window.vuplex) {
+  drawParticles();
+}
 
 </script>
 </body>
