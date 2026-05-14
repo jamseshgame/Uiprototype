@@ -1731,12 +1731,27 @@
     overflow: hidden;
     flex-shrink: 0;
     background: #1a1a1a;
+    position: relative;
   }
   .coop-player-row .player-avatar img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
+  }
+  /* Green ready indicator dotted onto the avatar when a player has flipped
+     their Ready pill on. Sits bottom-right with a dark ring so it reads as a
+     status badge rather than part of the avatar image. */
+  .coop-player-row .player-ready-dot {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #34d399;
+    box-shadow: 0 0 0 3px #1a1a1a, 0 0 8px rgba(52, 211, 153, 0.6);
+    pointer-events: none;
   }
   .coop-player-row .player-name-wrap {
     flex: 1;
@@ -3083,6 +3098,17 @@
   .play-go-btn:hover {
     background: var(--btn-primary-hover);
     box-shadow: 0 0 0 2px var(--btn-primary-border), 0 0 24px var(--btn-primary-glow);
+  }
+  /* Host's Start button is held off until every non-host bandmate is Ready.
+     Greys out the button + cancels the signature shimmer/attract animation so
+     it reads clearly as "waiting on others" rather than a normal CTA. */
+  .play-go-btn:disabled,
+  .play-go-btn.play-go-btn--disabled {
+    opacity: 0.45;
+    cursor: default;
+    filter: grayscale(0.5);
+    pointer-events: none;
+    animation: none !important;
   }
 
   .play-duration {
@@ -10686,6 +10712,8 @@ function handleUnityMessage(msg) {
     case 'updateHubs': updateHubsFromBackend(msg.data); break;
     case 'updateCoins': updateCoinsFromBackend(msg.data); break;
     case 'gameResults': showGameResults(msg.data); break;
+    case 'gameResultsGroupScore': applyGroupScore(msg.data); break;
+    case 'gameResultsLeaderboard': applyResultsLeaderboard(msg.data); break;
     case 'openPause': showPause((msg.data && msg.data.instrument) || 'guitar'); break;
     case 'closePause': hidePause(); break;
     case 'updatePauseLeaderboard': updatePauseLeaderboard(msg.data); break;
@@ -10951,10 +10979,11 @@ function updateGroupMembers(index, count) {
 }
 
 function updateLobbyFromBackend(data) {
-  // data: [{name, avatar, disconnected}, ...]
+  // data: [{name, avatar, disconnected, instrument, difficulty, ready, isSelf}, ...]
   if (!data) return;
   lobbyPlayers = [];
   for (var i = 0; i < data.length; i++) {
+    var ready = data[i].ready !== undefined ? !!data[i].ready : false;
     lobbyPlayers.push({
       name: data[i].name || 'Player ' + (i + 1),
       avatar: data[i].avatar || '',
@@ -10962,8 +10991,16 @@ function updateLobbyFromBackend(data) {
       plateClass: null,
       instrument: data[i].instrument || '',
       difficulty: data[i].difficulty || '',
-      ready: data[i].ready !== undefined ? data[i].ready : false,
-      disconnected: !!data[i].disconnected
+      ready: ready,
+      // Keep status in sync with ready — the player row reads status for the
+      // Choosing/Ready pill, but the network only pushes `ready`. Without this
+      // derivation real backend players would always render as "Choosing".
+      status: ready ? 'ready' : 'choosing',
+      disconnected: !!data[i].disconnected,
+      // Pass through isSelf from Unity — handleCoopReady needs it to find the
+      // local roster entry to toggle. Without this the non-host's Ready click
+      // would early-return on getSelfRosterIdx() === -1 and never reach Unity.
+      isSelf: !!data[i].isSelf
     });
   }
   if (playMode !== 'solo') buildPlayGrid();
@@ -10985,8 +11022,10 @@ function updateCoinsFromBackend(data) {
   }
 }
 
+function _fmtResultsNum(n) { return (n == null) ? '0' : Number(n).toLocaleString(); }
+
 function showGameResults(data) {
-  // data: {score,stars,accuracy,combo,perfect,notes,isGroupPlay,song:{title,artist,file}}
+  // data: {score,stars,accuracy,combo,perfect,notes,isGroupPlay,bandName,song:{title,artist,file}}
   if (!data) return;
   if (data.song) {
     var artEl = document.getElementById('results-album-art');
@@ -10998,15 +11037,23 @@ function showGameResults(data) {
   }
   // switchResultsTab() reads meScoreData/groupScoreData — without overwriting
   // them here, the panel keeps showing the hardcoded mock values.
-  function _fmtNum(n) { return (n == null) ? '0' : Number(n).toLocaleString(); }
   meScoreData = {
-    score: _fmtNum(data.score),
+    score: _fmtResultsNum(data.score),
     stars: data.stars || 0,
     accuracy: data.accuracy || '0%',
-    combo: _fmtNum(data.combo),
-    perfect: _fmtNum(data.perfect),
+    combo: _fmtResultsNum(data.combo),
+    perfect: _fmtResultsNum(data.perfect),
     notes: (data.notes != null) ? String(data.notes) : '0/0'
   };
+  // Combined band score arrives later via applyGroupScore (host has to collect
+  // every peer's score over the network first). Until then the Group tab shows
+  // a "Pending…" placeholder so users see a clear loading state.
+  groupScoreData = {
+    score: 'Pending…',
+    stars: data.stars || 0,
+    perInstrument: null
+  };
+  if (data.bandName) _resultsGroupName = data.bandName;
   // Hide the Group/Me tabs in solo play — there's no group context, so the
   // "Group" tab would just show stale mock data.
   var isGroupPlay = !!data.isGroupPlay;
@@ -11014,6 +11061,12 @@ function showGameResults(data) {
   var lbTabsEl = document.getElementById('lb-tabs');
   if (scoreTabsEl) scoreTabsEl.style.display = isGroupPlay ? '' : 'none';
   if (lbTabsEl) lbTabsEl.style.display = isGroupPlay ? '' : 'none';
+  // Solo: drop the Group leaderboard list entirely so the area shows just
+  // the personal list. switchResultsTab restores Me visibility for both tabs.
+  if (!isGroupPlay) {
+    var lbGroupEl = document.getElementById('lb-group');
+    if (lbGroupEl) lbGroupEl.style.display = 'none';
+  }
   switchResultsTab(isGroupPlay ? 'group' : 'me');
   var black = document.getElementById('onboard-black');
   black.className = 'visible';
@@ -11023,6 +11076,52 @@ function showGameResults(data) {
     setTimeout(function() { black.className = ''; }, 50);
   }, 200);
   _setUrlStep('results1');
+}
+
+// Receives the host's combined band score + per-instrument breakdown after the
+// host's RPC_BroadcastBandScores arrives. Replaces the "Pending…" placeholder
+// in groupScoreData and re-renders if the user is currently on the Group tab.
+function applyGroupScore(data) {
+  if (!data) return;
+  groupScoreData.score = _fmtResultsNum(data.score);
+  groupScoreData.perInstrument = data.perInstrument || null;
+  if (resultsScoreTab === 'group') {
+    document.getElementById('results-big-score').textContent = groupScoreData.score;
+    _renderResultsStats('group');
+  }
+}
+
+function _renderResultsLeaderboardList(containerId, entries, fallbackName) {
+  var el = document.getElementById(containerId);
+  if (!el) return;
+  if (!entries || !entries.length) {
+    el.innerHTML = '<div class="results-lb-entry"><div class="results-lb-info"><div class="results-lb-name">No entries yet</div></div></div>';
+    return;
+  }
+  var html = '';
+  for (var i = 0; i < entries.length; i++) {
+    var e = entries[i];
+    var name = e.name || fallbackName || 'Unknown';
+    var rank = (e.rank != null) ? e.rank : (i + 1);
+    var avatar = e.avatarUrl ? '<img src="' + e.avatarUrl + '" alt="">' : '';
+    var cls = 'results-lb-entry' + (e.isCurrentPlayer ? ' highlight' : '');
+    html += '<div class="' + cls + '">' +
+              '<div class="results-lb-rank">' + rank + '</div>' +
+              '<div class="results-lb-avatar">' + avatar + '</div>' +
+              '<div class="results-lb-info">' +
+                '<div class="results-lb-name">' + name + '</div>' +
+                '<div class="results-lb-score-val">' + Number(e.score || 0).toLocaleString() + '</div>' +
+              '</div>' +
+            '</div>';
+  }
+  el.innerHTML = html;
+}
+
+function applyResultsLeaderboard(data) {
+  if (!data || !data.entries) return;
+  var fallback = data.tab === 'group' ? _resultsGroupName : null;
+  if (data.tab === 'group') _renderResultsLeaderboardList('lb-group', data.entries, fallback);
+  else _renderResultsLeaderboardList('lb-me', data.entries, null);
 }
 
 function updateProfile(data) {
@@ -12587,8 +12686,45 @@ function updateDuration() {
 var resultsScoreTab = 'group';
 var resultsLbTab = 'group';
 
-var groupScoreData = { score: '987,654', stars: 4, accuracy: '98.5%', combo: '342', perfect: '98.5%', notes: '98.5%' };
-var meScoreData = { score: '245,890', stars: 3, accuracy: '92.1%', combo: '187', perfect: '88.3%', notes: '94.7%' };
+// Group play also pushes a band name with the gameResults payload — null in solo.
+var _resultsGroupName = 'Jamsesh Hunters';
+
+// Per-tab score data. groupScoreData starts with placeholder values; gets the
+// real combined total + per-instrument breakdown when the host's
+// RPC_BroadcastBandScores arrives. The per-instrument breakdown replaces the
+// 4-stat grid (accuracy/combo/etc) on the group tab, since the network only
+// collects per-player scores, not per-player accuracy/combo.
+var groupScoreData = { score: '0', stars: 0, perInstrument: null };
+var meScoreData = { score: '0', stars: 0, accuracy: '0%', combo: '0', perfect: '0', notes: '0/0' };
+
+function _renderResultsStats(tab) {
+  var statsEl = document.getElementById('results-stats');
+  if (tab === 'group') {
+    var pi = groupScoreData.perInstrument;
+    if (!pi) {
+      statsEl.innerHTML = '<div class="results-stat" style="grid-column:span 2"><div class="stat-label">Band breakdown</div><div class="stat-value">Pending…</div></div>';
+      return;
+    }
+    var html = '';
+    var keys = ['drums', 'guitar', 'vocals', 'bass', 'keys'];
+    for (var k = 0; k < keys.length; k++) {
+      if (pi[keys[k]] != null) {
+        var label = keys[k].charAt(0).toUpperCase() + keys[k].slice(1);
+        html += '<div class="results-stat"><div class="stat-label">' + label +
+                '</div><div class="stat-value">' + Number(pi[keys[k]]).toLocaleString() + '</div></div>';
+      }
+    }
+    statsEl.innerHTML = html || '<div class="results-stat" style="grid-column:span 2"><div class="stat-label">Band breakdown</div><div class="stat-value">—</div></div>';
+  }
+  else {
+    var d = meScoreData;
+    statsEl.innerHTML =
+      '<div class="results-stat accuracy"><div class="stat-label">Accuracy</div><div class="stat-value">' + d.accuracy + '</div></div>' +
+      '<div class="results-stat combo"><div class="stat-label">Max Combo</div><div class="stat-value">' + d.combo + '</div></div>' +
+      '<div class="results-stat perfect"><div class="stat-label">Perfect Hits</div><div class="stat-value">' + d.perfect + '</div></div>' +
+      '<div class="results-stat notes"><div class="stat-label">Notes Hit</div><div class="stat-value">' + d.notes + '</div></div>';
+  }
+}
 
 function switchResultsTab(tab) {
   resultsScoreTab = tab;
@@ -12599,7 +12735,7 @@ function switchResultsTab(tab) {
   var meName = 'Rael';
   var meEl = document.querySelector('.profile-name');
   if (meEl && meEl.textContent) meName = meEl.textContent;
-  document.getElementById('results-group-name').textContent = tab === 'group' ? 'Jamsesh Hunters' : meName;
+  document.getElementById('results-group-name').textContent = tab === 'group' ? _resultsGroupName : meName;
 
   // Update score tabs
   var scoreTabs = document.getElementById('score-tabs').children;
@@ -12618,16 +12754,11 @@ function switchResultsTab(tab) {
   }
   starsEl.innerHTML = starsHtml;
 
-  var statsEl = document.getElementById('results-stats');
-  statsEl.innerHTML =
-    '<div class="results-stat accuracy"><div class="stat-label">Accuracy</div><div class="stat-value">' + data.accuracy + '</div></div>' +
-    '<div class="results-stat combo"><div class="stat-label">Max Combo</div><div class="stat-value">' + data.combo + '</div></div>' +
-    '<div class="results-stat perfect"><div class="stat-label">Perfect Hits</div><div class="stat-value">' + data.perfect + '</div></div>' +
-    '<div class="results-stat notes"><div class="stat-label">Notes Hit</div><div class="stat-value">' + data.notes + '</div></div>';
+  _renderResultsStats(tab);
 
   // Update leaderboard tabs
   var lbTabs = document.getElementById('lb-tabs').children;
-  for (var i = 0; i < lbTabs.length; i++) lbTabs[i].className = 'results-tab';
+  for (var j = 0; j < lbTabs.length; j++) lbTabs[j].className = 'results-tab';
   lbTabs[tab === 'group' ? 0 : 1].className = 'results-tab active';
 
   document.getElementById('lb-group').style.display = tab === 'group' ? 'flex' : 'none';
@@ -14378,23 +14509,47 @@ function buildCoopGrid(grid) {
   // Options row — same Instrument / Difficulty / Experience / Apply / Save+Load tiles as solo
   buildOptionsRow(grid);
 
-  // Full-width signature Ready button — Group lobby uses Ready, not Start.
-  // Host: when all players are Ready, this kicks off the game.
-  // Client: toggles their own ready status.
+  // Full-width signature button. Host says "Start" and only enables once every
+  // non-host bandmate has flipped Ready (so the host can't kick off the song
+  // before everyone is set on their instrument/difficulty). Clients say
+  // "Ready"/"Cancel Ready" and toggle their own ready flag.
   var startBtn = document.createElement('button');
   startBtn.className = 'play-go-btn play-start-attract jamsesh-signature';
   startBtn.id = 'play-go-btn';
   startBtn.onclick = function() { handleCoopReady(); };
   if (isHost) {
-    startBtn.textContent = 'Ready';
+    startBtn.textContent = 'Start';
+    if (!_allNonHostReady()) {
+      startBtn.disabled = true;
+      startBtn.classList.add('play-go-btn--disabled');
+    }
   } else {
     var selfIdx = getSelfRosterIdx();
     var rosterNow = getCoopRoster();
-    var meReady = selfIdx >= 0 && rosterNow[selfIdx] && rosterNow[selfIdx].status === 'ready';
+    var meReady = selfIdx >= 0 && rosterNow[selfIdx] &&
+                  (rosterNow[selfIdx].status === 'ready' || rosterNow[selfIdx].ready === true);
     startBtn.textContent = meReady ? 'Cancel Ready' : 'Ready';
   }
   startBtn.style.cssText = 'width:100%;flex:1.5;min-height:0;font-size:64px;font-weight:900;letter-spacing:6px';
   grid.appendChild(startBtn);
+}
+
+// True when every non-host bandmate in the current roster is Ready. Disconnected
+// players are skipped — they can't flip Ready while they're gone, and gating
+// on them would deadlock the host forever. Returns true with an empty/host-only
+// roster so the host can solo-start with nobody to wait on.
+function _allNonHostReady() {
+  var roster = getCoopRoster();
+  if (!roster || !roster.length) return true;
+  for (var i = 0; i < roster.length; i++) {
+    var p = roster[i];
+    if (!p) continue;
+    if (hostName && p.name === hostName) continue; // host itself
+    if (p.disconnected) continue;
+    var ready = p.status === 'ready' || p.ready === true;
+    if (!ready) return false;
+  }
+  return true;
 }
 
 // ── Group tab dynamic-grid helpers ─────────────────────────────
@@ -14601,7 +14756,10 @@ function buildCoopPlayerRow(p, idx) {
   var diffId = p.isSelf ? (selectedDifficulty || p.difficulty || 'easy') : (p.difficulty || 'easy');
   var diffColor = DIFF_ICON_COLORS[diffId] || '#888';
   var isTheHost = hostName && p.name === hostName;
-  var statusReady = p.status === 'ready';
+  // status is authoritative when set, but fall back to the boolean `ready`
+  // field so a roster pushed without status (older payload paths) still
+  // renders the right pill / dot.
+  var statusReady = p.status === 'ready' || p.ready === true;
   var statusClass = statusReady ? 'coop-player-status-pill--ready' : 'coop-player-status-pill--choosing';
   var statusLabel = statusReady ? 'Ready' : 'Choosing';
   var canRemove = !p.isSelf && !isTheHost && (!inBandspace || isHost);
@@ -14610,9 +14768,13 @@ function buildCoopPlayerRow(p, idx) {
   var avatarHtml = avatarSrc
     ? '<img src="' + avatarSrc + '" alt="">'
     : '<div style="width:100%;height:100%;background:#333"></div>';
+  // Host doesn't toggle ready (their button is the gating Start), so don't
+  // dot their avatar — only mark non-host bandmates who have flipped Ready.
+  var showReadyDot = statusReady && !isTheHost;
+  var readyDotHtml = showReadyDot ? '<div class="player-ready-dot"></div>' : '';
 
   row.innerHTML =
-    '<div class="player-avatar">' + avatarHtml + '</div>' +
+    '<div class="player-avatar">' + avatarHtml + readyDotHtml + '</div>' +
     '<div class="player-name-wrap">' +
       '<div class="player-name">' + (p.name || 'Unknown') + '</div>' +
       (p.isSelf ? '<span class="you-badge">YOU</span>' : '') +
@@ -14653,9 +14815,14 @@ function getSelfRosterIdx() {
 }
 
 function handleCoopReady() {
-  // Host's "Ready" button kicks off the session — no waiting on clients here
-  // (Unity owns the all-ready gating in the real flow).
-  if (isHost) { startGame(); return; }
+  // Host: "Start" button. Only fires when every non-host bandmate is Ready —
+  // the button is also disabled in that case, but guard here too in case some
+  // upstream path bypasses the disabled state.
+  if (isHost) {
+    if (!_allNonHostReady()) return;
+    startGame();
+    return;
+  }
 
   // Client: toggle own ready status so the lobby pill flips.
   var roster = getCoopRoster();

@@ -370,6 +370,21 @@
     border-color: #ffffff;
     box-shadow: 0 0 0 2px #ffffff;
   }
+  /* Non-host waiting message — replaces the button row when isHost=false so
+     guests can't drive setlist progression / retry on their own. */
+  .results-await-host {
+    margin-top: 36px;
+    width: 100%;
+    height: var(--nav-btn-h);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    color: #aaaaaa;
+    letter-spacing: 0.4px;
+  }
 
   /* ── Results Screen 2 (Rewards) ── */
   .rewards-title {
@@ -670,10 +685,11 @@
         </div>
 
       </div>
-      <div class="results-buttons">
+      <div class="results-buttons" id="results1-buttons">
         <button class="results-btn retry" onclick="retryGame()">Retry</button>
         <button class="results-btn continue" onclick="showResults2()">Continue</button>
       </div>
+      <div class="results-await-host" id="results1-await" style="display:none">Awaiting host…</div>
     </div>
   </div>
 
@@ -739,10 +755,11 @@
         </div>
 
       </div>
-      <div class="results-buttons">
+      <div class="results-buttons" id="results2-buttons">
         <button class="results-btn retry" onclick="backToResults1()">Back</button>
         <button class="results-btn continue" onclick="exitResults()">Continue</button>
       </div>
+      <div class="results-await-host" id="results2-await" style="display:none">Awaiting host…</div>
     </div>
   </div>
 
@@ -768,31 +785,77 @@ else window.addEventListener('vuplexready', attachVuplex);
 
 function handleUnityMessage(msg) {
   if (!msg || !msg.type) return;
-  // The lighter page only consumes gameResults — every other Push from
-  // WebViewBridge is silently dropped, since the lobby's index.html will
+  // The lighter page only consumes the gameResults family — every other Push
+  // from WebViewBridge is silently dropped, since the lobby's index.html will
   // re-receive them when the user returns.
   if (msg.type === 'gameResults') applyGameResults(msg.data);
-  else if (msg.type === 'updateProfile' && msg.data && msg.data.name) _profileName = msg.data.name;
+  else if (msg.type === 'gameResultsGroupScore') applyGroupScore(msg.data);
+  else if (msg.type === 'gameResultsLeaderboard') applyLeaderboard(msg.data);
+  else if (msg.type === 'updateProfile' && msg.data && msg.data.name) {
+    _profileName = msg.data.name;
+    if (resultsTab === 'me') _refreshTitle();
+  }
 }
 
 // ── Tab state (mirrors index.html switchResultsTab) ────────
 var resultsTab = 'group';
 
-// Mock per-tab data — the lighter page doesn't have access to live group/me
-// stats so we mirror the placeholder values used by index.html until the
-// payload from Unity overwrites them.
-var groupScoreData = { score: '987,654', stars: 4, accuracy: '98.5%', combo: '342', perfect: '98.5%', notes: '98.5%' };
-var meScoreData = { score: '245,890', stars: 3, accuracy: '92.1%', combo: '187', perfect: '88.3%', notes: '94.7%' };
+// Group play also pushes a band name with the gameResults payload — null in solo.
+var _groupName = 'Jamsesh Hunters';
+
+// Per-tab score data. groupScoreData starts with placeholder values; gets the
+// real combined total when the host's RPC_BroadcastBandScores arrives. The
+// per-member breakdown (one row per player, with their instrument) replaces the
+// 4-stat grid (accuracy/combo/etc) on the group tab, since the network only
+// collects per-player scores, not per-player accuracy/combo.
+var groupScoreData = { score: '0', stars: 0, members: null };
+var meScoreData = { score: '0', stars: 0, accuracy: '0%', combo: '0', perfect: '0', notes: '0/0' };
 
 // Tracks the most-recent profile name pushed from Unity so the "Me" tab can
 // label the title correctly. Starts as the index.html default.
 var _profileName = 'Rael';
 
+function _refreshTitle() {
+  document.getElementById('results-group-name').textContent =
+    resultsTab === 'group' ? _groupName : _profileName;
+}
+
+function _renderStats(tab) {
+  var statsEl = document.getElementById('results-stats');
+  if (tab === 'group') {
+    // Per-member breakdown (one row per player). Falls back to a placeholder
+    // until the host's RPC_BroadcastBandScores arrives. Supports any band size
+    // and duplicate instruments — a 3-drummer band shows three rows.
+    var members = groupScoreData.members;
+    if (!members || !members.length) {
+      statsEl.innerHTML = '<div class="results-stat" style="grid-column:span 2"><div class="stat-label">Band breakdown</div><div class="stat-value">Pending…</div></div>';
+      return;
+    }
+    var html = '';
+    for (var i = 0; i < members.length; i++) {
+      var m = members[i];
+      var inst = m.instrument || '';
+      var instLabel = inst ? (inst.charAt(0).toUpperCase() + inst.slice(1)) : '';
+      var name = m.name || 'Player';
+      var label = instLabel ? (name + ' · ' + instLabel) : name;
+      html += '<div class="results-stat"><div class="stat-label">' + label +
+              '</div><div class="stat-value">' + Number(m.score || 0).toLocaleString() + '</div></div>';
+    }
+    statsEl.innerHTML = html;
+  }
+  else {
+    var d = meScoreData;
+    statsEl.innerHTML =
+      '<div class="results-stat accuracy"><div class="stat-label">Accuracy</div><div class="stat-value">' + d.accuracy + '</div></div>' +
+      '<div class="results-stat combo"><div class="stat-label">Max Combo</div><div class="stat-value">' + d.combo + '</div></div>' +
+      '<div class="results-stat perfect"><div class="stat-label">Perfect Hits</div><div class="stat-value">' + d.perfect + '</div></div>' +
+      '<div class="results-stat notes"><div class="stat-label">Notes Hit</div><div class="stat-value">' + d.notes + '</div></div>';
+  }
+}
+
 function switchResultsTab(tab) {
   resultsTab = tab;
-
-  document.getElementById('results-group-name').textContent =
-    tab === 'group' ? 'Jamsesh Hunters' : _profileName;
+  _refreshTitle();
 
   var scoreTabs = document.getElementById('score-tabs').children;
   for (var i = 0; i < scoreTabs.length; i++) scoreTabs[i].className = 'results-tab';
@@ -809,12 +872,7 @@ function switchResultsTab(tab) {
   }
   starsEl.innerHTML = starsHtml;
 
-  var statsEl = document.getElementById('results-stats');
-  statsEl.innerHTML =
-    '<div class="results-stat accuracy"><div class="stat-label">Accuracy</div><div class="stat-value">' + data.accuracy + '</div></div>' +
-    '<div class="results-stat combo"><div class="stat-label">Max Combo</div><div class="stat-value">' + data.combo + '</div></div>' +
-    '<div class="results-stat perfect"><div class="stat-label">Perfect Hits</div><div class="stat-value">' + data.perfect + '</div></div>' +
-    '<div class="results-stat notes"><div class="stat-label">Notes Hit</div><div class="stat-value">' + data.notes + '</div></div>';
+  _renderStats(tab);
 
   var lbTabs = document.getElementById('lb-tabs').children;
   for (var j = 0; j < lbTabs.length; j++) lbTabs[j].className = 'results-tab';
@@ -848,15 +906,94 @@ function applyGameResults(data) {
     notes: (data.notes != null) ? String(data.notes) : '0/0'
   };
 
-  // Hide the Group/Me tabs in solo — there's no group context, the placeholder
-  // group scores would just be misleading. Mirrors the index.html behaviour.
+  // Group score arrives later via gameResultsGroupScore (host has to collect
+  // every peer's score over the network first). Until then the Group tab shows
+  // "Pending…" so users see a clear loading state instead of stale mock data.
+  groupScoreData = {
+    score: 'Pending…',
+    stars: data.stars || 0,
+    members: null
+  };
+
+  if (data.bandName) _groupName = data.bandName;
+
+  // Hide the Group/Me tabs in solo — there's no group context, so a "Group" tab
+  // would be confusing. Mirrors the index.html behaviour.
   var isGroupPlay = !!data.isGroupPlay;
   var scoreTabsEl = document.getElementById('score-tabs');
   var lbTabsEl = document.getElementById('lb-tabs');
   if (scoreTabsEl) scoreTabsEl.style.display = isGroupPlay ? '' : 'none';
   if (lbTabsEl) lbTabsEl.style.display = isGroupPlay ? '' : 'none';
 
+  // Solo: collapse the leaderboard to just the personal list. Group: show
+  // both, but default-active is "group" so the user sees the band-wide score.
+  if (!isGroupPlay) {
+    document.getElementById('lb-group').style.display = 'none';
+  }
+
+  // Only the host drives setlist progression (Retry / Continue). Guests get
+  // an "Awaiting host…" placeholder so they can't accidentally desync the
+  // band by hitting buttons that only do something host-side. Solo always
+  // counts as host. Defaults to true if the flag is missing for any reason.
+  var canHost = (data.isHost !== false);
+  _applyHostControls(canHost);
+
   switchResultsTab(isGroupPlay ? 'group' : 'me');
+}
+
+function _applyHostControls(canHost) {
+  var b1 = document.getElementById('results1-buttons');
+  var a1 = document.getElementById('results1-await');
+  var b2 = document.getElementById('results2-buttons');
+  var a2 = document.getElementById('results2-await');
+  if (b1) b1.style.display = canHost ? '' : 'none';
+  if (a1) a1.style.display = canHost ? 'none' : 'flex';
+  if (b2) b2.style.display = canHost ? '' : 'none';
+  if (a2) a2.style.display = canHost ? 'none' : 'flex';
+}
+
+function applyGroupScore(data) {
+  if (!data) return;
+  groupScoreData.score = _fmtNum(data.score);
+  groupScoreData.members = data.members || null;
+  // Re-render only if the group tab is currently visible — switching to it later
+  // will pick up the new state via switchResultsTab.
+  if (resultsTab === 'group') {
+    document.getElementById('results-big-score').textContent = groupScoreData.score;
+    _renderStats('group');
+  }
+}
+
+function _renderLeaderboardList(containerId, entries, fallbackName) {
+  var el = document.getElementById(containerId);
+  if (!el) return;
+  if (!entries || !entries.length) {
+    el.innerHTML = '<div class="results-lb-entry"><div class="results-lb-info"><div class="results-lb-name">No entries yet</div></div></div>';
+    return;
+  }
+  var html = '';
+  for (var i = 0; i < entries.length; i++) {
+    var e = entries[i];
+    var name = e.name || fallbackName || 'Unknown';
+    var rank = (e.rank != null) ? e.rank : (i + 1);
+    var avatar = e.avatarUrl ? '<img src="' + e.avatarUrl + '" alt="">' : '';
+    var cls = 'results-lb-entry' + (e.isCurrentPlayer ? ' highlight' : '');
+    html += '<div class="' + cls + '">' +
+              '<div class="results-lb-rank">' + rank + '</div>' +
+              '<div class="results-lb-avatar">' + avatar + '</div>' +
+              '<div class="results-lb-info">' +
+                '<div class="results-lb-name">' + name + '</div>' +
+                '<div class="results-lb-score-val">' + Number(e.score || 0).toLocaleString() + '</div>' +
+              '</div>' +
+            '</div>';
+  }
+  el.innerHTML = html;
+}
+
+function applyLeaderboard(data) {
+  if (!data || !data.entries) return;
+  if (data.tab === 'group') _renderLeaderboardList('lb-group', data.entries, _groupName);
+  else _renderLeaderboardList('lb-me', data.entries, _profileName);
 }
 
 // ── Screen transitions (mirror index.html with local fade) ─
