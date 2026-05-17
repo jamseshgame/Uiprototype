@@ -11606,9 +11606,10 @@ function buildSocialPage() {
 }
 
 function buildSpacesGrid() {
-  // Spaces is temporarily reduced to a single "Jamsesh Hub" tile (returns to the
-  // open lobby on click). Mock hubs, Create New, and the private spaces preset
-  // tiles are hidden until each one has a real Unity-side destination wired.
+  // Spaces is reduced to the public hub tiles that map to a real Unity-side
+  // destination (the shared open lobby, environment chosen per hub). Mock hubs,
+  // Create New, and the private spaces preset tiles are hidden until each one
+  // has a real backend wired.
   var spacesTabs = document.getElementById('spaces-tabs');
   if (spacesTabs) spacesTabs.style.display = 'none';
   var privateTab = document.getElementById('spaces-tab-private');
@@ -11619,7 +11620,8 @@ function buildSpacesGrid() {
   pubGrid.innerHTML = '';
 
   var hubs = [
-    { name: 'Jamsesh Hub', count: '8/25', img: 'spaces/social.png' }
+    { name: 'Jamsesh Hub', count: '8/25', img: 'spaces/social.png' },
+    { name: 'Pastel Loft', count: '0/25', img: 'spaces/lobby.png' }
   ];
   for (var i = 0; i < hubs.length; i++) {
     var h = hubs[i];
@@ -13897,6 +13899,7 @@ function syncSetlistToUnity() {
 
 var soloGridPage = 0;
 var selectedExperience = 'Original';
+var selectedEnvironment = 'Colosseum';
 
 function buildPlayGrid() {
   var grid = document.getElementById('play-grid');
@@ -15026,16 +15029,59 @@ function openOptionPicker(type) {
       {id: 'expert', label: 'Expert', desc: 'Full song, no mercy'}
     ], selectedDifficulty);
   } else if (type === 'experience') {
-    title.textContent = 'Instrument Skin';
+    title.textContent = 'Experience';
     panel.appendChild(title);
     panel.style.width = '1200px';
     panel.style.maxHeight = '1400px';
+
+    // ── Environment ──
+    var envHeader = document.createElement('div');
+    envHeader.style.cssText = 'font-size:28px;font-weight:700;color:#ffffff;margin:8px 0 16px 0;letter-spacing:0.5px';
+    envHeader.textContent = 'Environment';
+    panel.appendChild(envHeader);
+
+    var envItems = [
+      {id: 'Colosseum', label: 'Colosseum', img: 'spaces/001.jpg'},
+      {id: 'Arena',     label: 'Arena',     img: 'spaces/002.jpg'}
+    ];
+    var envGrid = document.createElement('div');
+    envGrid.style.cssText = 'display:grid;grid-template-columns:repeat(2,1fr);gap:24px;width:100%;margin-bottom:32px';
+    for (var ei = 0; ei < envItems.length; ei++) {
+      var env = envItems[ei];
+      var envSelected = env.id === selectedEnvironment;
+      var envTile = document.createElement('div');
+      envTile.style.cssText = 'position:relative;overflow:hidden;border-radius:var(--panel-radius);cursor:pointer;padding-top:100%;border:2px solid ' + (envSelected ? '#ffffff' : 'transparent');
+      if (envSelected) envTile.style.boxShadow = '0 0 0 3px #ffffff, 0 0 12px rgba(255,255,255,0.4)';
+      envTile.innerHTML =
+        '<img src="' + env.img + '" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:0">' +
+        '<div style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);z-index:1"></div>' +
+        '<div style="position:absolute;bottom:24px;left:24px;z-index:2;font-size:36px;font-weight:800;color:#ffffff;text-shadow:0 2px 8px rgba(0,0,0,0.8)">' + env.label + '</div>';
+      envTile.onclick = (function(id) {
+        return function() {
+          selectedEnvironment = id;
+          sendToUnity('experience', {tab: 'environment', id: id});
+          closeOptionPicker();
+          buildPlayGrid();
+        };
+      })(env.id);
+      envGrid.appendChild(envTile);
+    }
+    panel.appendChild(envGrid);
+
+    // ── Instrument Skin ──
+    var skinHeader = document.createElement('div');
+    skinHeader.style.cssText = 'font-size:28px;font-weight:700;color:#ffffff;margin:8px 0 16px 0;letter-spacing:0.5px';
+    skinHeader.textContent = 'Instrument Skin';
+    panel.appendChild(skinHeader);
+
     var skinItems = [
-      {id: 'Original', label: 'Original', img: 'instruments/drums.png'},
-      {id: 'Crystal',  label: 'Crystal',  img: 'instruments/skins/crystal.png'}
+      {id: 'Original',      label: 'Original',      img: 'instruments/drums.png'},
+      {id: 'Crystal',       label: 'Crystal',       img: 'instruments/skins/crystal.png'},
+      {id: 'Crystal Green', label: 'Crystal Green', img: 'instruments/skins/crystal.png'},
+      {id: 'Iridescent',    label: 'Iridescent',    img: 'instruments/skins/crystal.png'}
     ];
     var skinGrid = document.createElement('div');
-    skinGrid.style.cssText = 'display:grid;grid-template-columns:repeat(2,1fr);gap:24px;width:100%';
+    skinGrid.style.cssText = 'display:grid;grid-template-columns:repeat(4,1fr);gap:16px;width:100%';
     for (var si = 0; si < skinItems.length; si++) {
       var skin = skinItems[si];
       var isSelected = skin.id === selectedExperience;
@@ -15045,7 +15091,7 @@ function openOptionPicker(type) {
       skinTile.innerHTML =
         '<img src="' + skin.img + '" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:0">' +
         '<div style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);z-index:1"></div>' +
-        '<div style="position:absolute;bottom:24px;left:24px;z-index:2;font-size:36px;font-weight:800;color:#ffffff;text-shadow:0 2px 8px rgba(0,0,0,0.8)">' + skin.label + '</div>';
+        '<div style="position:absolute;bottom:16px;left:16px;z-index:2;font-size:22px;font-weight:800;color:#ffffff;text-shadow:0 2px 8px rgba(0,0,0,0.8)">' + skin.label + '</div>';
       skinTile.onclick = (function(id) {
         return function() {
           selectedExperience = id;
