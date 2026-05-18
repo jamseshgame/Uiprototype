@@ -263,6 +263,7 @@
     text-shadow: none;
   }
 
+
   .xp-text {
     font-size: 36px;
     font-weight: 700;
@@ -3934,6 +3935,599 @@
     display: flex;
     flex-direction: column;
     min-height: 0;
+  }
+
+  /* ── Avatar Editor (Profile › Avatar) ───────────────── */
+  .avatar-login-gate {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .avatar-login-card {
+    width: 1500px;
+    max-width: 94%;
+    background: var(--btn-panel);
+    border: 1px solid var(--btn-tab-border);
+    border-radius: var(--panel-radius);
+    padding: 72px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 32px;
+  }
+  .avatar-login-title {
+    font-size: 60px;
+    font-weight: 800;
+    color: #ffffff;
+    text-align: center;
+  }
+  .avatar-login-sub {
+    font-size: 32px;
+    color: #ffffff;
+    text-align: center;
+    max-width: 85%;
+    line-height: 1.35;
+  }
+  .avatar-login-btn {
+    border: 1px solid var(--btn-primary-border);
+    border-radius: var(--panel-radius);
+    color: #ffffff;
+    font-size: 40px;
+    font-weight: 800;
+    padding: 32px 64px;
+    cursor: pointer;
+    min-width: 560px;
+    text-align: center;
+  }
+  .avatar-login-btn:hover {
+    box-shadow: 0 0 18px var(--btn-primary-glow);
+  }
+  .avatar-login-note {
+    font-size: 24px;
+    color: #ffffff;
+    text-align: center;
+    max-width: 85%;
+    opacity: 0.85;
+    line-height: 1.4;
+  }
+
+  /* Auth screen — SSO + email sign in / sign up */
+  .avatar-auth-screen {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px 8px 24px;
+    min-height: 0;
+    overflow-y: auto;
+  }
+  .avatar-auth-card {
+    width: 1500px;
+    max-width: 94%;
+    margin-top: 16px;
+    background: var(--btn-panel);
+    border: 1px solid var(--btn-tab-border);
+    border-radius: var(--panel-radius);
+    padding: 64px 56px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 24px;
+  }
+  .avatar-auth-title {
+    font-size: 56px;
+    font-weight: 800;
+    color: #ffffff;
+    text-align: center;
+  }
+  .avatar-auth-sub {
+    font-size: 28px;
+    color: #ffffff;
+    opacity: 0.85;
+    text-align: center;
+    margin-bottom: 12px;
+  }
+  .avatar-auth-tabs {
+    display: flex;
+    gap: 8px;
+    padding: 6px;
+    background: rgba(0,0,0,0.35);
+    border-radius: 999px;
+    align-self: center;
+    width: 420px;
+    max-width: 100%;
+  }
+  .avatar-auth-tab {
+    flex: 1;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    color: #ffffff;
+    font-size: 22px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+  }
+  .avatar-auth-tab:hover { background: rgba(255,255,255,0.08); }
+  .avatar-auth-tab.active {
+    background: #ffffff;
+    color: #000000;
+    box-shadow: 0 0 0 2px #ffffff;
+  }
+
+  .avatar-auth-sso {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .avatar-sso-btn {
+    height: 72px;
+    border-radius: var(--panel-radius);
+    border: 1px solid var(--btn-tab-border);
+    background: var(--btn-tab);
+    color: #ffffff;
+    font-size: 24px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 0 24px;
+    transition: background 0.15s, border-color 0.15s, box-shadow 0.2s;
+  }
+  .avatar-sso-btn:hover {
+    background: var(--btn-tab-hover);
+    border-color: var(--btn-primary-border);
+    box-shadow: 0 0 12px var(--btn-primary-glow);
+  }
+  .avatar-sso-icon {
+    display: inline-flex;
+    width: 40px;
+    height: 40px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.12);
+    font-size: 22px;
+    font-weight: 800;
+  }
+
+  .avatar-auth-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 4px 0;
+    color: #ffffff;
+    opacity: 0.75;
+    font-size: 18px;
+  }
+  .avatar-auth-divider::before,
+  .avatar-auth-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(255,255,255,0.18);
+  }
+
+  .avatar-auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .avatar-auth-input {
+    height: 92px;
+    border-radius: var(--panel-radius);
+    border: 1px solid var(--btn-tab-border);
+    background: rgba(0,0,0,0.35);
+    color: #ffffff;
+    font-size: 30px;
+    font-weight: 600;
+    padding: 0 28px;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .avatar-auth-input::placeholder { color: rgba(255,255,255,0.5); }
+  .avatar-auth-input:focus {
+    border-color: var(--btn-primary-border);
+    box-shadow: 0 0 12px var(--btn-primary-glow);
+  }
+  .avatar-auth-submit {
+    height: 104px;
+    border-radius: var(--panel-radius);
+    border: 1px solid var(--btn-primary-border);
+    color: #ffffff;
+    font-size: 34px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: box-shadow 0.2s;
+  }
+  .avatar-auth-submit:hover {
+    box-shadow: 0 0 18px var(--btn-primary-glow);
+  }
+
+  .avatar-auth-footer {
+    font-size: 20px;
+    color: #ffffff;
+    opacity: 0.65;
+    text-align: center;
+    margin-top: 10px;
+  }
+  .avatar-auth-otp-msg {
+    font-size: 26px;
+    color: #ffffff;
+    text-align: center;
+    margin-bottom: 8px;
+  }
+  .avatar-auth-otp-input {
+    text-align: center;
+    letter-spacing: 0.3em;
+    font-size: 40px;
+  }
+  .avatar-auth-secondary {
+    height: 76px;
+    border-radius: var(--panel-radius);
+    border: 1px solid var(--btn-tab-border);
+    background: transparent;
+    color: #ffffff;
+    font-size: 24px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+  }
+  .avatar-auth-secondary:hover {
+    background: var(--btn-tab-hover);
+    border-color: var(--btn-primary-border);
+    box-shadow: 0 0 12px var(--btn-primary-glow);
+  }
+  .avatar-auth-error {
+    background: rgba(239,68,68,0.18);
+    border: 1px solid rgba(239,68,68,0.6);
+    color: #ffffff;
+    font-size: 24px;
+    font-weight: 600;
+    text-align: center;
+    padding: 18px 22px;
+    border-radius: var(--panel-radius);
+    margin-top: 6px;
+  }
+  .avatar-auth-signup-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 20px;
+    color: #ffffff;
+    opacity: 0.85;
+    margin-top: 6px;
+    flex-wrap: wrap;
+  }
+  .avatar-auth-link {
+    background: none;
+    border: none;
+    color: #ffffff;
+    font-size: 20px;
+    font-weight: 700;
+    text-decoration: underline;
+    cursor: pointer;
+    padding: 4px 6px;
+  }
+  .avatar-auth-link:hover {
+    color: rgba(168,85,247,1);
+  }
+
+  /* Side-by-side Sign In / Sign Up sub-panels. Returning users (left) and new
+     users (right) get equal-weight columns with their own tinted backgrounds,
+     titles, copy, and CTA. Continue-as-Guest stays as the avatar-login-gate's
+     small bottom note, separate from this screen. */
+  .avatar-auth-split {
+    display: flex;
+    flex-direction: row;
+    gap: 36px;
+    align-items: stretch;
+    margin-top: 12px;
+  }
+  .avatar-auth-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 40px 36px;
+    border-radius: var(--panel-radius);
+    border: 1px solid var(--btn-tab-border);
+    min-width: 0;
+  }
+  .avatar-auth-col-signin { background: rgba(70, 120, 220, 0.12); }
+  .avatar-auth-col-signup { background: rgba(220, 130, 70, 0.12); }
+  .avatar-auth-col-title {
+    font-size: 40px;
+    font-weight: 800;
+    color: #ffffff;
+    text-align: left;
+  }
+  .avatar-auth-col-sub {
+    font-size: 24px;
+    color: #ffffff;
+    opacity: 0.82;
+    text-align: left;
+    line-height: 1.4;
+    margin-bottom: 8px;
+  }
+  /* Pushes the Sign Up CTA to the bottom of its column so its button aligns
+     vertically with the Send Code button across the gap. */
+  .avatar-auth-col-spacer { flex: 1; min-height: 8px; }
+
+  .avatar-editor-view {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    padding: 8px;
+    gap: 12px;
+  }
+  .avatar-editor-status {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-align: center;
+    padding: 4px 8px;
+    flex-shrink: 0;
+  }
+  .avatar-section-tabs {
+    flex-shrink: 0;
+  }
+  /* Sub-tabs row — smaller pill chips, reuses the same look but tighter */
+  .avatar-sub-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 0 8px;
+    flex-shrink: 0;
+  }
+  .avatar-sub-tab {
+    flex: 1 1 auto;
+    min-width: 120px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--panel-radius);
+    border: 1px solid var(--btn-tab-border);
+    background: var(--btn-tab);
+    color: #ffffff;
+    font-size: 22px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, border-color 0.15s, box-shadow 0.15s;
+    padding: 0 16px;
+  }
+  .avatar-sub-tab:hover {
+    background: var(--btn-tab-hover);
+    border-color: var(--btn-primary-border);
+    box-shadow: 0 0 12px var(--btn-primary-glow);
+  }
+  .avatar-sub-tab.active {
+    background: #ffffff;
+    color: #000000;
+    border-color: #ffffff;
+    box-shadow: 0 0 0 2px #ffffff;
+  }
+
+  .avatar-grid-wrap {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .avatar-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-auto-rows: 1fr;
+    gap: 18px;
+    padding: 12px;
+    flex: 1;
+    min-height: 0;
+  }
+  /* Slider list mode — full-width rows instead of a 4x4 grid */
+  .avatar-grid.slider-mode {
+    grid-template-columns: 1fr;
+    grid-auto-rows: 110px;
+    gap: 10px;
+  }
+
+  .avatar-item-tile {
+    background: var(--btn-panel);
+    border: 1px solid var(--btn-tab-border);
+    border-radius: var(--panel-radius);
+    overflow: hidden;
+    cursor: pointer;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    transition: background 0.15s, border-color 0.15s, box-shadow 0.2s;
+  }
+  .avatar-item-tile:hover {
+    background: var(--btn-tab-hover);
+    border-color: var(--btn-primary-border);
+    box-shadow: 0 0 12px var(--btn-primary-glow);
+  }
+  .avatar-item-tile.selected {
+    border-color: rgba(168,85,247,0.9);
+    box-shadow: 0 0 0 3px rgba(168,85,247,0.6), 0 0 16px rgba(168,85,247,0.6);
+  }
+  .avatar-item-tile.none-tile {
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-panel);
+    border-style: dashed;
+  }
+  .avatar-item-icon {
+    flex: 1;
+    width: 100%;
+    background-size: cover;
+    background-position: center;
+    background-color: #1a1a1a;
+  }
+  .avatar-item-label {
+    width: 100%;
+    padding: 8px 12px;
+    font-size: 18px;
+    font-weight: 700;
+    color: #ffffff;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    background: rgba(0,0,0,0.55);
+  }
+  .avatar-item-tile.body-type-tile {
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    font-weight: 800;
+    color: #ffffff;
+    text-align: center;
+    padding: 16px;
+    line-height: 1.2;
+  }
+  .avatar-color-swatch {
+    width: 100%;
+    height: 100%;
+    border-radius: var(--panel-radius);
+  }
+
+  /* Morph slider row */
+  .avatar-slider-row {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 16px 22px;
+    background: var(--btn-panel);
+    border: 1px solid var(--btn-tab-border);
+    border-radius: var(--panel-radius);
+  }
+  .avatar-slider-label {
+    flex: 0 0 320px;
+    font-size: 22px;
+    font-weight: 700;
+    color: #ffffff;
+  }
+  .avatar-slider-track {
+    flex: 1;
+    height: 14px;
+    background: rgba(0,0,0,0.45);
+    border-radius: 999px;
+    position: relative;
+    cursor: pointer;
+  }
+  .avatar-slider-fill {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, rgba(168,85,247,0.6), rgba(236,72,153,0.9));
+    border-radius: 999px;
+  }
+  .avatar-slider-handle {
+    position: absolute;
+    top: 50%;
+    width: 32px;
+    height: 32px;
+    background: #ffffff;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 0 3px rgba(168,85,247,0.6), 0 0 12px rgba(168,85,247,0.5);
+  }
+  .avatar-slider-value {
+    flex: 0 0 100px;
+    font-size: 22px;
+    font-weight: 700;
+    color: #ffffff;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Pagination — match action-bar visual weight */
+  .avatar-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    padding: 6px 8px;
+    flex-shrink: 0;
+  }
+  .avatar-page-btn {
+    height: 56px;
+    min-width: 200px;
+    padding: 0 28px;
+    border-radius: var(--panel-radius);
+    border: 1px solid var(--btn-tab-border);
+    background: var(--btn-tab);
+    color: #ffffff;
+    font-size: 22px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .avatar-page-btn:hover:not(:disabled) {
+    background: var(--btn-tab-hover);
+    border-color: var(--btn-primary-border);
+    box-shadow: 0 0 12px var(--btn-primary-glow);
+  }
+  .avatar-page-btn:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+  .avatar-page-label {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    min-width: 200px;
+    text-align: center;
+  }
+
+  /* Bottom action bar */
+  .avatar-actions {
+    display: flex;
+    gap: 14px;
+    padding: 6px 8px 10px;
+    flex-shrink: 0;
+  }
+  .avatar-action-btn {
+    flex: 1;
+    height: var(--nav-btn-h);
+    border-radius: var(--panel-radius);
+    border: 1px solid var(--btn-tab-border);
+    background: var(--btn-tab);
+    color: #ffffff;
+    font-size: 30px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, box-shadow 0.2s;
+  }
+  .avatar-action-btn:hover {
+    background: var(--btn-tab-hover);
+    border-color: var(--btn-primary-border);
+    box-shadow: 0 0 12px var(--btn-primary-glow);
+  }
+  .avatar-action-save {
+    background: rgba(34,197,94,0.18);
+    border-color: rgba(34,197,94,0.6);
+  }
+  .avatar-action-save:hover {
+    box-shadow: 0 0 14px rgba(34,197,94,0.55);
+  }
+  .avatar-action-cancel {
+    background: rgba(239,68,68,0.18);
+    border-color: rgba(239,68,68,0.6);
+  }
+  .avatar-action-cancel:hover {
+    box-shadow: 0 0 14px rgba(239,68,68,0.55);
   }
 
   .career-btn {
@@ -9736,17 +10330,103 @@ body.vr-mode .play-grid i { animation: none !important; }
           </div>
           <div class="career-btn" style="grid-column:3;grid-row:2;position:relative;overflow:hidden;cursor:default;pointer-events:none">
             <div style="position:absolute;top:0;left:0;right:0;bottom:0;display:flex;flex-direction:column;justify-content:center;padding:28px;gap:12px;z-index:1">
-              <div style="font-size:36px;color:rgba(255,255,255,0.4);font-weight:700">Device <span style="color:#ffffff;font-weight:900">Quest 3</span></div>
-              <div style="font-size:36px;color:rgba(255,255,255,0.4);font-weight:700">Firmware <span style="color:#ffffff;font-weight:900">203</span></div>
-              <div style="font-size:36px;color:rgba(255,255,255,0.4);font-weight:700">UI <span style="color:#ffffff;font-weight:900">v1.0.0.0</span></div>
-              <div style="font-size:36px;color:rgba(255,255,255,0.4);font-weight:700">Game <span style="color:#ffffff;font-weight:900">v1.0.0.0</span></div>
+              <div style="font-size:36px;color:rgba(255,255,255,0.4);font-weight:700">Device <span id="client-info-device" style="color:#ffffff;font-weight:900">Quest 3</span></div>
+              <div style="font-size:36px;color:rgba(255,255,255,0.4);font-weight:700">Firmware <span id="client-info-firmware" style="color:#ffffff;font-weight:900">203</span></div>
+              <div style="font-size:36px;color:rgba(255,255,255,0.4);font-weight:700">UI <span id="client-info-ui" style="color:#ffffff;font-weight:900">v1.0.0.0</span></div>
+              <div style="font-size:36px;color:rgba(255,255,255,0.4);font-weight:700">Game <span id="client-info-game" style="color:#ffffff;font-weight:900">v1.0.0.0</span></div>
             </div>
           </div>
         </div>
       </div>
       <div class="avatar-section" id="avatar-section" style="display:none">
         <button class="back-btn" onclick="hideAvatarSection()">&#8617; Profile</button>
-        <div class="spaces-grid" id="avatar-grid"></div>
+
+        <!-- Login gate (shown when the user is not signed in to a real Genies account) -->
+        <div class="avatar-login-gate" id="avatar-login-gate" style="display:none">
+          <div class="avatar-login-card">
+            <div class="avatar-login-title">Sign in to customise your avatar</div>
+            <div class="avatar-login-sub">A Genies account is required to save changes and sync your look to bandmates.</div>
+            <button class="avatar-login-btn jamsesh-signature" onclick="avatarShowAuthScreen()">Sign in with Genies</button>
+            <div class="avatar-login-note">You can keep playing anonymously — but customising, saving, and syncing your look to bandmates all need a real account.</div>
+          </div>
+        </div>
+
+        <!-- Auth screen — side-by-side Sign In (email + OTP) / Sign Up (Genies Hub) sub-panels. -->
+        <div class="avatar-auth-screen" id="avatar-auth-screen" style="display:none">
+          <button class="back-btn" onclick="avatarShowGate()">&#8617; Back</button>
+          <div class="avatar-auth-card">
+            <div class="avatar-auth-title" id="avatar-auth-title">Get Started with Genies</div>
+            <div class="avatar-auth-sub" id="avatar-auth-sub">Sign in to your account, or create one to keep your avatar across devices.</div>
+
+            <div class="avatar-auth-split" id="avatar-auth-split">
+              <!-- LEFT: Sign In (returning users) -->
+              <div class="avatar-auth-col avatar-auth-col-signin" id="avatar-auth-col-signin">
+                <div class="avatar-auth-col-title">Sign In</div>
+                <div class="avatar-auth-col-sub" id="avatar-auth-signin-sub">Returning user? Enter your email and we'll send you a verification code.</div>
+
+                <!-- Email step -->
+                <div class="avatar-auth-form" id="avatar-auth-form-email">
+                  <input class="avatar-auth-input" id="avatar-email-signin" type="email" placeholder="Email address" autocomplete="email">
+                  <button class="avatar-auth-submit jamsesh-signature" onclick="avatarSubmitSignin()">Send Code</button>
+                </div>
+
+                <!-- OTP step (occupies the Sign In column when active) -->
+                <div class="avatar-auth-form" id="avatar-auth-form-otp" style="display:none">
+                  <div class="avatar-auth-otp-msg" id="avatar-otp-msg">We sent a verification code to your email.</div>
+                  <input class="avatar-auth-input avatar-auth-otp-input" id="avatar-otp-code" type="text" inputmode="numeric" maxlength="8" placeholder="Verification code">
+                  <button class="avatar-auth-submit jamsesh-signature" onclick="avatarSubmitOtp()">Verify</button>
+                  <button class="avatar-auth-secondary" onclick="avatarResendOtp()">Resend code</button>
+                  <button class="avatar-auth-secondary" onclick="avatarOtpCancel()">Use a different email</button>
+                </div>
+              </div>
+
+              <!-- RIGHT: Sign Up (new users) -->
+              <div class="avatar-auth-col avatar-auth-col-signup" id="avatar-auth-col-signup">
+                <div class="avatar-auth-col-title">Sign Up</div>
+                <div class="avatar-auth-col-sub">Don't have a Genies account? Create one to customise your avatar and sync your look to bandmates across devices.</div>
+                <div class="avatar-auth-col-spacer"></div>
+                <button class="avatar-auth-submit jamsesh-signature" onclick="avatarOpenSignUp()">Create Account on Genies Hub &rarr;</button>
+              </div>
+            </div>
+
+            <div class="avatar-auth-error" id="avatar-auth-error" style="display:none"></div>
+
+            <div class="avatar-auth-footer">By continuing you agree to the Genies Terms of Service and Privacy Policy.</div>
+          </div>
+        </div>
+
+        <!-- Editor view (sections + sub-tabs + grid + actions) -->
+        <div class="avatar-editor-view" id="avatar-editor-view" style="display:none">
+          <div class="avatar-editor-status" id="avatar-editor-status">Avatar Editor</div>
+
+          <div class="play-mode-tabs avatar-section-tabs" id="avatar-section-tabs">
+            <div class="play-mode-tab active" data-asec="body"   onclick="selectAvatarSection('body')">Body</div>
+            <div class="play-mode-tab"        data-asec="wear"   onclick="selectAvatarSection('wear')">Wear</div>
+            <div class="play-mode-tab"        data-asec="hair"   onclick="selectAvatarSection('hair')">Hair</div>
+            <div class="play-mode-tab"        data-asec="face"   onclick="selectAvatarSection('face')">Face</div>
+            <div class="play-mode-tab"        data-asec="makeup" onclick="selectAvatarSection('makeup')">Makeup</div>
+            <div class="play-mode-tab"        data-asec="ink"    onclick="selectAvatarSection('ink')">Ink</div>
+            <div class="play-mode-tab"        data-asec="colors" onclick="selectAvatarSection('colors')">Colors</div>
+          </div>
+
+          <div class="avatar-sub-tabs" id="avatar-sub-tabs"></div>
+
+          <div class="avatar-grid-wrap">
+            <div class="avatar-grid" id="avatar-editor-grid"></div>
+          </div>
+
+          <div class="avatar-pagination" id="avatar-pagination">
+            <button class="avatar-page-btn" id="avatar-prev-btn" onclick="avatarGoToPage(-1)">&#9664; Prev</button>
+            <div class="avatar-page-label" id="avatar-page-label">Page 1/1</div>
+            <button class="avatar-page-btn" id="avatar-next-btn" onclick="avatarGoToPage(1)">Next &#9654;</button>
+          </div>
+
+          <div class="avatar-actions">
+            <button class="avatar-action-btn avatar-action-rotate" onclick="avatarRotate()">Rotate</button>
+            <button class="avatar-action-btn avatar-action-save"   onclick="avatarSave()">Save</button>
+            <button class="avatar-action-btn avatar-action-cancel" onclick="avatarCancel()">Cancel</button>
+          </div>
+        </div>
       </div>
       <div class="profile-section" id="profile-section-career">
         <button class="back-btn" onclick="hideProfilePanel()">&#8617; Profile</button>
@@ -10703,7 +11383,13 @@ function initVuplexListener() {
 function handleUnityMessage(msg) {
   switch(msg.type) {
     case 'updateProfile': updateProfile(msg.data); break;
+    case 'updateClientInfo': updateClientInfo(msg.data); break;
     case 'navigate': navigateTo(msg.data); break;
+    case 'avatarLoginStatus': applyAvatarLoginStatus(msg.data); break;
+    case 'avatarAuthStatus': applyAvatarAuthStatus(msg.data); break;
+    case 'avatarCatalog': applyAvatarCatalog(msg.data); break;
+    case 'avatarMorphValues': applyAvatarMorphValues(msg.data); break;
+    case 'avatarSelection': applyAvatarSelection(msg.data); break;
     case 'updateSongs': updateSongsFromBackend(msg.data); break;
     case 'updateLeaderboard': updateLeaderboardFromBackend(msg.data); break;
     case 'updateFriends': updateFriendsFromBackend(msg.data); break;
@@ -11143,6 +11829,22 @@ function updateProfile(data) {
   }
   if (data.notes != null) document.querySelectorAll('.currency')[0].querySelector('span').textContent = data.notes.toLocaleString();
   if (data.coins != null) document.querySelectorAll('.currency')[1].querySelector('span').textContent = data.coins.toLocaleString();
+}
+
+// Populates the existing Device/Firmware/UI/Game tile on the Career page
+// with real client values. Static for the session — Unity sends this once
+// on web ready via updateClientInfo. UI version comes from the webview's
+// own UI_VERSION constant (the page knows its own bundle version).
+function updateClientInfo(data) {
+  if (!data) return;
+  function setText(id, value) {
+    var el = document.getElementById(id);
+    if (el && value) el.textContent = value;
+  }
+  setText('client-info-device',   data.device);
+  setText('client-info-firmware', data.firmware);
+  setText('client-info-ui',       UI_VERSION);
+  setText('client-info-game',     data.gameVersion);
 }
 
 // ── Navigation ─────────────────────────────────────────
@@ -16000,6 +16702,11 @@ var themes = [
 
 var currentTheme = 'light-mode';
 var userCoins = 5000;
+// Webview HTML/JS bundle version — surfaced in the topbar profile-meta block
+// alongside the Unity-side device/firmware/game values. Bump when the page
+// content changes meaningfully so on-device users can tell which UI build
+// they're running independently of the Unity app version.
+var UI_VERSION = 'v1.0.0.0';
 var allTilings = [];
 var currentLayout = 317;
 var unlockedThemes = ['wireframe-light', 'wireframe-dark', 'neon-pink', 'cyber-cyan', 'sunset-blaze', 'light-mode', 'rainforest', 'neon-arcade', 'hunter', 'nebula', 'liquid-glass'];
@@ -16665,51 +17372,615 @@ function hideProfilePanel() {
   document.getElementById('profile-section-career').className = 'profile-section';
 }
 
+// ── Avatar Editor ─────────────────────────────────────
+// Mirror of the VR-side VRAvatarEditorUI. Section/sub-tab nav, populator
+// dispatch, and bridge messages. Catalog data comes from Unity via
+// 'avatarCatalog' messages; until that arrives we render placeholder tiles
+// so the layout is testable in the desktop browser.
+
+var avatarLoggedIn = false; // flipped by 'avatarLoginStatus' from Unity
+var avatarSection = 'body';
+var avatarSubIndex = 0;
+var avatarPage = 0;
+var avatarItemsPerPage = 8;  // 4 cols x 2 rows
+var avatarSelected = {};   // key: 'section/sub' -> assetId
+var avatarCatalogs = {};   // key: 'section/sub' -> [{id,name,iconUrl}]
+var avatarMorphValues = {}; // statName -> value (-1..1)
+
+// Sub-tab definitions per section. Order mirrors VRAvatarEditorUI.cs so the
+// Unity bridge can use these labels/indices verbatim.
+var AVATAR_SUBTABS = {
+  body:   [ {id:'bodyType', label:'Body Type'}, {id:'bodySculpt', label:'Sculpt'} ],
+  wear:   [
+    {id:'Hoodie',   label:'Hoodie'},
+    {id:'Shirt',    label:'Shirt'},
+    {id:'Dress',    label:'Dress'},
+    {id:'Pants',    label:'Pants'},
+    {id:'Shorts',   label:'Shorts'},
+    {id:'Skirt',    label:'Skirt'},
+    {id:'Shoes',    label:'Shoes'},
+    {id:'Earrings', label:'Earrings'},
+    {id:'Glasses',  label:'Glasses'},
+    {id:'Hat',      label:'Hat'},
+    {id:'Mask',     label:'Mask'}
+  ],
+  hair:   [
+    {id:'Hair',       label:'Hair'},
+    {id:'FacialHair', label:'Beard'},
+    {id:'Eyebrows',   label:'Brows'},
+    {id:'Eyelashes',  label:'Lashes'}
+  ],
+  face:   [
+    {id:'EyesShape',   label:'Eyes'},
+    {id:'EyesSculpt',  label:'Eye Sculpt'},
+    {id:'LipsShape',   label:'Lips'},
+    {id:'LipsSculpt',  label:'Lip Sculpt'},
+    {id:'JawShape',    label:'Jaw'},
+    {id:'JawSculpt',   label:'Jaw Sculpt'},
+    {id:'NoseShape',   label:'Nose'},
+    {id:'NoseSculpt',  label:'Nose Sculpt'},
+    {id:'BrowsSculpt', label:'Brow Sculpt'}
+  ],
+  makeup: [
+    {id:'Lipstick',  label:'Lipstick'},
+    {id:'Eyeshadow', label:'Eyeshadow'},
+    {id:'Blush',     label:'Blush'},
+    {id:'Freckles',  label:'Freckles'},
+    {id:'FaceGems',  label:'Face Gems'},
+    {id:'Stickers',  label:'Stickers'}
+  ],
+  ink:    [
+    {id:'LeftTopForearm',   label:'L Forearm'},
+    {id:'LeftTopOuterArm',  label:'L Outer Arm'},
+    {id:'RightSideThigh',   label:'R Thigh'},
+    {id:'LeftSideCalf',     label:'L Calf'},
+    {id:'LeftSideBelowKnee',label:'L Below Knee'},
+    {id:'LowerBack',        label:'Lower Back'},
+    {id:'LowerStomach',     label:'Stomach'}
+  ],
+  colors: [
+    {id:'Skin',            label:'Skin'},
+    {id:'Hair',            label:'Hair'},
+    {id:'FacialHair',      label:'Beard'},
+    {id:'Eyebrow',         label:'Brows'},
+    {id:'Eyelash',         label:'Lashes'},
+    {id:'Eyes',            label:'Eyes'},
+    {id:'MakeupLipstick',  label:'Lipstick'},
+    {id:'MakeupEyeshadow', label:'Eyeshadow'},
+    {id:'MakeupBlush',     label:'Blush'},
+    {id:'MakeupFreckles',  label:'Freckles'},
+    {id:'MakeupFaceGems',  label:'Gems'},
+    {id:'MakeupStickers',  label:'Stickers'}
+  ]
+};
+
+// 3 genders × 3 sizes — mirrors VR side
+var AVATAR_BODY_TYPES = [
+  {gender:'Male',        size:'Skinny', label:'Male<br>Skinny'},
+  {gender:'Male',        size:'Medium', label:'Male<br>Medium'},
+  {gender:'Male',        size:'Heavy',  label:'Male<br>Heavy'},
+  {gender:'Female',      size:'Skinny', label:'Female<br>Skinny'},
+  {gender:'Female',      size:'Medium', label:'Female<br>Medium'},
+  {gender:'Female',      size:'Heavy',  label:'Female<br>Heavy'},
+  {gender:'Androgynous', size:'Skinny', label:'Androgynous<br>Skinny'},
+  {gender:'Androgynous', size:'Medium', label:'Androgynous<br>Medium'},
+  {gender:'Androgynous', size:'Heavy',  label:'Androgynous<br>Heavy'}
+];
+
+// Morph slider sets per sculpt sub-tab. AvatarFeatureStat enum names verbatim.
+var AVATAR_MORPHS = {
+  bodySculpt:  ['Body_NeckThickness','Body_ShoulderBroadness','Body_ChestBustline','Body_ArmsThickness','Body_WaistThickness','Body_BellyFullness','Body_HipsThickness','Body_LegsThickness','Body_HipSize'],
+  EyesSculpt:  ['Eyes_Size','Eyes_VerticalPosition','Eyes_Spacing','Eyes_Rotation'],
+  LipsSculpt:  ['Lips_Width','Lips_Fullness','Lips_VerticalPosition'],
+  JawSculpt:   ['Jaw_Width','Jaw_Length'],
+  NoseSculpt:  ['Nose_Width','Nose_Length','Nose_VerticalPosition','Nose_Tilt','Nose_Projection'],
+  BrowsSculpt: ['EyeBrows_Thickness','EyeBrows_Length','EyeBrows_VerticalPosition','EyeBrows_Spacing']
+};
+
+// Sub-tabs in face[] which are sculpt (slider) vs preset (asset grid)
+var AVATAR_FACE_SCULPT_IDS = { EyesSculpt:1, LipsSculpt:1, JawSculpt:1, NoseSculpt:1, BrowsSculpt:1 };
+
 function showAvatarSection() {
   document.getElementById('career-main').style.display = 'none';
   document.getElementById('avatar-section').style.display = 'flex';
-  buildAvatarGrid();
+  sendToUnity('avatarEditorOpened', {});
+  renderAvatarEditor();
 }
 
 function hideAvatarSection() {
   document.getElementById('avatar-section').style.display = 'none';
   document.getElementById('career-main').style.display = 'flex';
+  sendToUnity('avatarEditorClosed', {});
 }
 
-function buildAvatarGrid() {
-  var grid = document.getElementById('avatar-grid');
+function setAvatarLoggedIn(value) {
+  avatarLoggedIn = !!value;
+  // Only re-render if the section is currently open.
+  var section = document.getElementById('avatar-section');
+  if (section && section.style.display !== 'none') renderAvatarEditor();
+}
+
+function renderAvatarEditor() {
+  var gate = document.getElementById('avatar-login-gate');
+  var auth = document.getElementById('avatar-auth-screen');
+  var view = document.getElementById('avatar-editor-view');
+  if (avatarLoggedIn) {
+    gate.style.display = 'none';
+    auth.style.display = 'none';
+    view.style.display = 'flex';
+    renderAvatarSubtabs();
+    renderAvatarGrid();
+    return;
+  }
+  // Not logged in — gate is the default; auth screen is shown explicitly
+  // via avatarShowAuthScreen(). Don't blow away an open auth screen on
+  // re-render.
+  if (auth.style.display === 'flex') {
+    view.style.display = 'none';
+    gate.style.display = 'none';
+    return;
+  }
+  gate.style.display = 'flex';
+  auth.style.display = 'none';
+  view.style.display = 'none';
+}
+
+function avatarShowAuthScreen() {
+  document.getElementById('avatar-login-gate').style.display = 'none';
+  document.getElementById('avatar-auth-screen').style.display = 'flex';
+  document.getElementById('avatar-editor-view').style.display = 'none';
+  avatarSetAuthMode('email');
+  sendToUnity('avatarAuthScreenOpened', {});
+}
+
+function avatarShowGate() {
+  document.getElementById('avatar-auth-screen').style.display = 'none';
+  document.getElementById('avatar-login-gate').style.display = 'flex';
+}
+
+var avatarAuthMode = 'email'; // 'email' | 'otp'
+var avatarOtpEmail = '';
+
+function avatarSetAuthMode(mode) {
+  avatarAuthMode = mode;
+  var showEmail = mode === 'email';
+  var showOtp   = mode === 'otp';
+
+  document.getElementById('avatar-auth-form-email').style.display = showEmail ? 'flex' : 'none';
+  document.getElementById('avatar-auth-form-otp').style.display   = showOtp   ? 'flex' : 'none';
+
+  // Hide the Sign Up column while verifying — the user is committed to
+  // sign-in at that point and the secondary CTA would be a distraction.
+  var signupCol = document.getElementById('avatar-auth-col-signup');
+  if (signupCol) signupCol.style.display = showOtp ? 'none' : 'flex';
+
+  // The Sign In column's helper copy is replaced by the OTP step's own
+  // 'we sent a code to ...' message — hide the column sub so it doesn't read twice.
+  var signinSub = document.getElementById('avatar-auth-signin-sub');
+  if (signinSub) signinSub.style.display = showOtp ? 'none' : 'block';
+
+  var title = document.getElementById('avatar-auth-title');
+  var sub   = document.getElementById('avatar-auth-sub');
+  if (showEmail) {
+    title.textContent = 'Get Started with Genies';
+    sub.textContent   = 'Sign in to your account, or create one to keep your avatar across devices.';
+  } else {
+    title.textContent = 'Verify your email';
+    sub.textContent   = avatarOtpEmail ? ('Code sent to ' + avatarOtpEmail) : 'Enter the code we just sent.';
+  }
+  avatarClearAuthError();
+}
+
+function avatarOpenSignUp() {
+  sendToUnity('avatarOpenSignUp', {});
+}
+
+function avatarSubmitSignin() {
+  var emailEl = document.getElementById('avatar-email-signin');
+  var email = emailEl ? (emailEl.value || '').trim() : '';
+  if (!email) { emailEl.focus(); return; }
+  avatarOtpEmail = email;
+  sendToUnity('avatarEmailSignin', { email: email });
+}
+
+function avatarSubmitOtp() {
+  var codeEl = document.getElementById('avatar-otp-code');
+  var code = codeEl ? (codeEl.value || '').trim() : '';
+  if (!code) { codeEl.focus(); return; }
+  sendToUnity('avatarOtpSubmit', { code: code });
+}
+
+function avatarResendOtp() {
+  sendToUnity('avatarOtpResend', { email: avatarOtpEmail });
+}
+
+function avatarOtpCancel() {
+  avatarOtpEmail = '';
+  var codeEl = document.getElementById('avatar-otp-code');
+  if (codeEl) codeEl.value = '';
+  avatarSetAuthMode('email');
+}
+
+function avatarShowAuthError(msg) {
+  var el = document.getElementById('avatar-auth-error');
+  if (!el) return;
+  el.textContent = msg || '';
+  el.style.display = msg ? 'block' : 'none';
+}
+
+function avatarClearAuthError() { avatarShowAuthError(''); }
+
+// Unity → Web: progress updates for the auth flow
+// data.stage: 'codeSent' | 'codeFailed' | 'verified' | 'verifyFailed' | 'redirected'
+// data.message: optional human-readable string
+function applyAvatarAuthStatus(data) {
+  if (!data) return;
+  switch (data.stage) {
+    case 'codeSent':
+      avatarSetAuthMode('otp');
+      avatarShowAuthError('');
+      break;
+    case 'codeFailed':
+      avatarShowAuthError(data.message || 'Could not send verification code. Try again.');
+      break;
+    case 'verifyFailed':
+      avatarShowAuthError(data.message || 'That code did not match. Try again or resend.');
+      break;
+    case 'verified':
+      avatarShowAuthError('');
+      // The matching avatarLoginStatus { loggedIn: true } will route to the editor.
+      break;
+    case 'signupRedirected':
+      // We opened the Genies Hub in an external browser for account creation.
+      avatarShowAuthError(data.message || 'Finish creating your account on the Genies Hub, then return here and sign in.');
+      break;
+  }
+}
+
+function selectAvatarSection(section) {
+  avatarSection = section;
+  avatarSubIndex = 0;
+  avatarPage = 0;
+  // Highlight active section
+  var tabs = document.querySelectorAll('#avatar-section-tabs .play-mode-tab');
+  for (var i = 0; i < tabs.length; i++) {
+    var t = tabs[i];
+    if (t.getAttribute('data-asec') === section) t.className = 'play-mode-tab active';
+    else t.className = 'play-mode-tab';
+  }
+  renderAvatarSubtabs();
+  renderAvatarGrid();
+}
+
+function selectAvatarSubtab(idx) {
+  avatarSubIndex = idx;
+  avatarPage = 0;
+  updateAvatarSubtabHighlight();
+  renderAvatarGrid();
+}
+
+function renderAvatarSubtabs() {
+  var bar = document.getElementById('avatar-sub-tabs');
+  bar.innerHTML = '';
+  var subs = AVATAR_SUBTABS[avatarSection] || [];
+  for (var i = 0; i < subs.length; i++) {
+    var sub = subs[i];
+    var btn = document.createElement('div');
+    btn.className = 'avatar-sub-tab' + (i === avatarSubIndex ? ' active' : '');
+    btn.textContent = sub.label;
+    btn.setAttribute('data-aidx', i);
+    btn.onclick = (function(idx) { return function() { selectAvatarSubtab(idx); }; })(i);
+    bar.appendChild(btn);
+  }
+}
+
+function updateAvatarSubtabHighlight() {
+  var bar = document.getElementById('avatar-sub-tabs');
+  var btns = bar.querySelectorAll('.avatar-sub-tab');
+  for (var i = 0; i < btns.length; i++) {
+    btns[i].className = 'avatar-sub-tab' + (i === avatarSubIndex ? ' active' : '');
+  }
+}
+
+function avatarCurrentSubId() {
+  var subs = AVATAR_SUBTABS[avatarSection] || [];
+  return subs[avatarSubIndex] ? subs[avatarSubIndex].id : '';
+}
+
+function avatarCatalogKey() {
+  return avatarSection + '/' + avatarCurrentSubId();
+}
+
+function avatarIsSliderMode() {
+  if (avatarSection === 'body' && avatarSubIndex === 1) return true;
+  if (avatarSection === 'face' && AVATAR_FACE_SCULPT_IDS[avatarCurrentSubId()]) return true;
+  return false;
+}
+
+function avatarIsBodyType() {
+  return avatarSection === 'body' && avatarSubIndex === 0;
+}
+
+function avatarHasNoneCell() {
+  // Hair sub-tabs and Ink sub-tabs allow per-slot un-equip
+  return avatarSection === 'hair' || avatarSection === 'ink';
+}
+
+function renderAvatarGrid() {
+  var grid = document.getElementById('avatar-editor-grid');
+  var status = document.getElementById('avatar-editor-status');
   grid.innerHTML = '';
+  grid.className = 'avatar-grid' + (avatarIsSliderMode() ? ' slider-mode' : '');
 
-  var avatarTypes = [
-    { id: 'shirts', label: 'Shirts', desc: 'T-shirts, crop tops, long sleeves', icon: '&#128085;', file: 'avatar_tiles/shirts.jpg' },
-    { id: 'hoodies', label: 'Hoodies', desc: 'Pullover, zip-up', icon: '&#129509;', file: 'avatar_tiles/hoodies.jpg' },
-    { id: 'jackets', label: 'Jackets', desc: 'Outerwear layers', icon: '&#129509;', file: 'avatar_tiles/jackets.jpg' },
-    { id: 'pants', label: 'Pants', desc: 'Jeans, sweatpants, cargo', icon: '&#128086;', file: 'avatar_tiles/pants.jpg' },
-    { id: 'dresses', label: 'Dresses', desc: 'Full-body, jumpsuits, armor', icon: '&#128087;', file: 'avatar_tiles/dresses.jpg' },
-    { id: 'shoes', label: 'Shoes', desc: 'Sandals, boots, platforms', icon: '&#128094;', file: 'avatar_tiles/shoes.jpg' },
-    { id: 'hats', label: 'Hats', desc: 'Caps, beanies, headphones', icon: '&#127913;', file: 'avatar_tiles/hats.jpg' },
-    { id: 'glasses', label: 'Glasses', desc: 'Eyewear, face masks, gems', icon: '&#128083;', file: 'avatar_tiles/glasses.jpg' },
-    { id: 'earrings', label: 'Earrings', desc: 'Studs, hoops, dangles', icon: '&#128141;', file: 'avatar_tiles/earrings.jpg' }
-  ];
+  var subId = avatarCurrentSubId();
+  var sectionLabel = avatarSection.charAt(0).toUpperCase() + avatarSection.slice(1);
+  status.textContent = sectionLabel + ' › ' + (AVATAR_SUBTABS[avatarSection][avatarSubIndex].label || '');
 
-  for (var i = 0; i < avatarTypes.length; i++) {
-    var at = avatarTypes[i];
+  if (avatarIsBodyType()) {
+    renderAvatarBodyTypeGrid(grid);
+    renderAvatarPagination(AVATAR_BODY_TYPES.length, 0);
+    return;
+  }
+  if (avatarIsSliderMode()) {
+    renderAvatarMorphGrid(grid, AVATAR_MORPHS[subId] || []);
+    renderAvatarPagination((AVATAR_MORPHS[subId] || []).length, 0);
+    return;
+  }
+  // Asset / color sub-tabs — render from cached catalog, else request from Unity
+  var key = avatarCatalogKey();
+  var items = avatarCatalogs[key];
+  if (!items) {
+    items = makeAvatarMockItems(avatarSection, subId);
+    sendToUnity('avatarRequestCatalog', { section: avatarSection, subId: subId, subIndex: avatarSubIndex });
+  }
+  renderAvatarAssetGrid(grid, items);
+  renderAvatarPagination(items.length + (avatarHasNoneCell() ? 1 : 0), avatarHasNoneCell() ? 1 : 0);
+}
+
+function renderAvatarBodyTypeGrid(grid) {
+  var start = avatarPage * avatarItemsPerPage;
+  var end = Math.min(start + avatarItemsPerPage, AVATAR_BODY_TYPES.length);
+  for (var i = start; i < end; i++) {
+    var bt = AVATAR_BODY_TYPES[i];
     var tile = document.createElement('div');
-    tile.className = 'space-tile';
-    tile.style.background = 'url(' + at.file + ') center center / cover no-repeat #1a1a1a';
-    tile.style.position = 'relative';
-    tile.style.overflow = 'hidden';
-    tile.style.cursor = 'pointer';
-    tile.onclick = (function(type) {
-      return function() { sendToUnity('avatarCategory', {id: type.id, label: type.label}); };
-    })(at);
-    tile.innerHTML =
-      '<div style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.45);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px">' +
-        '<div style="font-size:36px;font-weight:800;color:#ffffff">' + at.label + '</div>' +
-        '<div style="font-size:22px;color:rgba(255,255,255,0.7);text-align:center;padding:0 16px">' + at.desc + '</div>' +
-      '</div>';
+    tile.className = 'avatar-item-tile body-type-tile';
+    var selKey = 'body/bodyType';
+    if (avatarSelected[selKey] === bt.gender + '_' + bt.size) tile.className += ' selected';
+    tile.innerHTML = bt.label;
+    tile.onclick = (function(entry) {
+      return function() {
+        avatarSelected['body/bodyType'] = entry.gender + '_' + entry.size;
+        sendToUnity('avatarSetBodyType', { gender: entry.gender, size: entry.size });
+        renderAvatarGrid();
+      };
+    })(bt);
     grid.appendChild(tile);
   }
+}
+
+function renderAvatarMorphGrid(grid, stats) {
+  var start = avatarPage * avatarItemsPerPage;
+  var end = Math.min(start + avatarItemsPerPage, stats.length);
+  for (var i = start; i < end; i++) {
+    var stat = stats[i];
+    var initial = (typeof avatarMorphValues[stat] === 'number') ? avatarMorphValues[stat] : 0;
+    grid.appendChild(buildAvatarSliderRow(stat, initial));
+  }
+}
+
+function buildAvatarSliderRow(stat, initial) {
+  var row = document.createElement('div');
+  row.className = 'avatar-slider-row';
+
+  var labelEl = document.createElement('div');
+  labelEl.className = 'avatar-slider-label';
+  labelEl.textContent = avatarPrettyStat(stat);
+
+  var track = document.createElement('div');
+  track.className = 'avatar-slider-track';
+
+  var fill = document.createElement('div');
+  fill.className = 'avatar-slider-fill';
+  track.appendChild(fill);
+
+  var handle = document.createElement('div');
+  handle.className = 'avatar-slider-handle';
+  track.appendChild(handle);
+
+  var value = document.createElement('div');
+  value.className = 'avatar-slider-value';
+
+  function applyValue(v) {
+    v = Math.max(-1, Math.min(1, v));
+    avatarMorphValues[stat] = v;
+    // -1..1 -> 0..100 percent
+    var pct = (v + 1) * 50;
+    fill.style.left = '50%';
+    fill.style.width = Math.abs(pct - 50) + '%';
+    if (v < 0) fill.style.left = pct + '%';
+    handle.style.left = pct + '%';
+    value.textContent = (v >= 0 ? '+' : '') + v.toFixed(2);
+  }
+  applyValue(initial);
+
+  // Drag interaction — convert pointer X to value over the track rect.
+  var dragging = false;
+  function pointerToValue(clientX) {
+    var rect = track.getBoundingClientRect();
+    var t = (clientX - rect.left) / rect.width;
+    return Math.max(-1, Math.min(1, t * 2 - 1));
+  }
+  function onMove(e) {
+    if (!dragging) return;
+    var x = (e.touches && e.touches[0]) ? e.touches[0].clientX : e.clientX;
+    var v = pointerToValue(x);
+    applyValue(v);
+    sendToUnity('avatarSetMorph', { stat: stat, value: v });
+  }
+  function onUp() { dragging = false; }
+  track.onmousedown = function(e) {
+    dragging = true;
+    var v = pointerToValue(e.clientX);
+    applyValue(v);
+    sendToUnity('avatarSetMorph', { stat: stat, value: v });
+  };
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', onUp);
+  // Touch fallback (Vuplex pointer events fire as touch on some configs)
+  track.ontouchstart = function(e) {
+    dragging = true;
+    var t = e.touches[0];
+    var v = pointerToValue(t.clientX);
+    applyValue(v);
+    sendToUnity('avatarSetMorph', { stat: stat, value: v });
+  };
+  document.addEventListener('touchmove', onMove);
+  document.addEventListener('touchend', onUp);
+
+  row.appendChild(labelEl);
+  row.appendChild(track);
+  row.appendChild(value);
+  return row;
+}
+
+function avatarPrettyStat(stat) {
+  // 'Body_NeckThickness' -> 'Neck Thickness'
+  var u = stat.indexOf('_');
+  var raw = u < 0 ? stat : stat.substring(u + 1);
+  return raw.replace(/([A-Z])/g, ' $1').replace(/^ +/, '');
+}
+
+function renderAvatarAssetGrid(grid, items) {
+  var hasNone = avatarHasNoneCell();
+  var reserved = hasNone ? 1 : 0;
+  var firstPageSlots = avatarItemsPerPage - reserved;
+
+  if (avatarPage === 0 && hasNone) {
+    var noneTile = document.createElement('div');
+    noneTile.className = 'avatar-item-tile none-tile';
+    var selKey = avatarCatalogKey();
+    if (avatarSelected[selKey] === '<none>') noneTile.className += ' selected';
+    noneTile.innerHTML = '<div style="font-size:36px;font-weight:800;color:rgba(255,255,255,0.7)">None</div>';
+    noneTile.onclick = (function() {
+      return function() {
+        avatarSelected[avatarCatalogKey()] = '<none>';
+        sendToUnity('avatarUnequip', { section: avatarSection, subId: avatarCurrentSubId() });
+        renderAvatarGrid();
+      };
+    })();
+    grid.appendChild(noneTile);
+  }
+
+  var start, end;
+  if (avatarPage === 0) {
+    start = 0;
+    end = Math.min(firstPageSlots, items.length);
+  } else {
+    start = firstPageSlots + (avatarPage - 1) * avatarItemsPerPage;
+    end = Math.min(start + avatarItemsPerPage, items.length);
+  }
+
+  for (var i = start; i < end; i++) {
+    var item = items[i];
+    grid.appendChild(buildAvatarAssetTile(item));
+  }
+}
+
+function buildAvatarAssetTile(item) {
+  var tile = document.createElement('div');
+  tile.className = 'avatar-item-tile';
+  var key = avatarCatalogKey();
+  if (avatarSelected[key] === item.id) tile.className += ' selected';
+
+  // Color sub-tabs render as a full swatch; everything else uses icon + label.
+  if (avatarSection === 'colors') {
+    var swatch = document.createElement('div');
+    swatch.className = 'avatar-color-swatch';
+    swatch.style.background = item.color || '#444';
+    tile.appendChild(swatch);
+  } else {
+    var icon = document.createElement('div');
+    icon.className = 'avatar-item-icon';
+    if (item.iconUrl) icon.style.backgroundImage = 'url(' + item.iconUrl + ')';
+    tile.appendChild(icon);
+    var label = document.createElement('div');
+    label.className = 'avatar-item-label';
+    label.textContent = item.name || item.id;
+    tile.appendChild(label);
+  }
+
+  tile.onclick = (function(it) {
+    return function() {
+      avatarSelected[avatarCatalogKey()] = it.id;
+      if (avatarSection === 'colors') {
+        sendToUnity('avatarSetColor', { colorType: avatarCurrentSubId(), assetId: it.id });
+      } else {
+        sendToUnity('avatarEquip', { section: avatarSection, subId: avatarCurrentSubId(), assetId: it.id });
+      }
+      renderAvatarGrid();
+    };
+  })(item);
+  return tile;
+}
+
+function renderAvatarPagination(totalCells, reservedOnPage0) {
+  var totalPages = Math.max(1, Math.ceil(totalCells / avatarItemsPerPage));
+  if (avatarPage >= totalPages) avatarPage = totalPages - 1;
+  if (avatarPage < 0) avatarPage = 0;
+  var label = document.getElementById('avatar-page-label');
+  var prev = document.getElementById('avatar-prev-btn');
+  var next = document.getElementById('avatar-next-btn');
+  label.textContent = 'Page ' + (avatarPage + 1) + '/' + totalPages;
+  prev.disabled = avatarPage <= 0;
+  next.disabled = avatarPage >= totalPages - 1;
+}
+
+function avatarGoToPage(delta) {
+  avatarPage += delta;
+  if (avatarPage < 0) avatarPage = 0;
+  renderAvatarGrid();
+}
+
+function avatarRotate() { sendToUnity('avatarRotate', { degrees: 45 }); }
+function avatarSave()   { sendToUnity('avatarSave', {});  hideAvatarSection(); }
+function avatarCancel() { sendToUnity('avatarCancel', {}); hideAvatarSection(); }
+
+// Placeholder items shown until Unity pushes a real catalog. Lets us demo
+// the layout in a desktop browser.
+function makeAvatarMockItems(section, subId) {
+  var out = [];
+  var count = section === 'colors' ? 12 : 18;
+  var palette = ['#f97316','#ec4899','#a855f7','#3b82f6','#10b981','#facc15','#ef4444','#6366f1','#14b8a6','#f43f5e','#84cc16','#06b6d4'];
+  for (var i = 0; i < count; i++) {
+    if (section === 'colors') {
+      out.push({ id: subId + '_' + i, name: subId + ' ' + (i+1), color: palette[i % palette.length] });
+    } else {
+      out.push({ id: subId + '_' + i, name: subId + ' ' + (i+1), iconUrl: '' });
+    }
+  }
+  return out;
+}
+
+// Unity → Web message handlers (called from handleUnityMessage)
+function applyAvatarLoginStatus(data) {
+  setAvatarLoggedIn(data && data.loggedIn === true);
+}
+function applyAvatarCatalog(data) {
+  if (!data || !data.section || typeof data.subId !== 'string') return;
+  avatarCatalogs[data.section + '/' + data.subId] = data.items || [];
+  if (data.section === avatarSection && data.subId === avatarCurrentSubId()) renderAvatarGrid();
+}
+function applyAvatarMorphValues(data) {
+  if (!data || !data.stats) return;
+  for (var k in data.stats) {
+    if (Object.prototype.hasOwnProperty.call(data.stats, k)) avatarMorphValues[k] = data.stats[k];
+  }
+  if (avatarIsSliderMode()) renderAvatarGrid();
+}
+function applyAvatarSelection(data) {
+  if (!data || !data.section || !data.subId) return;
+  avatarSelected[data.section + '/' + data.subId] = data.assetId || '';
+  if (data.section === avatarSection && data.subId === avatarCurrentSubId()) renderAvatarGrid();
 }
 
 function buildProfileGrid() {
