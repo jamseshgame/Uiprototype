@@ -15777,15 +15777,32 @@ function openOptionPicker(type) {
     panel.appendChild(skinHeader);
 
     var skinItems = [
-      {id: 'Original',      label: 'Original',      img: 'instruments/drums.png'},
-      {id: 'Crystal',       label: 'Crystal',       img: 'instruments/skins/crystal.png'},
-      {id: 'Crystal Green', label: 'Crystal Green', img: 'instruments/skins/crystal.png'},
-      {id: 'Iridescent',    label: 'Iridescent',    img: 'instruments/skins/crystal.png'}
+      {id: 'Original',      label: 'Original',      img: 'instruments/drums.png',         instruments: ['guitar','drums','vocals','keys','bass','mixed']},
+      {id: 'Crystal',       label: 'Crystal',       img: 'instruments/skins/crystal.png', instruments: ['guitar','drums']},
+      {id: 'Crystal Green', label: 'Crystal Green', img: 'instruments/skins/crystal.png', instruments: ['guitar']},
+      {id: 'Iridescent',    label: 'Iridescent',    img: 'instruments/skins/crystal.png', instruments: ['guitar']},
+      {id: 'Prehistoric',   label: 'Prehistoric',   img: 'instruments/drums.png',         instruments: ['drums']}
     ];
+    var skinInstrument = selectedInstrument || 'guitar';
+    var availableSkins = [];
+    for (var fi = 0; fi < skinItems.length; fi++) {
+      var fitem = skinItems[fi];
+      if (!fitem.instruments || fitem.instruments.indexOf(skinInstrument) !== -1) {
+        availableSkins.push(fitem);
+      }
+    }
+    var skinStillAvailable = false;
+    for (var ci = 0; ci < availableSkins.length; ci++) {
+      if (availableSkins[ci].id === selectedExperience) { skinStillAvailable = true; break; }
+    }
+    if (!skinStillAvailable) {
+      selectedExperience = 'Original';
+      sendToUnity('experience', {tab: 'skin', id: 'Original'});
+    }
     var skinGrid = document.createElement('div');
     skinGrid.style.cssText = 'display:grid;grid-template-columns:repeat(4,1fr);gap:16px;width:100%';
-    for (var si = 0; si < skinItems.length; si++) {
-      var skin = skinItems[si];
+    for (var si = 0; si < availableSkins.length; si++) {
+      var skin = availableSkins[si];
       var isSelected = skin.id === selectedExperience;
       var skinTile = document.createElement('div');
       skinTile.style.cssText = 'position:relative;overflow:hidden;border-radius:var(--panel-radius);cursor:pointer;padding-top:100%;border:2px solid ' + (isSelected ? '#ffffff' : 'transparent');
