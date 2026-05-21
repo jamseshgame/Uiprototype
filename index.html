@@ -263,6 +263,26 @@
     text-shadow: none;
   }
 
+  .profile-level-line {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 28px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.85);
+    line-height: 1;
+    white-space: nowrap;
+    margin-top: 6px;
+  }
+
+  .profile-level-label {
+    color: var(--pink);
+  }
+
+  .profile-level-sep {
+    color: rgba(255,255,255,0.4);
+  }
+
 
   .xp-text {
     font-size: 36px;
@@ -10241,6 +10261,11 @@ body.vr-mode .play-grid i { animation: none !important; }
       </div>
       <div class="profile-info">
         <div class="profile-name">Rael</div>
+        <div class="profile-level-line" id="profile-level-line">
+          <span class="profile-level-label" id="profile-level-label">Lvl 0</span>
+          <span class="profile-level-sep">·</span>
+          <span class="profile-xp-label" id="profile-xp-label">0 / 0 XP</span>
+        </div>
       </div>
       <div class="topbar-spacer"></div>
       <div class="profile-info profile-info-right">
@@ -10366,14 +10391,14 @@ body.vr-mode .play-grid i { animation: none !important; }
 
                 <!-- Email step -->
                 <div class="avatar-auth-form" id="avatar-auth-form-email">
-                  <input class="avatar-auth-input" id="avatar-email-signin" type="email" placeholder="Email address" autocomplete="email">
+                  <input class="avatar-auth-input" id="avatar-email-signin" type="email" inputmode="none" onclick="requestKeyboardForInput('avatar-email-signin')" placeholder="Email address" autocomplete="email">
                   <button class="avatar-auth-submit jamsesh-signature" onclick="avatarSubmitSignin()">Send Code</button>
                 </div>
 
                 <!-- OTP step (occupies the Sign In column when active) -->
                 <div class="avatar-auth-form" id="avatar-auth-form-otp" style="display:none">
                   <div class="avatar-auth-otp-msg" id="avatar-otp-msg">We sent a verification code to your email.</div>
-                  <input class="avatar-auth-input avatar-auth-otp-input" id="avatar-otp-code" type="text" inputmode="numeric" maxlength="8" placeholder="Verification code">
+                  <input class="avatar-auth-input avatar-auth-otp-input" id="avatar-otp-code" type="text" inputmode="none" onclick="requestKeyboardForInput('avatar-otp-code')" maxlength="8" placeholder="Verification code">
                   <button class="avatar-auth-submit jamsesh-signature" onclick="avatarSubmitOtp()">Verify</button>
                   <button class="avatar-auth-secondary" onclick="avatarResendOtp()">Resend code</button>
                   <button class="avatar-auth-secondary" onclick="avatarOtpCancel()">Use a different email</button>
@@ -11397,6 +11422,7 @@ function handleUnityMessage(msg) {
     case 'updateLobby': updateLobbyFromBackend(msg.data); break;
     case 'updateHubs': updateHubsFromBackend(msg.data); break;
     case 'updateCoins': updateCoinsFromBackend(msg.data); break;
+    case 'updateProgression': updateProgression(msg.data); break;
     case 'gameResults': showGameResults(msg.data); break;
     case 'gameResultsGroupScore': applyGroupScore(msg.data); break;
     case 'gameResultsLeaderboard': applyResultsLeaderboard(msg.data); break;
@@ -11812,7 +11838,8 @@ function applyResultsLeaderboard(data) {
 
 function updateProfile(data) {
   if (data.name) {
-    document.querySelector('.profile-name').textContent = data.name;
+    var nameEl = document.querySelector('.profile-name');
+    if (nameEl) nameEl.textContent = data.name;
     var neonName = document.getElementById('career-neon-name');
     if (neonName) neonName.textContent = data.name;
     // Keep the creator "Solo - <name>" picker label in sync until the user
@@ -11822,13 +11849,99 @@ function updateProfile(data) {
       updateCreatorNameBtn();
     }
   }
-  if (data.level != null) document.querySelector('.level-badge').textContent = data.level;
+  // .level-badge is a styled-but-unrendered class today — null-guarded so the
+  // function doesn't throw and short-circuit the rest of the updates.
+  if (data.level != null) {
+    var levelBadge = document.querySelector('.level-badge');
+    if (levelBadge) levelBadge.textContent = data.level;
+    var levelLabel = document.getElementById('profile-level-label');
+    if (levelLabel) levelLabel.textContent = 'Lvl ' + data.level;
+  }
   if (data.xp != null && data.xpMax != null) {
     var pct = Math.min(100, Math.round((data.xp / data.xpMax) * 100));
-    document.querySelector('.xp-bar-fill').style.width = pct + '%';
+    var barFill = document.querySelector('.xp-bar-fill');
+    if (barFill) barFill.style.width = pct + '%';
+    var xpLabel = document.getElementById('profile-xp-label');
+    if (xpLabel) {
+      xpLabel.textContent = Number(data.xp).toLocaleString() + ' / ' + Number(data.xpMax).toLocaleString() + ' XP';
+    }
   }
-  if (data.notes != null) document.querySelectorAll('.currency')[0].querySelector('span').textContent = data.notes.toLocaleString();
-  if (data.coins != null) document.querySelectorAll('.currency')[1].querySelector('span').textContent = data.coins.toLocaleString();
+  // .currency elements aren't in the topbar markup yet; null-guard the lookup so
+  // a future addition can pick up the data without code changes.
+  var currencyEls = document.querySelectorAll('.currency');
+  if (data.notes != null && currencyEls[0]) {
+    var noteSpan = currencyEls[0].querySelector('span');
+    if (noteSpan) noteSpan.textContent = data.notes.toLocaleString();
+  }
+  if (data.coins != null && currencyEls[1]) {
+    var coinSpan2 = currencyEls[1].querySelector('span');
+    if (coinSpan2) coinSpan2.textContent = data.coins.toLocaleString();
+  }
+
+  // Sync the active profile + userCoins so the rotating stat ticker and the
+  // store affordability checks see the same values the topbar just rendered.
+  // Without this the ticker keeps cycling the static profiles[] defaults
+  // (e.g. coins=5000) while the .currency span shows the live balance.
+  var profile = getActiveProfile();
+  if (profile) {
+    if (data.coins != null)  profile.coins  = data.coins;
+    if (data.level != null)  profile.level  = data.level;
+    if (data.xp != null)     profile.xp     = data.xp;
+    if (data.xpMax != null)  profile.xpMax  = data.xpMax;
+    if (data.name)           profile.name   = data.name;
+  }
+  if (data.coins != null) userCoins = data.coins;
+  rebuildStatTicker();
+}
+
+// Rebuilds the topbar stat ticker DOM from the active profile so live data
+// (currency, XP, level) is visible on the next rotation. Idempotent — safe to
+// call multiple times. Mirrors the ticker construction in switchProfile().
+function rebuildStatTicker() {
+  var ticker = document.getElementById('stat-ticker');
+  if (!ticker) return;
+  var profile = getActiveProfile();
+  if (!profile) return;
+  // Preserve the index of the currently-active line so the rotation doesn't
+  // visibly jump back to "Level X" every time Unity pushes a profile update.
+  var prevActive = ticker.querySelector('.xp-text.ticker-active');
+  var prevIdx = 0;
+  if (prevActive) {
+    var siblings = ticker.querySelectorAll('.xp-text');
+    for (var k = 0; k < siblings.length; k++) {
+      if (siblings[k] === prevActive) { prevIdx = k; break; }
+    }
+  }
+  ticker.innerHTML = '';
+  var stats = [
+    'Level ' + profile.level,
+    profile.xp.toLocaleString() + ' / ' + profile.xpMax.toLocaleString() + ' XP',
+    profile.coins.toLocaleString() + ' Jamsesh Picks',
+    getSeasonPercent() + '% Season Complete'
+  ];
+  for (var s = 0; s < stats.length; s++) {
+    var el = document.createElement('div');
+    el.className = 'xp-text' + (s === prevIdx ? ' ticker-active' : '');
+    el.textContent = stats[s];
+    ticker.appendChild(el);
+  }
+}
+
+// Per-instrument progression payload — full breakdown of Drums/Guitar/Vocals
+// XP + level + currency balance. Currently we only consume the balance; the
+// per-instrument data is stashed on window for later UIs that want it (career
+// page instrument cards, future profile sub-pages, etc.) without re-fetching.
+function updateProgression(data) {
+  if (!data) return;
+  window._progression = data;
+  if (data.currencyBalance != null) {
+    var profile = getActiveProfile();
+    if (profile) profile.coins = data.currencyBalance;
+    userCoins = data.currencyBalance;
+    var coinSpan = document.querySelectorAll('.currency')[1];
+    if (coinSpan) coinSpan.querySelector('span').textContent = data.currencyBalance.toLocaleString();
+    rebuildStatTicker();
+  }
 }
 
 // Populates the existing Device/Firmware/UI/Game tile on the Career page
@@ -17632,19 +17745,26 @@ function avatarClearAuthError() { avatarShowAuthError(''); }
 // data.message: optional human-readable string
 function applyAvatarAuthStatus(data) {
   if (!data) return;
+  var otpMsg = document.getElementById('avatar-otp-msg');
   switch (data.stage) {
     case 'codeSent':
       avatarSetAuthMode('otp');
       avatarShowAuthError('');
+      if (otpMsg) otpMsg.textContent = data.message || 'We sent a verification code to your email.';
       break;
     case 'codeFailed':
       avatarShowAuthError(data.message || 'Could not send verification code. Try again.');
+      break;
+    case 'verifying':
+      avatarShowAuthError('');
+      if (otpMsg) otpMsg.textContent = data.message || 'Verifying code...';
       break;
     case 'verifyFailed':
       avatarShowAuthError(data.message || 'That code did not match. Try again or resend.');
       break;
     case 'verified':
       avatarShowAuthError('');
+      if (otpMsg) otpMsg.textContent = data.message || 'Code accepted. Signing you in...';
       // The matching avatarLoginStatus { loggedIn: true } will route to the editor.
       break;
     case 'signupRedirected':
