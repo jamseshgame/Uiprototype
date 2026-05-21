@@ -10084,11 +10084,11 @@ body.vr-mode .play-grid i { animation: none !important; }
       </div>
       <div class="meta-store-disclaimer">This app may access your display name, username, user ID, profile pictures, avatars, age group and a list of followers and people you follow who also own this app.</div>
       <div class="meta-store-screenshots">
-        <div class="meta-store-screenshot"><img src="art/001.jpg" alt=""></div>
-        <div class="meta-store-screenshot"><img src="art/010.jpg" alt=""></div>
-        <div class="meta-store-screenshot"><img src="art/025.jpg" alt=""></div>
-        <div class="meta-store-screenshot"><img src="art/040.jpg" alt=""></div>
-        <div class="meta-store-screenshot"><img src="art/055.jpg" alt=""></div>
+        <div class="meta-store-screenshot"><img src="art/placeholder.jpg" alt=""></div>
+        <div class="meta-store-screenshot"><img src="art/placeholder.jpg" alt=""></div>
+        <div class="meta-store-screenshot"><img src="art/placeholder.jpg" alt=""></div>
+        <div class="meta-store-screenshot"><img src="art/placeholder.jpg" alt=""></div>
+        <div class="meta-store-screenshot"><img src="art/placeholder.jpg" alt=""></div>
       </div>
     </div>
     <div class="meta-store-bottom-bar">
@@ -11150,7 +11150,7 @@ body.vr-mode .play-grid i { animation: none !important; }
       <!-- Left column: album art + score stacked -->
       <div class="results-left-col">
         <div class="results-album-col">
-          <img class="results-album-art" id="results-album-art" src="art/001.jpg" alt="Album">
+          <img class="results-album-art" id="results-album-art" src="art/placeholder.jpg" alt="Album">
           <div class="results-song-title" id="results-song-title">The Fate of Ophelia</div>
           <div class="results-song-artist" id="results-song-artist">Taylor Swift</div>
           <div class="results-song-diff">Expert</div>
@@ -12377,13 +12377,13 @@ function buildSocialPage() {
   groupGrid.appendChild(createTile);
 
   var groups = window._backendGroups || [
-    { name: 'Jamsesh Hunters', members: '8/10', file: 'bandlogos/Gemini_Generated_Image_4aa5a04aa5a04aa5.jpg' },
-    { name: 'Neon Phantoms', members: '10/10', file: 'bandlogos/Gemini_Generated_Image_7nxmb87nxmb87nxm.jpg' },
-    { name: 'Electric Dreams', members: '6/10', file: 'bandlogos/Gemini_Generated_Image_8etd7p8etd7p8etd.jpg' },
-    { name: 'Rhythm Rebels', members: '9/10', file: 'bandlogos/Gemini_Generated_Image_ds7ykeds7ykeds7y.jpg' },
-    { name: 'Sonic Wolves', members: '7/10', file: 'bandlogos/Gemini_Generated_Image_dyvmgcdyvmgcdyvm.jpg' },
-    { name: 'Bass Bandits', members: '5/10', file: 'bandlogos/Gemini_Generated_Image_g3jblgg3jblgg3jb.jpg' },
-    { name: 'Velvet Crush', members: '10/10', file: 'bandlogos/Gemini_Generated_Image_wzsyntwzsyntwzsy.jpg' }
+    { name: 'Jamsesh Hunters', members: '8/10', file: 'bandlogos/placeholder.jpg' },
+    { name: 'Neon Phantoms', members: '10/10', file: 'bandlogos/placeholder.jpg' },
+    { name: 'Electric Dreams', members: '6/10', file: 'bandlogos/placeholder.jpg' },
+    { name: 'Rhythm Rebels', members: '9/10', file: 'bandlogos/placeholder.jpg' },
+    { name: 'Sonic Wolves', members: '7/10', file: 'bandlogos/placeholder.jpg' },
+    { name: 'Bass Bandits', members: '5/10', file: 'bandlogos/placeholder.jpg' },
+    { name: 'Velvet Crush', members: '10/10', file: 'bandlogos/placeholder.jpg' }
   ];
   for (var i = 0; i < groups.length; i++) {
     var g = groups[i];
@@ -12497,13 +12497,13 @@ var createGroupMembers = [];
 var createGroupLogo = '';
 
 var groupLogoOptions = [
-  'bandlogos/Gemini_Generated_Image_4aa5a04aa5a04aa5.jpg',
-  'bandlogos/Gemini_Generated_Image_7nxmb87nxmb87nxm.jpg',
-  'bandlogos/Gemini_Generated_Image_8etd7p8etd7p8etd.jpg',
-  'bandlogos/Gemini_Generated_Image_ds7ykeds7ykeds7y.jpg',
-  'bandlogos/Gemini_Generated_Image_dyvmgcdyvmgcdyvm.jpg',
-  'bandlogos/Gemini_Generated_Image_g3jblgg3jblgg3jb.jpg',
-  'bandlogos/Gemini_Generated_Image_wzsyntwzsyntwzsy.jpg'
+  'bandlogos/placeholder.jpg',
+  'bandlogos/placeholder.jpg',
+  'bandlogos/placeholder.jpg',
+  'bandlogos/placeholder.jpg',
+  'bandlogos/placeholder.jpg',
+  'bandlogos/placeholder.jpg',
+  'bandlogos/placeholder.jpg'
 ];
 
 var availableFriends = [
@@ -12790,15 +12790,15 @@ var instruments = [
 // lobbyPlayers uses np plates defined below (initialized in initLobbyPlates)
 // PLAYFAB HOOKUP: Replace with data from Unity via sendToUnity('getLobby') / updateLobby message
 var lobbyPlayers = [
-  {name:'xShredMaster',  avatar:'art/001.jpg', plate:null, plateClass:null,            instrument:'guitar', difficulty:'expert', ready:true},
-  {name:'BeatDropQueen', avatar:'art/002.jpg', plate:null, plateClass:'plate-holo',    instrument:'drums',  difficulty:'hard',   ready:true},
-  {name:'NeonRiff',      avatar:'art/003.jpg', plate:null, plateClass:null,            instrument:'guitar', difficulty:'medium', ready:false},
-  {name:'AxelStorm',     avatar:'art/004.jpg', plate:null, plateClass:null,            instrument:'keys',   difficulty:'expert', ready:true},
-  {name:'VoxHunter',     avatar:'art/006.jpg', plate:null, plateClass:null,            instrument:'vocals', difficulty:'hard',   ready:true},
-  {name:'FretBoss',      avatar:'art/007.jpg', plate:null, plateClass:'plate-radiate', instrument:'guitar', difficulty:'expert', ready:true},
-  {name:'SynthWave99',   avatar:'art/008.jpg', plate:null, plateClass:null,            instrument:'keys',   difficulty:'medium', ready:false},
-  {name:'PickSlinger',   avatar:'art/009.jpg', plate:null, plateClass:null,            instrument:'guitar', difficulty:'easy',   ready:true},
-  {name:'CrashKid',      avatar:'art/011.jpg', plate:null, plateClass:null,            instrument:'drums',  difficulty:'hard',   ready:false}
+  {name:'xShredMaster',  avatar:'art/placeholder.jpg', plate:null, plateClass:null,            instrument:'guitar', difficulty:'expert', ready:true},
+  {name:'BeatDropQueen', avatar:'art/placeholder.jpg', plate:null, plateClass:'plate-holo',    instrument:'drums',  difficulty:'hard',   ready:true},
+  {name:'NeonRiff',      avatar:'art/placeholder.jpg', plate:null, plateClass:null,            instrument:'guitar', difficulty:'medium', ready:false},
+  {name:'AxelStorm',     avatar:'art/placeholder.jpg', plate:null, plateClass:null,            instrument:'keys',   difficulty:'expert', ready:true},
+  {name:'VoxHunter',     avatar:'art/placeholder.jpg', plate:null, plateClass:null,            instrument:'vocals', difficulty:'hard',   ready:true},
+  {name:'FretBoss',      avatar:'art/placeholder.jpg', plate:null, plateClass:'plate-radiate', instrument:'guitar', difficulty:'expert', ready:true},
+  {name:'SynthWave99',   avatar:'art/placeholder.jpg', plate:null, plateClass:null,            instrument:'keys',   difficulty:'medium', ready:false},
+  {name:'PickSlinger',   avatar:'art/placeholder.jpg', plate:null, plateClass:null,            instrument:'guitar', difficulty:'easy',   ready:true},
+  {name:'CrashKid',      avatar:'art/placeholder.jpg', plate:null, plateClass:null,            instrument:'drums',  difficulty:'hard',   ready:false}
 ];
 
 var difficulties = [
@@ -15294,7 +15294,7 @@ function buildLateJoinSpectateView(grid) {
       songTile.className = 'coop-song-tile';
       songTile.style.cursor = 'default';
       songTile.innerHTML =
-        '<div class="coop-song-art"><img src="' + (s.file || 'art/001.jpg') + '" alt=""></div>' +
+        '<div class="coop-song-art"><img src="' + (s.file || 'art/placeholder.jpg') + '" alt=""></div>' +
         '<div class="coop-song-info">' +
           '<div class="song-title">' + (s.title || 'Unknown') + '</div>' +
           '<div class="song-artist">' + (s.artist || 'Unknown') + '</div>' +
@@ -15922,7 +15922,9 @@ function openOptionPicker(type) {
       {id: 'Crystal',       label: 'Crystal',       img: 'instruments/skins/crystal.png', instruments: ['guitar','drums']},
       {id: 'Crystal Green', label: 'Crystal Green', img: 'instruments/skins/crystal.png', instruments: ['guitar']},
       {id: 'Iridescent',    label: 'Iridescent',    img: 'instruments/skins/crystal.png', instruments: ['guitar']},
-      {id: 'Prehistoric',   label: 'Prehistoric',   img: 'instruments/drums.png',         instruments: ['drums']}
+      {id: 'Prehistoric',   label: 'Prehistoric',   img: 'instruments/drums.png',         instruments: ['drums']},
+      {id: 'Flower',        label: 'Flower',        img: 'instruments/drums.png',         instruments: ['drums']},
+      {id: 'Nautical',      label: 'Nautical',      img: 'instruments/drums.png',         instruments: ['drums']}
     ];
     var skinInstrument = selectedInstrument || 'guitar';
     var availableSkins = [];
@@ -16148,17 +16150,17 @@ var creatorPhotos = [
 ];
 
 var creatorArtLogos = [
-  'bandlogos/Gemini_Generated_Image_4aa5a04aa5a04aa5.jpg',
-  'bandlogos/Gemini_Generated_Image_7nxmb87nxmb87nxm.jpg',
-  'bandlogos/Gemini_Generated_Image_8etd7p8etd7p8etd.jpg',
-  'bandlogos/Gemini_Generated_Image_ds7ykeds7ykeds7y.jpg',
-  'bandlogos/Gemini_Generated_Image_dyvmgcdyvmgcdyvm.jpg',
-  'bandlogos/Gemini_Generated_Image_g3jblgg3jblgg3jb.jpg',
-  'bandlogos/Gemini_Generated_Image_wzsyntwzsyntwzsy.jpg',
-  'art/002.jpg', 'art/013.jpg', 'art/024.jpg', 'art/035.jpg',
-  'art/046.jpg', 'art/057.jpg', 'art/068.jpg', 'art/079.jpg',
-  'art/090.jpg', 'art/003.jpg', 'art/014.jpg', 'art/025.jpg',
-  'art/036.jpg'
+  'bandlogos/placeholder.jpg',
+  'bandlogos/placeholder.jpg',
+  'bandlogos/placeholder.jpg',
+  'bandlogos/placeholder.jpg',
+  'bandlogos/placeholder.jpg',
+  'bandlogos/placeholder.jpg',
+  'bandlogos/placeholder.jpg',
+  'art/placeholder.jpg', 'art/placeholder.jpg', 'art/placeholder.jpg', 'art/placeholder.jpg',
+  'art/placeholder.jpg', 'art/placeholder.jpg', 'art/placeholder.jpg', 'art/placeholder.jpg',
+  'art/placeholder.jpg', 'art/placeholder.jpg', 'art/placeholder.jpg', 'art/placeholder.jpg',
+  'art/placeholder.jpg'
 ];
 
 var creatorWords = [
@@ -16493,7 +16495,7 @@ function createArt() {
 
   if (isDemoMode()) {
     // Demo: simulate API latency, then show a stock result.
-    setTimeout(function() { onCreatorArtGenerated('art/003.jpg'); }, 3000);
+    setTimeout(function() { onCreatorArtGenerated('art/placeholder.jpg'); }, 3000);
   } else {
     sendToUnity('creatorGenerateArt', {
       photoPath: creatorSelectedPhotoForArt || '',
@@ -16598,13 +16600,13 @@ function openCreatorNamePicker() {
   var currentId = creatorNameType + ':' + creatorSelectedName;
 
   var groups = window._backendGroups || [
-    { name: 'Jamsesh Hunters', file: 'bandlogos/Gemini_Generated_Image_4aa5a04aa5a04aa5.jpg' },
-    { name: 'Neon Phantoms', file: 'bandlogos/Gemini_Generated_Image_7nxmb87nxmb87nxm.jpg' },
-    { name: 'Electric Dreams', file: 'bandlogos/Gemini_Generated_Image_8etd7p8etd7p8etd.jpg' },
-    { name: 'Rhythm Rebels', file: 'bandlogos/Gemini_Generated_Image_ds7ykeds7ykeds7y.jpg' },
-    { name: 'Sonic Wolves', file: 'bandlogos/Gemini_Generated_Image_dyvmgcdyvmgcdyvm.jpg' },
-    { name: 'Bass Bandits', file: 'bandlogos/Gemini_Generated_Image_g3jblgg3jblgg3jb.jpg' },
-    { name: 'Velvet Crush', file: 'bandlogos/Gemini_Generated_Image_wzsyntwzsyntwzsy.jpg' }
+    { name: 'Jamsesh Hunters', file: 'bandlogos/placeholder.jpg' },
+    { name: 'Neon Phantoms', file: 'bandlogos/placeholder.jpg' },
+    { name: 'Electric Dreams', file: 'bandlogos/placeholder.jpg' },
+    { name: 'Rhythm Rebels', file: 'bandlogos/placeholder.jpg' },
+    { name: 'Sonic Wolves', file: 'bandlogos/placeholder.jpg' },
+    { name: 'Bass Bandits', file: 'bandlogos/placeholder.jpg' },
+    { name: 'Velvet Crush', file: 'bandlogos/placeholder.jpg' }
   ];
 
   // Build tiles: Solo + groups + None = up to 9
@@ -16741,7 +16743,7 @@ function buildStoreGrid() {
   buildTiledGrid(songsGrid, storeSongs, function(s, w, h, gc) {
     var tile = document.createElement('div');
     tile.className = 'space-tile';
-    tile.style.background = 'url(' + (s.file || 'art/001.jpg') + ') center center / cover no-repeat #1a1a1a';
+    tile.style.background = 'url(' + (s.file || 'art/placeholder.jpg') + ') center center / cover no-repeat #1a1a1a';
     tile.style.position = 'relative';
     tile.style.overflow = 'hidden';
     tile.style.cursor = 'pointer';
@@ -16805,15 +16807,15 @@ function buildStoreGrid() {
   // ── Items tab: category sections into tiled layout ──
   var itemsGrid = document.getElementById('store-items-grid');
   var storeCategories = [
-    {cat:'Spaces',      icon:'&#127760;', file:'art/010.jpg'},
-    {cat:'Stages',      icon:'&#127926;', file:'art/020.jpg'},
-    {cat:'Avatar',      icon:'&#128100;', file:'art/030.jpg'},
-    {cat:'Instruments', icon:'&#127928;', file:'art/040.jpg'},
-    {cat:'Gem',         icon:'&#128142;', file:'art/050.jpg'},
-    {cat:'Highway',     icon:'&#128739;', file:'art/060.jpg'},
-    {cat:'Skybox',      icon:'&#127748;', file:'art/070.jpg'},
-    {cat:'Theme',       icon:'&#127912;', file:'art/080.jpg'},
-    {cat:'Frame',       icon:'&#128247;', file:'art/090.jpg'}
+    {cat:'Spaces',      icon:'&#127760;', file:'art/placeholder.jpg'},
+    {cat:'Stages',      icon:'&#127926;', file:'art/placeholder.jpg'},
+    {cat:'Avatar',      icon:'&#128100;', file:'art/placeholder.jpg'},
+    {cat:'Instruments', icon:'&#127928;', file:'art/placeholder.jpg'},
+    {cat:'Gem',         icon:'&#128142;', file:'art/placeholder.jpg'},
+    {cat:'Highway',     icon:'&#128739;', file:'art/placeholder.jpg'},
+    {cat:'Skybox',      icon:'&#127748;', file:'art/placeholder.jpg'},
+    {cat:'Theme',       icon:'&#127912;', file:'art/placeholder.jpg'},
+    {cat:'Frame',       icon:'&#128247;', file:'art/placeholder.jpg'}
   ];
   buildTiledGrid(itemsGrid, storeCategories, function(c, w, h, gc) {
     var tile = document.createElement('div');
@@ -18473,15 +18475,8 @@ function buildHomeGrid(layoutIndex) {
   }
 
   function getSizeKey(w, h) {
-    if (w === 1 && h === 1) return '1x1';
-    if (w === 2 && h === 1) return '2x1';
-    if (w === 3 && h === 1) return '3x1';
-    if (w === 1 && h === 2) return '1x2';
-    if (w === 1 && h === 3) return '1x3';
-    if (w === 2 && h === 2) return '1x1';
-    if (w === 2 && h === 3) return '1x2';
-    if (w === 3 && h === 2) return '3x1';
-    if (w === 3 && h === 3) return '1x1';
+    // Size variants were byte-identical placeholders — collapsed to 1x1 only
+    // to keep APK lean. Reintroduce variants if/when art differs per aspect.
     return '1x1';
   }
 
@@ -19301,15 +19296,15 @@ function applyGroupBootRole() {
   };
 
   var others = [
-    {name:'xShredMaster',  avatar:'art/001.jpg', instrument:'guitar', difficulty:'expert', status:'ready',    plate:null, plateClass:null, ready:true},
-    {name:'BeatDropQueen', avatar:'art/002.jpg', instrument:'drums',  difficulty:'hard',   status:'ready',    plate:null, plateClass:'plate-holo', ready:true},
-    {name:'NeonRiff',      avatar:'art/003.jpg', instrument:'vocals', difficulty:'medium', status:'choosing', plate:null, plateClass:null, ready:false},
-    {name:'AxelStorm',     avatar:'art/004.jpg', instrument:'keys',   difficulty:'expert', status:'choosing', plate:null, plateClass:null, ready:false},
-    {name:'VoxHunter',     avatar:'art/006.jpg', instrument:'vocals', difficulty:'hard',   status:'ready',    plate:null, plateClass:null, ready:true},
-    {name:'FretBoss',      avatar:'art/007.jpg', instrument:'guitar', difficulty:'expert', status:'ready',    plate:null, plateClass:'plate-radiate', ready:true},
-    {name:'SynthWave99',   avatar:'art/008.jpg', instrument:'keys',   difficulty:'medium', status:'choosing', plate:null, plateClass:null, ready:false},
-    {name:'PickSlinger',   avatar:'art/009.jpg', instrument:'guitar', difficulty:'easy',   status:'ready',    plate:null, plateClass:null, ready:true},
-    {name:'CrashKid',      avatar:'art/011.jpg', instrument:'drums',  difficulty:'hard',   status:'choosing', plate:null, plateClass:null, ready:false}
+    {name:'xShredMaster',  avatar:'art/placeholder.jpg', instrument:'guitar', difficulty:'expert', status:'ready',    plate:null, plateClass:null, ready:true},
+    {name:'BeatDropQueen', avatar:'art/placeholder.jpg', instrument:'drums',  difficulty:'hard',   status:'ready',    plate:null, plateClass:'plate-holo', ready:true},
+    {name:'NeonRiff',      avatar:'art/placeholder.jpg', instrument:'vocals', difficulty:'medium', status:'choosing', plate:null, plateClass:null, ready:false},
+    {name:'AxelStorm',     avatar:'art/placeholder.jpg', instrument:'keys',   difficulty:'expert', status:'choosing', plate:null, plateClass:null, ready:false},
+    {name:'VoxHunter',     avatar:'art/placeholder.jpg', instrument:'vocals', difficulty:'hard',   status:'ready',    plate:null, plateClass:null, ready:true},
+    {name:'FretBoss',      avatar:'art/placeholder.jpg', instrument:'guitar', difficulty:'expert', status:'ready',    plate:null, plateClass:'plate-radiate', ready:true},
+    {name:'SynthWave99',   avatar:'art/placeholder.jpg', instrument:'keys',   difficulty:'medium', status:'choosing', plate:null, plateClass:null, ready:false},
+    {name:'PickSlinger',   avatar:'art/placeholder.jpg', instrument:'guitar', difficulty:'easy',   status:'ready',    plate:null, plateClass:null, ready:true},
+    {name:'CrashKid',      avatar:'art/placeholder.jpg', instrument:'drums',  difficulty:'hard',   status:'choosing', plate:null, plateClass:null, ready:false}
   ];
 
   if (role === 'host') {
