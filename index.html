@@ -11849,6 +11849,27 @@ function updateProfile(data) {
       updateCreatorNameBtn();
     }
   }
+  // While the backend progression fetch is still pending (login completed but
+  // the first GetProgressionConfig roundtrip hasn't returned), Unity sends
+  // progressionPending=true so we render "—" instead of misleading zeros.
+  progressionPending = !!data.progressionPending;
+  if (progressionPending) {
+    var pendLevelBadge = document.querySelector('.level-badge');
+    if (pendLevelBadge) pendLevelBadge.textContent = '—';
+    var pendLevelLabel = document.getElementById('profile-level-label');
+    if (pendLevelLabel) pendLevelLabel.textContent = 'Lvl —';
+    var pendBarFill = document.querySelector('.xp-bar-fill');
+    if (pendBarFill) pendBarFill.style.width = '0%';
+    var pendXpLabel = document.getElementById('profile-xp-label');
+    if (pendXpLabel) pendXpLabel.textContent = '— / — XP';
+    var pendCurrencyEls = document.querySelectorAll('.currency');
+    for (var c = 0; c < pendCurrencyEls.length; c++) {
+      var s = pendCurrencyEls[c].querySelector('span');
+      if (s) s.textContent = '—';
+    }
+    rebuildStatTicker();
+    return;
+  }
   // .level-badge is a styled-but-unrendered class today — null-guarded so the
   // function doesn't throw and short-circuit the rest of the updates.
   if (data.level != null) {
@@ -11913,12 +11934,19 @@ function rebuildStatTicker() {
     }
   }
   ticker.innerHTML = '';
-  var stats = [
-    'Level ' + profile.level,
-    profile.xp.toLocaleString() + ' / ' + profile.xpMax.toLocaleString() + ' XP',
-    profile.coins.toLocaleString() + ' Jamsesh Picks',
-    getSeasonPercent() + '% Season Complete'
-  ];
+  var stats = progressionPending
+    ? [
+        'Level —',
+        '— / — XP',
+        '— Jamsesh Picks',
+        getSeasonPercent() + '% Season Complete'
+      ]
+    : [
+        'Level ' + profile.level,
+        profile.xp.toLocaleString() + ' / ' + profile.xpMax.toLocaleString() + ' XP',
+        profile.coins.toLocaleString() + ' Jamsesh Picks',
+        getSeasonPercent() + '% Season Complete'
+      ];
   for (var s = 0; s < stats.length; s++) {
     var el = document.createElement('div');
     el.className = 'xp-text' + (s === prevIdx ? ' ticker-active' : '');
@@ -16832,6 +16860,9 @@ var themes = [
 
 var currentTheme = 'light-mode';
 var userCoins = 5000;
+// True while Unity is still waiting for the first GetProgressionConfig
+// response. updateProfile flips this on/off; rebuildStatTicker reads it.
+var progressionPending = false;
 // Webview HTML/JS bundle version — surfaced in the topbar profile-meta block
 // alongside the Unity-side device/firmware/game values. Bump when the page
 // content changes meaningfully so on-device users can tell which UI build
@@ -17839,8 +17870,8 @@ function avatarIsBodyType() {
 }
 
 function avatarHasNoneCell() {
-  // Hair sub-tabs and Ink sub-tabs allow per-slot un-equip
-  return avatarSection === 'hair' || avatarSection === 'ink';
+  // Wear, Hair, and Ink sub-tabs all support per-slot un-equip
+  return avatarSection === 'wear' || avatarSection === 'hair' || avatarSection === 'ink';
 }
 
 function renderAvatarGrid() {
@@ -17997,7 +18028,7 @@ function renderAvatarAssetGrid(grid, items) {
     noneTile.className = 'avatar-item-tile none-tile';
     var selKey = avatarCatalogKey();
     if (avatarSelected[selKey] === '<none>') noneTile.className += ' selected';
-    noneTile.innerHTML = '<div style="font-size:36px;font-weight:800;color:rgba(255,255,255,0.7)">None</div>';
+    noneTile.innerHTML = '<div style="font-size:36px;font-weight:800;color:var(--text-primary);opacity:0.7">None</div>';
     noneTile.onclick = (function() {
       return function() {
         avatarSelected[avatarCatalogKey()] = '<none>';
