@@ -2211,6 +2211,106 @@
     color: #444444;
   }
 
+  /* ── Instrument Picker — two layouts ─────────────────
+     Slug switches based on whether any instrument for the active song has >1 chart.
+     - instrument-picker--single    : 3 square instrument tiles, no chart list
+     - instrument-picker--multichart: 3 columns, each with header + vertical chart list (max 10)
+  */
+  .instrument-picker--single,
+  .instrument-picker--multichart {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    width: 100%;
+  }
+  .instrument-picker__column {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    border-radius: var(--panel-radius);
+    border: 2px solid transparent;
+    padding: 4px;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .instrument-picker__column.selected {
+    border-color: #ffffff;
+    box-shadow: 0 0 0 3px #ffffff, 0 0 16px rgba(255,255,255,0.4);
+  }
+  .instrument-picker__column.taken { opacity: 0.35; pointer-events: none; }
+
+  .instrument-picker__header {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--panel-radius);
+    cursor: pointer;
+    padding-top: 100%;
+  }
+  .instrument-picker--multichart .instrument-picker__header {
+    padding-top: 0;
+    height: 260px;
+  }
+  .instrument-picker__img {
+    position: absolute; top: 0; left: 0;
+    width: 100%; height: 100%;
+    object-fit: cover; z-index: 0;
+  }
+  .instrument-picker__shade {
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.4); z-index: 1;
+  }
+  .instrument-picker__label {
+    position: absolute; bottom: 24px; left: 24px; z-index: 2;
+    font-size: 36px; font-weight: 800; color: #ffffff;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+  }
+  .instrument-picker--multichart .instrument-picker__label {
+    font-size: 28px; bottom: 16px; left: 20px;
+  }
+
+  .instrument-picker__charts {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 760px;
+    overflow-y: auto;
+    padding: 4px 0;
+  }
+  .instrument-picker__charts--empty {
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    font-size: 22px;
+    padding: 24px 0;
+    min-height: 120px;
+    text-align: center;
+  }
+  .instrument-picker__chart {
+    padding: 16px 20px;
+    background: var(--btn-panel);
+    border: 1px solid var(--btn-panel-border);
+    border-radius: var(--panel-radius);
+    color: #ffffff;
+    font-size: 20px;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    text-align: center;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .instrument-picker__chart:hover {
+    background: var(--btn-panel-hover);
+    border-color: var(--btn-primary-border);
+  }
+  .instrument-picker__chart.selected {
+    background: #ffffff;
+    color: #000000;
+    border-color: #ffffff;
+    box-shadow: 0 0 0 2px #ffffff;
+  }
+
   /* ── Filter Grid Popup ───────────────────────── */
   .option-picker-panel.filter-panel {
     width: 1440px;
@@ -11416,6 +11516,7 @@ function handleUnityMessage(msg) {
     case 'avatarMorphValues': applyAvatarMorphValues(msg.data); break;
     case 'avatarSelection': applyAvatarSelection(msg.data); break;
     case 'updateSongs': updateSongsFromBackend(msg.data); break;
+    case 'updateSongCharts': updateSongChartsFromBackend(msg.data); break;
     case 'updateLeaderboard': updateLeaderboardFromBackend(msg.data); break;
     case 'updateFriends': updateFriendsFromBackend(msg.data); break;
     case 'updateGroups': updateGroupsFromBackend(msg.data); break;
@@ -11623,6 +11724,37 @@ function updateSongsFromBackend(data) {
     buildGrid(allSongs);
     buildPlayPanel(allSongs);
     buildStoreGrid();
+  }
+}
+
+// Unity → UI. Pushes the available chart variants per instrument for one or more songs.
+// data shape (single or array of):
+//   { rank?: number, title?: string, charts: { guitar: [{id,name,preset,active}], drums: [...], vocals: [...] } }
+// Matched against allSongs + setlist by rank first, then by title. The picker reads
+// setlist[activeSongIdx].charts at render time, so this can be called any time.
+function updateSongChartsFromBackend(data) {
+  if (!data) return;
+  var entries = data.length !== undefined ? data : [data];
+  for (var i = 0; i < entries.length; i++) {
+    var e = entries[i];
+    if (!e || !e.charts) continue;
+    var lists = [allSongs, setlist];
+    for (var li = 0; li < lists.length; li++) {
+      var songList = lists[li];
+      for (var s = 0; s < songList.length; s++) {
+        var sg = songList[s];
+        var match = false;
+        if (e.rank != null && sg.rank === e.rank) match = true;
+        else if (e.title && sg.title === e.title) match = true;
+        if (match) sg.charts = e.charts;
+      }
+    }
+  }
+  // If the instrument picker is open, re-render so new charts appear immediately.
+  var pickerOverlay = document.getElementById('option-picker-overlay');
+  if (pickerOverlay && pickerOverlay.style.display === 'flex') {
+    var titleEl = pickerOverlay.querySelector('.option-picker-title');
+    if (titleEl && titleEl.textContent === 'Select Instrument') openOptionPicker('instrument');
   }
 }
 
@@ -12746,6 +12878,10 @@ var instrumentAvailability = { vocals: true, drums: true, guitar: true };
 var songInstruments = {};
 var songDiffs = {};
 var songSpaces = {};
+// Per-song chart-variant selections. songChartSelections[setlistIdx] = {guitar:'<chartId>', drums:'<chartId>', ...}
+// The chart catalogue itself lives on the song object as song.charts (pushed from Unity via 'updateSongCharts').
+var songChartSelections = {};
+var MAX_CHARTS_PER_INSTRUMENT = 10;
 var activeSongIdx = 0;
 var savedSetlists = [];
 var setlistCounter = 1;
@@ -15176,6 +15312,37 @@ function setSongInstrument(idx, val) {
 function setSongDifficulty(idx, val) {
   songDiffs[idx] = val;
 }
+// ── Chart variants (multichart) ───────────────────────
+// Returns an array of {id, name, preset, active} for the given song+instrument, capped at MAX_CHARTS_PER_INSTRUMENT.
+function getSongCharts(idx, instrumentId) {
+  var s = setlist[idx];
+  if (!s || !s.charts || !s.charts[instrumentId]) return [];
+  var list = s.charts[instrumentId];
+  if (!list || !list.length) return [];
+  if (list.length > MAX_CHARTS_PER_INSTRUMENT) list = list.slice(0, MAX_CHARTS_PER_INSTRUMENT);
+  return list;
+}
+// Resolves the chart id the UI should treat as "current" for this song+instrument:
+// 1) explicit user selection from songChartSelections, else 2) the chart marked active, else 3) first chart, else null.
+function getSongActiveChart(idx, instrumentId) {
+  var sel = songChartSelections[idx];
+  if (sel && sel[instrumentId]) return sel[instrumentId];
+  var charts = getSongCharts(idx, instrumentId);
+  for (var i = 0; i < charts.length; i++) { if (charts[i].active) return charts[i].id; }
+  return charts.length > 0 ? charts[0].id : null;
+}
+function setSongChart(idx, instrumentId, chartId) {
+  if (!songChartSelections[idx]) songChartSelections[idx] = {};
+  songChartSelections[idx][instrumentId] = chartId;
+}
+// True if any of the playable instruments for this song has more than one chart.
+function anySongInstrumentHasMultichart(idx) {
+  var instIds = ['guitar', 'drums', 'vocals'];
+  for (var i = 0; i < instIds.length; i++) {
+    if (getSongCharts(idx, instIds[i]).length > 1) return true;
+  }
+  return false;
+}
 function selectSong(idx) {
   activeSongIdx = idx;
   // Sync globals so option pickers show the right value
@@ -15815,51 +15982,91 @@ function openOptionPicker(type) {
   if (type === 'instrument') {
     title.textContent = 'Select Instrument';
     panel.appendChild(title);
-    panel.style.width = '1200px';
-    panel.style.maxHeight = '1400px';
+    panel.style.width = '1400px';
+    panel.style.maxHeight = '1500px';
+    // Keys removed (was "Coming Soon"). Layout is now always 3-in-a-row.
     var instItems = [
       {id: 'guitar', label: 'Guitar', img: 'instruments/guitar.png'},
-      {id: 'drums', label: 'Drums', img: 'instruments/drums.png'},
-      {id: 'vocals', label: 'Vocals', img: 'instruments/vocals.png'},
-      {id: 'keys', label: 'Coming Soon', img: 'instruments/keys.png', disabled: true}
+      {id: 'drums',  label: 'Drums',  img: 'instruments/drums.png'},
+      {id: 'vocals', label: 'Vocals', img: 'instruments/vocals.png'}
     ];
+
+    // Two layout slugs, switched by whether ANY instrument for the active song has >1 chart.
+    var hasMulti = anySongInstrumentHasMultichart(activeSongIdx);
+    var slug = hasMulti ? 'instrument-picker--multichart' : 'instrument-picker--single';
+
     var instGrid = document.createElement('div');
-    instGrid.style.cssText = 'display:grid;grid-template-columns:repeat(2,1fr);gap:24px;width:100%';
+    instGrid.className = slug;
+
     for (var ii = 0; ii < instItems.length; ii++) {
       var inst = instItems[ii];
 
-      // In coop/battle mode, check if this instrument is taken by another player
+      // In coop/battle mode, check if this instrument is taken by another player.
       var isTaken = false;
       if (inBandspace && playMode !== 'solo') {
-        var avail = instrumentAvailability[inst.id];
-        if (avail === false) isTaken = true;
+        if (instrumentAvailability[inst.id] === false) isTaken = true;
       }
-
       var isSelected = inst.id === selectedInstrument && !isTaken;
-      var isDisabled = inst.disabled || isTaken;
 
-      var instTile = document.createElement('div');
-      instTile.style.cssText = 'position:relative;overflow:hidden;border-radius:var(--panel-radius);cursor:' + (isDisabled ? 'default' : 'pointer') + ';padding-top:100%;border:2px solid ' + (isSelected ? '#ffffff' : 'transparent');
-      if (isSelected) instTile.style.boxShadow = '0 0 0 3px #ffffff, 0 0 12px rgba(255,255,255,0.4)';
-      if (isDisabled) instTile.style.opacity = '0.35';
+      var col = document.createElement('div');
+      col.className = 'instrument-picker__column' + (isSelected ? ' selected' : '') + (isTaken ? ' taken' : '');
 
+      // Header tile (image + label) — always rendered, identical role in both layouts.
+      var header = document.createElement('div');
+      header.className = 'instrument-picker__header';
       var labelText = isTaken ? inst.label + ' (Taken)' : inst.label;
-      instTile.innerHTML =
-        '<img src="' + inst.img + '" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:0">' +
-        '<div style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);z-index:1"></div>' +
-        '<div style="position:absolute;bottom:24px;left:24px;z-index:2;font-size:36px;font-weight:800;color:#ffffff;text-shadow:0 2px 8px rgba(0,0,0,0.8)">' + labelText + '</div>';
-      if (!isDisabled) {
-        instTile.onclick = (function(id) {
+      header.innerHTML =
+        '<img src="' + inst.img + '" class="instrument-picker__img">' +
+        '<div class="instrument-picker__shade"></div>' +
+        '<div class="instrument-picker__label">' + labelText + '</div>';
+      if (!isTaken) {
+        header.onclick = (function(id) {
           return function() {
+            var chartId = getSongActiveChart(activeSongIdx, id);
             selectedInstrument = id;
             setSongInstrument(activeSongIdx, id);
-            sendToUnity('instrument', id);
+            sendToUnity('instrument', { instrument: id, chartId: chartId });
             closeOptionPicker();
             buildPlayGrid();
           };
         })(inst.id);
       }
-      instGrid.appendChild(instTile);
+      col.appendChild(header);
+
+      // Chart list — only rendered in the multichart layout.
+      if (hasMulti && !isTaken) {
+        var charts = getSongCharts(activeSongIdx, inst.id);
+        var listEl = document.createElement('div');
+        if (charts.length === 0) {
+          listEl.className = 'instrument-picker__charts instrument-picker__charts--empty';
+          listEl.textContent = 'No chart';
+        } else {
+          listEl.className = 'instrument-picker__charts';
+          var activeChartId = getSongActiveChart(activeSongIdx, inst.id);
+          for (var ci = 0; ci < charts.length; ci++) {
+            var c = charts[ci];
+            var chartChosen = c.id === activeChartId && isSelected;
+            var chip = document.createElement('div');
+            chip.className = 'instrument-picker__chart' + (chartChosen ? ' selected' : '');
+            chip.textContent = c.name || c.preset || c.id;
+            chip.onclick = (function(instId, chartId) {
+              return function(ev) {
+                ev.stopPropagation();
+                selectedInstrument = instId;
+                setSongInstrument(activeSongIdx, instId);
+                setSongChart(activeSongIdx, instId, chartId);
+                sendToUnity('instrument', { instrument: instId, chartId: chartId });
+                closeOptionPicker();
+                buildPlayGrid();
+              };
+            })(inst.id, c.id);
+            listEl.appendChild(chip);
+          }
+        }
+        col.appendChild(listEl);
+      }
+
+      instGrid.appendChild(col);
     }
     panel.appendChild(instGrid);
   } else if (type === 'difficulty') {
@@ -19233,11 +19440,62 @@ function init() {
         try {
           var data = JSON.parse(xhr.responseText);
           updateSongsFromBackend(data);
+          // Dev-only: seed the maxed-out multichart layout (10 charts per instrument)
+          // on every song in allSongs so whichever song the user adds to the setlist
+          // shows the picker's --multichart slug. Has no effect in Vuplex (Unity pushes
+          // real charts via updateSongCharts).
+          var dbgCharts = window.__buildMaxCharts ? window.__buildMaxCharts(10) : null;
+          if (dbgCharts) {
+            var batch = [];
+            for (var ds = 0; ds < allSongs.length; ds++) batch.push({rank: allSongs[ds].rank, charts: dbgCharts});
+            updateSongChartsFromBackend(batch);
+            console.log('[dev] Seeded 10 charts/instrument on ' + batch.length + ' songs');
+          }
         } catch (e) {}
       }
     };
     xhr.send();
   }
+  // Console helper for ad-hoc testing of multichart layout. Usage:
+  //   debugSetSongCharts({title: 'Espresso', charts: { guitar: [{id:'a',name:'A',active:true},{id:'b',name:'B'}] }})
+  // Or to clear: debugSetSongCharts({title: 'Espresso', charts: {}})
+  window.debugSetSongCharts = updateSongChartsFromBackend;
+
+  // Builds a charts object with N charts per instrument (capped at 10 because of preset lists).
+  window.__buildMaxCharts = function(perInstrument) {
+    var n = Math.min(perInstrument || 10, 10);
+    var presets = {
+      guitar: ['v10-polyphonic', 'v9-sparse-strong-beat', 'v8-rhythm', 'v7-lead', 'v6-tab',
+               'v5-onset', 'v4-cnn', 'v3-hmm', 'v2-baseline', 'v1-legacy'],
+      drums:  ['drums-v1', 'drums-sparse', 'drums-dense', 'drums-cnn', 'drums-hmm',
+               'drums-baseline', 'drums-onset', 'drums-fills', 'drums-ghost', 'drums-v0'],
+      vocals: ['vocals-v1', 'vocals-sparse', 'vocals-dense', 'vocals-melodyne', 'vocals-pitch',
+               'vocals-rms', 'vocals-cnn', 'vocals-hmm', 'vocals-baseline', 'vocals-v0']
+    };
+    var build = function(prefix, list) {
+      var out = [];
+      for (var i = 0; i < n; i++) {
+        out.push({ id: prefix + (i+1), name: list[i], preset: list[i], active: i === 0 });
+      }
+      return out;
+    };
+    return { guitar: build('g', presets.guitar), drums: build('d', presets.drums), vocals: build('v', presets.vocals) };
+  };
+
+  // Fakes the maxed-out multichart layout. Usage from console:
+  //   debugMaxCharts()                 — applies to setlist[activeSongIdx]
+  //   debugMaxCharts('Espresso')       — applies by title
+  //   debugMaxCharts({rank: 12})       — applies by rank
+  //   debugMaxCharts('Espresso', 5)    — only 5 charts per mode instead of 10
+  window.debugMaxCharts = function(target, perInstrument) {
+    var msg = { charts: window.__buildMaxCharts(perInstrument) };
+    if (typeof target === 'string') msg.title = target;
+    else if (target && target.rank != null) msg.rank = target.rank;
+    else if (target && target.title) msg.title = target.title;
+    else if (setlist[activeSongIdx]) { msg.title = setlist[activeSongIdx].title; msg.rank = setlist[activeSongIdx].rank; }
+    updateSongChartsFromBackend(msg);
+    console.log('[debugMaxCharts] Seeded charts on:', msg.title || msg.rank);
+  };
   buildSocialPage();
   buildSpacesGrid();
   buildVaultGrid();
