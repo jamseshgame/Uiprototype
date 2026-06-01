@@ -32,31 +32,32 @@
   }
 
   :root {
-    /* Colour scheme — purple / blue / pink / green */
-    --pink: #7c3aed;
-    --cyan: #d946a8;
-    --orange: #e85d8a;
-    --mint: #16a34a;
-    --gold: #22c55e;
-    --purple: #7c3aed;
+    /* Colour scheme — Hyperpop (deep purple / acid lime / magenta / teal) */
+    --pink: #FF2E92;      /* global accent (magenta) — per-page accent overrides via setPageColors */
+    --cyan: #00E5C7;      /* teal */
+    --orange: #FFCB6B;    /* amber */
+    --mint: #00E5C7;      /* teal */
+    --gold: #C77DFF;      /* violet */
+    --purple: #B0A6DF;    /* lavender */
+    --lime: #E8FF3A;      /* signature primary */
     --bg-body: transparent;
-    --bg-panel: rgba(255,255,255,0.04);
-    --bg-surface: rgba(255,255,255,0.06);
-    --bg-surface-hover: rgba(255,255,255,0.10);
+    --bg-panel: #1A1628;          /* white .04 over #100C1F */
+    --bg-surface: #1E1B2C;        /* white .06 over #100C1F */
+    --bg-surface-hover: #282435;  /* white .10 over #100C1F */
     --text-primary: #f0ecf8;
-    --text-secondary: rgba(240,236,248,0.6);
-    --text-muted: rgba(255,255,255,0.5);
-    --border-strong: rgba(255,255,255,0.12);
-    --border-subtle: rgba(255,255,255,0.06);
+    --text-secondary: rgba(240,236,248,0.65);
+    --text-muted: rgba(255,255,255,0.45);
+    --border-strong: rgba(255,255,255,0.18);
+    --border-subtle: rgba(255,255,255,0.10);
     --overlay-light: rgba(255,255,255,0.05);
     --scrollbar-color: rgba(255,255,255,0.15);
     --glow-pink: 0 0 0 3px var(--pink), 0 0 20px var(--pink-40);
 
     --pad: 32px;
     --panel-gap: 20px;
-    --radius-inner: 28px;
-    --panel-radius: 28px;
-    --radius-outer: 56px;
+    --radius-inner: 22px;
+    --panel-radius: 22px;
+    --radius-outer: 54px;
     --grid-gap: 16px;
 
     /* Page-aware button colours — set via JS in navigateTo() */
@@ -90,7 +91,7 @@
      (--bg-panel, --bg-surface) are translucent rgba whites — without a solid html
      background, the OVROverlay underlay shows the world (passthrough/scene) through
      every transparent pixel, making the panel look "see-through". */
-  html { background: #0d0a16; }
+  html { background: #0A0816; }
 
   /* ── Font hierarchy: Monda (body) / Bebas Neue (headings, labels, buttons) / Gasoek One (logo) ── */
   /* Logo wordmark — display face */
