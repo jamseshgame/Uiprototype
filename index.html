@@ -19805,20 +19805,25 @@ function setPageColors(pageName) {
   bgGrad.addColorStop(0.7, scheme.grad[2]);
   bgGrad.addColorStop(1, scheme.grad[3]);
 
-  // Set button CSS variables from page accent
+  // Set button CSS variables from page accent — backgrounds flattened to solid hex (no bg alpha; VR perf rule)
   var a = scheme.accent;
   var r = document.documentElement;
   var rgb = a[0] + ',' + a[1] + ',' + a[2];
-  r.style.setProperty('--btn-tab',           'rgba(' + rgb + ',0.15)');
-  r.style.setProperty('--btn-tab-hover',     'rgba(' + rgb + ',0.28)');
-  r.style.setProperty('--btn-tab-border',    'rgba(' + rgb + ',0.25)');
-  r.style.setProperty('--btn-panel',         'rgba(' + rgb + ',0.10)');
-  r.style.setProperty('--btn-panel-hover',   'rgba(' + rgb + ',0.20)');
-  r.style.setProperty('--btn-panel-border',  'rgba(' + rgb + ',0.18)');
-  r.style.setProperty('--btn-primary',       'rgba(' + rgb + ',0.30)');
-  r.style.setProperty('--btn-primary-hover', 'rgba(' + rgb + ',0.45)');
-  r.style.setProperty('--btn-primary-border','rgba(' + rgb + ',0.50)');
-  r.style.setProperty('--btn-primary-glow',  'rgba(' + rgb + ',0.35)');
+  // blend accent over panel base #1a1628 = (26,22,40); returns solid hex
+  function mix(al) {
+    function ch(i, base) { var v = Math.round(al * a[i] + (1 - al) * base); return (v < 16 ? '0' : '') + v.toString(16); }
+    return '#' + ch(0, 26) + ch(1, 22) + ch(2, 40);
+  }
+  r.style.setProperty('--btn-tab',           mix(0.15));
+  r.style.setProperty('--btn-tab-hover',     mix(0.28));
+  r.style.setProperty('--btn-tab-border',    'rgba(' + rgb + ',0.45)');
+  r.style.setProperty('--btn-panel',         mix(0.10));
+  r.style.setProperty('--btn-panel-hover',   mix(0.20));
+  r.style.setProperty('--btn-panel-border',  'rgba(' + rgb + ',0.40)');
+  r.style.setProperty('--btn-primary',       mix(0.30));
+  r.style.setProperty('--btn-primary-hover', mix(0.45));
+  r.style.setProperty('--btn-primary-border','rgba(' + rgb + ',0.55)');
+  r.style.setProperty('--btn-primary-glow',  'rgba(' + rgb + ',0.40)');
 }
 
 /* Palette — initialized to home */
