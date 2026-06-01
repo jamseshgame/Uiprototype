@@ -99,17 +99,23 @@ Retune to the redesign's scale (`lg 32 / md 22 / sm 14`) mapped onto the existin
 
 Adjustable; this is a starting map.
 
-### 5.6 Baked PNG backdrops
+### 5.6 Ambient backdrop — retune the existing particle canvas
 
-The redesign's ambient orb glow is reproduced as **fully-opaque 1920×1920 PNGs** in a root `backdrops/` folder, set as static `background-image` on the page base (a static image is the cheapest thing to render and involves no compositing layer). The SVG noise grain is **dropped entirely**.
+The live UI already renders the ambient backdrop via a full-screen animated particle canvas (`drawParticles`, z-index 0), driven per-page by the `pageColorSchemes` object (`index.html` ~19760): each page has a 4-stop `grad` (canvas linear gradient), a `waves` colour set (glowing wave-lines), an `accent`, and particle tints (`pt`/`pb`). It is already perf-tuned ("single pass, no shadowBlur").
 
-PNGs are produced by a **committed, re-runnable generator** (a small canvas-based HTML/script that bakes orbs per accent over `--bg-deep`), so backdrops can be regenerated if a palette changes — not hand-painted one-offs. The generator and its output both live in the repo.
+**Decision:** recolour `pageColorSchemes` per page to the Hyperpop palette (deep-purple gradients + lime/magenta/teal/lavender waves & particle tints) to achieve the ambient-orb mood. This keeps the animated glow, reuses already-safe machinery, and **adds no image assets and no generator**. The SVG noise grain from the redesign is **dropped entirely**.
+
+(Supersedes the earlier baked-PNG approach — no `backdrops/` folder is created.)
+
+### 5.7 Button-accent flattening (JS, styling-only)
+
+`setPageColors()` (`index.html` ~19783, in the second/interaction-layer `<script>`) currently emits per-page button colours as `rgba(accent, α)` *backgrounds* (`--btn-tab`, `--btn-panel`, `--btn-primary`, …). Alpha *backgrounds* violate the VR perf rule (§5.2). Since these lines are edited anyway to apply the new accents, the values are **flattened to pre-computed solid hex** using the §5.2 formula (blending the accent over the panel base), keeping the same look without a compositing layer. This is a styling-only JS change — no IDs/handlers/bridge/flow are affected.
 
 ## 6. Rollout Sequence (single pass, ordered to surface regressions early)
 
 1. Fonts + `@font-face` + global token redefinition + radii (reskins everything variable-driven).
 2. Flatten and verify surfaces / buttons / borders / tiles against the perf guardrail.
-3. Per-page accent map + baked PNG backdrops.
+3. Per-page accent map (incl. button-accent flattening §5.7) + retuned particle canvas (`pageColorSchemes` §5.6).
 4. Screen-by-screen refinement where the redesign's **layout** genuinely differs (e.g. two-row topbar, setlist panel treatment) — within the change boundary (§7).
 5. Apply the same token + font treatment to `results.html` (it duplicates the results look standalone).
 
@@ -133,9 +139,8 @@ PNGs are produced by a **committed, re-runnable generator** (a small canvas-base
 | Bebas Neue illegible at small VR sizes | Readability pass (§5.3); flag for in-headset check. |
 | A styling change accidentally touches a Unity-referenced hook | Change boundary (§7) + hook-integrity diff in DoD. |
 | Layout tweaks regress a flow | Sequenced rollout; full walkthrough in DoD. |
-| PNG backdrop with alpha composites against passthrough | Backdrops are fully opaque; verified in generator. |
+| Retuned canvas colours clash or read muddy | Canvas gradient/waves reviewed per page in the walkthrough; values adjustable in one object. |
 
 ## 10. Open Items
 
 - Exact flattened-token hex table is produced during implementation (method fixed here in §5.2).
-- Backdrop generator implementation (canvas vs. image library) decided during planning; requirement is that it is committed and re-runnable.
