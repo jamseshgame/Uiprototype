@@ -71,6 +71,7 @@
     --btn-primary-hover: rgba(124,58,237,0.45);
     --btn-primary-border: rgba(124,58,237,0.50);
     --btn-primary-glow: rgba(124,58,237,0.35);
+    --page-accent: #b0a6df;  /* home lavender default; overridden live by setPageColors() */
     --pink-15: rgba(124,58,237,0.15);
     --pink-30: rgba(124,58,237,0.3);
     --pink-40: rgba(124,58,237,0.4);
@@ -495,10 +496,10 @@
   }
 
   .grid-nav-btn.active {
-    background: #ffffff;
-    color: #4a2080;
-    border-color: #ffffff;
-    box-shadow: 0 0 0 2px #ffffff;
+    background: var(--page-accent);
+    color: #000000;
+    border-color: var(--page-accent);
+    box-shadow: 0 0 0 2px var(--page-accent);
   }
 
   .grid-viewport {
@@ -1184,10 +1185,10 @@
   }
 
   .play-mode-tab.active {
-    background: #ffffff;
+    background: var(--page-accent);
     color: #000000;
-    border-color: #ffffff;
-    box-shadow: 0 0 0 2px #ffffff;
+    border-color: var(--page-accent);
+    box-shadow: 0 0 0 2px var(--page-accent);
   }
 
   #page-vault .play-mode-tab.active {
@@ -2178,10 +2179,10 @@
   }
   .option-picker-tab:hover { background: var(--btn-tab-hover); border-color: var(--btn-primary-border); }
   .option-picker-tab.active {
-    background: #ffffff;
+    background: var(--page-accent);
     color: #000000;
-    border-color: #ffffff;
-    box-shadow: 0 0 0 2px #ffffff;
+    border-color: var(--page-accent);
+    box-shadow: 0 0 0 2px var(--page-accent);
   }
   .option-picker-grid {
     display: grid;
@@ -4198,9 +4199,9 @@
   }
   .avatar-auth-tab:hover { background: rgba(255,255,255,0.08); }
   .avatar-auth-tab.active {
-    background: #ffffff;
+    background: var(--page-accent);
     color: #000000;
-    box-shadow: 0 0 0 2px #ffffff;
+    box-shadow: 0 0 0 2px var(--page-accent);
   }
 
   .avatar-auth-sso {
@@ -4455,10 +4456,10 @@
     box-shadow: 0 0 12px var(--btn-primary-glow);
   }
   .avatar-sub-tab.active {
-    background: #ffffff;
+    background: var(--page-accent);
     color: #000000;
-    border-color: #ffffff;
-    box-shadow: 0 0 0 2px #ffffff;
+    border-color: var(--page-accent);
+    box-shadow: 0 0 0 2px var(--page-accent);
   }
 
   .avatar-grid-wrap {
@@ -4837,7 +4838,7 @@
   }
   .nav-item[data-page="play"].active {
     animation: none;
-    border-color: #ffffff;
+    border-color: var(--page-accent);
   }
   @keyframes playNudge {
     0%, 62% { box-shadow: none; border-color: rgba(0,224,255,0.25); }
@@ -4874,9 +4875,9 @@
   }
 
   .nav-item.active {
-    background: #ffffff;
-    border-color: #ffffff;
-    box-shadow: 0 0 0 2px #ffffff;
+    background: var(--page-accent);
+    border-color: var(--page-accent);
+    box-shadow: 0 0 0 2px var(--page-accent);
   }
 
   .nav-icon {
@@ -9356,10 +9357,10 @@
     text-align: center;
   }
   .results-tab.active {
-    background: #ffffff;
+    background: var(--page-accent);
     color: #000000;
-    border-color: #ffffff;
-    box-shadow: 0 0 0 2px #ffffff;
+    border-color: var(--page-accent);
+    box-shadow: 0 0 0 2px var(--page-accent);
   }
   .results-tab:not(.active) {
     background: #333333;
@@ -19809,6 +19810,7 @@ function setPageColors(pageName) {
   var a = scheme.accent;
   var r = document.documentElement;
   var rgb = a[0] + ',' + a[1] + ',' + a[2];
+  r.style.setProperty('--page-accent', 'rgb(' + rgb + ')');
   // Blend over the ACTIVE theme's panel colour (read live from --bg-panel) so this works across all themes.
   var panelHex = (getComputedStyle(r).getPropertyValue('--bg-panel') || '').trim();
   var pbase = [26, 22, 40]; // fallback = #1a1628 (hyperpop panel)
