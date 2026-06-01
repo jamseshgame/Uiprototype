@@ -17070,6 +17070,7 @@ function buildStoreGrid() {
 
 // ── Themes ──────────────────────────────────────────────
 var themes = [
+  { id: 'hyperpop', name: 'Hyperpop', bg: '#100C1F', panel: '#1A1628', tile: '#1E1B2C', tileHover: '#282435', accent: '#FF2E92' },
   { id: 'wireframe-light', name: 'Wireframe Light', bg: '#fafafa', panel: '#fafafa', tile: '#ebebeb', tileHover: '#e0e0e0', accent: '#000000', cssClass: 'theme-wireframe' },
   { id: 'wireframe-dark',  name: 'Wireframe Dark',  bg: '#000000', panel: '#0a0a0a', tile: '#141414', tileHover: '#1e1e1e', accent: '#ffffff', cssClass: 'theme-wireframe' },
   { id: 'neon-pink',    name: 'Neon Pink',    bg: '#0d0d1a', panel: '#1a1a2e', tile: '#222238', tileHover: '#2c2c44', accent: '#db2777' },
@@ -17092,7 +17093,7 @@ var themes = [
   { id: 'prism',        name: 'Prism',        bg: '#0a0e1a', panel: '#161c2e', tile: '#1c2438', tileHover: '#242e46', accent: '#60a5fa', cssClass: 'theme-prism' }
 ];
 
-var currentTheme = 'light-mode';
+var currentTheme = 'hyperpop';
 var userCoins = 5000;
 // True while Unity is still waiting for the first GetProgressionConfig
 // response. updateProfile flips this on/off; rebuildStatTicker reads it.
@@ -17237,11 +17238,11 @@ function applyTheme(themeId) {
     root.style.setProperty('--bg-image-brightness', '1');
   }
 
-  root.style.setProperty('--cyan', light ? '#d946a8' : '#f472b6');
-  root.style.setProperty('--gold', light ? '#22c55e' : '#4ade80');
-  root.style.setProperty('--orange', light ? '#e85d8a' : '#f9a8d4');
-  root.style.setProperty('--mint', light ? '#16a34a' : '#34d399');
-  root.style.setProperty('--purple', light ? '#7c3aed' : '#a78bfa');
+  root.style.setProperty('--cyan', light ? '#d946a8' : '#00E5C7');
+  root.style.setProperty('--gold', light ? '#22c55e' : '#C77DFF');
+  root.style.setProperty('--orange', light ? '#e85d8a' : '#FFCB6B');
+  root.style.setProperty('--mint', light ? '#16a34a' : '#00E5C7');
+  root.style.setProperty('--purple', light ? '#7c3aed' : '#B0A6DF');
 
   // Update pink opacity variants for glow effects
   var acc = theme.accent;
