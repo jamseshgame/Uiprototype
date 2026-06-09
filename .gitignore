@@ -1,2 +1,5 @@
 # Unity meta files (generated when used as a submodule in Unity projects)
 *.meta
+
+# npm dependencies (local dev tooling only, e.g. browser-sync; regenerable via npm install)
+node_modules/

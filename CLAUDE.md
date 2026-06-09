@@ -4,21 +4,25 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Jamsesh is a VR music rhythm game. This repo contains its UI prototype — a **single-file HTML/CSS/JS application** (`index.html`, ~20000 lines) designed to run inside **Vuplex WebView on Meta Quest headsets**. The viewport is a fixed **1920x1920 pixel** panel.
+Jamsesh is a VR music rhythm game. This repo contains its UI prototype — a **single-file HTML/CSS/JS application** (`index.html`, ~18,000 lines) designed to run inside **Vuplex WebView on Meta Quest headsets**. The viewport is a fixed **1920x1920 pixel** panel.
 
-There is also a `src/` directory with a Figma Make-exported React/Vite app — this is a separate reference artifact and is **not** the primary working file.
+A second standalone page, `results.html`, ships the end-of-song results UI on its own (mounted by `LobbyWebView` in place of `index.html` when the gameplay-end flag is set). It duplicates the look of `index.html`'s results screens but ships **none of the lobby app** (no song library, themes, banners, particles, etc.) so the page stays small. Same ES5 / Chromium 91 rules apply.
+
+There is also `claudedesignui/` — a Babel-in-the-browser React design-exploration tool that is a **separate reference artifact**, **not** the primary working file, and does **not** follow the ES5 / single-file rules below (see "The claudedesignui/ Design Tool" section).
+
+Handover docs for the Unity integration live at the repo root: `HANDOVER.md` (Group Lobby / bandspace contract) and `MULTICHART_HANDOVER.md` (multichart / instrument picker contract).
 
 ## Development
 
 ```bash
-# Serve index.html locally with live reload
-npx browser-sync start --server --files "index.html" --no-open
-
-# The React/Figma app (not the main prototype):
-npm install
-npm run dev      # Vite dev server
-npm run build    # Vite production build
+# Serve all HTML locally with live reload (index.html + results.html)
+npx browser-sync start --server --files "*.html" --port 3000 --no-open
+# Then open http://localhost:3000
 ```
+
+The `claudedesignui/` HTML files transpile JSX in-browser via `@babel/standalone`, so they need no build step either — open them directly (or via the same static server).
+
+There are no tests, no linter, and no build step for `index.html` / `results.html` — they are served verbatim to the WebView. Validate changes by loading the page in a desktop Chromium and exercising the relevant flows.
 
 ## Critical Constraints
 
@@ -30,7 +34,7 @@ npm run build    # Vite production build
   - No CSS `gap` on flex in older builds; test carefully
 - **Single file**: All CSS is in `<style>`, all JS is in `<script>`, all HTML is inline
 - **No build step**: The file is served directly to the WebView
-- **Exception**: The second `<script>` block (~line 19731) is a post-load interaction layer that uses modern JS (arrow functions, `forEach`). This block runs after the main ES5 app and is acceptable since it is a separate concern — but all **main application code** in the first `<script>` (starts ~line 11524) must remain ES5.
+- **Exception**: The second `<script>` block (line ~17969–18071) is a post-load interaction layer that uses modern JS (arrow functions, `forEach`). This block runs after the main ES5 app and is acceptable since it is a separate concern — but all **main application code** in the first `<script>` (line ~9609–17968) must remain ES5.
 
 ## Data Files & Directory Structure
 
@@ -54,17 +58,16 @@ npm run build    # Vite production build
 ## Architecture of index.html
 
 ### Structure (top to bottom)
-> Line numbers below are approximate and drift as the file grows (~20000 lines). Grep for function/section names rather than trusting exact offsets.
-1. **CSS** (top ~11500 lines): Global styles, component styles, play grid/coop/option-picker styles, game screen/results/rewards styles, creator page styles, Genies avatar customization styles, theme overrides (Arcade, Hunter, Nebula, Liquid Glass, Wireframe), banner/frame styles, shimmer animations, layout overlay styles, onboarding/early-access styles, create-group/create-space popup styles, demo screen styles (Meta Store, Quest Home, Boot Splash, OS permission popups), jamsesh-signature texture class
-2. **HTML** (between CSS and first `<script>`): Onboarding screens (legal, permissions), demo screens (Meta Store, Quest Home, Boot Splash, OS permission popups), `.viewport` containing early access overlay, full-screen `<canvas>`, tutorial gameplay screens, `.topbar`, 9 `.page` elements, `.navbar`, Genies avatar section, all popup overlays, creator screens, `.layout-overlay`, game screens (results 1, results 2)
-3. **JavaScript — Main App** (first `<script>`, ~line 11524 onward): Vuplex bridge, navigation, page builders, theme engine, banner/frame systems, profile system, Main Stage play grid system (solo/group + bandspace, per-song settings), drag-and-drop setlist, option picker popups, store builder, creator system, Genies avatar system, home grid tiling generator, social/spaces builders, create-group/create-space flows, mode system (demo/onboard flags), onboarding flow (legal, perms, tutorial play), data arrays
-4. **JavaScript — Interaction Layer** (second `<script>`, ~line 19731 onward): Click bounce feedback and canvas-based particle festival background animation (uses modern JS)
+> Line numbers below are approximate and drift as the file changes (~18,000 lines). Grep for function/section names rather than trusting exact offsets.
+1. **CSS** (lines 9–~8523): Global styles, component styles, play grid/coop/option-picker styles, game screen/results/rewards styles, creator page styles, Genies avatar customization styles, theme overrides (Arcade, Hunter, Nebula, Liquid Glass, Wireframe), banner/frame styles, shimmer animations, layout overlay styles, onboarding/early-access styles, create-group/create-space popup styles, demo screen styles (Meta Store, Quest Home, Boot Splash, OS permission popups), jamsesh-signature texture class
+2. **HTML** (lines ~8524–9608): Onboarding screens (legal, permissions), demo screens (Meta Store, Quest Home, Boot Splash, OS permission popups), `.viewport` containing early access overlay, full-screen `<canvas>`, tutorial gameplay screens, `.topbar`, 9 `.page` elements, `.navbar`, Genies avatar section, all popup overlays, creator screens, `.layout-overlay`, game screens (results 1, results 2)
+3. **JavaScript — Main App** (lines ~9609–17968): Vuplex bridge, navigation, page builders, theme engine, banner/frame systems, profile system, Main Stage grid system (solo + group lobby with per-song settings), Genies avatar system, option picker popups, store builder, creator system, home grid tiling generator, social/spaces builders, create-group/create-space flows, mode system (demo/onboard/host/client flags), onboarding flow (legal, perms, tutorial play), data arrays
+4. **JavaScript — Interaction Layer** (lines ~17969–18071): Click bounce feedback and canvas-based particle festival background animation (uses modern JS)
 
 ### Navigation
 - Pages use `display: none` / `.page.active { display: flex }` — **elements in hidden pages have 0 `offsetHeight`**
 - `navigateTo(pageName)` toggles page visibility and updates navbar
-- The **Play** tab is branded **"Main Stage"** in the navbar (proscenium icon, breathing cyan→purple attract glow) but the page/internal id is still `play`
-- Song picker is a sub-panel within the Main Stage page, toggled via `showPlayPicker()`/`hidePlayPicker()`
+- Song picker is a sub-panel within the Play page, toggled via `showPlayPicker()`/`hidePlayPicker()`
 - Settings page has toggled sub-sections: `showThemes()`, `showBanners()`, `showFrames()`, `showTos()`, `showPrivacy()`
 - Social page: 2 tabs (Groups, Friends) via `switchSocialTab(tab)`
 - Spaces page: 2 tabs (Public, Private) via `switchSpacesTab(tab)`
@@ -73,12 +76,15 @@ npm run build    # Vite production build
 - Season page: "COMING SOON" placeholder (no interactive content)
 
 ### Home Grid & Layout System
-- `generateAllTilings()` computes all 322 valid rectangular tilings of a 3x3 grid into `var allTilings = []`
-- `buildHomeGrid(layoutIndex)` renders the home page as `var(--panel-radius)` rounded tiles (octagon clip-paths were removed) with per-tile glow colors and drop-shadow hover effects
-- `var currentLayout = 317` — default tiling index (also the out-of-range fallback). Override per-session with `?layout=N` (0–321) and tile priority order with `?tiles=a,b,c`
-- The **Store page reuses this same tiling mechanic** on all four tabs (Songs/Packs/Items/Vault) — `?layout=N` reshapes the store too
-- Layout picker overlay (`.layout-overlay`) shows thumbnail previews of all tilings in a scrollable grid. The picker button is **hidden unless `?layoutPicker` is present** in the URL
-- `openLayoutPicker()` / `closeLayoutPicker()` / `selectLayout(index)` manage the overlay
+- `generateAllTilings()` computes all valid rectangular tilings of a 3x3 grid into `var allTilings = []` (322 valid tilings).
+- `buildHomeGrid(layoutIndex)` renders the home page as tiled rectangles with per-tile background images, glow colours, and drop-shadow hover effects. **Octagon clip-paths have been removed** — tiles are now plain `border-radius` rectangles using the nested radius system.
+- `var currentLayout = 317` — default tiling index. Out-of-range guard also resets to 317.
+- **7 tile types × 5 size variants each** in `/home_tiles/` (1x1, 2x1, 3x1, 1x2, 1x3): Season, Store, Vault, Creator, Spaces, News, Social. Priority-based assignment — biggest cell in the tiling gets highest priority. The **Play Now** tile is the highest-priority mainstage slot (cyan→purple glow matching the Main Stage nav button); it replaced Grammys Season as the featured home slot.
+- **3x2 tiles** double their title/subtitle/detail font sizes with matching shadow and letter-spacing. Forced uppercase has been removed from home tile text.
+- **Social tile** has a floating-avatar-bubbles animation. **Store / Vault / Spaces / News / Creator** tiles use background images.
+- Layout picker overlay (`.layout-overlay`) shows thumbnail previews of all tilings in a scrollable grid. **Hidden by default**; reveal with `?layoutPicker` URL flag.
+- `openLayoutPicker()` / `closeLayoutPicker()` / `selectLayout(index)` manage the overlay.
+- `?tiles=` URL param overrides tile priority order (e.g. `?tiles=social,store,season,news,spaces,vault,creator`).
 
 ### Theme System
 - `var themes = [...]` array (~20 themes) defines theme objects with `id`, `bg`, `panel`, `tile`, `tileHover`, `accent`, and optional `cssClass`, `locked`, `price`, `bgImage`
@@ -100,26 +106,39 @@ npm run build    # Vite production build
 - Profile avatar border animates between frame colors via `@keyframes frameGlow`
 - `buildFrameGrid()` renders circular frame preview cards in a 5-column grid
 
-### Main Stage (Play) Tab System
-- Modes are built by `buildModeTabs()` and switched via `setPlayMode(mode)` → `buildPlayGrid()`. **Outside a bandspace only `Solo` exists**; inside a bandspace the tabs become **Solo / Group** (`'solo'` / `'coop'` ids), and the Solo tab greys out so the player sees their instrument scope is the band. There is **no longer a "Battle" mode**.
-- `buildPlayGrid()` dispatches to `buildSoloGrid()` (`play-grid--solo`) or `buildCoopGrid()` (`play-grid--coop`)
-- **Empty default setlist**: `buildPlayPanel(songs)` starts with `setlist = []` (no random/preset songs — `generateDefaultSetlists()` still exists but is **never called**). The user adds songs via the picker. In bandspace, a non-host client's setlist arrives over the network instead.
-- **State-aware songs grid**: 0 songs → single big `+` add tile; 1 song → 1×2 `[song][+]`; 2–3 songs → 2×2 with `+` bottom-right; 4 → full 2×2; 5+ → 2×2 paginated with vertical ▲/▼ arrows (`soloGridPage`)
-- **Layout** (top to bottom): state-aware songs grid → unified **5-tile options row** (`Save / Load Setlist` · Instrument · Difficulty · Experience · Apply to All) → half-height Start button with `jamsesh-signature` texture and `playNudge` attract animation
-- **Manage popup** (`Save / Load Setlist` tile): simplified to a 1×2 grid of **Save Setlist** / **Load Setlist** + full-width Back. (The old Edit/Community tiles were removed.)
-- **Load Setlist popup**: 3 tabs — **Personal** (user-saved only), **Jamsesh** and **Community** (both "Coming Soon..." placeholders). Built-in lesson setlists were removed from this view.
-- **Per-song settings**: Each song tracks its own instrument/difficulty via `songInstruments[idx]` / `songDiffs[idx]`. Clicking a tile calls `selectSong(idx)` → `activeSongIdx` (active tile gets white outer glow). The options row edits the active song only. Per-tile instrument badges resolve a `mixed` selection to the song's own instrument so "Mixed" never shows on a single tile.
-- **Apply to All**: copies the active song's instrument + difficulty to every setlist song via `applyToAllSongs()`
-- **Drag-and-drop setlist**: drag songs from the picker into setlist slots, reorder tiles by dragging, or drag a tile out to remove it (visual ghost + drop-target highlights; see "Main Stage drag-and-drop" block ~line 15036)
+### Main Stage Tab System (formerly "Play")
+- The Play tab was rebranded to **Main Stage** (proscenium stage icon, cyan→purple attract glow). Internally most code still uses `play*` / `solo`/`coop` identifiers — only the user-facing label changed.
+- Modes are switched via `setPlayMode(mode)` which calls `buildPlayGrid()`:
+  - **Solo** — always available (single player setlist). `playMode = 'solo'`.
+  - **Group** — only visible when `inBandspace === true`. `playMode = 'coop'` internally. There is no Battle mode anymore. Inside a bandspace, Solo is rendered greyed-out (still visible but disabled).
+- `buildPlayGrid()` dispatches to `buildSoloGrid()` (solo) or `buildCoopGrid()` (group lobby — see Group Lobby section below).
+- **Solo mode layout** (top to bottom): State-aware songs panel → unified 5-tile options row (Save/Load Setlist, Instrument, Difficulty, Experience, Apply to All) → Half-height Start button with `jamsesh-signature` texture and `playNudge` attract animation.
+- **Default setlist is empty** — `init()` calls `buildPlayPanel([])`. `generateDefaultSetlists()` exists but is no longer called automatically; preset Rock Classics / Chill Vibes / Party Mix / Throwbacks / Hot Hits entries are gone.
+- **State-aware songs panel**: 0 songs → single big `+ Add Songs` tile; 1 song → 1×2 `[song][+]`; 2–3 songs → 2×2 with `+` at bottom-right; 4 songs → 2×2 full; 5+ songs → 2×2 paginated with vertical ▲/▼ arrows on the right (`soloGridPage` tracks page).
+- **Row-level edit affordance**: Hovering the songs row darkens all tiles and shows a centred **Edit Setlist** label → opens the picker. There are no per-tile replace/remove buttons on the Main Stage tiles themselves anymore — replace/remove flows live inside the picker and via drag-and-drop.
+- **Per-song settings**: Each song tile tracks its own instrument and difficulty via `songInstruments[idx]` and `songDiffs[idx]`. Clicking a tile calls `selectSong(idx)` to set `activeSongIdx` (active tile gets white outer glow). The options row shows/changes settings for the active song only.
+- **Apply to All**: 5th tile in the options row copies the active song's instrument + difficulty to every song in the setlist via `applyToAllSongs()`.
+- **Mixed setlist resolution**: Per-tile instrument badges resolve a setlist-level `mixed` selection to the song's own instrument (e.g. Guitar Basics → `Guitar`), so "Mixed" never appears on a single tile. The setlist-level `Instrument: Mixed` indicator in the options row is unchanged.
+- **Drag-and-drop setlist**: Drag songs from the picker grid into setlist slots, reorder setlist tiles by dragging, or drag tiles out to remove. Visual ghost + drop-target highlights.
+- **Mode tabs**: Can have background images via `modeTabImages` object.
 - Option tiles open popup panels via `openOptionPicker(type)`:
-  - **Instrument**: 2x2 image grid (Guitar, Drums, Vocals, Keys "Coming Soon") → `selectedInstrument` / `setSongInstrument()`
-  - **Difficulty**: Simple list (Easy, Normal, Hard, Expert) → `selectedDifficulty` / `setSongDifficulty()`
-  - **Experience**: Tabbed picker with 5 tabs (Stage, Gem, Highway, Inst. Skin, Skybox) → `selectedExpItems[tab]` / `selectedExperience`
+  - **Instrument**: 2x2 image grid (Guitar, Drums, Vocals, Keys "Coming Soon") → sets `selectedInstrument` and per-song via `setSongInstrument()`
+  - **Difficulty**: Simple list (Easy, Normal, Hard, Expert) → sets `selectedDifficulty` and per-song via `setSongDifficulty()`
+  - **Experience**: Tabbed picker with 5 tabs (Stage, Gem, Highway, Inst. Skin, Skybox) → sets `selectedExpItems[tab]` and `selectedExperience`
+- **Manage popup** (formerly Edit/Save/Load/Community): now a **1×2 grid of Save Setlist / Load Setlist** with a full-width **Back** button at the bottom. Edit/Community tiles were removed.
+- **Load Setlist — 3 tabs**: Personal / Jamsesh / Community. Jamsesh and Community show a large "Coming Soon..." placeholder; Personal lists user-saved setlists only (built-in lesson setlists are no longer shown in this view).
+- **Lesson setlists**: `lessonSetlists[]` (Basic, Advanced, Expert) are still used by the Tutorial Play onboarding step but no longer surface in the standard Load popup.
 
-### Bandspace (Multiplayer)
-- A **bandspace** is a networked band/jam session. `var inBandspace` is toggled by a Unity message (`msg.data` truthy) and by `enterBandspace`-style flows (~line 19590). `isHost` distinguishes the session host from clients.
-- When `inBandspace`: the Group mode tab appears, instrument selection scope becomes the band, a non-host client's setlist is pushed over the network (not reset locally), and `buildPlayPanel` suppresses default-config sends so a client's instrument stays "Unknown" until actively chosen.
-- `var mainStageRoster = []` holds players added on the Main Stage who are not yet in a bandspace.
+### Group Lobby (Bandspace)
+When Unity flips `inBandspace=true`, the Group tab becomes available and `buildCoopGrid()` renders a vertical list of up to **10 players** (host + 9). Each row shows avatar, name, instrument icon, colour-coded difficulty star, and a status pill — `CHOOSING` (amber) or `READY` (green). See `HANDOVER.md` for the full Unity contract.
+
+- **`?host`** URL slug: sets `inBandspace=true`, `isHost=true`, `hostName=<active profile>`. Active profile renders as host at top of list. `+ Add Player` enabled.
+- **`?client`** URL slug: sets `inBandspace=true`, `isHost=false`, `hostName=<first mock entry>`. Active profile renders second with a `YOU` badge. `+ Add Player` hidden, lobby is read-only.
+- Bottom button is **Ready** (not Start). Host tapping Ready fires `startGame`; client tapping Ready toggles their own pill via `playerReady`.
+- Songs side max = 9 (featured 2×2 + small tiles, transitioning to 3×3 at 7+). Players side max = 10 (vertical list, fixed slot height).
+- Unity → WebView messages: `setInBandspace`, `updateIsHost`, `lobbyRoster` (canonical 10-slot roster), `sessionInProgress` (toggles late-join Spectate), `updateInstrumentAvailability`.
+- WebView → Unity messages: `playerReady {ready}`, `startGame {instrument, difficulty, setlist[]}`, `invitePlayer {name}`, `kickPlayer {name}`, `playMode "solo"|"coop"`.
+- Mock lobby data exists on the `main` branch for in-browser demos; the `production` branch strips placeholder media and mock arrays.
 
 ### Song Picker Grid
 - **3×3 grid, 9 songs per page**, discrete (non-overlapping) paging. Driven by `GRID_COLUMNS = 3` and `GRID_DEFAULT_ROWS = 3`. `getGridPagingMetrics()` returns `pageRows === stepRows`, so each down/up arrow click advances by a full page.
@@ -138,10 +157,10 @@ npm run build    # Vite production build
 - Transitions use fade-to-black (`#onboard-black` div at z-index 1001, 200ms opacity transition)
 
 ### Store Page
-- 4 tabs: **Songs** (cover-art tiles with $2.99 price tags), **Packs** (themed bundles + locked ones with unlock dates), **Items** (9 category sections: Spaces, Stages, Avatar, Instruments, Gem, Highway, Skybox, Theme, Frame), **Vault** (owned items + creator shapes grid)
-- **All four tabs use the same home-grid tiling mechanic** as the home page, so `?layout=N` reshapes the store too and layout-picker changes propagate. Real songs repopulate the tiled Songs tab after `updateSongsFromBackend`.
-- `buildStoreGrid()` called after songs load in XHR callback (needs `allSongs` populated)
-- `switchStoreTab(tab)` toggles between songs/packs/items/vault
+- 4 tabs: **Songs** (cover-art tiles with $2.99 price tags), **Packs** (themed bundles + locked entries with unlock dates), **Items** (9 category sections: Spaces, Stages, Avatar, Instruments, Gem, Highway, Skybox, Theme, Frame), **Vault** (owned items + creator shapes grid).
+- **All four tabs now use the home-grid tiling mechanic.** `?layout=N` reshapes the store too; layout-picker rebuilds propagate, and real songs repopulate the tiled Songs tab after `updateSongsFromBackend`.
+- `buildStoreGrid()` called after songs load in XHR callback (needs `allSongs` populated).
+- `switchStoreTab(tab)` toggles between songs/packs/items/vault.
 
 ### Creator Page
 - 3 tabs: **Photos** (3x3 grid with `+` capture tile, paginated), **Art** (3x3 grid with `+` create tile, band logos, paginated), **Songs** ("COMING SOON" placeholder)
@@ -159,21 +178,29 @@ npm run build    # Vite production build
 - Option picker overlay (`#option-picker-overlay`) used by instrument/difficulty/experience selection
 - Purchase flow: check `locked` + `isThemeUnlocked()`/`isBannerUnlocked()`/`isFrameUnlocked()` → open popup → confirm → add to unlocked array → apply
 
-### Mode System (Demo / Onboard)
-- **Independent flags**: `demoEnabled` and `onboardEnabled` (not mutually exclusive). Parsed from URL params by `parseMode()`.
-- **URL parameters** (combine with `&`, e.g. `?demo&onboard&step=tutorial`):
-  - `?demo` (demo screens), `?onboard` (force fresh onboarding), `?reset` (clear localStorage progress)
-  - `?step=N` or `?step=name` — jump to onboarding step; accepts **named slugs** `legal` / `perms` / `tutorial` / `menu` and auto-sets all prior flags
-  - `?skip` — bypass everything, straight to the full unlocked menu regardless of localStorage
-  - `?layout=N` (home/store tiling 0–321), `?tiles=a,b,c` (tile priority order), `?layoutPicker` (reveal the layout-picker button)
-  - URL parser tolerates a stray `?` after `&`
-- **`isDemoMode()`** / **`isOnboardMode()`** — helper functions checked throughout the flow
-- **`startFlow()`** — entry point called at end of `init()`. Demo → Meta Store screen. Normal → Early Access overlay.
-- **Onboarding steps** (tracked in `onboardFlags` via localStorage, synced to PlayFab via Vuplex):
+### Mode System (Demo / Onboard / URL Flags)
+- **Independent flags**: `demoEnabled` and `onboardEnabled` (not mutually exclusive). Parsed from URL params by `parseMode()`. URL parser tolerates stray `?` after `&`.
+- **Full URL parameter list**:
+  | Flag | Effect |
+  |------|--------|
+  | `?demo` | Enables demo-only screens (Meta Store, Quest Home, Boot Splash, OS permission popups). |
+  | `?onboard` | Forces fresh onboarding from the beginning, clearing saved progress. |
+  | `?step=N` or `?step=<name>` | Jumps to step N (number or named slug: `legal`, `perms`, `tutorial`, `menu`). Auto-marks all prior steps complete. |
+  | `?reset` | Clears all `localStorage` onboarding progress without starting any flow. |
+  | `?skip` | Bypass everything — straight to full unlocked menu. Ignores localStorage and onboarding flags. |
+  | `?layout=N` | Sets home grid layout (0–321). Persists via `sendToUnity('layoutChanged', N)`. Also reshapes the Store tiling. |
+  | `?tiles=a,b,c` | Overrides home tile priority order (e.g. `?tiles=social,store,season,news,spaces,vault,creator`). |
+  | `?layoutPicker` | Reveals the layout-picker button (hidden by default). |
+  | `?host` / `?client` | Open directly into the Group lobby with a populated roster — see Group Lobby section. |
+- **Combining**: flags combine with `&`, e.g. `?demo&onboard&step=tutorial`, `?host&skip`.
+- **`isDemoMode()`** / **`isOnboardMode()`** — helper functions checked throughout the flow.
+- **`startFlow()`** — entry point called at end of `init()`. Demo → Meta Store screen. Normal → Early Access overlay. `?host` / `?client` run *after* `startFlow()`, so legal/perms onboarding still gates access.
+- **Onboarding steps** (tracked in `onboardFlags` via localStorage under key `jamsesh_onboard`, synced to PlayFab via Vuplex):
   1. `legal` — Terms of Service / Privacy Policy. Re-shown if `LEGAL_VERSION` is bumped.
   2. `perms_explainer` — Camera & Microphone permissions explainer.
-  3. `tutorial_play` — Locks UI to Play tab with Guitar/Drum/Vocal Basics tutorial songs.
-- **`completeOnboardStep(step)`** saves to localStorage and fires `sendToUnity('onboardStepComplete', ...)`
+  3. `tutorial_play` — Locks UI to Main Stage tab with Guitar/Drum/Vocal Basics tutorial songs.
+- **`completeOnboardStep(step)`** saves to localStorage and fires `sendToUnity('onboardStepComplete', ...)`. On launch Unity may push `{type:'onboardProgress', data:{completedSteps:[...]}}` to restore progress.
+- **URL is updated live** as onboarding progresses via `history.replaceState` (`?step=legal`, `?step=perms`, `?step=tutorial`, `?step=menu`).
 
 ### Onboarding & Early Access Screens
 - **Early Access overlay** (`#early-access-overlay`, z-index 1002): Full-panel disclaimer with particle background, shown every session. `dismissEarlyAccess()` calls `onboardAfterEarlyAccess()`.
@@ -240,11 +267,16 @@ npm run build    # Vite production build
 - All user actions (navigation, song selection, theme/banner/frame changes) emit bridge messages
 
 ### CSS Custom Properties
-Key variables set by themes: `--bg-body`, `--bg-panel`, `--bg-surface`, `--bg-surface-hover`, `--pink` (accent), `--text-primary`, `--text-secondary`, `--text-muted`, `--border-strong`, `--border-subtle`, `--panel-radius`, `--grid-gap`, `--tile-h`, `--nav-btn-h`
+Key theme-set variables: `--bg-body`, `--bg-panel`, `--bg-surface`, `--bg-surface-hover`, `--pink` (accent), `--text-primary`, `--text-secondary`, `--text-muted`, `--border-strong`, `--border-subtle`, `--grid-gap`, `--tile-h`, `--nav-btn-h`.
 
-Frame variables: `--frame-color-1`, `--frame-color-2`
+Frame variables: `--frame-color-1`, `--frame-color-2`.
 
-**Unified radius**: All panels, buttons, tabs, and tiles use `var(--panel-radius)` (28px). No `calc(var(--panel-radius) / 2)` or hardcoded pixel values — only exceptions are `50%` for circles, `999px` for pills, and the quest onboarding screen.
+**Nested radius system**:
+- `--radius-outer` (56px) for containers (panels that hold tiles)
+- `--panel-radius` (28px) for tiles, buttons, tabs
+- Follows the formula `R_outer = R_inner + padding` so nested shapes look concentric. Only exceptions: `50%` for circles, `999px` for pills, and the Quest onboarding screen.
+
+**Per-page colour theming**: Each tab has its own gradient background, wave/particle colours, and accent — Home=purple, Social=green, Spaces=blue, Play=cyan, Creator=amber, Store=pink, Season=gold, Profile=purple. All buttons use page-aware CSS variables (`--btn-tab`, `--btn-tab-border`, `--btn-panel`, `--btn-panel-hover`, `--btn-primary`) that auto-adapt to the active page's accent — there are no grey buttons across the UI. Popups and their buttons inherit the same page-aware variables.
 
 **Signature texture**: `.jamsesh-signature` class applies the JamPick-derived diagonal purple→blue→cyan gradient with repeating stripe overlay and cyan edge glow. Used on special/hero buttons (e.g., Start button).
 
@@ -264,8 +296,7 @@ Frame variables: `--frame-color-1`, `--frame-color-2`
 ### Key Global State
 - `var allSongs = []` — loaded from songs.json or via Unity bridge
 - `var setlist = []` — current song setlist (global, not per-profile)
-- `var playMode = 'solo'` — current Main Stage mode (`'solo'` / `'coop'`; `'coop'` = Group, only inside a bandspace)
-- `var inBandspace = false`, `isHost` — multiplayer band session state; `var mainStageRoster = []` — players added on Main Stage not yet in a bandspace
+- `var playMode = 'solo'` — current Main Stage mode (`'solo'` or `'coop'` — `'coop'` is the Group lobby, only selectable when `inBandspace` is true)
 - `var activeSongIdx = 0` — currently selected song tile in solo mode
 - `var selectedInstrument`, `var selectedDifficulty`, `var selectedExperience` — play option defaults
 - `var songInstruments = {}`, `var songDiffs = {}` — per-song instrument/difficulty overrides (keyed by setlist index)
@@ -275,11 +306,25 @@ Frame variables: `--frame-color-1`, `--frame-color-2`
 - `var unlockedThemes`, `var unlockedBanners`, `var unlockedFrames` — arrays of unlocked IDs
 - `var userCoins = 5000` — currency for purchasing locked items
 - `var currentPage = 0` — pagination state for song picker
-- `var allTilings = []` (322 tilings), `var currentLayout = 317` — home grid tiling data and selected layout (also reused by the Store page)
+- `var allTilings = []`, `var currentLayout = 317` — home grid tiling data and selected layout
 - `var avatarCatalogs = {}`, `var avatarSelected = {}`, `var avatarMorphValues = {}`, `var avatarLoggedIn` — Genies avatar state (all populated from Unity)
-- `var lobbyPlayers = [9]` — player data for coop friend grids
+- `var lobbyPlayers = [9]` — mock roster for the Group lobby (replaced by Unity-pushed `lobbyRoster` in production)
+- `var inBandspace`, `var isHost`, `var hostName` — Group lobby state pushed by Unity (or set by `?host`/`?client` URL slugs)
 - `var demoEnabled = false`, `var onboardEnabled = false` — URL flag toggles
 - `var onboardFlags = {}` — onboarding step completion state (persisted to localStorage)
+
+## The claudedesignui/ Design Tool
+
+`claudedesignui/` is a **separate, self-contained design-exploration app** — a React rebuild of the prototype's screens used for high-fidelity visual exploration, wireframes, and user-journey decks. **It is not shipped to the WebView and shares no code with `index.html`.** Treat it as its own project with its own rules.
+
+- **Different constraints — modern JS/JSX, no ES5, no single-file rule.** It runs React 18 + `@babel/standalone` (in-browser JSX transpile, no build step) via CDN `<script>` tags. `.jsx` files use `const`/arrow functions/JSX freely. **Do not** apply the Chromium-91 / ES5 constraints from `index.html` here.
+- **Multiple HTML entry points**, each composing a different set of `.jsx`/`.css` files (open directly in a browser — no dev server needed):
+  - `Jamsesh Prototype.html` → `app.jsx` — interactive React prototype of the Main Stage / play / results flow (`data.js` + `image-slot.js` + `tweaks-panel.jsx` + `ui.jsx` + `screens.jsx`).
+  - `Hi-Fi Screens.html` → `hifi-*.jsx` + `design-canvas.jsx` — annotated hi-fi screen boards.
+  - `User Journey Wireframe.html` / `End of Session Wireframe.html` — wireframe decks.
+- **Component layout**: `ui.jsx` (Topbar/Navbar) → `window.JamUI`; `screens.jsx` (all page/screen components) → `window.JamScreens`; `app.jsx` wires them with a `useReducer` store and a `Scaler` that fits the fixed **1920×1920** canvas into the window. `data.js` exposes a fictional `window.SONG_CATALOG` / `LEADERBOARD` / `INSTRUMENTS` etc. (separate from the root `songs.json`).
+- **Its own assets** live in `claudedesignui/assets/` — do **not** point it at the root `art/`, `avatars/`, etc.
+- **Tweaks/edit-mode host protocol**: `tweaks-panel.jsx` provides `window.useTweaks` + `TweaksPanel`/`TweakRadio`/`TweakSlider`/etc. Defaults are declared between `/*EDITMODE-BEGIN*/ … /*EDITMODE-END*/` markers (see `app.jsx`'s `TWEAK_DEFAULTS`) — the host edit-mode bridge reads/writes those keys, so keep that marker block a plain JSON-literal object. `image-slot.js` is a user-fillable image placeholder that persists drops to an `.image-slots.state.json` sidecar via the same host bridge; it is read-only outside that runtime.
 
 ## Common Pitfalls
 
@@ -296,7 +341,7 @@ Frame variables: `--frame-color-1`, `--frame-color-2`
 - **Canvas z-index**: The particle canvas is at `z-index: 0` with `pointer-events: none`. UI elements must remain above it.
 - **Null guard on removed elements**: If you remove an HTML element (e.g., `#season-grid`), any JS function that accesses it must add a null check (`if (!container) return;`), otherwise it crashes and blocks all subsequent JS execution in `init()`.
 - **Store grid needs songs loaded**: `buildStoreGrid()` must be called inside the XHR callback after `allSongs` is populated, not in the synchronous init block.
-- **Play grid mode switching**: `buildPlayGrid()` dynamically changes the `#play-grid` className between `play-grid--solo` and `play-grid--coop` (Group). Both modes hide the static `.play-go-bar` and render the Start button dynamically. Group mode is only reachable inside a bandspace.
+- **Play grid mode switching**: `buildPlayGrid()` dynamically changes the `#play-grid` className between `play-grid--solo` and `play-grid--coop`. Solo mode hides static `.play-go-bar` and renders Start button dynamically. Group mode renders the lobby roster (see Group Lobby section). There is no Battle mode anymore.
 - **`aspect-ratio` CSS not supported**: Chromium 91 does not support `aspect-ratio`. Use `padding-top: 100%` trick for 1:1 squares instead.
 - **Early access hides main UI**: `init()` hides topbar/navbar/pages on startup. `_showMainUI()` restores them after onboarding completes. If adding new init-time UI, ensure it handles the hidden state.
 - **Create popups use native keyboard**: Group name, space name, and save setlist inputs are standard `<input type="text">` — no on-screen keyboard. Don't add `readonly` to these inputs.
