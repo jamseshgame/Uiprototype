@@ -130,6 +130,11 @@
   .home-banner-sub,
   .topbar-title,
   .tile-title,
+  .quest-name,
+  .season-reward-name,
+  .badge-name,
+  .song-title,
+  .player-name,
   .tile-cat {
     font-family: 'Bebas Neue', sans-serif;
     font-weight: 400;
@@ -153,7 +158,6 @@
   .purchase-btn,
   .space-popup-opt,
   .play-nameplate,
-  .song-title,
   .settings-tile {
     font-family: 'Monda', sans-serif;
     font-weight: 400;
@@ -256,6 +260,19 @@
     z-index: 4;
     /* Topbar launcher keeps its box (the floating-text treatment is for the
        bottom navbar items only). !important beats the later base .nav-item rule. */
+    background: rgba(255,255,255,0.06) !important;
+    border: 1px solid rgba(255,255,255,0.10) !important;
+  }
+
+  /* Avatar launcher — identical box to Settings, parked just to its left. */
+  .topbar-avatar-btn {
+    position: absolute !important;
+    right: calc(var(--pad) + 216px);   /* 200px Settings width + 16px gap */
+    top: 50%;
+    transform: translateY(-50%);
+    width: 200px;
+    flex: 0 0 auto !important;
+    z-index: 4;
     background: rgba(255,255,255,0.06) !important;
     border: 1px solid rgba(255,255,255,0.10) !important;
   }
@@ -545,10 +562,12 @@
   }
 
   .grid-nav-btn:hover {
-    background: linear-gradient(135deg, rgba(60,130,255,0.5), rgba(0,224,255,0.5));
-    border-color: rgba(60,130,255,0.5);
+    background: linear-gradient(135deg, rgba(60,130,255,0.28), rgba(0,224,255,0.28));
+    border-color: rgba(60,130,255,0.4);
     color: #ffffff;
-    box-shadow: 0 0 0 2px rgba(60,130,255,0.4), 0 0 12px rgba(60,130,255,0.5);
+    /* Keep the resting lift shadow (0 8px 12px) so the button doesn't visually
+       drop on hover — only soften/brighten the accent glow on top of it. */
+    box-shadow: 0 0 6px rgba(60,130,255,0.3), 0 8px 12px rgba(0,0,0,0.3);
   }
 
   .grid-nav-btn:disabled {
@@ -932,11 +951,13 @@
   }
 
   .song-tile .tile-title {
-    font-size: 20px;
-    font-weight: 800;
-    white-space: nowrap;
+    font-size: 34px;
+    font-weight: 400;
+    white-space: normal;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
     overflow: hidden;
-    text-overflow: ellipsis;
     line-height: 1.2;
     color: #ffffff;
     text-shadow: 0 1px 6px rgba(0,0,0,0.5);
@@ -1473,13 +1494,15 @@
     gap: 4px;
   }
   .play-grid-song-info .song-title {
-    font-size: 26px;
-    font-weight: 800;
+    font-size: 43px;
+    font-weight: 400;
     color: #ffffff;
     text-shadow: 0 1px 4px rgba(0,0,0,0.8);
-    white-space: nowrap;
+    white-space: normal;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
     overflow: hidden;
-    text-overflow: ellipsis;
   }
   .play-grid-song-info .song-artist {
     font-size: 20px;
@@ -1592,7 +1615,7 @@
   }
   .play-grid-nav-btn {
     width: 64px;
-    height: 64px;
+    height: 70px;              /* ~10% taller for hand-tracking pinch targets */
     border-radius: var(--panel-radius);
     border: 1px solid transparent;
     background: #333333;
@@ -1902,8 +1925,8 @@
     gap: 8px;
   }
   .coop-player-row .player-name {
-    font-size: 20px;
-    font-weight: 700;
+    font-size: 35px;
+    font-weight: 400;
     color: #ffffff;
     white-space: nowrap;
     overflow: hidden;
@@ -2028,12 +2051,14 @@
     z-index: 2;
   }
   .coop-player-tile-info .player-name {
-    font-size: 28px;
-    font-weight: 800;
+    font-size: 45px;
+    font-weight: 400;
     color: #ffffff;
-    white-space: nowrap;
+    white-space: normal;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
     overflow: hidden;
-    text-overflow: ellipsis;
     text-shadow: 0 2px 6px rgba(0,0,0,0.9);
   }
   .coop-player-tile-info .player-meta {
@@ -2138,12 +2163,14 @@
     padding: 12px 16px;
   }
   .coop-song-info .song-title {
-    font-size: 20px;
-    font-weight: 700;
+    font-size: 35px;
+    font-weight: 400;
     color: #ffffff;
-    white-space: nowrap;
+    white-space: normal;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
     overflow: hidden;
-    text-overflow: ellipsis;
   }
   .coop-song-info .song-artist {
     font-size: 16px;
@@ -3412,11 +3439,13 @@
   }
 
   .play-tile .tile-title {
-    font-size: 18px;
-    font-weight: 700;
-    white-space: nowrap;
+    font-size: 30px;
+    font-weight: 400;
+    white-space: normal;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
     overflow: hidden;
-    text-overflow: ellipsis;
   }
 
   .play-tile .tile-artist {
@@ -3585,9 +3614,9 @@
   /* ── Spaces Grid ─────────────────────────────────── */
   .spaces-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);   /* 4x3 standard (matches Journeys/badges) */
     grid-template-rows: repeat(3, 1fr);
-    gap: 48px;
+    gap: 36px;
     padding: 24px;
     flex: 1;
     min-height: 0;
@@ -4714,7 +4743,7 @@
     flex-shrink: 0;
   }
   .avatar-page-btn {
-    height: 56px;
+    height: 62px;              /* ~10% taller for hand-tracking pinch targets */
     min-width: 200px;
     padding: 0 28px;
     border-radius: var(--panel-radius);
@@ -5045,12 +5074,40 @@
     box-shadow: 0 0 12px rgba(255,80,200,0.3);
   }
 
+  /* Settings sub-section back buttons are styled to match the PROFILE/GAMEPLAY
+     tab pills: same pill shape, height (padding), Bebas Neue 33px, and the dark
+     segmented-box fill — no magenta glow. */
+  #page-settings .back-btn {
+    width: auto;
+    min-width: 300px;
+    height: auto;
+    align-self: flex-start;
+    padding: 11px 29px;
+    border-radius: 999px;
+    background: rgba(0,0,0,0.25);
+    border: 1px solid var(--border-subtle);
+    color: #ffffff;
+    font-family: 'Bebas Neue', sans-serif !important;
+    font-size: 33px;
+    letter-spacing: 0.04em;
+    box-shadow: none;
+    margin-bottom: 16px;
+  }
+  #page-settings .back-btn:hover {
+    background: rgba(255,255,255,0.07);
+    color: #ffffff;
+    box-shadow: none;
+  }
+  #page-settings .back-btn:active {
+    box-shadow: none;
+  }
+
   /* ── Settings ──────────────────────────────────────── */
   .settings-grid {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    grid-template-rows: repeat(5, 1fr);
-    gap: var(--grid-gap);
+    grid-template-columns: repeat(4, 1fr);   /* 4x3 standard */
+    grid-template-rows: repeat(3, 1fr);
+    gap: 36px;
     flex: 1;
     min-height: 0;
     /* Gap below the tabs + 8px sides so tiles align with the inset tab buttons
@@ -5084,14 +5141,19 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    padding: 20px;          /* breathing room so the larger labels never touch the edges */
     background: rgba(0, 0, 0, 0.5);
   }
 
   .settings-tile .tile-title {
-    font-size: 26px;
-    font-weight: 800;
+    font-family: 'Monda', sans-serif;   /* match the navbar buttons (.nav-label) */
+    font-size: 52px;        /* maximised — fits the longest labels (e.g. "Terms of Service") with wrapping */
+    line-height: 1.05;
+    font-weight: 700;
+    letter-spacing: 0.04em;
     text-align: center;
     color: #ffffff;
+    overflow-wrap: break-word;
   }
 
   .career-tile .tile-title {
@@ -5186,7 +5248,7 @@
 
   .frame-grid {
     display: grid;
-    grid-template-columns: repeat(5, 200px);
+    grid-template-columns: repeat(4, 200px);   /* 4-wide to match the 4x3 standard (9 frames = 4/4/1) */
     gap: var(--pad);
     justify-content: center;
     align-content: center;
@@ -5274,7 +5336,7 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 48px;        /* match the Photos/Art (.spaces-grid) spacing */
+    gap: 36px;        /* match the 4x3 standard (.spaces-grid / .badge-grid) */
     padding: 24px;
     min-height: 0;
   }
@@ -5285,13 +5347,6 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
-  }
-
-  .season-label {
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--text-secondary);
-    padding: 0 4px;
   }
 
   .season-row {
@@ -5412,14 +5467,16 @@
   }
 
   .season-reward-name {
-    font-size: 16px;
-    font-weight: 700;
+    font-size: 30px;
+    font-weight: 400;
     color: var(--text-primary);
     text-align: center;
     padding: 0 4px;
-    white-space: nowrap;
+    white-space: normal;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
     overflow: hidden;
-    text-overflow: ellipsis;
     width: 100%;
   }
 
@@ -5467,7 +5524,22 @@
     border-color: var(--pink);
     background: rgba(0,0,0,0.12);
   }
-  .season-info-glyph { width: 84px; height: 84px; fill: var(--pink); }
+  .season-info-glyph { width: 72px; height: 72px; fill: var(--pink); }
+  /* On photo-backed info tiles, lift the glyph + track name above the shade and
+     make them legible over the image. */
+  .season-art--img .season-info-glyph { position: relative; z-index: 1; fill: #ffffff; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.9)); }
+  .season-art--img .season-info-cat { position: relative; z-index: 1; color: #ffffff; text-shadow: 0 2px 10px rgba(0,0,0,0.9); }
+  /* Track name integrated into the info tile (replaces the old row label). */
+  .season-info-cat {
+    font-size: 30px;
+    font-weight: 800;
+    color: var(--text-primary);
+    text-align: center;
+    letter-spacing: 1px;
+    line-height: 1.1;
+    margin-top: 14px;
+    padding: 0 8px;
+  }
   .season-tile.season-info .season-reward-name { color: var(--text-primary); }
   .season-tile.season-info .season-xp { color: var(--pink); }
 
@@ -5556,63 +5628,198 @@
     flex: 1;
     min-height: 0;
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);   /* 4x3 standard (matches Journeys/badges) */
     grid-template-rows: repeat(3, 1fr);
-    gap: 48px;        /* match the Photos/Art (.spaces-grid) spacing */
+    gap: 36px;        /* match the Photos/Art (.spaces-grid) spacing */
     padding: 24px;
   }
 
+  /* Challenge tiles mirror the Journey reward tiles (.season-tile family) exactly:
+     same card chrome + mint "earned" treatment, a hero art box (reward number in
+     place of the LEVEL number), matching name, status line, and progress bar. */
   .quest-tile {
+    height: 100%;
     min-height: 0;
     border-radius: var(--panel-radius);
+    overflow: hidden;
     border: 2px solid transparent;
+    position: relative;
+    background: #0c0a14;
+  }
+
+  /* Art box matches the Journey reward art box: a filled, full-bleed rounded box
+     (the journey ones are an image + dark shade; here a rich dark fill behind the
+     stars) rather than a thin-outlined empty box. */
+  .quest-art {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    overflow: hidden;
+    border: none;
+    border-radius: 0;
+    background: linear-gradient(160deg, rgba(124,58,237,0.22), rgba(8,6,16,0.55));
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start;
-    gap: 10px;
-    padding: 20px;
-    position: relative;
+    justify-content: center;
+    line-height: 1;
+    gap: 4px;
   }
-
-  .quest-art {
-    flex: 1;
-    width: 100%;
-    min-height: 0;
-    border: 1px solid var(--text-muted);
-    border-radius: var(--panel-radius);
+  /* Black gradient rising from the bottom so the caption stays legible over art. */
+  .quest-fade {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 62%;
+    background: linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.6) 38%, rgba(0,0,0,0) 100%);
+    pointer-events: none;
+    z-index: 1;
   }
-
-  .quest-name {
-    font-size: 22px;
+  /* Name + time-left, parked over the gradient at the bottom of the tile. */
+  .quest-caption {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    z-index: 2;
+    padding: 18px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  /* Reward image(s) as the tile's main art — multiple rewards become slanted slices. */
+  .quest-slices { position: absolute; top: 0; left: 0; right: 0; bottom: 0; }
+  .quest-slice {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  /* Slices sit over a dark backdrop; the small clip gap reveals it as a crisp
+     diagonal divider between adjacent reward images. */
+  .quest-slices { background: #0c0a14; }
+  /* Hero matches .season-level-cap / .season-level-num */
+  .quest-art-cap {
+    font-size: 18px;
     font-weight: 700;
-    text-align: center;
-    color: var(--text-primary);
+    letter-spacing: 4px;
+    color: rgba(255,255,255,0.7);
   }
-
-  .quest-reward {
+  .quest-art-val {
+    font-size: 96px;
+    font-weight: 800;
+    color: var(--text-primary);
+    text-align: center;
+  }
+  .quest-art-val.cosmetic { font-size: 34px; }
+  /* Gold star rating shown in the art box (the "main image" for Rate Us). */
+  .quest-stars {
+    font-size: 64px;
+    line-height: 1;
+    letter-spacing: 6px;
+    color: #ffcf3f;
+    text-shadow: 0 0 14px rgba(255,200,60,0.55);
+  }
+  /* Optional reward-preview image inside the art box (greyed until completed). */
+  .quest-art-img {
+    width: 100%;
+    height: 100%;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    filter: grayscale(1) brightness(0.6);
+  }
+  .quest-art-img.claimed { filter: none; }
+  /* Bottom meta line — date / expiry / completed status. */
+  .quest-meta {
     font-size: 16px;
     font-weight: 600;
     color: var(--text-muted);
     text-align: center;
   }
 
-  .quest-state {
-    font-size: 16px;
-    font-weight: 800;
-    padding: 8px 22px;
-    border: 1px solid var(--text-primary);
-    border-radius: 999px;
+  /* Name sits over the bottom gradient — white with a soft shadow for legibility. */
+  .quest-name {
+    font-size: 100px;
+    font-weight: 400;
+    line-height: 1.0;
+    text-align: left;
+    color: #ffffff;
+    white-space: normal;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    width: 100%;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.85);
+  }
+  /* Bottom line: time-left on the left, the progress chip (if any) on the right. */
+  .quest-timerow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  /* Time remaining: "X days left" / "X hours left" — accent pill-less subline. */
+  .quest-time {
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: rgba(255,255,255,0.82);
+    text-shadow: 0 1px 6px rgba(0,0,0,0.85);
+  }
+  /* "4/5" completion chip — only for multi-step challenges that aren't done yet. */
+  .quest-progress {
     flex-shrink: 0;
+    font-size: 15px;
+    font-weight: 800;
+    color: #ffffff;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid rgba(255,255,255,0.35);
+    border-radius: 999px;
+    padding: 2px 12px;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.85);
   }
 
-  /* Claimable quests: invert the pill to read as the call-to-action. Boosted
-     specificity so it beats the B&W wireframe's white-background override. */
-  .quest-claim .quest-state:not(#zz9):not(#zz8) {
-    background-color: #000 !important;
-    color: #fff !important;
-    -webkit-text-fill-color: #fff !important;
-    border-color: #000 !important;
+  /* Status line matches .season-xp; bar matches .season-xp-bar / .season-xp-fill */
+  .quest-status {
+    font-size: 16px;
+    font-weight: 800;
+    color: rgba(255,255,255,0.72);
+    margin-top: 2px;
+  }
+  .quest-bar {
+    position: relative;
+    width: 100%;
+    flex-shrink: 0;
+    height: 8px;
+    border-radius: 999px;
+    overflow: hidden;
+    background: #1e1e1e;
+  }
+  .quest-bar-fill {
+    height: 100%;
+    background: var(--mint);
+    transition: width 0.3s ease;
+  }
+
+  /* Earned (Claim / Claimed) → mint "unlocked" treatment, mirroring .season-tile.unlocked */
+  .quest-tile.quest-done, .quest-tile.quest-claim {
+    border-color: var(--mint);
+  }
+  /* Claimed gets the ✓ badge like an unlocked journey reward. */
+  .quest-done::before {
+    content: '\2713';
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    width: 34px;
+    height: 34px;
+    line-height: 34px;
+    text-align: center;
+    border-radius: 999px;
+    background: rgba(0,0,0,0.55);
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--mint);
+    z-index: 3;
   }
 
   /* ── Badges — paginated 5x5 collection grid ─────────────── */
@@ -5684,12 +5891,14 @@
   }
 
   .badge-name {
-    font-size: 20px;
-    font-weight: 800;
+    font-size: 35px;
+    font-weight: 400;
     text-align: center;
-    white-space: nowrap;
+    white-space: normal;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
     overflow: hidden;
-    text-overflow: ellipsis;
     width: 100%;
     color: var(--text-primary);
   }
@@ -5715,7 +5924,7 @@
   .badge-page-btn {
     font-size: 16px;
     font-weight: 800;
-    padding: 12px 26px;
+    padding: 14px 26px;        /* ~10% taller for hand-tracking pinch targets */
     border: 1px solid var(--text-primary);
     border-radius: 999px;
     color: var(--text-primary);
@@ -5727,6 +5936,47 @@
     font-size: 18px;
     font-weight: 700;
     color: var(--text-primary);
+  }
+
+  /* ── Shared pagination row (every 4x3 page: tabs top / grid / pager bottom).
+     renderPager() sets a container's class to .pager and fills it. Used on
+     every grid page; disabled single-page state keeps the layout identical. ── */
+  .pager {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    padding-top: 16px;
+  }
+  /* Identical vertical box to .play-mode-tab (Bebas Neue 30px / 14px vertical
+     padding / 1px border, all border-box) so the pager pills match the tab-row
+     pills to the pixel in height. */
+  .pager-btn {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 30px;
+    font-weight: 400;
+    padding: 14px 29px;
+    min-width: 150px;
+    border: 1px solid var(--text-primary);
+    border-radius: 999px;
+    color: var(--text-primary);
+    background: transparent;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+  }
+  .pager-btn:hover:not(:disabled) {
+    background: var(--btn-tab-hover);
+    border-color: var(--btn-primary-border);
+    box-shadow: 0 0 12px var(--btn-primary-glow);
+  }
+  .pager-btn:disabled { opacity: 0.35; pointer-events: none; }
+  .pager-label {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+    min-width: 150px;
+    text-align: center;
   }
 
   /* ── Legal Sections ─────────────────────────────────── */
@@ -5748,6 +5998,49 @@
   }
 
   .profile-section.active { display: flex; }
+
+  /* JamCreator / Referrals placeholder sections — centred hero with a Coming Soon pill. */
+  .profile-subsection {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 28px;
+    padding: 40px;
+  }
+  .profile-subsection-icon {
+    width: 150px;
+    height: 150px;
+    fill: var(--page-accent, #ffffff);
+    opacity: 0.9;
+  }
+  .profile-subsection-title {
+    font-size: 72px;
+    font-weight: 900;
+    color: #ffffff;
+    letter-spacing: 1px;
+  }
+  .profile-subsection-sub {
+    font-size: 30px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.7);
+    max-width: 960px;
+    line-height: 1.4;
+  }
+  .profile-subsection-soon {
+    margin-top: 8px;
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--page-accent, #ffffff);
+    border: 2px solid var(--page-accent, #ffffff);
+    border-radius: 999px;
+    padding: 12px 36px;
+  }
 
   .profile-grid {
     display: flex;
@@ -6083,6 +6376,224 @@
     justify-content: center;
   }
   .save-overlay.active { display: flex; }
+
+  /* ── Challenge reward popup ───────────────────────────────── */
+  .challenge-overlay {
+    display: none;
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.66);
+    z-index: 999;
+    align-items: center;
+    justify-content: center;
+  }
+  .challenge-overlay.active { display: flex; }
+  .challenge-panel {
+    position: relative;
+    width: 1500px;
+    max-width: 92%;
+    max-height: 92%;
+    box-sizing: border-box;
+    background: var(--bg-panel);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-outer);
+    padding: 56px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 40px;
+  }
+  /* Prev/next arrows to flick through challenges, parked just outside the panel. */
+  .challenge-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    border: 1px solid var(--text-primary);
+    background: rgba(0,0,0,0.45);
+    color: #ffffff;
+    font-size: 36px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .challenge-nav-prev { left: -116px; }
+  .challenge-nav-next { right: -116px; }
+  .challenge-nav:disabled { opacity: 0.3; pointer-events: none; }
+  /* Subtle hover: just a background/glow lift — no scale, and keep translateY(-50%)
+     so the arrow can't jump. Excluded from .fx-press (FX_SKIP) which would otherwise
+     overwrite the centering transform and make it leap on hover. */
+  .challenge-nav { transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease; }
+  .challenge-nav:hover:not(:disabled) {
+    background: rgba(255,255,255,0.14);
+    box-shadow: 0 0 10px rgba(255,255,255,0.22);
+  }
+  .challenge-nav:active:not(:disabled) { transform: translateY(-50%) scale(0.94); }
+  /* Challenge name — main heading at the top of the panel. */
+  .challenge-title {
+    font-size: 44px;
+    font-weight: 800;
+    color: var(--text-primary);
+    text-align: center;
+    letter-spacing: 0.01em;
+  }
+  /* Bottom action row: expiry (left) · CTA button (centred) · progress (right),
+     all vertically centred with the button. */
+  .challenge-cta-row {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+  }
+  /* Expiry / time-left — left side of the CTA row. */
+  .challenge-expiry {
+    flex: 1;
+    font-size: 30px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-align: left;
+    letter-spacing: 0.02em;
+  }
+  /* No bounding box — the reward(s) sit directly on the panel. */
+  .challenge-reward-wrap {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  /* Progress readout — right side of the CTA row. flex:1 keeps the slot even when
+     empty (binary challenges) so the centred button doesn't shift. */
+  .challenge-progress {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 12px;
+  }
+  .challenge-progress-label {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-secondary);
+  }
+  .challenge-progress-bar {
+    width: 300px;
+    max-width: 100%;
+    height: 16px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.14);
+    overflow: hidden;
+  }
+  .challenge-progress-fill {
+    height: 100%;
+    background: var(--mint);
+    border-radius: 999px;
+  }
+  /* Reward area: 1-4 tiles, ALL the same square size, always in a single row.
+     A single row of fixed-size tiles keeps the CTA at the same Y for every count. */
+  .challenge-reward-grid {
+    width: 100%;
+    display: grid;
+    gap: 24px;
+    justify-content: center;
+    align-items: start;
+  }
+  .reward-grid-1 { grid-template-columns: 460px; }
+  .reward-grid-2 { grid-template-columns: repeat(2, 400px); }
+  .reward-grid-3 { grid-template-columns: repeat(3, 350px); }
+  .reward-grid-4 { grid-template-columns: repeat(4, 310px); }   /* 4 in a row */
+  .challenge-reward-tile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+  /* Fixed height (not width-driven square) so the reward row — and therefore the
+     whole popup — stays the same size whether there are 1, 2, 3 or 4 tiles. Width
+     still varies per count (the grid columns), images cover-fill. */
+  .challenge-reward-img {
+    width: 100%;
+    height: 420px;
+    border-radius: var(--panel-radius);
+    background-color: rgba(0,0,0,0.35);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    filter: grayscale(1) brightness(0.5);
+    transition: filter 0.6s ease;
+  }
+  .challenge-reward-tile.claimed .challenge-reward-img { filter: none; }
+  .challenge-reward-label {
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--text-primary);
+    text-align: center;
+    line-height: 1.2;
+    min-height: 2.4em;          /* reserve 2 lines so every tile column is the same height */
+  }
+  .challenge-claim-msg {
+    display: none;
+    font-size: 34px;
+    font-weight: 800;
+    color: var(--text-primary);
+    text-align: center;
+    padding: 0 20px;
+  }
+  .challenge-action-btn {
+    font-size: 40px;
+    font-weight: 800;
+    color: #ffffff;
+    /* Fixed width so the CTA is identical for every label (Rate Us / Perform Now /
+       Refer Now / Create Now / Claim Reward / OK) instead of hugging its text. */
+    width: 560px;
+    max-width: 100%;
+    box-sizing: border-box;
+    text-align: center;
+    padding: 24px 0;
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  /* Verifying spinner overlay — sits above everything and darkens the whole panel. */
+  .challenge-spinner-overlay {
+    display: none;
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.82);
+    z-index: 1000;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 40px;
+  }
+  .challenge-spinner-overlay.active { display: flex; }
+  .challenge-spinner {
+    width: 150px;
+    height: 150px;
+    border: 12px solid rgba(255,255,255,0.18);
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  .challenge-spinner-text {
+    font-size: 44px;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+  /* Dots live in a fixed-width slot (sized for all 3) so "Verifying" never moves and
+     the whole block is centred at the 3-dot state. */
+  .challenge-spinner-dots {
+    display: inline-block;
+    width: 1em;
+    text-align: left;
+  }
 
   .save-popup {
     background: rgba(10,10,30,0.95);
@@ -8273,13 +8784,30 @@ input, textarea, select {
 .fx-press:active:not(#zz9):not(#zz8) {
   transform: scale(0.96) !important;
 }
+/* Pagination arrows opt out of the hover grow: these are tall, stacked vertical
+   arrows, so a centre-origin scale(1.03) pushes the bottom edge down and reads
+   as the button "depressing" on hover. Drop the hover scale (colour/glow hover
+   feedback still applies); keep the click depress for press feedback. The :active
+   rule is placed after :hover so a click still wins while the pointer is over it. */
+.grid-nav-btn:hover:not(#zz9):not(#zz8),
+.play-songs-page-nav-btn:hover:not(#zz9):not(#zz8),
+.play-grid-nav-btn:hover:not(#zz9):not(#zz8),
+.pager-btn:hover:not(#zz9):not(#zz8) {
+  transform: none !important;
+}
+.grid-nav-btn:active:not(#zz9):not(#zz8),
+.play-songs-page-nav-btn:active:not(#zz9):not(#zz8),
+.play-grid-nav-btn:active:not(#zz9):not(#zz8),
+.pager-btn:active:not(#zz9):not(#zz8) {
+  transform: scale(0.96) !important;
+}
 
 /* Controls centred via transform keep their offset while expanding/depressing
    (a bare scale() would drop the translate and jump them out of place), so they
    opt out of .fx-press and get matching rules here. */
-.topbar-settings-btn:not(#zz9):not(#zz8) { transition: transform 0.1s ease !important; }
-.topbar-settings-btn:hover:not(#zz9):not(#zz8)  { transform: translateY(-50%) scale(1.03) !important; }
-.topbar-settings-btn:active:not(#zz9):not(#zz8) { transform: translateY(-50%) scale(0.96) !important; }
+.topbar-settings-btn:not(#zz9):not(#zz8), .topbar-avatar-btn:not(#zz9):not(#zz8) { transition: transform 0.1s ease !important; }
+.topbar-settings-btn:hover:not(#zz9):not(#zz8),  .topbar-avatar-btn:hover:not(#zz9):not(#zz8)  { transform: translateY(-50%) scale(1.03) !important; }
+.topbar-settings-btn:active:not(#zz9):not(#zz8), .topbar-avatar-btn:active:not(#zz9):not(#zz8) { transform: translateY(-50%) scale(0.96) !important; }
 .legal-agree-ok:not(#zz9):not(#zz8), .perms-explain-ok:not(#zz9):not(#zz8) { transition: transform 0.1s ease !important; }
 .legal-agree-ok:hover:not(#zz9):not(#zz8),  .perms-explain-ok:hover:not(#zz9):not(#zz8)  { transform: translateX(-50%) scale(1.03) !important; }
 .legal-agree-ok:active:not(#zz9):not(#zz8), .perms-explain-ok:active:not(#zz9):not(#zz8) { transform: translateX(-50%) scale(0.96) !important; }
@@ -8300,6 +8828,7 @@ input, textarea, select {
   border-radius: 999px;
   background: rgba(0, 0, 0, 0.25);
   border: 1px solid var(--border-subtle);
+  margin-bottom: 16px;             /* reserved top band: consistent gap before the 4x3 grid */
 }
 .play-mode-tab,
 #page-store .play-mode-tab,
@@ -8310,7 +8839,7 @@ input, textarea, select {
   height: auto !important;
   min-width: 300px !important;          /* ~2x typical tab width — localization headroom */
   justify-content: center !important;
-  padding: 11px 29px !important;
+  padding: 14px 29px !important;        /* ~10% taller for hand-tracking pinch targets */
   border-radius: 999px !important;
   background: transparent !important;
   border: none !important;
@@ -8576,6 +9105,10 @@ input, textarea, select {
 <!-- ══════════════ TOP BAR ══════════════ -->
 <header class="topbar">
     <div class="topbar-main">
+      <div class="nav-item topbar-avatar-btn" onclick="event.stopPropagation(); showAvatarSection()">
+        <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" fill="currentColor"/></svg></span>
+        <span class="nav-label">Avatar</span>
+      </div>
       <div class="nav-item topbar-settings-btn" onclick="event.stopPropagation(); navigateTo('settings')">
         <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z" fill="currentColor"/></svg></span>
         <span class="nav-label">Settings</span>
@@ -8589,7 +9122,8 @@ input, textarea, select {
         <div class="profile-name">RAELJAMSESH</div>
       </div>
       <div class="topbar-spacer"></div>
-      <div class="profile-info profile-info-right">
+      <!-- Progression ticker disabled for now (kept for later use). -->
+      <div class="profile-info profile-info-right" style="display:none">
         <div class="stat-ticker" id="stat-ticker"></div>
       </div>
     </div>
@@ -8744,10 +9278,10 @@ input, textarea, select {
             <div class="avatar-grid" id="avatar-editor-grid"></div>
           </div>
 
-          <div class="avatar-pagination" id="avatar-pagination">
-            <button class="avatar-page-btn" id="avatar-prev-btn" onclick="avatarGoToPage(-1)">&#9664; Prev</button>
-            <div class="avatar-page-label" id="avatar-page-label">Page 1/1</div>
-            <button class="avatar-page-btn" id="avatar-next-btn" onclick="avatarGoToPage(1)">Next &#9654;</button>
+          <div class="pager" id="avatar-pagination">
+            <button class="pager-btn" id="avatar-prev-btn" onclick="avatarGoToPage(-1)">&#9664; Prev</button>
+            <div class="pager-label" id="avatar-page-label">Page 1/1</div>
+            <button class="pager-btn" id="avatar-next-btn" onclick="avatarGoToPage(1)">Next &#9654;</button>
           </div>
 
           <div class="avatar-actions">
@@ -8768,8 +9302,8 @@ input, textarea, select {
         <div class="play-mode-tab" onclick="switchProgressTab('challenges')">Challenges</div>
         <div class="play-mode-tab" onclick="switchProgressTab('badges')">Badges</div>
       </div>
-      <div id="progress-tab-journeys" class="spaces-tab-content"><div class="season-grid" id="season-grid"></div></div>
-      <div id="progress-tab-challenges" class="spaces-tab-content" style="display:none"><div class="quest-grid" id="quest-grid"></div></div>
+      <div id="progress-tab-journeys" class="spaces-tab-content"><div class="season-grid" id="season-grid"></div><div id="journeys-pager"></div></div>
+      <div id="progress-tab-challenges" class="spaces-tab-content" style="display:none"><div class="quest-grid" id="quest-grid"></div><div id="challenges-pager"></div></div>
       <div id="progress-tab-badges" class="spaces-tab-content" style="display:none"><div class="badge-grid" id="badge-grid"></div><div class="badge-pagination" id="badge-pagination"></div></div>
     </div>
     <div class="page" id="page-social">
@@ -8777,16 +9311,16 @@ input, textarea, select {
         <div class="play-mode-tab active" onclick="switchSocialTab('groups')">Groups</div>
         <div class="play-mode-tab" onclick="switchSocialTab('friends')">Friends</div>
       </div>
-      <div id="social-tab-groups" class="spaces-tab-content"><div class="spaces-grid" id="social-grid-groups"></div></div>
-      <div id="social-tab-friends" class="spaces-tab-content" style="display:none"><div id="social-friends-list"></div></div>
+      <div id="social-tab-groups" class="spaces-tab-content"><div class="spaces-grid" id="social-grid-groups"></div><div id="social-groups-pager"></div></div>
+      <div id="social-tab-friends" class="spaces-tab-content" style="display:none"><div id="social-friends-list"></div><div id="social-friends-pager"></div></div>
     </div>
     <div class="page" id="page-spaces">
       <div class="play-mode-tabs" id="spaces-tabs">
         <div class="play-mode-tab active" onclick="switchSpacesTab('public')">Public</div>
         <div class="play-mode-tab" onclick="switchSpacesTab('private')">Private</div>
       </div>
-      <div id="spaces-tab-public" class="spaces-tab-content"><div class="spaces-grid" id="spaces-grid-public"></div></div>
-      <div id="spaces-tab-private" class="spaces-tab-content" style="display:none"><div class="spaces-grid" id="spaces-grid-private"></div></div>
+      <div id="spaces-tab-public" class="spaces-tab-content"><div class="spaces-grid" id="spaces-grid-public"></div><div id="spaces-public-pager"></div></div>
+      <div id="spaces-tab-private" class="spaces-tab-content" style="display:none"><div class="spaces-grid" id="spaces-grid-private"></div><div id="spaces-private-pager"></div></div>
     </div>
     <div class="page" id="page-creator">
       <div class="play-mode-tabs" id="creator-tabs">
@@ -8803,10 +9337,10 @@ input, textarea, select {
         <button class="play-mode-tab" onclick="switchStoreTab('items')">Items</button>
         <button class="play-mode-tab" onclick="switchStoreTab('vault')">My Collection</button>
       </div>
-      <div id="store-tab-songs" class="vault-tab-content"><div class="spaces-grid" id="store-songs-grid"></div></div>
-      <div id="store-tab-packs" class="vault-tab-content" style="display:none"><div class="spaces-grid" id="store-packs-grid"></div></div>
-      <div id="store-tab-items" class="vault-tab-content" style="display:none"><div class="spaces-grid" id="store-items-grid"></div></div>
-      <div id="store-tab-vault" class="vault-tab-content" style="display:none"><div class="spaces-grid" id="vault-grid"></div><div class="vault-creator-grid" id="vault-creator-grid" style="display:none"></div></div>
+      <div id="store-tab-songs" class="vault-tab-content"><div class="spaces-grid" id="store-songs-grid"></div><div id="store-songs-pager"></div></div>
+      <div id="store-tab-packs" class="vault-tab-content" style="display:none"><div class="spaces-grid" id="store-packs-grid"></div><div id="store-packs-pager"></div></div>
+      <div id="store-tab-items" class="vault-tab-content" style="display:none"><div class="spaces-grid" id="store-items-grid"></div><div id="store-items-pager"></div></div>
+      <div id="store-tab-vault" class="vault-tab-content" style="display:none"><div class="spaces-grid" id="vault-grid"></div><div class="vault-creator-grid" id="vault-creator-grid" style="display:none"></div><div id="store-vault-pager"></div></div>
     </div>
     <div class="page" id="page-settings">
       <div id="settings-main" style="display:flex;flex-direction:column;flex:1;min-height:0">
@@ -8818,13 +9352,15 @@ input, textarea, select {
           <div class="settings-grid">
             <div class="settings-tile" onclick="openNameEditor()"><div class="tile-info"><div class="tile-title">Name</div></div></div>
             <div class="settings-tile"><div class="tile-info"><div class="tile-title">Picture</div></div></div>
-            <div class="settings-tile" onclick="showAvatarSection()"><div class="tile-info"><div class="tile-title">Avatar</div></div></div>
             <div class="settings-tile" id="themes-tile" onclick="showThemes()"><div class="tile-info"><div class="tile-title">Themes</div></div></div>
             <div class="settings-tile" id="banners-tile" onclick="showBanners()"><div class="tile-info"><div class="tile-title">Banners</div></div></div>
             <div class="settings-tile" id="frames-tile" onclick="showFrames()"><div class="tile-info"><div class="tile-title">Frames</div></div></div>
+            <div class="settings-tile" onclick="showJamCreatorSection()"><div class="tile-info"><div class="tile-title">JamCreator</div></div></div>
+            <div class="settings-tile" onclick="showReferralsSection()"><div class="tile-info"><div class="tile-title">Referrals</div></div></div>
             <div class="settings-tile"><div class="tile-info"><div class="tile-title">Credits</div></div></div>
             <div class="settings-tile" style="cursor:default"><div class="tile-info"><div class="tile-title" style="font-size:16px;line-height:1.4">Device<br>0.1.0 (508)</div></div></div>
           </div>
+          <div id="settings-profile-pager"></div>
         </div>
         <div id="settings-tab-gameplay" class="spaces-tab-content" style="display:none">
           <div class="settings-grid">
@@ -8838,22 +9374,41 @@ input, textarea, select {
             <div class="settings-tile"><div class="tile-info"><div class="tile-title">Send Feedback</div></div></div>
             <div class="settings-tile" style="cursor:default"><div class="tile-info"><div class="tile-title" style="font-size:16px;line-height:1.4">Backstage Pass<br>0.1.0 (508)</div></div></div>
           </div>
+          <div id="settings-gameplay-pager"></div>
         </div>
       </div>
       <div class="theme-section" id="theme-section">
-        <button class="back-btn" onclick="hideSettingsSub()">&#9664; Settings</button>
+        <button class="back-btn" onclick="hideSettingsSub()">&#9664; Profile</button>
         <div class="theme-grid" id="theme-grid"></div>
       </div>
       <div class="banner-section" id="banner-section">
-        <button class="back-btn" onclick="hideSettingsSub()">&#9664; Settings</button>
+        <button class="back-btn" onclick="hideSettingsSub()">&#9664; Profile</button>
         <div class="banner-grid" id="banner-grid"></div>
       </div>
       <div class="frame-section" id="frame-section">
-        <button class="back-btn" onclick="hideSettingsSub()">&#9664; Settings</button>
+        <button class="back-btn" onclick="hideSettingsSub()">&#9664; Profile</button>
         <div class="frame-grid" id="frame-grid"></div>
       </div>
+      <div class="profile-section" id="profile-section-jamcreator">
+        <button class="back-btn" onclick="hideSettingsSub()">&#9664; Profile</button>
+        <div class="profile-subsection">
+          <svg class="profile-subsection-icon" viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
+          <div class="profile-subsection-title">JamCreator</div>
+          <div class="profile-subsection-sub">Record, edit and share videos of your performances — and complete the Share Videos challenge.</div>
+          <div class="profile-subsection-soon">Coming Soon</div>
+        </div>
+      </div>
+      <div class="profile-section" id="profile-section-referrals">
+        <button class="back-btn" onclick="hideSettingsSub()">&#9664; Profile</button>
+        <div class="profile-subsection">
+          <svg class="profile-subsection-icon" viewBox="0 0 24 24"><path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+          <div class="profile-subsection-title">Referrals</div>
+          <div class="profile-subsection-sub">Invite friends to Jamsesh and earn rewards when they join — and complete the Refer Friends challenge.</div>
+          <div class="profile-subsection-soon">Coming Soon</div>
+        </div>
+      </div>
       <div class="legal-section" id="tos-section">
-        <button class="back-btn" onclick="hideSettingsSub()">&#9664; Settings</button>
+        <button class="back-btn" onclick="hideSettingsSub()">&#9664; Gameplay</button>
         <div class="legal-content" id="tos-content">
           <h2>Terms of Service</h2>
           <p class="legal-version">Version 1 &mdash; Effective date: 1 November 2025 | Last update: 1 November 2025</p>
@@ -9153,7 +9708,7 @@ input, textarea, select {
         </div>
       </div>
       <div class="legal-section" id="pp-section">
-        <button class="back-btn" onclick="hideSettingsSub()">&#9664; Settings</button>
+        <button class="back-btn" onclick="hideSettingsSub()">&#9664; Gameplay</button>
         <div class="legal-content" id="pp-content">
           <h2>Privacy Policy</h2>
           <p class="legal-version">Version 1 &mdash; Effective date: 4 September 2025 | Last update: 4 September 2025</p>
@@ -9352,6 +9907,29 @@ input, textarea, select {
       <button class="save-btn-confirm" onclick="confirmSaveSetlist()">Save</button>
     </div>
   </div>
+</div>
+
+<!-- Challenge reward popup (Rate Us → verify → claim). -->
+<div class="challenge-overlay" id="challenge-overlay" onclick="closeChallengePopup(event)">
+  <div class="challenge-panel" onclick="event.stopPropagation()">
+    <div class="challenge-title" id="challenge-title"></div>
+    <div class="challenge-reward-wrap">
+      <div class="challenge-reward-grid" id="challenge-reward-grid"></div>
+    </div>
+    <div class="challenge-claim-msg" id="challenge-claim-msg"></div>
+    <div class="challenge-cta-row">
+      <div class="challenge-expiry" id="challenge-expiry"></div>
+      <button class="challenge-action-btn jamsesh-signature" id="challenge-action-btn" onclick="challengeAction()">Rate Us</button>
+      <div class="challenge-progress" id="challenge-progress"></div>
+    </div>
+    <button class="challenge-nav challenge-nav-prev" id="challenge-nav-prev" onclick="challengePrev()">&#9664;</button>
+    <button class="challenge-nav challenge-nav-next" id="challenge-nav-next" onclick="challengeNext()">&#9654;</button>
+  </div>
+</div>
+<!-- Full-panel verifying spinner (darkens everything underneath). -->
+<div class="challenge-spinner-overlay" id="challenge-spinner-overlay">
+  <div class="challenge-spinner"></div>
+  <div class="challenge-spinner-text">Verifying<span class="challenge-spinner-dots" id="challenge-spinner-dots">.</span></div>
 </div>
 
 <div class="load-overlay" id="load-overlay">
@@ -9672,6 +10250,8 @@ function handleUnityMessage(msg) {
     case 'updateHubs': updateHubsFromBackend(msg.data); break;
     case 'updateCoins': updateCoinsFromBackend(msg.data); break;
     case 'updateProgression': updateProgression(msg.data); break;
+    case 'updateChallenges': updateChallengesFromBackend(msg.data); break;
+    case 'setChallengeVerifySeconds': setChallengeVerifySeconds(msg.data); break;
     case 'gameResults': showGameResults(msg.data); break;
     case 'gameResultsGroupScore': applyGroupScore(msg.data); break;
     case 'gameResultsLeaderboard': applyResultsLeaderboard(msg.data); break;
@@ -10321,7 +10901,7 @@ function navigateTo(pageName) {
 }
 
 // ── Song Grid ──────────────────────────────────────────
-var GRID_COLUMNS = 3;
+var GRID_COLUMNS = 4;           // 4x3 standard: 4 columns, 3 rows visible (scrolls for more)
 var GRID_VISIBLE_ROWS = 3;
 var pickerScrollOffset = 0;     // current Y translation in px (0 = top)
 var pickerScrollMax = 0;        // total content height - viewport height
@@ -10406,7 +10986,7 @@ function buildGrid(songs) {
   setupPickerGamepad();
 }
 
-// Compute square tile size so 3 cols × 3 rows fit inside the viewport.
+// Compute square tile size so 4 cols × 3 rows fit inside the viewport.
 function sizePickerGrid() {
   var viewport = document.querySelector('.grid-viewport');
   var grid = document.getElementById('grid-content');
@@ -10637,17 +11217,57 @@ function switchSpacesTab(tab) {
   }
 }
 
+// ── Shared pagination row ───────────────────────────────────────────────
+// Renders "◀ Prev | Page X / Y | Next ▶" into `container` using the unified
+// .pager styling. onNav(dir) fires with -1/+1 when an enabled arrow is tapped.
+// totalPages <= 1 renders both buttons disabled so single-page grids keep the
+// exact same tabs/grid/pager frame as paginated ones.
+function renderPager(container, currentPage, totalPages, onNav) {
+  if (!container) return;
+  if (totalPages < 1) totalPages = 1;
+  if (currentPage < 0) currentPage = 0;
+  if (currentPage > totalPages - 1) currentPage = totalPages - 1;
+  container.className = 'pager';
+  // Single page → keep the row (so the grid never shifts) but hide its controls.
+  container.style.visibility = (totalPages <= 1) ? 'hidden' : '';
+  container.innerHTML = '';
+
+  var prev = document.createElement('button');
+  prev.className = 'pager-btn';
+  prev.innerHTML = '&#9664; Prev';
+  prev.disabled = currentPage <= 0;
+  prev.onclick = (function(cur) { return function() { if (cur > 0 && onNav) onNav(-1); }; })(currentPage);
+  container.appendChild(prev);
+
+  var label = document.createElement('div');
+  label.className = 'pager-label';
+  label.textContent = 'Page ' + (currentPage + 1) + ' / ' + totalPages;
+  container.appendChild(label);
+
+  var next = document.createElement('button');
+  next.className = 'pager-btn';
+  next.innerHTML = 'Next &#9654;';
+  next.disabled = currentPage >= totalPages - 1;
+  next.onclick = (function(cur, tot) { return function() { if (cur < tot - 1 && onNav) onNav(1); }; })(currentPage, totalPages);
+  container.appendChild(next);
+}
+
+// Generic page-slice helper: returns the items for `page` at PAGE_SIZE/page.
+var PAGE_SIZE = 12;   // 4x3
+function pageSlice(items, page) {
+  return items.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE);
+}
+function pageCount(len) {
+  return Math.max(1, Math.ceil(len / PAGE_SIZE));
+}
+
+var socialGroupsPage = 0;
+var socialFriendsPage = 0;
+
 function buildSocialPage() {
   // ── Groups ──
   var groupGrid = document.getElementById('social-grid-groups');
   groupGrid.innerHTML = '';
-
-  // Create New tile
-  var createTile = document.createElement('div');
-  createTile.className = 'space-tile-create';
-  createTile.onclick = function() { openCreateGroup(); };
-  createTile.innerHTML = '<div class="space-tile-create-plus">+</div><div class="space-tile-create-label">Create New</div>';
-  groupGrid.appendChild(createTile);
 
   var groups = window._backendGroups || [
     { name: 'Jamsesh Hunters', members: '8/10', file: '' },
@@ -10658,8 +11278,23 @@ function buildSocialPage() {
     { name: 'Bass Bandits', members: '5/10', file: '' },
     { name: 'Velvet Crush', members: '10/10', file: '' }
   ];
-  for (var i = 0; i < groups.length; i++) {
-    var g = groups[i];
+  // Full cell list: the Create-New tile is cell 0, then the groups.
+  var groupCells = [{ create: true }];
+  for (var gci = 0; gci < groups.length; gci++) groupCells.push({ create: false, g: groups[gci] });
+  var gTotal = pageCount(groupCells.length);
+  if (socialGroupsPage >= gTotal) socialGroupsPage = gTotal - 1;
+  if (socialGroupsPage < 0) socialGroupsPage = 0;
+  var gPage = pageSlice(groupCells, socialGroupsPage);
+  for (var i = 0; i < gPage.length; i++) {
+    if (gPage[i].create) {
+      var createTile = document.createElement('div');
+      createTile.className = 'space-tile-create';
+      createTile.onclick = function() { openCreateGroup(); };
+      createTile.innerHTML = '<div class="space-tile-create-plus">+</div><div class="space-tile-create-label">Create New</div>';
+      groupGrid.appendChild(createTile);
+      continue;
+    }
+    var g = gPage[i].g;
     var tile = document.createElement('div');
     tile.className = 'space-tile';
     tile.onclick = (function(grp) {
@@ -10680,6 +11315,7 @@ function buildSocialPage() {
       '</div>';
     groupGrid.appendChild(tile);
   }
+  renderPager(document.getElementById('social-groups-pager'), socialGroupsPage, gTotal, function(dir) { socialGroupsPage += dir; buildSocialPage(); });
 
   // ── Friends ──
   var friendsWrap = document.getElementById('social-friends-list');
@@ -10699,8 +11335,12 @@ function buildSocialPage() {
     { name: 'PickSlinger', online: false, avatar: '' },
     { name: 'StarShredder', online: false, avatar: '' }
   ];
-  for (var i = 0; i < friends.length; i++) {
-    var f = friends[i];
+  var fTotal = pageCount(friends.length);
+  if (socialFriendsPage >= fTotal) socialFriendsPage = fTotal - 1;
+  if (socialFriendsPage < 0) socialFriendsPage = 0;
+  var fPage = pageSlice(friends, socialFriendsPage);
+  for (var i = 0; i < fPage.length; i++) {
+    var f = fPage[i];
     var item = document.createElement('div');
     item.className = 'friend-item' + (f.online ? ' online' : '');
     item.style.setProperty('--friend-delay', (i * 0.06) + 's');
@@ -10719,17 +11359,17 @@ function buildSocialPage() {
   addBtn.className = 'friend-add-btn';
   addBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>Add Friend';
   friendsWrap.appendChild(addBtn);
+  renderPager(document.getElementById('social-friends-pager'), socialFriendsPage, fTotal, function(dir) { socialFriendsPage += dir; buildSocialPage(); });
 }
 
+var spacesPublicPage = 0;
+
 function buildSpacesGrid() {
-  // Spaces is reduced to the public hub tiles that map to a real Unity-side
-  // destination (the shared open lobby, environment chosen per hub). Mock hubs,
-  // Create New, and the private spaces preset tiles are hidden until each one
-  // has a real backend wired.
+  // Public hub tiles map to a real Unity-side destination (the shared open
+  // lobby). Tabs are shown so Spaces matches the standard tabs/grid/pager frame.
+  // Private has no backed content yet — its grid stays empty but keeps the frame.
   var spacesTabs = document.getElementById('spaces-tabs');
-  if (spacesTabs) spacesTabs.style.display = 'none';
-  var privateTab = document.getElementById('spaces-tab-private');
-  if (privateTab) privateTab.style.display = 'none';
+  if (spacesTabs) spacesTabs.style.display = '';   // re-shown (was hidden until backend)
 
   // ── Public (Hubs) ──
   var pubGrid = document.getElementById('spaces-grid-public');
@@ -10739,8 +11379,12 @@ function buildSpacesGrid() {
     { name: 'Jamsesh Hub', count: '8/25', img: 'spaces/social.png' },
     { name: 'Pastel Loft', count: '0/25', img: 'spaces/lobby.png' }
   ];
-  for (var i = 0; i < hubs.length; i++) {
-    var h = hubs[i];
+  var pubTotal = pageCount(hubs.length);
+  if (spacesPublicPage >= pubTotal) spacesPublicPage = pubTotal - 1;
+  if (spacesPublicPage < 0) spacesPublicPage = 0;
+  var pubPage = pageSlice(hubs, spacesPublicPage);
+  for (var i = 0; i < pubPage.length; i++) {
+    var h = pubPage[i];
     var tile = document.createElement('div');
     tile.className = 'space-tile';
     tile.style.background = 'url(' + h.img + ') center center / cover no-repeat';
@@ -10757,12 +11401,12 @@ function buildSpacesGrid() {
       '</div>';
     pubGrid.appendChild(tile);
   }
+  renderPager(document.getElementById('spaces-public-pager'), spacesPublicPage, pubTotal, function(dir) { spacesPublicPage += dir; buildSpacesGrid(); });
 
-  // ── Private ──
-  // Tab is hidden above; defensively clear the grid so any future Unity-pushed
-  // updates can't paint into a stale list.
+  // ── Private ── (no backend content yet; keep grid empty but render the frame)
   var privGrid = document.getElementById('spaces-grid-private');
   if (privGrid) privGrid.innerHTML = '';
+  renderPager(document.getElementById('spaces-private-pager'), 0, 1, null);
 }
 
 // ── Create Group ────────────────────────────────────────
@@ -12303,24 +12947,7 @@ function buildLoadList() {
     list.appendChild(item);
   }
 
-  if (totalPages > 1) {
-    var prevBtn = document.createElement('button');
-    prevBtn.className = 'play-grid-nav-btn';
-    prevBtn.innerHTML = '&#9664;';
-    prevBtn.disabled = loadListPage === 0;
-    prevBtn.onclick = function() { loadListPage--; buildLoadList(); };
-    var label = document.createElement('div');
-    label.style.cssText = 'font-size:24px;font-weight:700;color:#ffffff';
-    label.textContent = (loadListPage + 1) + ' / ' + totalPages;
-    var nextBtn = document.createElement('button');
-    nextBtn.className = 'play-grid-nav-btn';
-    nextBtn.innerHTML = '&#9654;';
-    nextBtn.disabled = loadListPage >= totalPages - 1;
-    nextBtn.onclick = function() { loadListPage++; buildLoadList(); };
-    pagDiv.appendChild(prevBtn);
-    pagDiv.appendChild(label);
-    pagDiv.appendChild(nextBtn);
-  }
+  renderPager(pagDiv, loadListPage, totalPages, function(dir) { loadListPage += dir; buildLoadList(); });
 }
 
 function loadLessonSetlist(lesson) {
@@ -12538,6 +13165,9 @@ var lbNamePool = [
 ];
 var lbPlatePool = [np.galaxy, np.bamboo, np.garden, np.flames, np.drums, np.microphone, np.kpop, np.sakura];
 var lbPlateClasses = ['plate-holo', 'plate-radiate'];
+// Mock leaderboard avatars use the real (committed) avatar images — the old
+// art/NNN.jpg song-cover paths aren't in the repo and 404'd on every build.
+var lbAvatarPool = ['avatars/rael_new.png', 'avatars/jooleeno.jpg', 'avatars/ted.png', 'avatars/abbie.png', 'avatars/arthen.jpg'];
 
 function lbHash(str) {
   var h = 5381;
@@ -12561,12 +13191,11 @@ function generateLeaderboard(songTitle, instId, diffId, lbType) {
   for (var i = 0; i < 8; i++) {
     var score = baseScore - Math.floor(rng() * 12000 + 3000) * i;
     if (score < 100000) score = 100000 + Math.floor(rng() * 50000);
-    var avatarNum = String(Math.floor(rng() * 40) + 1).padStart(3, '0');
     var entry = {
       pos: i + 1,
       name: names[i],
       score: score,
-      avatar: 'art/' + avatarNum + '.jpg'
+      avatar: lbAvatarPool[Math.floor(rng() * lbAvatarPool.length)]
     };
     if (rng() > 0.7) {
       entry.plateClass = lbPlateClasses[Math.floor(rng() * lbPlateClasses.length)];
@@ -14552,23 +15181,10 @@ var vaultItems = [
 
 function buildVaultGrid() {
   var grid = document.getElementById('vault-grid');
-  // Pick 9 items for 3x3 grid
-  var shown = [];
-  var seenCats = {};
-  for (var i = 0; i < vaultItems.length && shown.length < 9; i++) {
-    var v = vaultItems[i];
-    if (!seenCats[v.cat]) {
-      seenCats[v.cat] = true;
-      shown.push(v);
-    }
-  }
-  // Fill remaining slots if less than 9 categories
-  for (var i = 0; i < vaultItems.length && shown.length < 9; i++) {
-    var found = false;
-    for (var j = 0; j < shown.length; j++) { if (shown[j].name === vaultItems[i].name) { found = true; break; } }
-    if (!found) shown.push(vaultItems[i]);
-  }
-  buildTiledGrid(grid, shown, function(v, w, h, gc) {
+  var vaultTotal = pageCount(vaultItems.length);
+  if (storeVaultPage >= vaultTotal) storeVaultPage = vaultTotal - 1;
+  if (storeVaultPage < 0) storeVaultPage = 0;
+  buildUniformGrid(grid, pageSlice(vaultItems, storeVaultPage), function(v, w, h, gc) {
     var tile = document.createElement('div');
     tile.className = 'space-tile';
     tile.style.background = 'url(' + v.file + ') center center / cover no-repeat #1a1a1a';
@@ -14585,6 +15201,7 @@ function buildVaultGrid() {
       '</div>';
     return tile;
   });
+  renderPager(document.getElementById('store-vault-pager'), storeVaultPage, vaultTotal, function(dir) { storeVaultPage += dir; buildVaultGrid(); });
 
   // ── Creator grid ──
   var creatorGrid = document.getElementById('vault-creator-grid');
@@ -14615,7 +15232,7 @@ function buildVaultGrid() {
 
 var creatorPhotosPage = 0;
 var creatorArtPage = 0;
-var CREATOR_PER_PAGE = 9;
+var CREATOR_PER_PAGE = 12;   // 4x3
 var creatorSelectedShape = 'wide';
 var creatorSelectedWords = {};
 
@@ -14695,27 +15312,7 @@ function buildCreatorPhotosGrid() {
     grid.appendChild(tile);
   }
 
-  // Pagination
-  var pagDiv = document.getElementById('creator-photos-pagination');
-  pagDiv.innerHTML = '';
-  if (totalPages > 1) {
-    var prevBtn = document.createElement('button');
-    prevBtn.className = 'play-grid-nav-btn';
-    prevBtn.innerHTML = '&#9664;';
-    prevBtn.disabled = creatorPhotosPage === 0;
-    prevBtn.onclick = function() { creatorPhotosPage--; buildCreatorPhotosGrid(); };
-    var label = document.createElement('div');
-    label.style.cssText = 'font-size:24px;font-weight:700;color:#ffffff';
-    label.textContent = (creatorPhotosPage + 1) + ' / ' + totalPages;
-    var nextBtn = document.createElement('button');
-    nextBtn.className = 'play-grid-nav-btn';
-    nextBtn.innerHTML = '&#9654;';
-    nextBtn.disabled = creatorPhotosPage >= totalPages - 1;
-    nextBtn.onclick = function() { creatorPhotosPage++; buildCreatorPhotosGrid(); };
-    pagDiv.appendChild(prevBtn);
-    pagDiv.appendChild(label);
-    pagDiv.appendChild(nextBtn);
-  }
+  renderPager(document.getElementById('creator-photos-pagination'), creatorPhotosPage, totalPages, function(dir) { creatorPhotosPage += dir; buildCreatorPhotosGrid(); });
 }
 
 function buildCreatorArtGrid() {
@@ -14758,26 +15355,7 @@ function buildCreatorArtGrid() {
     grid.appendChild(tile);
   }
 
-  var pagDiv = document.getElementById('creator-art-pagination');
-  pagDiv.innerHTML = '';
-  if (totalPages > 1) {
-    var prevBtn = document.createElement('button');
-    prevBtn.className = 'play-grid-nav-btn';
-    prevBtn.innerHTML = '&#9664;';
-    prevBtn.disabled = creatorArtPage === 0;
-    prevBtn.onclick = function() { creatorArtPage--; buildCreatorArtGrid(); };
-    var label = document.createElement('div');
-    label.style.cssText = 'font-size:24px;font-weight:700;color:#ffffff';
-    label.textContent = (creatorArtPage + 1) + ' / ' + totalPages;
-    var nextBtn = document.createElement('button');
-    nextBtn.className = 'play-grid-nav-btn';
-    nextBtn.innerHTML = '&#9654;';
-    nextBtn.disabled = creatorArtPage >= totalPages - 1;
-    nextBtn.onclick = function() { creatorArtPage++; buildCreatorArtGrid(); };
-    pagDiv.appendChild(prevBtn);
-    pagDiv.appendChild(label);
-    pagDiv.appendChild(nextBtn);
-  }
+  renderPager(document.getElementById('creator-art-pagination'), creatorArtPage, totalPages, function(dir) { creatorArtPage += dir; buildCreatorArtGrid(); });
 }
 
 function openCreatorCamera() {
@@ -15197,16 +15775,32 @@ function buildTiledGrid(container, items, makeTile) {
   }
 }
 
-function buildStoreGrid() {
-  // ── Songs tab: random songs into tiled layout ──
-  var songsGrid = document.getElementById('store-songs-grid');
-  var shuffled = allSongs.slice();
-  for (var i = shuffled.length - 1; i > 0; i--) {
-    var j = Math.floor(Math.random() * (i + 1));
-    var tmp = shuffled[i]; shuffled[i] = shuffled[j]; shuffled[j] = tmp;
+// Uniform 4x3 grid render (Store tabs + Vault). Unlike buildTiledGrid this does
+// NOT use the home 3x3 tiling spans — tiles flow into the .spaces-grid (4 cols
+// x 3 rows = 12 cells) in order. makeTile keeps its (item, w, h, gc) call
+// signature for call-site compatibility; w/h/gc are unused in uniform mode.
+function buildUniformGrid(container, items, makeTile) {
+  if (!container) return;
+  container.innerHTML = '';
+  var count = Math.min(items.length, 12);   // 4x3
+  for (var i = 0; i < count; i++) {
+    var tile = makeTile(items[i]);
+    if (tile) container.appendChild(tile);
   }
-  var storeSongs = shuffled.slice(0, 9);
-  buildTiledGrid(songsGrid, storeSongs, function(s, w, h, gc) {
+}
+
+var storeSongsPage = 0;
+var storePacksPage = 0;
+var storeItemsPage = 0;
+var storeVaultPage = 0;
+
+function buildStoreGrid() {
+  // ── Songs tab: paginate the full catalogue 12 (4x3) at a time ──
+  var songsGrid = document.getElementById('store-songs-grid');
+  var songTotal = pageCount(allSongs.length);
+  if (storeSongsPage >= songTotal) storeSongsPage = songTotal - 1;
+  if (storeSongsPage < 0) storeSongsPage = 0;
+  buildUniformGrid(songsGrid, pageSlice(allSongs, storeSongsPage), function(s, w, h, gc) {
     var tile = document.createElement('div');
     tile.className = 'space-tile';
     tile.style.background = 'url(' + (s.file || '') + ') center center / cover no-repeat #1a1a1a';
@@ -15224,8 +15818,9 @@ function buildStoreGrid() {
       '</div>';
     return tile;
   });
+  renderPager(document.getElementById('store-songs-pager'), storeSongsPage, songTotal, function(dir) { storeSongsPage += dir; buildStoreGrid(); });
 
-  // ── Packs tab: 6 packs + 3 locked into tiled layout ──
+  // ── Packs tab ──
   var packsGrid = document.getElementById('store-packs-grid');
   var packData = [
     {name:'Starter Bundle', picks:500, items:['Neon Arena','Electric Guitar'], price:'$4.99', color:'#1a3a5c', locked:false},
@@ -15238,7 +15833,10 @@ function buildStoreGrid() {
     {locked:true, unlock:'Unlocks on 10/15'},
     {locked:true, unlock:'Unlocks on 11/1'}
   ];
-  buildTiledGrid(packsGrid, packData, function(p, w, h, gc) {
+  var packTotal = pageCount(packData.length);
+  if (storePacksPage >= packTotal) storePacksPage = packTotal - 1;
+  if (storePacksPage < 0) storePacksPage = 0;
+  buildUniformGrid(packsGrid, pageSlice(packData, storePacksPage), function(p, w, h, gc) {
     var tile = document.createElement('div');
     tile.className = 'space-tile';
     tile.style.position = 'relative';
@@ -15269,8 +15867,9 @@ function buildStoreGrid() {
     }
     return tile;
   });
+  renderPager(document.getElementById('store-packs-pager'), storePacksPage, packTotal, function(dir) { storePacksPage += dir; buildStoreGrid(); });
 
-  // ── Items tab: category sections into tiled layout ──
+  // ── Items tab ──
   var itemsGrid = document.getElementById('store-items-grid');
   var storeCategories = [
     {cat:'Spaces',      icon:'&#127760;', file:''},
@@ -15283,7 +15882,10 @@ function buildStoreGrid() {
     {cat:'Theme',       icon:'&#127912;', file:''},
     {cat:'Frame',       icon:'&#128247;', file:''}
   ];
-  buildTiledGrid(itemsGrid, storeCategories, function(c, w, h, gc) {
+  var itemsTotal = pageCount(storeCategories.length);
+  if (storeItemsPage >= itemsTotal) storeItemsPage = itemsTotal - 1;
+  if (storeItemsPage < 0) storeItemsPage = 0;
+  buildUniformGrid(itemsGrid, pageSlice(storeCategories, storeItemsPage), function(c, w, h, gc) {
     var tile = document.createElement('div');
     tile.className = 'space-tile';
     tile.style.background = 'url(' + c.file + ') center center / cover no-repeat #1a1a1a';
@@ -15300,6 +15902,7 @@ function buildStoreGrid() {
       '</div>';
     return tile;
   });
+  renderPager(document.getElementById('store-items-pager'), storeItemsPage, itemsTotal, function(dir) { storeItemsPage += dir; buildStoreGrid(); });
 }
 
 // ── Themes ──────────────────────────────────────────────
@@ -15737,6 +16340,8 @@ function hideSettingsSub() {
   document.getElementById('theme-section').className = 'theme-section';
   document.getElementById('banner-section').className = 'banner-section';
   document.getElementById('frame-section').className = 'frame-section';
+  document.getElementById('profile-section-jamcreator').className = 'profile-section';
+  document.getElementById('profile-section-referrals').className = 'profile-section';
   document.getElementById('tos-section').className = 'legal-section';
   document.getElementById('pp-section').className = 'legal-section';
   activeLegalEl = null;
@@ -15796,6 +16401,24 @@ function showProfilesPanel() {
 function hideProfilePanel() {
   document.getElementById('career-main').style.display = 'flex';
   document.getElementById('profile-section-career').className = 'profile-section';
+}
+
+// JamCreator / Referrals sub-sections, hosted on the Settings page (Settings ▸
+// Profile tab). They follow the theme/banner/frame sub-section pattern: navigate
+// to Settings first (so the challenge-CTA deep-link works from any page — and so
+// navigateTo's own hideSettingsSub runs before we open ours), then hide
+// settings-main and show the section. Back uses hideSettingsSub().
+function showJamCreatorSection() {
+  navigateTo('settings');
+  document.getElementById('settings-main').style.display = 'none';
+  document.getElementById('profile-section-jamcreator').className = 'profile-section active';
+  sendToUnity('jamCreatorOpened', {});
+}
+function showReferralsSection() {
+  navigateTo('settings');
+  document.getElementById('settings-main').style.display = 'none';
+  document.getElementById('profile-section-referrals').className = 'profile-section active';
+  sendToUnity('referralsOpened', {});
 }
 
 // ── Avatar Editor ─────────────────────────────────────
@@ -16550,19 +17173,19 @@ var XP_ICON_TIKTOK = '<svg viewBox="0 0 24 24"><path d="M16.6 5.82a4.28 4.28 0 0
 var XP_ICON_INSTA = '<svg viewBox="0 0 24 24"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41a3.7 3.7 0 0 1-1.38-.9 3.7 3.7 0 0 1-.9-1.38c-.16-.42-.36-1.06-.41-2.23C2.17 15.58 2.16 15.2 2.16 12s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41C8.42 2.17 8.8 2.16 12 2.16zm0 3.24A6.6 6.6 0 1 0 18.6 12 6.6 6.6 0 0 0 12 5.4zm0 10.88A4.28 4.28 0 1 1 16.28 12 4.28 4.28 0 0 1 12 16.28zm6.85-11.13a1.54 1.54 0 1 0 1.54 1.54 1.54 1.54 0 0 0-1.54-1.54z"/></svg>';
 
 var seasonData = [
-  {label: 'My Journey', earnTitle: 'Earn My Journey XP',
+  {label: 'Solo', earnTitle: 'Earn Solo XP', infoImg: 'spaces/stage.png',
    earnSub: 'Your personal XP grows every time you pick up the pick and play.',
    earn: [
-    {icon: XP_ICON_PLAY,  title: 'Play a Show',        desc: 'Finish any track in Perform to bank XP toward your personal journey.', xp: 50,  unit: 'Journey XP'},
-    {icon: XP_ICON_STAR,  title: 'Beat Your Best',     desc: 'Set a new personal high score on any track for a bonus.',              xp: 75,  unit: 'Journey XP'},
-    {icon: XP_ICON_FLAME, title: 'Daily Streak',       desc: 'Play at least one track a day to keep your streak alive.',             xp: 100, unit: 'Journey XP'}
+    {icon: XP_ICON_PLAY,  title: 'Play a Show',        desc: 'Finish any track in Perform to bank XP toward your solo career.', xp: 50,  unit: 'Solo XP'},
+    {icon: XP_ICON_STAR,  title: 'Beat Your Best',     desc: 'Set a new personal high score on any track for a bonus.',          xp: 75,  unit: 'Solo XP'},
+    {icon: XP_ICON_FLAME, title: 'Daily Streak',       desc: 'Play at least one track a day to keep your streak alive.',         xp: 100, unit: 'Solo XP'}
    ],
    rewards: [
     {name: 'Rookie Title',   xp: 1000, xpEarned: 1000, unlocked: true,  img: 'plates/microphone.jpg'},
     {name: 'Gold Frame',     xp: 3000, xpEarned: 2200, unlocked: false, img: 'plates/flames.jpg'},
     {name: 'Legend Banner',  xp: 6000, xpEarned: 0,    unlocked: false, img: 'banners/Space 1.png'}
   ]},
-  {label: 'Group', earnTitle: 'Earn Group XP',
+  {label: 'Group', earnTitle: 'Earn Group XP', infoImg: 'home_tiles/mainstage_1x1.png',
    earnSub: 'Group XP is shared progress — jam with your band to level it up.',
    earn: [
     {icon: XP_ICON_BAND, title: 'Perform in a Band', desc: 'Complete a track in a Group session with your bandmates.',         xp: 75,  unit: 'Group XP'},
@@ -16574,7 +17197,7 @@ var seasonData = [
     {name: 'Gold Stage',     xp: 3000, xpEarned: 3000, unlocked: true,  img: 'spaces/stage.png'},
     {name: 'Star Backdrop',  xp: 6000, xpEarned: 1500, unlocked: false, img: 'plates/galaxy.jpg'}
   ]},
-  {label: 'Social', earnTitle: 'Earn Social XP',
+  {label: 'Social', earnTitle: 'Earn Social XP', infoImg: 'spaces/social.png',
    earnSub: 'Show the world your jams. Post, tag, and invite to climb the Social track.',
    earn: [
     {icon: XP_ICON_TIKTOK, title: 'Share a TikTok video', tiktok: true,
@@ -16596,17 +17219,196 @@ try { tiktokHandle = localStorage.getItem('jamsesh_tiktok_handle') || ''; } catc
 
 // One-off Challenges — a 3x3 grid of real-world / social tasks. Mixed rewards:
 // mostly JamPicks, a couple grant an exclusive cosmetic. state: todo | claim | done
+// ── Challenges (Unity / PlayFab–driven) ─────────────────────────────────────
+// The Challenges tab is populated by Unity via the `updateChallenges` bridge
+// message, mirroring updateGroups / updateFriends / updateHubs. Each challenge:
+//   {
+//     id:        'rate_us',                        // string   — stable PlayFab key
+//     name:      'Rate Us',                        // string   — display title
+//     type:      'rate_us',                        // rate_us | play_setlist | refer_friends | share_videos
+//     setlistId: 'hot_hits',                       // play_setlist only — setlist the CTA deep-links into
+//     count:     3,                                // refer_friends / share_videos — required quantity (variable)
+//     rewards: [                                   // array    — up to 3 cosmetics + at most ONE picks (max 4 total)
+//       { name: 'Gold Mic', image: 'vault/013.jpg' },  // cosmetic — { name, image }; list cosmetics first
+//       { picks: 1000 }                            // picks    — { picks: <quantity> }; at most one, listed last
+//     ],                                           //   popup layout by count: 1=big square, 2=side-by-side, 3=row, 4=2x2
+//     startDate: '2026-06-01T00:00:00Z',           // ISO-8601 string, or null
+//     endDate:   null,                             // ISO-8601 string, or null = NO EXPIRY
+//     completed: false,                            // bool     — has THIS player completed it
+//     image:     ''                                // optional — custom tile art (else gold stars)
+//   }
+// Unity → WebView:  { type: 'updateChallenges',          data: [ <challenge>, ... ] }
+//                   { type: 'setChallengeVerifySeconds',  data: 15 }   // verify-spinner length
+// WebView → Unity:  challengeCTA           { id, type, setlistId, count }  — player tapped the CTA;
+//                                            Unity routes by type: rate_us → open app-store listing,
+//                                            play_setlist → deep-link Perform + setlistId,
+//                                            refer_friends → deep-link Profile ▸ Referrals,
+//                                            share_videos → deep-link Profile ▸ JamCreator.
+//                   challengeRewardClaimed { id, rewards }   — player claimed the reward(s)
+// See CHALLENGES_HANDOVER.md for the full contract + PlayFab mapping.
+// `questData` is the in-browser mock fallback used until Unity pushes real data.
+var PICKS_IMAGE = 'branding/jamsesh-pick.png';   // shown for any { picks: N } reward
 var questData = [
-  {name: 'Leave a Star Rating',   reward: '1,000 Picks',   cosmetic: false, state: 'claim'},
-  {name: 'Write a Review',        reward: '1,500 Picks',   cosmetic: false, state: 'todo'},
-  {name: 'Share a TikTok',        reward: '2,000 Picks',   cosmetic: false, state: 'todo'},
-  {name: 'Invite a Friend',       reward: '1,000 Picks',   cosmetic: false, state: 'done'},
-  {name: 'Join the Discord',      reward: '500 Picks',     cosmetic: false, state: 'claim'},
-  {name: 'Follow on Instagram',   reward: '500 Picks',     cosmetic: false, state: 'todo'},
-  {name: 'Share a Clip to Story', reward: '1,000 Picks',   cosmetic: false, state: 'todo'},
-  {name: 'Complete Your Profile', reward: 'Starter Frame', cosmetic: true,  state: 'done'},
-  {name: 'Play Your First Show',  reward: 'Debut Badge',   cosmetic: true,  state: 'claim'}
+  // type: rate_us  ·  1 reward → 1 big square
+  {
+    id: 'rate_us',
+    name: 'Rate Us',
+    type: 'rate_us',
+    rewards: [{ name: 'Iridescent Classic Guitar #1', image: 'vault/iridescent-guitar.png' }],
+    startDate: '2026-06-01T00:00:00Z',
+    endDate: null,
+    completed: false
+  },
+  // type: play_setlist  ·  2 rewards → side by side (1 cosmetic + picks)
+  {
+    id: 'play_setlist',
+    name: 'Play the Hot Hits Setlist',
+    type: 'play_setlist',
+    setlistId: 'hot_hits',                // which setlist to deep-link into
+    rewards: [
+      { name: 'Neon Arena', image: 'vault/001.jpg' },
+      { picks: 1000 }
+    ],
+    startDate: '2026-06-01T00:00:00Z',
+    endDate: '2026-07-31T00:00:00Z',
+    completed: false
+  },
+  // type: refer_friends  ·  3 rewards → row (2 cosmetic + picks)
+  {
+    id: 'refer_friends',
+    name: 'Refer 3 Friends',
+    type: 'refer_friends',
+    count: 3,                             // how many friends must join (variable)
+    progress: 1,                          // how many done so far (Unity-pushed)
+    rewards: [
+      { name: 'Fire Stage', image: 'vault/006.jpg' },
+      { name: 'Galaxy Skybox', image: 'vault/023.jpg' },
+      { picks: 2000 }
+    ],
+    startDate: '2026-06-01T00:00:00Z',
+    endDate: null,
+    completed: false
+  },
+  // type: share_videos  ·  4 rewards → 2x2 grid (3 cosmetic + picks)
+  {
+    id: 'share_videos',
+    name: 'Share 5 Videos',
+    type: 'share_videos',
+    count: 5,                             // how many videos must be shared (variable)
+    progress: 4,                          // how many done so far (Unity-pushed)
+    rewards: [
+      { name: 'Gold Mic', image: 'vault/013.jpg' },
+      { name: 'Diamond', image: 'vault/017.jpg' },
+      { name: 'Rainbow Road', image: 'vault/019.jpg' },
+      { picks: 500 }
+    ],
+    startDate: '2026-06-01T00:00:00Z',
+    endDate: '2026-08-15T00:00:00Z',
+    completed: false
+  }
 ];
+
+// Challenge type registry — CTA label + how the CTA behaves. All four hook up to
+// Unity the SAME way: tapping the CTA fires one `challengeCTA` bridge message
+// ({ id, type, setlistId, count }); Unity routes by `type` (open store / deep-link)
+// and PlayFab tracks completion, then re-pushes `updateChallenges` with completed:true.
+var CHALLENGE_TYPES = {
+  rate_us:       { cta: 'Rate Us'     },                    // opens the app-store listing (then verify → claim)
+  play_setlist:  { cta: 'Perform Now' },                    // deep-links to the Perform tab + the given setlistId
+  refer_friends: { cta: 'Refer Now',  unit: 'friends' },    // deep-links to Profile ▸ Referrals  (create if absent)
+  share_videos:  { cta: 'Create Now', unit: 'videos'  }     // deep-links to Profile ▸ JamCreator (create if absent)
+};
+
+function updateChallengesFromBackend(data) {
+  // data: [{ id, name, rewards:[{name,image}], startDate, endDate, completed, image,
+  //          count, progress }, ...]
+  //   count    = target for multi-step challenges (e.g. 5 videos); omit/<=1 = binary
+  //   progress = how many done so far (0..count); drives the tile "4/5" chip + popup bar
+  if (!data) return;
+  window._backendChallenges = data;
+  buildQuestGrid();
+}
+
+// Reward display names: cosmetic → name; picks → "<n> Picks"; bare string → itself.
+function challengeRewardNames(ch) {
+  var out = [], r = (ch && ch.rewards) || [];
+  for (var i = 0; i < r.length; i++) {
+    var rw = r[i];
+    if (typeof rw === 'string') out.push(rw);
+    else if (rw && rw.picks != null) out.push(Number(rw.picks).toLocaleString() + ' Picks');
+    else out.push((rw && rw.name) || '');
+  }
+  return out;
+}
+
+// Partial-completion progress, or null for binary challenges (count <= 1) / when
+// no count is set. `done` is clamped to [0, total]. Used by the tile counter chip
+// and the popup progress line.
+function challengeProgress(ch) {
+  var total = (ch && ch.count) || 0;
+  if (total <= 1) return null;
+  var done = (ch && ch.progress) || 0;
+  if (done < 0) done = 0;
+  if (done > total) done = total;
+  return { done: done, total: total };
+}
+
+// First reward image (for the tile preview / reward popup), '' if none.
+function challengeRewardImage(ch) {
+  var r = (ch && ch.rewards) || [];
+  if (r[0] && typeof r[0] === 'object' && r[0].image) return r[0].image;
+  return '';
+}
+
+// Bottom-line status: "Completed" / "Starts <date>" / "Ends <date>" / "Ended" / "No expiry".
+function challengeStatusText(ch) {
+  if (ch.completed) return 'Completed';
+  var now = new Date();
+  if (ch.startDate) {
+    var s = new Date(ch.startDate);
+    if (!isNaN(s.getTime()) && s > now) return 'Starts ' + formatChallengeDate(ch.startDate);
+  }
+  if (ch.endDate) {
+    var e = new Date(ch.endDate);
+    if (!isNaN(e.getTime())) return (e < now) ? 'Ended' : 'Ends ' + formatChallengeDate(ch.endDate);
+  }
+  return 'No expiry';
+}
+
+function formatChallengeDate(iso) {
+  var d = new Date(iso);
+  if (isNaN(d.getTime())) return '';
+  var M = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return d.getDate() + ' ' + M[d.getMonth()] + ' ' + d.getFullYear();
+}
+
+// Tile time-left line: "X days left", or "X hours left" once under 24h remain.
+// Falls back to Completed / Starts <date> / Ended / No expiry for the edge cases.
+function challengeTimeLeft(ch) {
+  if (ch.completed) return 'Completed';
+  var now = new Date();
+  if (ch.startDate) {
+    var s = new Date(ch.startDate);
+    if (!isNaN(s.getTime()) && s > now) return 'Starts ' + formatChallengeDate(ch.startDate);
+  }
+  if (ch.endDate) {
+    var e = new Date(ch.endDate);
+    if (!isNaN(e.getTime())) {
+      var ms = e.getTime() - now.getTime();
+      if (ms <= 0) return 'Ended';
+      if (ms >= 86400000) {
+        var days = Math.round(ms / 86400000);
+        if (days < 1) days = 1;
+        return days + (days === 1 ? ' day left' : ' days left');
+      }
+      var hours = Math.round(ms / 3600000);
+      if (hours < 1) hours = 1;
+      if (hours > 23) hours = 23;
+      return hours + (hours === 1 ? ' hour left' : ' hours left');
+    }
+  }
+  return 'No expiry';
+}
 
 function buildSeasonGrid() {
   var container = document.getElementById('season-grid');
@@ -16617,19 +17419,19 @@ function buildSeasonGrid() {
     var section = document.createElement('div');
     section.className = 'season-category';
 
-    var label = document.createElement('div');
-    label.className = 'season-label';
-    label.textContent = cat.label;
-    section.appendChild(label);
-
     var row = document.createElement('div');
     row.className = 'season-row';
 
-    // First tile of every row: a "how to earn XP" entry that opens the popup.
+    // First tile of every row: the track name + a "how to earn XP" entry that
+    // opens the popup (replaces the old per-row .season-label heading).
     var info = document.createElement('div');
     info.className = 'season-tile season-info';
+    var infoGlyph = '<svg class="season-info-glyph" viewBox="0 0 24 24"><path d="M11 7h2v2h-2zm0 4h2v6h-2zm1-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>';
+    var infoArtCls = 'season-art' + (cat.infoImg ? ' season-art--img' : '');
+    var infoArtStyle = cat.infoImg ? ' style="background-image:url(\'' + cat.infoImg + '\')"' : '';
+    var infoShade = cat.infoImg ? '<div class="season-art-shade"></div>' : '';
     info.innerHTML =
-      '<div class="season-art"><svg class="season-info-glyph" viewBox="0 0 24 24"><path d="M11 7h2v2h-2zm0 4h2v6h-2zm1-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg></div>' +
+      '<div class="' + infoArtCls + '"' + infoArtStyle + '>' + infoShade + infoGlyph + '<span class="season-info-cat">' + cat.label + '</span></div>' +
       '<div class="season-reward-name">How to earn XP</div>' +
       '<div class="season-xp">Tap to learn</div>';
     info.onclick = (function(idx) { return function() { openXpInfo(idx); }; })(c);
@@ -16658,6 +17460,8 @@ function buildSeasonGrid() {
     section.appendChild(row);
     container.appendChild(section);
   }
+  // Journeys is a fixed 3-track layout (12 tiles) — single disabled pager for frame parity.
+  renderPager(document.getElementById('journeys-pager'), 0, 1, null);
 }
 
 // "How to earn XP" popup for a journey track — reuses the option-picker overlay.
@@ -16746,22 +17550,247 @@ function switchProgressTab(tab) {
   }
 }
 
+// Diagonal slice for reward i of n in a challenge tile's art box. Outer edges are
+// straight (0 / 100%); internal dividers slant by `s` (top vs bottom offset).
+function questSliceClip(i, n) {
+  if (n <= 1) return 'polygon(0 0, 100% 0, 100% 100%, 0 100%)';
+  var s = 16, g = 1.2, step = 100 / n;   // s = slant, g = half-gap at internal dividers
+  var lt = (i === 0) ? 0 : (i * step + s + g);
+  var lb = (i === 0) ? 0 : (i * step - s + g);
+  var rt = (i === n - 1) ? 100 : ((i + 1) * step + s - g);
+  var rb = (i === n - 1) ? 100 : ((i + 1) * step - s - g);
+  return 'polygon(' + lt + '% 0, ' + rt + '% 0, ' + rb + '% 100%, ' + lb + '% 100%)';
+}
+
+var challengesPage = 0;
 function buildQuestGrid() {
   var container = document.getElementById('quest-grid');
   if (!container) return;
   container.innerHTML = '';
-  for (var i = 0; i < questData.length; i++) {
-    var q = questData[i];
+  var challenges = window._backendChallenges || questData;
+  var qTotal = pageCount(challenges.length);
+  if (challengesPage >= qTotal) challengesPage = qTotal - 1;
+  if (challengesPage < 0) challengesPage = 0;
+  var qPage = pageSlice(challenges, challengesPage);
+  for (var i = 0; i < qPage.length; i++) {
+    var q = qPage[i];
+    var done = !!q.completed;
     var tile = document.createElement('div');
-    tile.className = 'quest-tile quest-' + q.state;
-    var stateLabel = q.state === 'done' ? '✓ Claimed' : (q.state === 'claim' ? 'Claim' : 'Go');
+    // Completed → mint "earned" card + check; otherwise the dark to-do card.
+    tile.className = 'quest-tile ' + (done ? 'quest-done' : 'quest-todo');
+    tile.style.cursor = 'pointer';
+    tile.onclick = (function(ch) { return function() { openChallengePopup(ch); }; })(q);
+
+    // Art box: the reward image(s). 1 reward fills the box; 2+ become slanted slices.
+    var qRewards = q.rewards || [];
+    var rn = Math.min(qRewards.length, 4);
+    var art;
+    if (rn > 0) {
+      var slices = '';
+      for (var k = 0; k < rn; k++) {
+        var rw = qRewards[k];
+        var rImg = (rw && rw.picks != null) ? PICKS_IMAGE
+          : ((rw && typeof rw === 'object' && rw.image) ? rw.image : (q.image || ''));
+        var clip = questSliceClip(k, rn);
+        slices += '<div class="quest-slice" style="background-image:url(\'' + rImg + '\');-webkit-clip-path:' + clip + ';clip-path:' + clip + '"></div>';
+      }
+      art = '<div class="quest-slices">' + slices + '</div>';
+    } else {
+      art = '<span class="quest-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>';
+    }
+
+    var prog = q.completed ? null : challengeProgress(q);
+    var progChip = prog ? '<span class="quest-progress">' + prog.done + '/' + prog.total + '</span>' : '';
     tile.innerHTML =
-      '<div class="quest-art"></div>' +
-      '<div class="quest-name">' + q.name + '</div>' +
-      '<div class="quest-reward">' + (q.cosmetic ? 'Cosmetic: ' : '') + q.reward + '</div>' +
-      '<div class="quest-state">' + stateLabel + '</div>';
+      '<div class="quest-art">' + art + '</div>' +
+      '<div class="quest-fade"></div>' +
+      '<div class="quest-caption">' +
+        '<div class="quest-name">' + (q.name || '') + '</div>' +
+        '<div class="quest-timerow">' +
+          '<span class="quest-time">' + challengeTimeLeft(q) + '</span>' +
+          progChip +
+        '</div>' +
+      '</div>';
     container.appendChild(tile);
   }
+  renderPager(document.getElementById('challenges-pager'), challengesPage, qTotal, function(dir) { challengesPage += dir; buildQuestGrid(); });
+}
+
+// ── Challenge reward popup (Rate Us → verify → claim) ───────────────────
+var challengeVerifySeconds = 15;   // Verifying-spinner duration; Unity can override (seconds)
+var challengeState = 'rate';       // 'rate' | 'verifying' | 'claim' | 'done'
+var _challengeActive = null;       // the challenge object currently shown in the popup
+var _challengeList = [];           // the list being paged through (backend or mock)
+var _challengeIndex = 0;           // index of _challengeActive within _challengeList
+var _challengeRewardLabel = '';    // reward name(s), comma-joined, for the messages
+var _challengeDotsTimer = null;
+var _challengeVerifyTimer = null;
+
+// Render the popup reward area: 1-4 reward tiles, laid out by count (1=big square,
+// 2=side-by-side, 3=row, 4=2x2). `claimed` shows them full-colour vs greyed.
+function renderChallengeRewards(ch, claimed) {
+  var grid = document.getElementById('challenge-reward-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  var rewards = (ch && ch.rewards) || [];
+  var n = Math.min(rewards.length, 4) || 1;
+  grid.className = 'challenge-reward-grid reward-grid-' + n;
+  for (var i = 0; i < rewards.length && i < 4; i++) {
+    var rw = rewards[i];
+    var isPicks = (rw && typeof rw === 'object' && rw.picks != null);
+    var img = isPicks ? PICKS_IMAGE
+      : ((rw && typeof rw === 'object' && rw.image) ? rw.image : (ch.image || ''));
+    var label = isPicks ? (Number(rw.picks).toLocaleString() + ' Picks')
+      : (typeof rw === 'string' ? rw : ((rw && rw.name) || ''));
+    var tile = document.createElement('div');
+    tile.className = 'challenge-reward-tile' + (claimed ? ' claimed' : '');
+    tile.innerHTML =
+      '<div class="challenge-reward-img" style="background-image:url(\'' + img + '\')"></div>' +
+      '<div class="challenge-reward-label">' + label + '</div>';
+    grid.appendChild(tile);
+  }
+}
+
+function openChallengePopup(challenge) {
+  _challengeCleanup();
+  _challengeList = window._backendChallenges || questData;
+  _challengeActive = challenge || _challengeList[0] || {};
+  _challengeIndex = _challengeList.indexOf(_challengeActive);
+  if (_challengeIndex < 0) _challengeIndex = 0;
+  var ch = _challengeActive;
+  _challengeRewardLabel = challengeRewardNames(ch).join(', ');
+  updateChallengeNav();
+
+  var msg = document.getElementById('challenge-claim-msg');
+  var btn = document.getElementById('challenge-action-btn');
+  var title = document.getElementById('challenge-title');
+  if (title) title.textContent = ch.name || '';
+  var expiry = document.getElementById('challenge-expiry');
+  if (expiry) expiry.textContent = challengeTimeLeft(ch);
+
+  // Progress readout (bottom-right) — only for multi-step challenges not yet done.
+  var progEl = document.getElementById('challenge-progress');
+  if (progEl) {
+    var prog = ch.completed ? null : challengeProgress(ch);
+    if (prog) {
+      var unit = (CHALLENGE_TYPES[ch.type] || {}).unit;
+      var pct = Math.round(prog.done / prog.total * 100);
+      progEl.innerHTML =
+        '<div class="challenge-progress-label">' + prog.done + ' of ' + prog.total + (unit ? ' ' + unit : '') + '</div>' +
+        '<div class="challenge-progress-bar"><div class="challenge-progress-fill" style="width:' + pct + '%"></div></div>';
+    } else {
+      // Empty but keep the flex:1 slot so the centred CTA button doesn't shift.
+      progEl.innerHTML = '';
+    }
+  }
+  document.getElementById('challenge-spinner-overlay').className = 'challenge-spinner-overlay';
+  renderChallengeRewards(ch, false);   // rewards greyed until claimed
+  if (msg) { msg.style.display = 'none'; msg.textContent = ''; }
+
+  if (ch.completed) {
+    // Task done → ready to claim the reward.
+    challengeState = 'claim';
+    if (btn) btn.textContent = 'Claim Reward';
+  } else {
+    // Not done → show the type's call-to-action (Rate Us / Perform Now / Refer Now / Create Now).
+    challengeState = 'cta';
+    var t = CHALLENGE_TYPES[ch.type] || {};
+    if (btn) btn.textContent = ch.actionLabel || t.cta || 'Rate Us';
+  }
+  document.getElementById('challenge-overlay').className = 'challenge-overlay active';
+}
+
+function closeChallengePopup(e) {
+  if (e && e.target !== document.getElementById('challenge-overlay')) return;
+  _challengeCleanup();
+  document.getElementById('challenge-overlay').className = 'challenge-overlay';
+}
+
+// Flick through challenges without leaving the popup.
+function challengePrev() { if (_challengeIndex > 0) openChallengePopup(_challengeList[_challengeIndex - 1]); }
+function challengeNext() { if (_challengeIndex < _challengeList.length - 1) openChallengePopup(_challengeList[_challengeIndex + 1]); }
+function updateChallengeNav() {
+  var prev = document.getElementById('challenge-nav-prev');
+  var next = document.getElementById('challenge-nav-next');
+  if (prev) prev.disabled = _challengeIndex <= 0;
+  if (next) next.disabled = _challengeIndex >= _challengeList.length - 1;
+}
+
+function _challengeCleanup() {
+  if (_challengeDotsTimer) { clearInterval(_challengeDotsTimer); _challengeDotsTimer = null; }
+  if (_challengeVerifyTimer) { clearTimeout(_challengeVerifyTimer); _challengeVerifyTimer = null; }
+}
+
+function challengeAction() {
+  if (challengeState === 'cta') {
+    doChallengeCTA(_challengeActive || {});
+  } else if (challengeState === 'claim') {
+    challengeClaimReward();
+  } else if (challengeState === 'done') {
+    closeChallengePopup();
+  }
+}
+
+// CTA tap — SAME hookup for every type: fire one `challengeCTA` message (Unity opens
+// the store / deep-links by `type` and PlayFab tracks completion), then a best-effort
+// local deep-link so the flow is testable in the browser.
+function doChallengeCTA(ch) {
+  sendToUnity('challengeCTA', {
+    id: ch.id || '',
+    type: ch.type || '',
+    setlistId: ch.setlistId || null,
+    count: ch.count || null
+  });
+  if (ch.type === 'rate_us') {
+    // Opens the app-store listing on device; verify the rating, then allow Claim.
+    challengeStartVerify();
+    return;
+  }
+  // Deep-link types navigate away — close the popup; PlayFab pushes completion later.
+  closeChallengePopup();
+  if (ch.type === 'play_setlist') {
+    navigateTo('play');        // Perform tab (Unity opens ch.setlistId on device)
+  } else if (ch.type === 'refer_friends') {
+    showReferralsSection();    // Profile ▸ Referrals
+  } else if (ch.type === 'share_videos') {
+    showJamCreatorSection();   // Profile ▸ JamCreator
+  }
+}
+
+function challengeStartVerify() {
+  challengeState = 'verifying';
+  var dotsEl = document.getElementById('challenge-spinner-dots');
+  var dots = 1;
+  if (dotsEl) dotsEl.textContent = '.';
+  _challengeDotsTimer = setInterval(function() {
+    dots = (dots % 3) + 1;
+    var d = '';
+    for (var i = 0; i < dots; i++) d += '.';
+    if (dotsEl) dotsEl.textContent = d;
+  }, 450);
+  document.getElementById('challenge-spinner-overlay').className = 'challenge-spinner-overlay active';
+  _challengeVerifyTimer = setTimeout(function() {
+    _challengeCleanup();
+    document.getElementById('challenge-spinner-overlay').className = 'challenge-spinner-overlay';
+    challengeState = 'claim';
+    document.getElementById('challenge-action-btn').textContent = 'Claim Reward';
+  }, challengeVerifySeconds * 1000);
+}
+
+function challengeClaimReward() {
+  challengeState = 'done';
+  renderChallengeRewards(_challengeActive, true);
+  var msg = document.getElementById('challenge-claim-msg');
+  msg.textContent = _challengeRewardLabel + ' added to your collection';
+  msg.style.display = 'block';
+  document.getElementById('challenge-action-btn').textContent = 'OK';
+  sendToUnity('challengeRewardClaimed', { id: (_challengeActive && _challengeActive.id) || '', rewards: challengeRewardNames(_challengeActive || {}) });
+}
+
+// Unity hook: override the Verifying-spinner duration (in seconds).
+function setChallengeVerifySeconds(seconds) {
+  var n = parseFloat(seconds);
+  if (!isNaN(n) && n >= 0) challengeVerifySeconds = n;
 }
 
 // ── Badges: paginated 4x3 collection grid ─────────────────────────
@@ -16859,27 +17888,8 @@ function buildBadgeGrid() {
 }
 
 function buildBadgePagination() {
-  var pag = document.getElementById('badge-pagination');
-  if (!pag) return;
-  pag.innerHTML = '';
-  var totalPages = Math.ceil(badgeData.length / BADGES_PER_PAGE);
-  if (totalPages <= 1) return;
-  var prev = document.createElement('button');
-  prev.className = 'badge-page-btn';
-  prev.innerHTML = '&#9664; Prev';
-  prev.disabled = badgePage === 0;
-  prev.onclick = function() { if (badgePage > 0) { badgePage--; buildBadgeGrid(); } };
-  var label = document.createElement('div');
-  label.className = 'badge-page-label';
-  label.textContent = 'Page ' + (badgePage + 1) + ' / ' + totalPages;
-  var next = document.createElement('button');
-  next.className = 'badge-page-btn';
-  next.innerHTML = 'Next &#9654;';
-  next.disabled = badgePage >= totalPages - 1;
-  next.onclick = function() { if (badgePage < totalPages - 1) { badgePage++; buildBadgeGrid(); } };
-  pag.appendChild(prev);
-  pag.appendChild(label);
-  pag.appendChild(next);
+  renderPager(document.getElementById('badge-pagination'), badgePage, pageCount(badgeData.length),
+    function(dir) { badgePage += dir; buildBadgeGrid(); });
 }
 
 // ── Home Grid Layout System ──────────────────────────────────────
@@ -17789,6 +18799,9 @@ function init() {
   buildSeasonGrid();
   buildQuestGrid();
   buildBadgeGrid();
+  // Settings tabs are static (≤12 tiles) → single disabled pager for frame parity.
+  renderPager(document.getElementById('settings-profile-pager'), 0, 1, null);
+  renderPager(document.getElementById('settings-gameplay-pager'), 0, 1, null);
   buildHomeGrid(currentLayout);
   applyTheme(currentTheme);
 
@@ -17980,7 +18993,7 @@ init();
    already sits inside a tagged control; transform-positioned controls are
    excluded (FX_SKIP) because they have their own CSS rules that keep the offset. */
 const FX_SELECTOR = 'button, .nav-item, .home-tile-wrap, [class*="-tile"], [class*="-card"], [class*="-opt"], [class*="-btn"], .play-mode-tab, .legal-agree-tab, .avatar-sub-tab, .picker-filter';
-const FX_SKIP = '.topbar-settings-btn, .legal-agree-ok, .perms-explain-ok, .play-grid-options-row';
+const FX_SKIP = '.topbar-settings-btn, .topbar-avatar-btn, .legal-agree-ok, .perms-explain-ok, .play-grid-options-row, .challenge-nav';
 
 function fxTag(el) {
   if (el.classList.contains('fx-press')) return;
