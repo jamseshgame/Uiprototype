@@ -14275,7 +14275,7 @@ function buildOptionsRow(container) {
     {
       label: 'Vibe', value: selectedExperience,
       icon: '<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>',
-      onclick: function() { openOptionPicker('experience'); }
+      onclick: function() { openExperiencePicker(); }
     },
     {
       label: 'Save / Load', value: 'Setlist',
@@ -14854,7 +14854,18 @@ function addCoopPlayer(friend) {
 }
 
 // ── Option Picker Popup ──
+var currentPickerType = null;
+// Snapshot of the skin/environment selection taken when the Experience picker is
+// first opened, so Cancel can revert. experiencePendingSnapshot defers the capture
+// until after the picker rebuilds (so it reflects any auto-correction).
+var experienceSnapshot = null;
+var experiencePendingSnapshot = false;
+function openExperiencePicker() {
+  experiencePendingSnapshot = true;
+  openOptionPicker('experience');
+}
 function openOptionPicker(type) {
+  currentPickerType = type;
   var overlay = document.getElementById('option-picker-overlay');
   var panel = document.getElementById('option-picker-panel');
   overlay.style.display = 'flex';
@@ -15024,8 +15035,8 @@ function openOptionPicker(type) {
         return function() {
           selectedEnvironment = id;
           sendToUnity('experience', {tab: 'environment', id: id});
-          closeOptionPicker();
-          buildPlayGrid();
+          // Keep the picker open (rebuild for the highlight); Accept/Cancel close it.
+          openOptionPicker('experience');
         };
       })(env.id);
       envGrid.appendChild(envTile);
@@ -15064,6 +15075,11 @@ function openOptionPicker(type) {
       selectedExperience = 'Original';
       sendToUnity('experience', {tab: 'skin', id: 'Original'});
     }
+    // Capture the revert point once per fresh open (after any auto-correction above).
+    if (experiencePendingSnapshot) {
+      experienceSnapshot = { skin: selectedExperience, env: selectedEnvironment };
+      experiencePendingSnapshot = false;
+    }
     var skinGrid = document.createElement('div');
     skinGrid.style.cssText = 'display:grid;grid-template-columns:repeat(4,1fr);gap:16px;width:100%';
     for (var si = 0; si < availableSkins.length; si++) {
@@ -15076,17 +15092,52 @@ function openOptionPicker(type) {
         '<img src="' + skin.img + '" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:0">' +
         '<div style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);z-index:1"></div>' +
         '<div style="position:absolute;bottom:16px;left:16px;z-index:2;font-size:22px;font-weight:800;color:#ffffff;text-shadow:0 2px 8px rgba(0,0,0,0.8)">' + skin.label + '</div>';
-      skinTile.onclick = (function(id) {
+      skinTile.onclick = (function(id, inst) {
         return function() {
           selectedExperience = id;
-          sendToUnity('experience', {tab: 'skin', id: id});
-          closeOptionPicker();
-          buildPlayGrid();
+          // Pass the instrument so Unity spawns the right preview model. Keep the
+          // picker open (rebuild it so the new selection is highlighted) — the
+          // rotating preview at the avatar spot lives until the picker is closed.
+          sendToUnity('experience', {tab: 'skin', id: id, instrument: inst});
+          openOptionPicker('experience');
         };
-      })(skin.id);
+      })(skin.id, skinInstrument);
       skinGrid.appendChild(skinTile);
     }
     panel.appendChild(skinGrid);
+
+    // ── Accept / Cancel ──
+    var actionRow = document.createElement('div');
+    actionRow.style.cssText = 'display:flex;gap:24px;width:100%;margin-top:40px';
+
+    var cancelBtn = document.createElement('div');
+    cancelBtn.style.cssText = 'flex:1;text-align:center;padding:28px;border-radius:var(--panel-radius);cursor:pointer;font-size:30px;font-weight:800;color:#ffffff;background:rgba(255,255,255,0.12);border:2px solid rgba(255,255,255,0.3)';
+    cancelBtn.textContent = 'Cancel';
+    cancelBtn.onclick = (function(inst) {
+      return function() {
+        // Revert skin + environment to the snapshot taken when the screen opened.
+        if (experienceSnapshot) {
+          selectedExperience = experienceSnapshot.skin;
+          selectedEnvironment = experienceSnapshot.env;
+          sendToUnity('experience', {tab: 'skin', id: selectedExperience, instrument: inst});
+          sendToUnity('experience', {tab: 'environment', id: selectedEnvironment});
+        }
+        closeOptionPicker();
+      };
+    })(skinInstrument);
+    actionRow.appendChild(cancelBtn);
+
+    var acceptBtn = document.createElement('div');
+    acceptBtn.className = 'jamsesh-signature';
+    acceptBtn.style.cssText = 'flex:1;text-align:center;padding:28px;border-radius:var(--panel-radius);cursor:pointer;font-size:30px;font-weight:800;color:#ffffff';
+    acceptBtn.textContent = 'Accept';
+    acceptBtn.onclick = function() {
+      // Keep the current selection; closeOptionPicker fires experienceClosed + buildPlayGrid.
+      closeOptionPicker();
+    };
+    actionRow.appendChild(acceptBtn);
+
+    panel.appendChild(actionRow);
   }
 }
 
@@ -15148,6 +15199,16 @@ function closeOptionPicker() {
   panel.className = 'option-picker-panel';
   panel.style.width = '';
   panel.style.maxHeight = '';
+
+  // Closing the Experience picker (cancel/accept) tears down the instrument
+  // skin preview in Unity, and applies any skin/env change to the play grid.
+  if (currentPickerType === 'experience') {
+    sendToUnity('experienceClosed', {});
+    buildPlayGrid();
+    experienceSnapshot = null;
+    experiencePendingSnapshot = false;
+  }
+  currentPickerType = null;
 }
 
 // ── Vault Grid ──────────────────────────────────────────
