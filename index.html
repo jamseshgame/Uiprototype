@@ -141,6 +141,34 @@
     letter-spacing: 0.02em;
   }
 
+  /* ── Hero tile caption standard ────────────────────────────
+     The challenge-tile typography (.quest-name / .quest-time) applied to
+     browse-grid tiles UI-wide: Bebas 100px two-line-clamp title + 17px bold
+     subline. JS builders attach these classes; families whose markup already
+     uses .tile-title / .tile-artist mirror the same values in their own rules. */
+  .tile-hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-weight: 400;
+    letter-spacing: 0.02em;
+    font-size: 100px;
+    line-height: 1.0;
+    color: #ffffff;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.85);
+    white-space: normal;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    overflow-wrap: break-word;
+  }
+  .tile-hero-sub {
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: rgba(255,255,255,0.82);
+    text-shadow: 0 1px 6px rgba(0,0,0,0.85);
+  }
+
   /* UI / Buttons — Monda */
   button,
   .play-go-btn,
@@ -951,25 +979,28 @@
   }
 
   .song-tile .tile-title {
-    font-size: 34px;
+    font-size: 64px;   /* hero standard scaled — picker tiles are ~300px wide (leaderboard column) */
     font-weight: 400;
     white-space: normal;
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
     overflow: hidden;
-    line-height: 1.2;
+    overflow-wrap: break-word;
+    line-height: 1.0;
     color: #ffffff;
-    text-shadow: 0 1px 6px rgba(0,0,0,0.5);
+    text-shadow: 0 2px 8px rgba(0,0,0,0.85);
   }
 
   .song-tile .tile-artist {
-    font-size: 16px;
-    color: rgba(255,255,255,0.7);
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: rgba(255,255,255,0.82);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+    text-shadow: 0 1px 6px rgba(0,0,0,0.85);
   }
 
   .song-tile .tile-meta {
@@ -1494,20 +1525,24 @@
     gap: 4px;
   }
   .play-grid-song-info .song-title {
-    font-size: 43px;
+    font-size: 100px;
     font-weight: 400;
+    line-height: 1.0;
     color: #ffffff;
-    text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+    text-shadow: 0 2px 8px rgba(0,0,0,0.85);
     white-space: normal;
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
     overflow: hidden;
+    overflow-wrap: break-word;
   }
   .play-grid-song-info .song-artist {
-    font-size: 20px;
-    color: rgba(255,255,255,0.8);
-    text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: rgba(255,255,255,0.82);
+    text-shadow: 0 1px 6px rgba(0,0,0,0.85);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -3439,18 +3474,25 @@
   }
 
   .play-tile .tile-title {
-    font-size: 30px;
+    font-size: 100px;
     font-weight: 400;
+    line-height: 1.0;
+    color: #ffffff;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.85);
     white-space: normal;
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
     overflow: hidden;
+    overflow-wrap: break-word;
   }
 
   .play-tile .tile-artist {
-    font-size: 16px;
-    color: var(--text-muted);
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: rgba(255,255,255,0.82);
+    text-shadow: 0 1px 6px rgba(0,0,0,0.85);
   }
 
   .play-add-tile {
@@ -3653,17 +3695,25 @@
   }
 
   .space-tile .tile-title {
-    font-size: 18px;
-    font-weight: 700;
-    white-space: nowrap;
+    font-size: 100px;
+    font-weight: 400;
+    line-height: 1.0;
+    color: #ffffff;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.85);
+    white-space: normal;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
     overflow: hidden;
-    text-overflow: ellipsis;
-    line-height: 1.2;
+    overflow-wrap: break-word;
   }
 
   .space-tile .tile-artist {
-    font-size: 16px;
-    color: var(--text-muted);
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: rgba(255,255,255,0.82);
+    text-shadow: 0 1px 6px rgba(0,0,0,0.85);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -3724,7 +3774,11 @@
       linear-gradient(135deg, rgba(0,255,180,0.04) 0%, rgba(255,255,255,0.02) 50%, rgba(0,224,255,0.03) 100%);
     background-size: 200% 200%, 100% 100%;
     border: 1px solid rgba(0,255,180,0.15);
-    border-radius: var(--panel-radius);
+    /* Fixed 48px, not var(--panel-radius): the min(8%,48px) percentage goes
+       elliptical on wide-short rows (~10px vertical) and reads square. 48px
+       = inner Invite pill radius (28) + row padding (20), per the nested
+       radius formula, and matches the big tiles' 48px cap. */
+    border-radius: 48px;
     height: var(--nav-btn-h);
     box-shadow:
       inset 0 0 0 1px rgba(0,255,180,0.1),
@@ -3797,7 +3851,7 @@
     background: linear-gradient(135deg, rgba(0,255,180,0.06) 0%, rgba(255,255,255,0.03) 100%);
     color: #ffffff;
     border: 1px solid rgba(0,255,180,0.2);
-    border-radius: var(--panel-radius);
+    border-radius: 48px;   /* match .friend-item — same row height, same radius */
     box-shadow: inset 0 0 0 1px rgba(0,255,180,0.1);
     filter: drop-shadow(0 0 6px rgba(0,255,180,0.12));
     font-size: 30px;
@@ -4900,18 +4954,28 @@
   }
 
   .vault-tile .tile-title {
-    font-size: 18px;
-    font-weight: 800;
+    font-size: 100px;
+    font-weight: 400;
     text-align: center;
-    line-height: 1.2;
+    line-height: 1.0;
+    color: #ffffff;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.85);
+    white-space: normal;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    overflow-wrap: break-word;
   }
 
   .vault-tile .tile-cat {
-    font-size: 16px;
+    font-size: 17px;
     font-weight: 700;
+    letter-spacing: 0.5px;
     color: var(--cyan);
     text-align: center;
     margin-bottom: 4px;
+    text-shadow: 0 1px 6px rgba(0,0,0,0.85);
   }
 
   /* ── Bottom Nav ───────────────────────────────────── */
@@ -5146,13 +5210,13 @@
   }
 
   .settings-tile .tile-title {
-    font-family: 'Monda', sans-serif;   /* match the navbar buttons (.nav-label) */
-    font-size: 52px;        /* maximised — fits the longest labels (e.g. "Terms of Service") with wrapping */
-    line-height: 1.05;
-    font-weight: 700;
-    letter-spacing: 0.04em;
+    font-size: 100px;       /* hero tile standard — Bebas inherited from the .tile-title base rule */
+    line-height: 1.0;
+    font-weight: 400;
+    letter-spacing: 0.02em;
     text-align: center;
     color: #ffffff;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.85);
     overflow-wrap: break-word;
   }
 
@@ -5226,10 +5290,12 @@
   }
 
   .banner-card .tile-title {
-    font-size: 18px;
-    font-weight: 800;
+    font-size: 34px;   /* hero standard scaled to fit the swatch info strip */
+    font-weight: 400;
+    line-height: 1.0;
     text-align: center;
     color: #ffffff;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.85);
   }
 
   .banner-card.locked .tile-info {
@@ -5280,8 +5346,9 @@
   }
 
   .frame-card .tile-title {
-    font-size: 14px;
-    font-weight: 800;
+    font-size: 24px;   /* hero standard scaled to fit the circular swatch */
+    font-weight: 400;
+    line-height: 1.0;
     text-align: center;
     color: var(--text-primary);
     padding: 8px;
@@ -5326,9 +5393,11 @@
   }
 
   .theme-card .tile-title {
-    font-size: 18px;
-    font-weight: 800;
+    font-size: 34px;   /* hero standard scaled to fit the swatch info strip */
+    font-weight: 400;
+    line-height: 1.0;
     text-align: center;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.85);
   }
 
   /* ── Season Grid ──────────────────────────────────────── */
@@ -5467,9 +5536,11 @@
   }
 
   .season-reward-name {
-    font-size: 30px;
+    font-size: 100px;
     font-weight: 400;
+    line-height: 1.0;
     color: var(--text-primary);
+    text-shadow: 0 2px 8px rgba(0,0,0,0.85);
     text-align: center;
     padding: 0 4px;
     white-space: normal;
@@ -5477,13 +5548,15 @@
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
     overflow: hidden;
+    overflow-wrap: break-word;
     width: 100%;
   }
 
   .season-xp {
-    font-size: 16px;
-    font-weight: 800;
-    color: rgba(255,255,255,0.72);
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: rgba(255,255,255,0.82);
     margin-top: 2px;
   }
 
@@ -5891,21 +5964,25 @@
   }
 
   .badge-name {
-    font-size: 35px;
+    font-size: 100px;
     font-weight: 400;
+    line-height: 1.0;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.85);
     text-align: center;
     white-space: normal;
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
     overflow: hidden;
+    overflow-wrap: break-word;
     width: 100%;
     color: var(--text-primary);
   }
 
   .badge-hint {
-    font-size: 16px;
-    font-weight: 500;
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
     text-align: center;
     line-height: 1.3;
     width: 100%;
@@ -6040,6 +6117,234 @@
     border: 2px solid var(--page-accent, #ffffff);
     border-radius: 999px;
     padding: 12px 36px;
+  }
+
+  /* ── Referrals (Share The Love): header + bandmates list + reward-tier tiles ── */
+  .referral-head {
+    flex-shrink: 0;
+    text-align: center;
+    padding: 4px 60px 8px;
+  }
+  .referral-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 110px;
+    line-height: 1;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: #ffffff;
+    text-shadow: 0 4px 24px rgba(0,0,0,0.55), 0 0 40px rgba(255,255,255,0.12);
+  }
+  .referral-code-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 18px;
+    margin-top: 14px;
+    padding: 10px 32px;
+    border: 2px solid var(--page-accent, #ffffff);
+    border-radius: 999px;
+  }
+  .referral-code-tag {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.6);
+  }
+  .referral-code {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 44px;
+    letter-spacing: 6px;
+    line-height: 1;
+    color: #ffffff;
+  }
+  .referral-sub {
+    font-size: 28px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.7);
+    line-height: 1.4;
+    max-width: 1400px;
+    margin: 10px auto 0;
+  }
+  .referral-sub b { color: #ffffff; }
+  .referral-friends {
+    flex: 1;
+    min-height: 0;
+    /* Paginated via the shared pager — clip both axes so the friendSlideIn
+       30px X-overshoot can't flash a horizontal scrollbar on rebuild. */
+    overflow: hidden;
+    padding-bottom: 0;   /* rows never reach the bottom; the pager gap is set
+                            by the band's flex-basis below */
+  }
+  /* Badge band reuses the Badges screen tile family (.badge-tile); pin a
+     single row of 4 to the bottom (the shared .badge-grid declares 3 rows). */
+  .referral-tiers {
+    /* Sized so the leftover flex space above the pager lands at exactly 24px
+       — even with the 24px gaps below the pager and under the band. */
+    flex: 0 0 353px;
+    min-height: 0;
+    padding: 24px 24px 24px;
+    grid-template-rows: 1fr;
+  }
+  /* Band-only treatment: badge art fills the tile edge-to-edge (uniform size
+     across all four), caption sits bottom-left over a readability gradient. */
+  .referral-tiers .badge-tile {
+    padding: 20px 24px;
+    overflow: hidden;
+    justify-content: flex-end;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  .referral-tiers .badge-art {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    padding: 0;
+    border: none;
+  }
+  .referral-tiers .badge-art img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .referral-tiers .badge-art::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.78) 100%);
+  }
+  .referral-tiers .badge-name,
+  .referral-tiers .badge-hint {
+    position: relative;
+    z-index: 1;
+    text-align: left;
+  }
+  .referral-tiers .badge-name { font-size: 56px; }
+  .referral-tiers .badge-hint { font-size: 20px; }
+  .referral-invite-pill {
+    flex-shrink: 0;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 26px;
+    letter-spacing: 1px;
+    color: var(--page-accent, #ffffff);
+    border: 2px solid currentColor;
+    border-radius: 999px;
+    padding: 8px 22px;
+    transition: opacity 0.2s ease;
+  }
+  .referral-invite-pill.sent { opacity: 0.45; }
+  /* Referral lifecycle tag (SENT amber / COMPLETE green) + Claim Picks pill. */
+  .referral-status-tag {
+    flex-shrink: 0;
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border: 2px solid currentColor;
+    border-radius: 999px;
+    padding: 7px 18px;
+  }
+  .referral-status-tag.sent { color: #ffb84d; }
+  .referral-status-tag.complete { color: var(--mint); }
+  .referral-status-tag.jamming { color: var(--purple); }
+  .referral-claim-pill {
+    flex-shrink: 0;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 26px;
+    letter-spacing: 1px;
+    color: #ffffff;
+    background: var(--btn-primary);
+    border: 2px solid var(--btn-primary-border);
+    border-radius: 999px;
+    padding: 8px 22px;
+    cursor: pointer;
+    box-shadow: 0 0 12px var(--btn-primary-glow);
+    transition: opacity 0.2s ease;
+  }
+  .referral-claim-pill.claimed {
+    background: none;
+    border-color: rgba(255,255,255,0.25);
+    color: rgba(255,255,255,0.45);
+    box-shadow: none;
+    cursor: default;
+  }
+  /* Referral-tier progress (e.g. "1 out of 2 referrals complete") — rendered
+     by makeBadgeTile when the entry carries a progress object. */
+  .badge-tile.in-progress { opacity: 0.85; }
+  .badge-progress {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 6px;
+  }
+  .badge-progress-bar {
+    width: 100%;
+    height: 14px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.18);
+    overflow: hidden;
+  }
+  .badge-progress-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: var(--page-accent, #ffffff);
+    box-shadow: 0 0 10px var(--page-accent, #ffffff);
+  }
+  .badge-progress-label {
+    font-size: 20px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.75);
+    text-align: left;
+  }
+  .referral-enter-code-btn {
+    display: inline-flex;
+    align-items: center;
+    vertical-align: bottom;   /* baseline-align with the inline-flex code chip */
+    margin: 14px 0 0 18px;
+    padding: 13px 36px;
+    background: var(--btn-panel);
+    border: 2px solid var(--page-accent, #ffffff);
+    border-radius: 999px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 34px;
+    letter-spacing: 3px;
+    line-height: 1;
+    color: #ffffff;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+  .referral-enter-code-btn:hover { background: var(--btn-panel-hover); }
+  .referral-enter-code-btn.applied { opacity: 0.5; pointer-events: none; }
+  /* Referral-code entry popup (reuses the save-popup family inside a dimmed overlay). */
+  .referral-code-overlay {
+    display: none;
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.66);
+    z-index: 999;
+    align-items: center;
+    justify-content: center;
+  }
+  .referral-code-overlay.active { display: flex; }
+  /* Doubled class beats .save-popup's later width:1600px declaration. */
+  .save-popup.referral-code-popup { width: 980px; }
+  .referral-code-popup .save-input {
+    text-transform: uppercase;
+    letter-spacing: 4px;
+  }
+  .referral-code-popup-sub {
+    font-size: 26px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.7);
+    line-height: 1.4;
+  }
+  .referral-code-popup-sub b { color: #ffffff; }
+  .referral-code-error {
+    min-height: 30px;
+    font-size: 24px;
+    font-weight: 700;
+    color: #ff5577;
   }
 
   .profile-grid {
@@ -7558,6 +7863,11 @@
   .home-layout-btn-tile    { border-radius:var(--panel-radius); background:rgba(140,190,255,0.6); }
   .home-layout-btn:hover .home-layout-btn-tile,
   .home-layout-btn:active .home-layout-btn-tile { background:rgba(170,210,255,0.85); }
+
+  /* 4x3 variants — Challenges layout picker (3164 tilings vs home's 322) */
+  .layout-thumb-wrap.thumb-wrap-4x3 { padding-top:75%; }
+  .layout-thumb.thumb-4x3           { grid-template-columns:repeat(4,1fr); }
+  .home-layout-btn.quest-layout-btn { grid-template-columns:repeat(4,1fr); }
 
   /* Wireframe cleanup */
   .theme-wireframe .home-tile::before,
@@ -9303,7 +9613,7 @@ input, textarea, select {
         <div class="play-mode-tab" onclick="switchProgressTab('badges')">Badges</div>
       </div>
       <div id="progress-tab-journeys" class="spaces-tab-content"><div class="season-grid" id="season-grid"></div><div id="journeys-pager"></div></div>
-      <div id="progress-tab-challenges" class="spaces-tab-content" style="display:none"><div class="quest-grid" id="quest-grid"></div><div id="challenges-pager"></div></div>
+      <div id="progress-tab-challenges" class="spaces-tab-content" style="display:none;position:relative"><div class="quest-grid" id="quest-grid"></div><div id="challenges-pager"></div><button class="home-layout-btn quest-layout-btn" id="quest-layout-btn" onclick="openQuestLayoutPicker()" style="display:none"></button></div>
       <div id="progress-tab-badges" class="spaces-tab-content" style="display:none"><div class="badge-grid" id="badge-grid"></div><div class="badge-pagination" id="badge-pagination"></div></div>
     </div>
     <div class="page" id="page-social">
@@ -9400,12 +9710,18 @@ input, textarea, select {
       </div>
       <div class="profile-section" id="profile-section-referrals">
         <button class="back-btn" onclick="hideSettingsSub()">&#9664; Profile</button>
-        <div class="profile-subsection">
-          <svg class="profile-subsection-icon" viewBox="0 0 24 24"><path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-          <div class="profile-subsection-title">Referrals</div>
-          <div class="profile-subsection-sub">Invite friends to Jamsesh and earn rewards when they join — and complete the Refer Friends challenge.</div>
-          <div class="profile-subsection-soon">Coming Soon</div>
+        <div class="referral-head">
+          <div class="referral-title">Share The Love</div>
+          <div class="referral-code-chip">
+            <span class="referral-code-tag">Your Code</span>
+            <span class="referral-code" id="referral-code">J4M-53SH</span>
+          </div>
+          <button class="referral-enter-code-btn" id="referral-enter-code-btn" onclick="openReferralCodePopup()">Enter a Friend's Code</button>
+          <div class="referral-sub">Every invite you send earns <b>500 Picks</b> &mdash; and when your referred player starts their first jam, you <b>both</b> earn <b>1,000 Picks</b>. Friends can also enter your code during onboarding to count as your referral.</div>
         </div>
+        <div class="friends-list-wrap referral-friends" id="referral-friends-list"></div>
+        <div id="referral-friends-pager"></div>
+        <div class="badge-grid referral-tiers" id="referral-tiers"></div>
       </div>
       <div class="legal-section" id="tos-section">
         <button class="back-btn" onclick="hideSettingsSub()">&#9664; Gameplay</button>
@@ -9814,7 +10130,7 @@ input, textarea, select {
     </div>
     <div class="nav-item" data-page="creator" onclick="navigateTo('creator')">
       <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M7 14c-1.66 0-3 1.34-3 3 0 1.31-1.16 2-2 2 .92 1.22 2.49 2 4 2 2.21 0 4-1.79 4-4 0-1.66-1.34-3-3-3zm13.71-9.37l-1.34-1.34c-.39-.39-1.02-.39-1.41 0L9 12.25 11.75 15l8.96-8.96c.39-.39.39-1.02 0-1.41z" fill="currentColor"/></svg></span>
-      <span class="nav-label">Creator</span>
+      <span class="nav-label">Design</span>
     </div>
     <div class="nav-item" data-page="store" onclick="navigateTo('store')">
       <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M20 4H4v2h16V4zm1 10v-2l-1-5H4l-1 5v2h1v6h10v-6h4v6h2v-6h1zm-9 4H6v-4h6v4z" fill="currentColor"/></svg></span>
@@ -9909,9 +10225,25 @@ input, textarea, select {
   </div>
 </div>
 
+<!-- Referral code entry popup (Profile ▸ Referrals — redeem a friend's code). -->
+<div class="referral-code-overlay" id="referral-code-overlay" onclick="closeReferralCodePopup(event)">
+  <div class="save-popup referral-code-popup" onclick="event.stopPropagation()" style="position:relative">
+    <button class="popup-close-btn" onclick="closeReferralCodePopup()">&#10005;</button>
+    <h2>Enter Referral Code</h2>
+    <div class="referral-code-popup-sub">Got a code from a friend? Enter it below &mdash; you <b>both</b> earn <b>1,000 Picks</b> when you finish your first jam.</div>
+    <input class="save-input" id="referral-code-input" type="text" maxlength="12" placeholder="e.g. J4M-53SH">
+    <div class="referral-code-error" id="referral-code-error"></div>
+    <div class="save-buttons">
+      <button class="save-btn-cancel" onclick="closeReferralCodePopup()">Cancel</button>
+      <button class="save-btn-confirm" onclick="confirmReferralCode()">Submit</button>
+    </div>
+  </div>
+</div>
+
 <!-- Challenge reward popup (Rate Us → verify → claim). -->
 <div class="challenge-overlay" id="challenge-overlay" onclick="closeChallengePopup(event)">
   <div class="challenge-panel" onclick="event.stopPropagation()">
+    <button class="popup-close-btn" onclick="closeChallengePopup()">&#10005;</button>
     <div class="challenge-title" id="challenge-title"></div>
     <div class="challenge-reward-wrap">
       <div class="challenge-reward-grid" id="challenge-reward-grid"></div>
@@ -9952,6 +10284,15 @@ input, textarea, select {
     <div class="layout-title">Choose Layout</div>
     <div class="layout-count" id="layout-count"></div>
     <div class="layout-browser" id="layout-browser"></div>
+  </div>
+</div>
+
+<div class="layout-overlay" id="quest-layout-overlay" onclick="closeQuestLayoutPicker(event)">
+  <div class="layout-popup" onclick="event.stopPropagation()">
+    <button class="popup-close-btn" onclick="closeQuestLayoutPicker()">&#10005;</button>
+    <div class="layout-title">Choose Challenges Layout</div>
+    <div class="layout-count" id="quest-layout-count"></div>
+    <div class="layout-browser" id="quest-layout-browser"></div>
   </div>
 </div>
 
@@ -11264,6 +11605,25 @@ function pageCount(len) {
 var socialGroupsPage = 0;
 var socialFriendsPage = 0;
 
+// Shared friends list — Unity-pushed roster when present, mock data otherwise.
+// Used by the Bandmates ▸ Friends tab and the Profile ▸ Referrals page.
+function getFriendsData() {
+  return window._backendFriends || [
+    { name: 'Jooleeno', online: true, avatar: 'avatars/jooleeno.jpg' },
+    { name: 'Ted', online: true, avatar: 'avatars/ted.png' },
+    { name: 'Abbie', online: true, avatar: 'avatars/abbie.png' },
+    { name: 'Arthen', online: false, avatar: 'avatars/arthen.jpg' },
+    { name: 'xShadowPick', online: true, avatar: 'avatars/rael_new.png' },
+    { name: 'MelodyQueen', online: false, avatar: 'avatars/jooleeno.jpg' },
+    { name: 'BeatDropper99', online: false, avatar: 'avatars/ted.png' },
+    { name: 'FretNinja', online: true, avatar: 'avatars/abbie.png' },
+    { name: 'GrooveMonkey', online: false, avatar: 'avatars/arthen.jpg' },
+    { name: 'RiffLord420', online: true, avatar: 'avatars/rael_new.png' },
+    { name: 'PickSlinger', online: false, avatar: 'avatars/jooleeno.jpg' },
+    { name: 'StarShredder', online: false, avatar: 'avatars/ted.png' }
+  ];
+}
+
 function buildSocialPage() {
   // ── Groups ──
   var groupGrid = document.getElementById('social-grid-groups');
@@ -11309,9 +11669,9 @@ function buildSocialPage() {
     })(g);
     tile.innerHTML =
       '<img src="' + g.file + '" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;pointer-events:none" alt="">' +
-      '<div class="tile-info" style="pointer-events:none;position:absolute;bottom:0;left:0;right:0;padding:48px 16px 16px;background:linear-gradient(0deg,rgba(0,0,0,0.95) 0%,rgba(0,0,0,0.9) 40%,rgba(0,0,0,0.6) 70%,transparent 100%);display:flex;flex-direction:column;align-items:center;justify-content:flex-end">' +
-        '<div style="font-size:28px;font-weight:800;color:#ffffff;text-align:center">' + g.name + '</div>' +
-        '<div style="font-size:20px;color:#bbbbbb">' + g.members + ' Members</div>' +
+      '<div class="tile-info" style="pointer-events:none;position:absolute;bottom:0;left:0;right:0;padding:48px 20px 18px;background:linear-gradient(0deg,rgba(0,0,0,0.95) 0%,rgba(0,0,0,0.9) 40%,rgba(0,0,0,0.6) 70%,transparent 100%);display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-end;gap:4px">' +
+        '<div class="tile-hero-title">' + g.name + '</div>' +
+        '<div class="tile-hero-sub">' + g.members + ' Members</div>' +
       '</div>';
     groupGrid.appendChild(tile);
   }
@@ -11321,20 +11681,7 @@ function buildSocialPage() {
   var friendsWrap = document.getElementById('social-friends-list');
   friendsWrap.innerHTML = '';
   friendsWrap.className = 'friends-list-wrap';
-  var friends = window._backendFriends || [
-    { name: 'Jooleeno', online: true, avatar: 'avatars/jooleeno.jpg' },
-    { name: 'Ted', online: true, avatar: 'avatars/ted.png' },
-    { name: 'Abbie', online: true, avatar: 'avatars/abbie.png' },
-    { name: 'Arthen', online: false, avatar: 'avatars/arthen.jpg' },
-    { name: 'xShadowPick', online: true, avatar: '' },
-    { name: 'MelodyQueen', online: false, avatar: '' },
-    { name: 'BeatDropper99', online: false, avatar: '' },
-    { name: 'FretNinja', online: true, avatar: '' },
-    { name: 'GrooveMonkey', online: false, avatar: '' },
-    { name: 'RiffLord420', online: true, avatar: '' },
-    { name: 'PickSlinger', online: false, avatar: '' },
-    { name: 'StarShredder', online: false, avatar: '' }
-  ];
+  var friends = getFriendsData();
   var fTotal = pageCount(friends.length);
   if (socialFriendsPage >= fTotal) socialFriendsPage = fTotal - 1;
   if (socialFriendsPage < 0) socialFriendsPage = 0;
@@ -11395,9 +11742,9 @@ function buildSpacesGrid() {
       return function() { sendToUnity('joinHub', hub.name); };
     })(h);
     tile.innerHTML =
-      '<div style="position:absolute;bottom:0;left:0;right:0;padding:24px;background:linear-gradient(0deg,rgba(0,0,0,0.95) 0%,rgba(0,0,0,0.9) 40%,rgba(0,0,0,0.6) 70%,transparent 100%);">' +
-        '<div style="font-size:32px;font-weight:800;color:#ffffff;">' + h.name + '</div>' +
-        '<div style="font-size:20px;color:rgba(255,255,255,0.7);">' + h.count + ' Jammers</div>' +
+      '<div style="position:absolute;bottom:0;left:0;right:0;padding:24px 20px 18px;background:linear-gradient(0deg,rgba(0,0,0,0.95) 0%,rgba(0,0,0,0.9) 40%,rgba(0,0,0,0.6) 70%,transparent 100%);">' +
+        '<div class="tile-hero-title">' + h.name + '</div>' +
+        '<div class="tile-hero-sub">' + h.count + ' Jammers</div>' +
       '</div>';
     pubGrid.appendChild(tile);
   }
@@ -13773,9 +14120,9 @@ function makeSoloSongTile(sIdx) {
       '<img src="' + (s.file || '') + '" alt="" style="' + (s.file ? '' : 'display:none') + '">' +
       '<div class="song-pos">' + (sIdx + 1) + '</div>' +
       '<div style="position:absolute;bottom:0;left:0;right:0;padding:80px 16px 16px;background:linear-gradient(180deg,transparent 0%,rgba(0,0,0,0.9) 60%);z-index:2">' +
-        '<div style="font-size:28px;font-weight:800;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 2px 6px rgba(0,0,0,0.9)">' + (s.title || 'Unknown') + '</div>' +
-        '<div style="font-size:22px;color:rgba(255,255,255,0.75);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 4px rgba(0,0,0,0.8)">' + (s.artist || '') + '</div>' +
-        '<div style="font-size:18px;color:rgba(255,255,255,0.45);margin-top:4px">' + mDur + ' &#183; ' + (s.genre || '') + ' &#183; ' + (s.bpm || '') + ' BPM</div>' +
+        '<div class="tile-hero-title">' + (s.title || 'Unknown') + '</div>' +
+        '<div class="tile-hero-sub">' + (s.artist || '') + '</div>' +
+        '<div class="tile-hero-sub" style="color:rgba(255,255,255,0.6);margin-top:4px">' + mDur + ' &#183; ' + (s.genre || '') + ' &#183; ' + (s.bpm || '') + ' BPM</div>' +
         '<div class="song-badges" style="position:static;margin-top:8px">' +
           '<div class="song-badge"><svg viewBox="0 0 24 24"><path d="M19.59 3.41c-.8-.8-2.1-.8-2.9 0L12 8.1 9.59 5.69c-.8-.8-2.1-.8-2.9 0-.8.8-.8 2.1 0 2.9L9.1 11 3.41 16.69c-.8.8-.8 2.1 0 2.9.4.4.93.59 1.45.59s1.05-.2 1.45-.59L12 13.9l2.41 2.41c.4.4.93.59 1.45.59s1.05-.2 1.45-.59c.8-.8.8-2.1 0-2.9L14.9 11l5.69-5.69c.8-.8.8-2.1 0-2.9z"/></svg>' + instLabel + '</div>' +
           '<div class="song-badge"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.27 5.82 21 7 14.14l-5-4.87 6.91-1.01z"/></svg>' + diffLabel + '</div>' +
@@ -15256,9 +15603,9 @@ function buildVaultGrid() {
       return function() { sendToUnity('selectVaultItem', {name: item.name, cat: item.cat}); };
     })(v);
     tile.innerHTML =
-      '<div style="position:absolute;bottom:0;left:0;right:0;padding:24px;background:linear-gradient(0deg,rgba(0,0,0,0.85) 0%,transparent 100%);">' +
-        '<div style="font-size:32px;font-weight:800;color:#ffffff;">' + v.name + '</div>' +
-        '<div style="font-size:20px;color:rgba(255,255,255,0.7);">' + v.cat + '</div>' +
+      '<div style="position:absolute;bottom:0;left:0;right:0;padding:24px 20px 18px;background:linear-gradient(0deg,rgba(0,0,0,0.85) 0%,transparent 100%);">' +
+        '<div class="tile-hero-title">' + v.name + '</div>' +
+        '<div class="tile-hero-sub">' + v.cat + '</div>' +
       '</div>';
     return tile;
   });
@@ -15873,9 +16220,9 @@ function buildStoreGrid() {
     })(s);
     tile.innerHTML =
       '<div class="store-price">$2.99</div>' +
-      '<div style="position:absolute;bottom:0;left:0;right:0;padding:24px;background:linear-gradient(0deg,rgba(0,0,0,0.85) 0%,transparent 100%);">' +
-        '<div style="font-size:32px;font-weight:800;color:#ffffff;">' + (s.title || 'Unknown') + '</div>' +
-        '<div style="font-size:20px;color:rgba(255,255,255,0.7);">' + (s.artist || 'Unknown') + '</div>' +
+      '<div style="position:absolute;bottom:0;left:0;right:0;padding:24px 20px 18px;background:linear-gradient(0deg,rgba(0,0,0,0.85) 0%,transparent 100%);">' +
+        '<div class="tile-hero-title">' + (s.title || 'Unknown') + '</div>' +
+        '<div class="tile-hero-sub">' + (s.artist || 'Unknown') + '</div>' +
       '</div>';
     return tile;
   });
@@ -15906,7 +16253,7 @@ function buildStoreGrid() {
     tile.style.flexDirection = 'column';
     tile.style.alignItems = 'center';
     tile.style.justifyContent = 'center';
-    tile.style.gap = '12px';
+    tile.style.gap = '8px';
     if (!p.locked) {
       tile.style.background = p.color;
       tile.style.cursor = 'pointer';
@@ -15916,10 +16263,10 @@ function buildStoreGrid() {
       })(p);
       tile.innerHTML =
         '<div class="store-price">' + p.price + '</div>' +
-        '<div style="font-size:64px;line-height:1">&#127873;</div>' +
-        '<div style="font-size:32px;font-weight:800;color:#ffffff;text-align:center">' + p.name + '</div>' +
-        '<div style="font-size:24px;color:#ffffff;text-align:center">' + p.picks + ' Picks</div>' +
-        '<div style="font-size:20px;color:rgba(255,255,255,0.6);text-align:center">' + p.items[0] + ' + ' + p.items[1] + '</div>';
+        '<div style="font-size:40px;line-height:1">&#127873;</div>' +
+        '<div class="tile-hero-title" style="text-align:center">' + p.name + '</div>' +
+        '<div class="tile-hero-sub" style="text-align:center">' + p.picks + ' Picks</div>' +
+        '<div class="tile-hero-sub" style="text-align:center;color:rgba(255,255,255,0.6)">' + p.items[0] + ' + ' + p.items[1] + '</div>';
     } else {
       tile.style.background = '#1a1a1a';
       tile.innerHTML =
@@ -15959,7 +16306,7 @@ function buildStoreGrid() {
     tile.innerHTML =
       '<div style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px">' +
         '<div style="font-size:64px;line-height:1">' + c.icon + '</div>' +
-        '<div style="font-size:36px;font-weight:800;color:#ffffff">' + c.cat + '</div>' +
+        '<div class="tile-hero-title" style="text-align:center">' + c.cat + '</div>' +
       '</div>';
     return tile;
   });
@@ -15984,6 +16331,10 @@ var progressionPending = false;
 var UI_VERSION = 'v1.0.0.0';
 var allTilings = [];
 var currentLayout = 317;
+// Challenges grid tilings (4x3 → 3164 layouts). 0 = uniform all-1x1 4x3 grid.
+// Override with ?challengeLayout=N; reveal the picker with ?challengeLayoutPicker.
+var questTilings = [];
+var currentQuestLayout = 0;
 var unlockedThemes = ['hyperpop', 'wireframe-dark'];
 var pendingPurchaseId = null;
 
@@ -16479,7 +16830,176 @@ function showReferralsSection() {
   navigateTo('settings');
   document.getElementById('settings-main').style.display = 'none';
   document.getElementById('profile-section-referrals').className = 'profile-section active';
+  buildReferralsSection();
   sendToUnity('referralsOpened', {});
+}
+
+// ── Referrals (Share The Love) ────────────────────────
+// Friends list on top (same roster as Bandmates ▸ Friends), a row of badges
+// from the Badges screen along the bottom (same badgeData entries — art and
+// earned state stay in sync — but with referral-tier hints overriding the
+// badge's own hint in this band only).
+// `earned`/`progress` here override the Badges screen state — referral tiers
+// track referral counts, not the badge's own unlock condition.
+var REFERRAL_BADGES = [
+  { name: 'Recruiter',     hint: 'Refer 1 person who plays Jamsesh',   earned: true },
+  { name: 'Band Together', hint: 'Refer 2 people who play Jamsesh',    earned: false,
+    progress: { pct: 50, label: '1 out of 2 referrals complete' } },
+  { name: 'Full Lineup',   hint: 'Refer 5 people who play Jamsesh',    earned: false },
+  { name: 'Going Viral',   hint: 'Refer 10 people who play Jamsesh',   earned: false }
+];
+
+// Mock per-friend referral lifecycle — Unity drives the real state later.
+// state: 'sent' (invite sent → 500 Picks) | 'complete' (first jam done →
+// 1,000 Picks) | 'jamming' (already plays — not referrable, no action);
+// absent = not yet invited (row click sends the invite).
+var referralStates = {
+  'Jooleeno':    { state: 'complete', claimed: false },
+  'Ted':         { state: 'complete', claimed: true },
+  'Abbie':       { state: 'sent',     claimed: false },
+  'Arthen':      { state: 'jamming' },
+  'xShadowPick': { state: 'sent',     claimed: false },
+  'MelodyQueen': { state: 'complete', claimed: false },
+  'FretNinja':   { state: 'complete', claimed: true }
+};
+var referralCode = 'J4M-53SH';   // mock; Unity pushes the player's real code later
+var enteredReferralCode = '';    // friend's code this player redeemed (Unity validates for real)
+
+// ── Referral code entry popup ──
+function openReferralCodePopup() {
+  var input = document.getElementById('referral-code-input');
+  input.value = '';
+  document.getElementById('referral-code-error').textContent = '';
+  document.getElementById('referral-code-overlay').className = 'referral-code-overlay active';
+  input.focus();
+}
+
+function closeReferralCodePopup(e) {
+  if (e && e.target !== document.getElementById('referral-code-overlay')) return;
+  document.getElementById('referral-code-overlay').className = 'referral-code-overlay';
+}
+
+function confirmReferralCode() {
+  var code = document.getElementById('referral-code-input').value.replace(/\s+/g, '').toUpperCase();
+  var errEl = document.getElementById('referral-code-error');
+  if (!code) { errEl.textContent = 'Please enter a code.'; return; }
+  if (code === referralCode.toUpperCase()) { errEl.textContent = 'That\'s your own code — ask a friend for theirs!'; return; }
+  enteredReferralCode = code;
+  sendToUnity('referralCodeEntered', { code: code });
+  document.getElementById('referral-code-overlay').className = 'referral-code-overlay';
+  updateReferralCodeBtn();
+}
+
+// One-shot affordance: once a code is applied the button shows it and goes inert.
+function updateReferralCodeBtn() {
+  var btn = document.getElementById('referral-enter-code-btn');
+  if (!btn) return;
+  if (enteredReferralCode) {
+    btn.textContent = 'Code Applied: ' + enteredReferralCode;
+    btn.className = 'referral-enter-code-btn applied';
+  } else {
+    btn.textContent = 'Enter a Friend\'s Code';
+    btn.className = 'referral-enter-code-btn';
+  }
+}
+
+var referralFriendsPage = 0;
+// 2 cols x 4 rows fits above the reward-tier band (the social tab's PAGE_SIZE
+// of 12 is too tall here); the pager widget itself is the shared renderPager.
+var REFERRAL_FRIENDS_PER_PAGE = 8;
+
+function buildReferralsSection() {
+  var codeEl = document.getElementById('referral-code');
+  if (codeEl) codeEl.textContent = referralCode;
+  updateReferralCodeBtn();
+
+  // ── Friends (2-column list, paginated) ──
+  var list = document.getElementById('referral-friends-list');
+  if (!list) return;
+  list.innerHTML = '';
+  var friends = getFriendsData();
+  var fTotal = Math.max(1, Math.ceil(friends.length / REFERRAL_FRIENDS_PER_PAGE));
+  if (referralFriendsPage >= fTotal) referralFriendsPage = fTotal - 1;
+  if (referralFriendsPage < 0) referralFriendsPage = 0;
+  var fStart = referralFriendsPage * REFERRAL_FRIENDS_PER_PAGE;
+  var fPage = friends.slice(fStart, fStart + REFERRAL_FRIENDS_PER_PAGE);
+  for (var i = 0; i < fPage.length; i++) {
+    var f = fPage[i];
+    var st = referralStates[f.name];
+    var item = document.createElement('div');
+    item.className = 'friend-item' + (f.online ? ' online' : '');
+    item.style.setProperty('--friend-delay', (i * 0.06) + 's');
+    var rightHtml;
+    if (!st) {
+      rightHtml = '<div class="referral-invite-pill">Invite</div>';
+    } else if (st.state === 'jamming') {
+      rightHtml = '<div class="referral-status-tag jamming">Already Jamming</div>';
+    } else {
+      rightHtml =
+        '<div class="referral-status-tag ' + st.state + '">' + (st.state === 'complete' ? 'Complete' : 'Sent') + '</div>' +
+        (st.claimed
+          ? '<div class="referral-claim-pill claimed">Claimed</div>'
+          : '<div class="referral-claim-pill" data-claim="1">Claim Picks</div>');
+    }
+    item.innerHTML =
+      '<div class="friend-avatar"><img src="' + f.avatar + '" alt=""></div>' +
+      '<div class="friend-info">' +
+        '<div class="friend-name">' + f.name + '</div>' +
+        '<div class="friend-status' + (f.online ? ' online' : '') + '">' +
+          '<span class="friend-dot' + (f.online ? ' online' : '') + '"></span>' +
+          (f.online ? 'Online' : 'Offline') +
+        '</div>' +
+      '</div>' +
+      rightHtml;
+    if (!st) {
+      // Not yet invited — whole row sends the invite (pill flips to "Invited").
+      item.onclick = (function(fr, el) {
+        return function() {
+          var pill = el.querySelector('.referral-invite-pill');
+          if (pill && pill.className.indexOf('sent') === -1) {
+            pill.className += ' sent';
+            pill.textContent = 'Invited';
+          }
+          sendToUnity('referFriend', { name: fr.name });
+        };
+      })(f, item);
+    } else if (st.state !== 'jamming' && !st.claimed) {
+      var claimBtn = item.querySelector('[data-claim]');
+      claimBtn.onclick = (function(fr, s) {
+        return function(e) {
+          e.stopPropagation();
+          s.claimed = true;
+          sendToUnity('claimReferralPicks', { name: fr.name, reward: s.state === 'complete' ? 1000 : 500 });
+          buildReferralsSection();
+        };
+      })(f, st);
+    }
+    list.appendChild(item);
+  }
+  renderPager(document.getElementById('referral-friends-pager'), referralFriendsPage, fTotal, function(dir) {
+    referralFriendsPage += dir;
+    buildReferralsSection();
+  });
+
+  // ── Badge band (Badges screen entries with referral-tier hints) ──
+  var band = document.getElementById('referral-tiers');
+  band.innerHTML = '';
+  for (var t = 0; t < REFERRAL_BADGES.length; t++) {
+    for (var j = 0; j < badgeData.length; j++) {
+      if (badgeData[j].name === REFERRAL_BADGES[t].name) {
+        var src = badgeData[j];
+        band.appendChild(makeBadgeTile({
+          name: src.name,
+          hint: REFERRAL_BADGES[t].hint,
+          icon: src.icon,
+          img: src.img,
+          earned: REFERRAL_BADGES[t].earned,
+          progress: REFERRAL_BADGES[t].progress
+        }));
+        break;
+      }
+    }
+  }
 }
 
 // ── Avatar Editor ─────────────────────────────────────
@@ -17629,16 +18149,40 @@ function buildQuestGrid() {
   if (!container) return;
   container.innerHTML = '';
   var challenges = window._backendChallenges || questData;
-  var qTotal = pageCount(challenges.length);
+
+  // Tiled 4x3 layout — same mechanic as the home grid. Per-page capacity is the
+  // slot count of the current tiling (12 on the uniform layout, fewer when slots
+  // span multiple cells).
+  if (!questTilings.length) questTilings = generateAllTilings(4, 3);
+  if (currentQuestLayout < 0 || currentQuestLayout >= questTilings.length) currentQuestLayout = 0;
+  var tiling = questTilings[currentQuestLayout];
+  var perPage = tiling.length;
+  var qTotal = Math.max(1, Math.ceil(challenges.length / perPage));
   if (challengesPage >= qTotal) challengesPage = qTotal - 1;
   if (challengesPage < 0) challengesPage = 0;
-  var qPage = pageSlice(challenges, challengesPage);
-  for (var i = 0; i < qPage.length; i++) {
+  var qPage = challenges.slice(challengesPage * perPage, challengesPage * perPage + perPage);
+
+  // Same slot ordering as the home grid: biggest slot first (top-left wins ties),
+  // so the page's first challenge always lands on the largest tile.
+  var slots = [];
+  for (var s = 0; s < tiling.length; s++) {
+    slots.push({ t: tiling[s], area: tiling[s].w * tiling[s].h });
+  }
+  slots.sort(function(a, b) {
+    if (b.area !== a.area) return b.area - a.area;
+    if (a.t.r !== b.t.r) return a.t.r - b.t.r;
+    return a.t.c - b.t.c;
+  });
+
+  for (var i = 0; i < qPage.length && i < slots.length; i++) {
     var q = qPage[i];
+    var slot = slots[i].t;
     var done = !!q.completed;
     var tile = document.createElement('div');
     // Completed → mint "earned" card + check; otherwise the dark to-do card.
     tile.className = 'quest-tile ' + (done ? 'quest-done' : 'quest-todo');
+    tile.style.gridColumn = (slot.c + 1) + ' / span ' + slot.w;
+    tile.style.gridRow = (slot.r + 1) + ' / span ' + slot.h;
     tile.style.cursor = 'pointer';
     tile.onclick = (function(ch) { return function() { openChallengePopup(ch); }; })(q);
 
@@ -17675,6 +18219,7 @@ function buildQuestGrid() {
     container.appendChild(tile);
   }
   renderPager(document.getElementById('challenges-pager'), challengesPage, qTotal, function(dir) { challengesPage += dir; buildQuestGrid(); });
+  updateQuestLayoutBtn(currentQuestLayout);
 }
 
 // ── Challenge reward popup (Rate Us → verify → claim) ───────────────────
@@ -17911,7 +18456,7 @@ var badgeData = [
   { name: 'Going Viral',    hint: 'Share a TikTok with #jamseshgame',icon: BADGE_ICON.tiktok,    earned: false },
   { name: 'Influencer',     hint: 'Share a clip to Instagram',       icon: BADGE_ICON.instagram, earned: false },
   { name: 'Recruiter',      hint: 'Invite a friend who joins',       icon: BADGE_ICON.link,      earned: false },
-  { name: 'Shutterbug',     hint: 'Capture a photo in Creator',      icon: BADGE_ICON.camera,    earned: true },
+  { name: 'Shutterbug',     hint: 'Capture a photo in Design',      icon: BADGE_ICON.camera,    earned: true },
   { name: 'Cover Artist',   hint: 'Create your first AI art',        icon: BADGE_ICON.brush,     earned: false },
   { name: 'World Builder',  hint: 'Create a Space',                  icon: BADGE_ICON.home,      earned: false },
   { name: 'Style Icon',     hint: 'Equip a theme, banner & frame',   icon: BADGE_ICON.palette,   earned: false },
@@ -17926,6 +18471,26 @@ for (var _bi = 0; _bi < badgeData.length; _bi++) {
   badgeData[_bi].img = _bi === 0 ? 'badges/01.png' : 'badges/locked.png';
 }
 
+// Single badge tile — shared by the Badges grid and the Referrals badge band.
+function makeBadgeTile(b) {
+  var tile = document.createElement('div');
+  tile.className = 'badge-tile' + (b.earned ? ' earned' : ' locked') + (b.progress ? ' in-progress' : '');
+  var artInner = b.img
+    ? '<img src="' + b.img + '" alt="">'
+    : '<svg class="badge-icon" viewBox="0 0 24 24"><path d="' + b.icon + '"/></svg>';
+  tile.innerHTML =
+    '<div class="badge-art' + (b.img ? ' badge-art--img' : '') + '">' + artInner + '</div>' +
+    '<div class="badge-name">' + b.name + '</div>' +
+    '<div class="badge-hint">' + b.hint + '</div>' +
+    (b.progress
+      ? '<div class="badge-progress">' +
+          '<div class="badge-progress-bar"><div class="badge-progress-fill" style="width:' + b.progress.pct + '%"></div></div>' +
+          '<div class="badge-progress-label">' + b.progress.label + '</div>' +
+        '</div>'
+      : '');
+  return tile;
+}
+
 function buildBadgeGrid() {
   var grid = document.getElementById('badge-grid');
   if (!grid) return;
@@ -17933,17 +18498,7 @@ function buildBadgeGrid() {
   var start = badgePage * BADGES_PER_PAGE;
   var pageItems = badgeData.slice(start, start + BADGES_PER_PAGE);
   for (var i = 0; i < pageItems.length; i++) {
-    var b = pageItems[i];
-    var tile = document.createElement('div');
-    tile.className = 'badge-tile' + (b.earned ? ' earned' : ' locked');
-    var artInner = b.img
-      ? '<img src="' + b.img + '" alt="">'
-      : '<svg class="badge-icon" viewBox="0 0 24 24"><path d="' + b.icon + '"/></svg>';
-    tile.innerHTML =
-      '<div class="badge-art' + (b.img ? ' badge-art--img' : '') + '">' + artInner + '</div>' +
-      '<div class="badge-name">' + b.name + '</div>' +
-      '<div class="badge-hint">' + b.hint + '</div>';
-    grid.appendChild(tile);
+    grid.appendChild(makeBadgeTile(pageItems[i]));
   }
   buildBadgePagination();
 }
@@ -17954,17 +18509,22 @@ function buildBadgePagination() {
 }
 
 // ── Home Grid Layout System ──────────────────────────────────────
-function generateAllTilings() {
+// All rectangular tilings of a cols x rows grid. Defaults to the home grid's
+// 3x3 (322 tilings); the Challenges grid passes 4x3 (3164 tilings). Tiling 0 is
+// always the uniform all-1x1 grid (the recursion tries 1x1 first at every cell).
+function generateAllTilings(cols, rows) {
+  cols = cols || 3;
+  rows = rows || 3;
   var results = [];
-  var grid = [
-    [0, 0, 0],
-    [0, 0, 0],
-    [0, 0, 0]
-  ];
+  var grid = [];
+  for (var gr = 0; gr < rows; gr++) {
+    grid.push([]);
+    for (var gc = 0; gc < cols; gc++) grid[gr].push(0);
+  }
 
   function findEmpty() {
-    for (var r = 0; r < 3; r++) {
-      for (var c = 0; c < 3; c++) {
+    for (var r = 0; r < rows; r++) {
+      for (var c = 0; c < cols; c++) {
         if (grid[r][c] === 0) return { r: r, c: c };
       }
     }
@@ -17972,7 +18532,7 @@ function generateAllTilings() {
   }
 
   function canPlace(r, c, w, h) {
-    if (r + h > 3 || c + w > 3) return false;
+    if (r + h > rows || c + w > cols) return false;
     for (var dr = 0; dr < h; dr++) {
       for (var dc = 0; dc < w; dc++) {
         if (grid[r + dr][c + dc] !== 0) return false;
@@ -17996,8 +18556,8 @@ function generateAllTilings() {
       return;
     }
     var r = cell.r, c = cell.c;
-    for (var w = 1; w <= 3 - c; w++) {
-      for (var h = 1; h <= 3 - r; h++) {
+    for (var w = 1; w <= cols - c; w++) {
+      for (var h = 1; h <= rows - r; h++) {
         if (canPlace(r, c, w, h)) {
           place(r, c, w, h, 1);
           tiles.push({ r: r, c: c, w: w, h: h });
@@ -18028,7 +18588,7 @@ var homeTileDefs = {
   season:  { id: 'season',  title: 'Grammys Progress', sub: '8 Days Left', detail: '40% Complete', ext: 'jpg', action: function() { navigateTo('season'); } },
   store:   { id: 'store',   title: 'Store', sub: 'Golden Stratocaster', detail: '10,000 Picks - 7 days left', ext: 'jfif', action: function() { navigateTo('store'); } },
   vault:   { id: 'vault',   title: 'My Collection', sub: '2 New Items Unlocked', detail: 'Check out your new gear', ext: 'webp', action: function() { navigateTo('store', {tab: 'vault'}); } },
-  creator: { id: 'creator', title: 'Creator', sub: 'Your Creations', detail: 'Build and share content', ext: 'jpg', action: function() { navigateTo('creator'); } },
+  creator: { id: 'creator', title: 'Design', sub: 'Your Creations', detail: 'Build and share content', ext: 'jpg', action: function() { navigateTo('creator'); } },
   spaces:  { id: 'spaces',  title: 'Spaces', sub: 'K-Pop Zone', detail: '20/25 Jammers online!', ext: 'jfif', action: function() { navigateTo('spaces'); } },
   news:    { id: 'news',    title: 'News', sub: 'Update v0.25', detail: 'New battle mode added!', ext: 'jfif', action: function() { navigateTo('settings'); } },
   social:  { id: 'social',  title: 'Bandmates', sub: '8 Friends Online', detail: 'Jump in and jam together', ext: 'webp', action: function() { navigateTo('social', {tab: 'friends'}); } }
@@ -18126,19 +18686,12 @@ function buildHomeGrid(layoutIndex) {
 
     var overlayColor = gc.c.replace(/[\d.]+\)$/, '0.25)');
     var overlayMid = gc.c.replace(/[\d.]+\)$/, '0.4)');
-    var big = (t.w === 3 && t.h === 2);
-    var tSize = big ? 96 : 48;
-    var sSize = big ? 68 : 34;
-    var dSize = big ? 48 : 24;
-    var tShadow = big ? '4px' : '2px';
-    var sShadow = big ? '2px' : '1px';
-    var tLetter = big ? '2px' : '1px';
     tile.innerHTML =
       '<img src="' + bgSrc + '" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:0;border-radius:var(--panel-radius)" alt="">' +
       '<div style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:1;background:linear-gradient(180deg,' + overlayColor + ' 0%,' + overlayMid + ' 40%,rgba(0,0,0,0.7) 100%);border-radius:var(--panel-radius)"></div>' +
-      '<div style="font-size:' + tSize + 'px;font-family:\'Bebas Neue\',sans-serif;font-weight:400;color:#ffffff;text-shadow:-' + tShadow + ' -' + tShadow + ' 0 rgba(0,0,0,0.8),' + tShadow + ' -' + tShadow + ' 0 rgba(0,0,0,0.8),-' + tShadow + ' ' + tShadow + ' 0 rgba(0,0,0,0.8),' + tShadow + ' ' + tShadow + ' 0 rgba(0,0,0,0.8);position:relative;z-index:3;letter-spacing:' + tLetter + ';text-transform:none">' + ht.title + '</div>' +
-      '<div style="font-size:' + sSize + 'px;font-weight:700;color:rgba(255,255,255,0.9);text-shadow:-' + sShadow + ' -' + sShadow + ' 0 rgba(0,0,0,0.7),' + sShadow + ' -' + sShadow + ' 0 rgba(0,0,0,0.7),-' + sShadow + ' ' + sShadow + ' 0 rgba(0,0,0,0.7),' + sShadow + ' ' + sShadow + ' 0 rgba(0,0,0,0.7);position:relative;z-index:3;text-transform:none">' + ht.sub + '</div>' +
-      '<div style="font-size:' + dSize + 'px;font-weight:600;color:rgba(255,255,255,0.7);text-shadow:-' + sShadow + ' -' + sShadow + ' 0 rgba(0,0,0,0.6),' + sShadow + ' -' + sShadow + ' 0 rgba(0,0,0,0.6),-' + sShadow + ' ' + sShadow + ' 0 rgba(0,0,0,0.6),' + sShadow + ' ' + sShadow + ' 0 rgba(0,0,0,0.6);position:relative;z-index:3;text-transform:none">' + ht.detail + '</div>';
+      '<div class="tile-hero-title" style="position:relative;z-index:3">' + ht.title + '</div>' +
+      '<div class="tile-hero-sub" style="position:relative;z-index:3">' + ht.sub + '</div>' +
+      '<div class="tile-hero-sub" style="position:relative;z-index:3;color:rgba(255,255,255,0.6)">' + ht.detail + '</div>';
 
     wrap.appendChild(tile);
     container.appendChild(wrap);
@@ -18201,7 +18754,7 @@ function selectLayout(index) {
   buildStoreGrid();
   buildVaultGrid();
   updateLayoutBtn(index);
-  var thumbs = document.querySelectorAll('.layout-thumb');
+  var thumbs = document.querySelectorAll('#layout-browser .layout-thumb');
   for (var i = 0; i < thumbs.length; i++) {
     var idx = parseInt(thumbs[i].getAttribute('data-layout-index'), 10);
     if (idx === index) {
@@ -18224,6 +18777,103 @@ function openLayoutPicker() {
 function closeLayoutPicker(e) {
   if (e && e.target !== document.getElementById('layout-overlay')) return;
   document.getElementById('layout-overlay').className = 'layout-overlay';
+}
+
+/* ── Challenges layout picker (4x3) ──────────────────────────
+   Mirrors the home layout picker: ?challengeLayoutPicker reveals the picker
+   button on the Challenges tab; ?challengeLayout=N deep-links a layout. */
+
+function buildQuestLayoutBrowser() {
+  var browser = document.getElementById('quest-layout-browser');
+  browser.innerHTML = '';
+  document.getElementById('quest-layout-count').textContent = questTilings.length + ' layouts';
+  for (var i = 0; i < questTilings.length; i++) {
+    var wrap = document.createElement('div');
+    wrap.className = 'layout-thumb-wrap thumb-wrap-4x3';
+    var thumb = document.createElement('div');
+    thumb.className = 'layout-thumb thumb-4x3' + (i === currentQuestLayout ? ' selected' : '');
+    thumb.setAttribute('data-layout-index', i);
+    thumb.onclick = (function(idx) {
+      return function() { selectQuestLayout(idx); };
+    })(i);
+
+    var tiling = questTilings[i];
+    for (var j = 0; j < tiling.length; j++) {
+      var t = tiling[j];
+      var cell = document.createElement('div');
+      cell.className = 'layout-thumb-tile';
+      cell.style.gridColumn = (t.c + 1) + ' / span ' + t.w;
+      cell.style.gridRow = (t.r + 1) + ' / span ' + t.h;
+      thumb.appendChild(cell);
+    }
+
+    var label = document.createElement('div');
+    label.style.cssText = 'position:absolute;bottom:4px;left:0;right:0;text-align:center;font-size:16px;font-weight:700;color:#666666;z-index:2;pointer-events:none';
+    label.textContent = i;
+
+    wrap.appendChild(thumb);
+    wrap.appendChild(label);
+    browser.appendChild(wrap);
+  }
+}
+
+function updateQuestLayoutBtn(layoutIndex) {
+  var btn = document.getElementById('quest-layout-btn');
+  if (!btn) return;
+  btn.innerHTML = '';
+  var tiling = questTilings[layoutIndex];
+  if (!tiling) return;
+  for (var j = 0; j < tiling.length; j++) {
+    var t = tiling[j];
+    var cell = document.createElement('div');
+    cell.className = 'home-layout-btn-tile';
+    cell.style.gridColumn = (t.c + 1) + ' / span ' + t.w;
+    cell.style.gridRow = (t.r + 1) + ' / span ' + t.h;
+    btn.appendChild(cell);
+  }
+}
+
+function selectQuestLayout(index) {
+  currentQuestLayout = index;
+  challengesPage = 0;   // per-page capacity changes with the tiling
+  buildQuestGrid();
+  var thumbs = document.querySelectorAll('#quest-layout-browser .layout-thumb');
+  for (var i = 0; i < thumbs.length; i++) {
+    var idx = parseInt(thumbs[i].getAttribute('data-layout-index'), 10);
+    if (idx === index) {
+      thumbs[i].className = 'layout-thumb thumb-4x3 selected';
+    } else {
+      thumbs[i].className = 'layout-thumb thumb-4x3';
+    }
+  }
+  // Update URL and persist via Unity/PlayFab. Unlike the home picker this
+  // keeps the other flags so a live-reload boots back into the same dev
+  // state. ?skip / ?challengeLayoutPicker are re-added from JS state because
+  // the onboarding flow's own ?step= URL rewrites strip them.
+  try {
+    var params = window.location.search.substring(1).split('&');
+    var keep = [];
+    for (var p = 0; p < params.length; p++) {
+      var key = params[p] ? params[p].split('=')[0] : '';
+      if (key && key !== 'challengeLayout' && key !== 'challengeLayoutPicker' && key !== 'skip') keep.push(params[p]);
+    }
+    if (skipAll) keep.push('skip');
+    if (questLayoutPickerEnabled) keep.push('challengeLayoutPicker');
+    keep.push('challengeLayout=' + index);
+    window.history.replaceState(null, '', '?' + keep.join('&'));
+  } catch(e) {}
+  sendToUnity('challengeLayoutChanged', index);
+  closeQuestLayoutPicker();
+}
+
+function openQuestLayoutPicker() {
+  buildQuestLayoutBrowser();
+  document.getElementById('quest-layout-overlay').className = 'layout-overlay active';
+}
+
+function closeQuestLayoutPicker(e) {
+  if (e && e.target !== document.getElementById('quest-layout-overlay')) return;
+  document.getElementById('quest-layout-overlay').className = 'layout-overlay';
 }
 
 /* ══════════════ ONBOARDING FLOW ══════════════ */
@@ -18332,6 +18982,7 @@ var demoEnabled = false;     // ?demo — show demo-only screens
 var onboardEnabled = false;  // ?onboard — force onboarding even if completed
 var skipAll = false;         // ?skip — bypass everything, straight to full menu
 var layoutPickerEnabled = false; // ?layoutPicker — reveal the home layout picker button
+var questLayoutPickerEnabled = false; // ?challengeLayoutPicker — reveal the Challenges layout picker button
 var screenOverride = '';     // ?step=results1|results2 — direct-link to a results screen
 var onboardFlags = {};       // { legal: true, perms_explainer: true }
 var groupBootRole = '';      // ?host | ?client — pre-load the Group tab as host/client
@@ -18357,6 +19008,7 @@ function parseMode() {
   onboardEnabled = 'onboard' in map;
   skipAll = 'skip' in map;
   layoutPickerEnabled = 'layoutPicker' in map;
+  questLayoutPickerEnabled = 'challengeLayoutPicker' in map;
 
   // ?onboard clears saved flags to force re-run
   if (onboardEnabled) {
@@ -18405,6 +19057,14 @@ function parseMode() {
     var layoutNum = parseInt(map.layout, 10);
     if (!isNaN(layoutNum) && layoutNum >= 0) {
       currentLayout = layoutNum;
+    }
+  }
+
+  // ?challengeLayout=N — override Challenges grid layout (0-3163, clamped after tilings generate)
+  if (map.challengeLayout) {
+    var questLayoutNum = parseInt(map.challengeLayout, 10);
+    if (!isNaN(questLayoutNum) && questLayoutNum >= 0) {
+      currentQuestLayout = questLayoutNum;
     }
   }
 
@@ -18765,6 +19425,11 @@ function init() {
     var lpBtn = document.getElementById('home-layout-btn');
     if (lpBtn) lpBtn.style.display = '';
   }
+  // Same for the Challenges picker — ?challengeLayoutPicker
+  if (questLayoutPickerEnabled) {
+    var qlpBtn = document.getElementById('quest-layout-btn');
+    if (qlpBtn) qlpBtn.style.display = '';
+  }
 
   // Hide main UI while early access / onboarding screens are showing
   var topbar = document.querySelector('.topbar');
@@ -18782,6 +19447,8 @@ function init() {
   // Tilings must exist before any layout-driven grid builds below
   allTilings = generateAllTilings();
   if (currentLayout < 0 || currentLayout >= allTilings.length) currentLayout = 317;
+  questTilings = generateAllTilings(4, 3);
+  if (currentQuestLayout < 0 || currentQuestLayout >= questTilings.length) currentQuestLayout = 0;
 
   // Initialize play panel structure; Unity bridge pushes real songs + art
   buildPlayPanel([]);
@@ -18893,6 +19560,14 @@ function init() {
   // ?host / ?client — populate the lobby and jump to the Group tab so the
   // multiplayer lobby UI is testable outside of a Unity session.
   if (groupBootRole) applyGroupBootRole();
+
+  // ?challengeLayoutPicker — jump straight to Progress ▸ Challenges so the
+  // picker is on screen immediately and live-reloads land back on the grid
+  // being tuned (a bare ?challengeLayout=N boot stays on the default tab).
+  if (questLayoutPickerEnabled) {
+    navigateTo('season');
+    switchProgressTab('challenges');
+  }
 }
 
 function applyGroupBootRole() {

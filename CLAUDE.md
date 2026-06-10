@@ -191,6 +191,8 @@ When Unity flips `inBandspace=true`, the Group tab becomes available and `buildC
   | `?layout=N` | Sets home grid layout (0–321). Persists via `sendToUnity('layoutChanged', N)`. Also reshapes the Store tiling. |
   | `?tiles=a,b,c` | Overrides home tile priority order (e.g. `?tiles=social,store,season,news,spaces,vault,creator`). |
   | `?layoutPicker` | Reveals the layout-picker button (hidden by default). |
+  | `?challengeLayout=N` | Sets the Challenges (Progress tab) 4x3 grid layout (0–3163). Persists via `sendToUnity('challengeLayoutChanged', N)`. |
+  | `?challengeLayoutPicker` | Reveals the Challenges layout-picker button (hidden by default). |
   | `?host` / `?client` | Open directly into the Group lobby with a populated roster — see Group Lobby section. |
 - **Combining**: flags combine with `&`, e.g. `?demo&onboard&step=tutorial`, `?host&skip`.
 - **`isDemoMode()`** / **`isOnboardMode()`** — helper functions checked throughout the flow.
