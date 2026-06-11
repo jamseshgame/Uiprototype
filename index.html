@@ -4948,15 +4948,16 @@
     bottom: 0;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    align-items: flex-start;
+    justify-content: flex-end;
+    padding: 18px 20px;
     background: #0d0d0d;
   }
 
   .vault-tile .tile-title {
     font-size: 100px;
     font-weight: 400;
-    text-align: center;
+    text-align: left;
     line-height: 1.0;
     color: #ffffff;
     text-shadow: 0 2px 8px rgba(0,0,0,0.85);
@@ -4973,7 +4974,7 @@
     font-weight: 700;
     letter-spacing: 0.5px;
     color: var(--cyan);
-    text-align: center;
+    text-align: left;
     margin-bottom: 4px;
     text-shadow: 0 1px 6px rgba(0,0,0,0.85);
   }
@@ -5203,8 +5204,8 @@
     top: 0; left: 0; right: 0; bottom: 0;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    align-items: flex-start;
+    justify-content: flex-end;
     padding: 20px;          /* breathing room so the larger labels never touch the edges */
     background: rgba(0, 0, 0, 0.5);
   }
@@ -5214,7 +5215,7 @@
     line-height: 1.0;
     font-weight: 400;
     letter-spacing: 0.02em;
-    text-align: center;
+    text-align: left;
     color: #ffffff;
     text-shadow: 0 2px 8px rgba(0,0,0,0.85);
     overflow-wrap: break-word;
@@ -5284,8 +5285,9 @@
     position: absolute;
     top: 0; left: 0; right: 0; bottom: 0;
     display: flex;
-    align-items: center;
-    justify-content: center;
+    align-items: flex-end;
+    justify-content: flex-start;
+    padding: 14px 18px;
     background: #0a0a0a;
   }
 
@@ -5293,7 +5295,7 @@
     font-size: 34px;   /* hero standard scaled to fit the swatch info strip */
     font-weight: 400;
     line-height: 1.0;
-    text-align: center;
+    text-align: left;
     color: #ffffff;
     text-shadow: 0 2px 8px rgba(0,0,0,0.85);
   }
@@ -5387,8 +5389,9 @@
     position: absolute;
     top: 0; left: 0; right: 0; bottom: 0;
     display: flex;
-    align-items: center;
-    justify-content: center;
+    align-items: flex-end;
+    justify-content: flex-start;
+    padding: 14px 18px;
     background: #1a1a1a;
   }
 
@@ -5396,7 +5399,7 @@
     font-size: 34px;   /* hero standard scaled to fit the swatch info strip */
     font-weight: 400;
     line-height: 1.0;
-    text-align: center;
+    text-align: left;
     text-shadow: 0 2px 8px rgba(0,0,0,0.85);
   }
 
@@ -5541,7 +5544,7 @@
     line-height: 1.0;
     color: var(--text-primary);
     text-shadow: 0 2px 8px rgba(0,0,0,0.85);
-    text-align: center;
+    text-align: left;
     padding: 0 4px;
     white-space: normal;
     display: -webkit-box;
@@ -5558,6 +5561,8 @@
     letter-spacing: 0.5px;
     color: rgba(255,255,255,0.82);
     margin-top: 2px;
+    width: 100%;
+    text-align: left;
   }
 
   .season-xp-bar {
@@ -5968,7 +5973,7 @@
     font-weight: 400;
     line-height: 1.0;
     text-shadow: 0 2px 8px rgba(0,0,0,0.85);
-    text-align: center;
+    text-align: left;
     white-space: normal;
     display: -webkit-box;
     -webkit-box-orient: vertical;
@@ -5983,7 +5988,7 @@
     font-size: 17px;
     font-weight: 700;
     letter-spacing: 0.5px;
-    text-align: center;
+    text-align: left;
     line-height: 1.3;
     width: 100%;
     color: var(--text-secondary);
@@ -6120,25 +6125,19 @@
   }
 
   /* ── Referrals (Share The Love): header + bandmates list + reward-tier tiles ── */
+  /* Single centered row: code chip + enter-code button + reward summary. */
   .referral-head {
     flex-shrink: 0;
-    text-align: center;
-    padding: 4px 60px 8px;
-  }
-  .referral-title {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 110px;
-    line-height: 1;
-    letter-spacing: 6px;
-    text-transform: uppercase;
-    color: #ffffff;
-    text-shadow: 0 4px 24px rgba(0,0,0,0.55), 0 0 40px rgba(255,255,255,0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 28px;
+    padding: 12px 60px 16px;
   }
   .referral-code-chip {
     display: inline-flex;
     align-items: center;
     gap: 18px;
-    margin-top: 14px;
     padding: 10px 32px;
     border: 2px solid var(--page-accent, #ffffff);
     border-radius: 999px;
@@ -6157,23 +6156,52 @@
     line-height: 1;
     color: #ffffff;
   }
-  .referral-sub {
-    font-size: 28px;
+  /* Reward summary line: pick asset + Send/Join amounts + help button.
+     The full explainer lives in the referral help popup. */
+  .referral-rewards-line {
+    display: inline-flex;
+    align-items: center;
+    gap: 24px;
+  }
+  .referral-pick-img {
+    width: 56px;
+    height: 56px;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 8px rgba(0,0,0,0.6));
+  }
+  .referral-reward-item {
+    font-size: 30px;
     font-weight: 600;
     color: rgba(255,255,255,0.7);
-    line-height: 1.4;
-    max-width: 1400px;
-    margin: 10px auto 0;
   }
-  .referral-sub b { color: #ffffff; }
+  .referral-reward-item b { color: #ffffff; }
+  .referral-help-btn {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 2px solid var(--page-accent, #ffffff);
+    background: var(--btn-panel);
+    color: #ffffff;
+    font-size: 26px;
+    font-weight: 800;
+    line-height: 1;
+    cursor: pointer;
+  }
+  .referral-help-btn:hover { background: var(--btn-panel-hover); }
   .referral-friends {
     flex: 1;
     min-height: 0;
     /* Paginated via the shared pager — clip both axes so the friendSlideIn
        30px X-overshoot can't flash a horizontal scrollbar on rebuild. */
     overflow: hidden;
-    padding-bottom: 0;   /* rows never reach the bottom; the pager gap is set
-                            by the band's flex-basis below */
+    /* Fixed 5-row template, vertically centred: leftover flex space splits
+       evenly above and below the rows, and partial last pages keep the same
+       geometry instead of re-centring. Side padding only — the even
+       top/bottom gap comes from the centring. */
+    grid-template-rows: repeat(5, var(--nav-btn-h));
+    align-content: center;
+    padding-top: 0;
+    padding-bottom: 0;
   }
   /* Badge band reuses the Badges screen tile family (.badge-tile); pin a
      single row of 4 to the bottom (the shared .badge-grid declares 3 rows). */
@@ -6300,8 +6328,6 @@
   .referral-enter-code-btn {
     display: inline-flex;
     align-items: center;
-    vertical-align: bottom;   /* baseline-align with the inline-flex code chip */
-    margin: 14px 0 0 18px;
     padding: 13px 36px;
     background: var(--btn-panel);
     border: 2px solid var(--page-accent, #ffffff);
@@ -6835,7 +6861,8 @@
     font-size: 26px;
     font-weight: 800;
     color: var(--text-primary);
-    text-align: center;
+    width: 100%;
+    text-align: left;
     line-height: 1.2;
     min-height: 2.4em;          /* reserve 2 lines so every tile column is the same height */
   }
@@ -9711,13 +9738,17 @@ input, textarea, select {
       <div class="profile-section" id="profile-section-referrals">
         <button class="back-btn" onclick="hideSettingsSub()">&#9664; Profile</button>
         <div class="referral-head">
-          <div class="referral-title">Share The Love</div>
           <div class="referral-code-chip">
             <span class="referral-code-tag">Your Code</span>
             <span class="referral-code" id="referral-code">J4M-53SH</span>
           </div>
           <button class="referral-enter-code-btn" id="referral-enter-code-btn" onclick="openReferralCodePopup()">Enter a Friend's Code</button>
-          <div class="referral-sub">Every invite you send earns <b>500 Picks</b> &mdash; and when your referred player starts their first jam, you <b>both</b> earn <b>1,000 Picks</b>. Friends can also enter your code during onboarding to count as your referral.</div>
+          <div class="referral-rewards-line">
+            <img class="referral-pick-img" src="branding/jamsesh-pick.png" alt="">
+            <span class="referral-reward-item">Send: <b id="referral-reward-send">100</b> Picks</span>
+            <span class="referral-reward-item">Join: <b id="referral-reward-join">500</b> Picks</span>
+            <button class="referral-help-btn" onclick="openReferralHelpPopup()">?</button>
+          </div>
         </div>
         <div class="friends-list-wrap referral-friends" id="referral-friends-list"></div>
         <div id="referral-friends-pager"></div>
@@ -10230,12 +10261,24 @@ input, textarea, select {
   <div class="save-popup referral-code-popup" onclick="event.stopPropagation()" style="position:relative">
     <button class="popup-close-btn" onclick="closeReferralCodePopup()">&#10005;</button>
     <h2>Enter Referral Code</h2>
-    <div class="referral-code-popup-sub">Got a code from a friend? Enter it below &mdash; you <b>both</b> earn <b>1,000 Picks</b> when you finish your first jam.</div>
+    <div class="referral-code-popup-sub">Got a code from a friend? Enter it below &mdash; you <b>both</b> earn <b><span id="referral-code-popup-reward">500</span> Picks</b> when you finish your first jam.</div>
     <input class="save-input" id="referral-code-input" type="text" maxlength="12" placeholder="e.g. J4M-53SH">
     <div class="referral-code-error" id="referral-code-error"></div>
     <div class="save-buttons">
       <button class="save-btn-cancel" onclick="closeReferralCodePopup()">Cancel</button>
       <button class="save-btn-confirm" onclick="confirmReferralCode()">Submit</button>
+    </div>
+  </div>
+</div>
+
+<!-- Referral help popup (Profile ▸ Referrals — how the rewards work). -->
+<div class="referral-code-overlay" id="referral-help-overlay" onclick="closeReferralHelpPopup(event)">
+  <div class="save-popup referral-code-popup" onclick="event.stopPropagation()" style="position:relative">
+    <button class="popup-close-btn" onclick="closeReferralHelpPopup()">&#10005;</button>
+    <h2>How Referrals Work</h2>
+    <div class="referral-code-popup-sub" id="referral-help-text"></div>
+    <div class="save-buttons">
+      <button class="save-btn-confirm" onclick="closeReferralHelpPopup()">Got It</button>
     </div>
   </div>
 </div>
@@ -10592,6 +10635,7 @@ function handleUnityMessage(msg) {
     case 'updateCoins': updateCoinsFromBackend(msg.data); break;
     case 'updateProgression': updateProgression(msg.data); break;
     case 'updateChallenges': updateChallengesFromBackend(msg.data); break;
+    case 'updateReferralRewards': updateReferralRewards(msg.data); break;
     case 'setChallengeVerifySeconds': setChallengeVerifySeconds(msg.data); break;
     case 'gameResults': showGameResults(msg.data); break;
     case 'gameResultsGroupScore': applyGroupScore(msg.data); break;
@@ -16251,8 +16295,8 @@ function buildStoreGrid() {
     tile.style.overflow = 'hidden';
     tile.style.display = 'flex';
     tile.style.flexDirection = 'column';
-    tile.style.alignItems = 'center';
-    tile.style.justifyContent = 'center';
+    tile.style.alignItems = 'flex-start';
+    tile.style.justifyContent = 'flex-end';
     tile.style.gap = '8px';
     if (!p.locked) {
       tile.style.background = p.color;
@@ -16264,9 +16308,9 @@ function buildStoreGrid() {
       tile.innerHTML =
         '<div class="store-price">' + p.price + '</div>' +
         '<div style="font-size:40px;line-height:1">&#127873;</div>' +
-        '<div class="tile-hero-title" style="text-align:center">' + p.name + '</div>' +
-        '<div class="tile-hero-sub" style="text-align:center">' + p.picks + ' Picks</div>' +
-        '<div class="tile-hero-sub" style="text-align:center;color:rgba(255,255,255,0.6)">' + p.items[0] + ' + ' + p.items[1] + '</div>';
+        '<div class="tile-hero-title">' + p.name + '</div>' +
+        '<div class="tile-hero-sub">' + p.picks + ' Picks</div>' +
+        '<div class="tile-hero-sub" style="color:rgba(255,255,255,0.6)">' + p.items[0] + ' + ' + p.items[1] + '</div>';
     } else {
       tile.style.background = '#1a1a1a';
       tile.innerHTML =
@@ -16304,9 +16348,9 @@ function buildStoreGrid() {
       return function() { sendToUnity('storeCategory', {cat: cat.cat}); };
     })(c);
     tile.innerHTML =
-      '<div style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px">' +
+      '<div style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-end;gap:12px;padding:24px 20px 18px">' +
         '<div style="font-size:64px;line-height:1">' + c.icon + '</div>' +
-        '<div class="tile-hero-title" style="text-align:center">' + c.cat + '</div>' +
+        '<div class="tile-hero-title">' + c.cat + '</div>' +
       '</div>';
     return tile;
   });
@@ -16849,10 +16893,54 @@ var REFERRAL_BADGES = [
   { name: 'Going Viral',   hint: 'Refer 10 people who play Jamsesh',   earned: false }
 ];
 
+// ── Referral reward amounts ──
+// Display defaults for desktop testing. PlayFab-tunable: Unity pushes
+// {type:'updateReferralRewards', data:{send:N, join:N}} (sourced from PlayFab
+// title data) and every surface re-renders via renderReferralRewards().
+// send: Picks for sending an invite. join: Picks each side earns when the
+// referred player starts their first jam.
+var referralRewards = { send: 100, join: 500 };
+
+function updateReferralRewards(data) {
+  if (!data) return;
+  if (typeof data.send === 'number') referralRewards.send = data.send;
+  if (typeof data.join === 'number') referralRewards.join = data.join;
+  renderReferralRewards();
+}
+
+// Stamp the current reward amounts into every spot that displays them:
+// the header reward line, the help popup body, and the code-entry blurb.
+function renderReferralRewards() {
+  var sendEl = document.getElementById('referral-reward-send');
+  var joinEl = document.getElementById('referral-reward-join');
+  if (sendEl) sendEl.textContent = referralRewards.send.toLocaleString();
+  if (joinEl) joinEl.textContent = referralRewards.join.toLocaleString();
+  var helpEl = document.getElementById('referral-help-text');
+  if (helpEl) {
+    helpEl.innerHTML = 'Every invite you send earns <b>' + referralRewards.send.toLocaleString() +
+      ' Picks</b> &mdash; and when your referred player starts their first jam, you <b>both</b> earn <b>' +
+      referralRewards.join.toLocaleString() +
+      ' Picks</b>. Friends can also enter your code during onboarding to count as your referral.';
+  }
+  var codeRewardEl = document.getElementById('referral-code-popup-reward');
+  if (codeRewardEl) codeRewardEl.textContent = referralRewards.join.toLocaleString();
+}
+
+// ── Referral help popup ──
+function openReferralHelpPopup() {
+  renderReferralRewards();
+  document.getElementById('referral-help-overlay').className = 'referral-code-overlay active';
+}
+
+function closeReferralHelpPopup(e) {
+  if (e && e.target !== document.getElementById('referral-help-overlay')) return;
+  document.getElementById('referral-help-overlay').className = 'referral-code-overlay';
+}
+
 // Mock per-friend referral lifecycle — Unity drives the real state later.
-// state: 'sent' (invite sent → 500 Picks) | 'complete' (first jam done →
-// 1,000 Picks) | 'jamming' (already plays — not referrable, no action);
-// absent = not yet invited (row click sends the invite).
+// state: 'sent' (invite sent → referralRewards.send Picks) | 'complete'
+// (first jam done → referralRewards.join Picks) | 'jamming' (already plays —
+// not referrable, no action); absent = not yet invited (row click sends the invite).
 var referralStates = {
   'Jooleeno':    { state: 'complete', claimed: false },
   'Ted':         { state: 'complete', claimed: true },
@@ -16904,14 +16992,15 @@ function updateReferralCodeBtn() {
 }
 
 var referralFriendsPage = 0;
-// 2 cols x 4 rows fits above the reward-tier band (the social tab's PAGE_SIZE
+// 2 cols x 5 rows fits above the reward-tier band (the social tab's PAGE_SIZE
 // of 12 is too tall here); the pager widget itself is the shared renderPager.
-var REFERRAL_FRIENDS_PER_PAGE = 8;
+var REFERRAL_FRIENDS_PER_PAGE = 10;
 
 function buildReferralsSection() {
   var codeEl = document.getElementById('referral-code');
   if (codeEl) codeEl.textContent = referralCode;
   updateReferralCodeBtn();
+  renderReferralRewards();
 
   // ── Friends (2-column list, paginated) ──
   var list = document.getElementById('referral-friends-list');
@@ -16969,7 +17058,7 @@ function buildReferralsSection() {
         return function(e) {
           e.stopPropagation();
           s.claimed = true;
-          sendToUnity('claimReferralPicks', { name: fr.name, reward: s.state === 'complete' ? 1000 : 500 });
+          sendToUnity('claimReferralPicks', { name: fr.name, reward: s.state === 'complete' ? referralRewards.join : referralRewards.send });
           buildReferralsSection();
         };
       })(f, st);
