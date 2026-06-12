@@ -15624,8 +15624,8 @@ function openOptionPicker(type) {
     acceptBtn.className = 'std-popup-btn jamsesh-signature';
     acceptBtn.textContent = 'Accept';
     acceptBtn.onclick = function() {
-      // Keep the current selection; closeOptionPicker fires experienceClosed + buildPlayGrid.
-      closeOptionPicker();
+      // Commit the current selection (accept=true skips the snapshot revert).
+      closeOptionPicker(true);
     };
     stdFooter.appendChild(acceptBtn);
 
@@ -15685,16 +15685,23 @@ function buildSimplePickerChoices(panel, type, items, currentVal) {
   panel.appendChild(choices);
 }
 
-function closeOptionPicker() {
+function closeOptionPicker(accept) {
   document.getElementById('option-picker-overlay').style.display = 'none';
   var panel = document.getElementById('option-picker-panel');
   panel.className = 'option-picker-panel';
   panel.style.width = '';
   panel.style.maxHeight = '';
 
-  // Closing the Experience picker (cancel/accept) tears down the instrument
-  // skin preview in Unity, and applies any skin/env change to the play grid.
+  // Closing the Experience picker tears down the instrument skin preview in Unity
+  // and applies any skin/env change to the play grid. A cancel (X / backdrop tap —
+  // no accept arg) reverts skin+environment to the snapshot taken on open; Accept keeps them.
   if (currentPickerType === 'experience') {
+    if (!accept && experienceSnapshot) {
+      selectedExperience = experienceSnapshot.skin;
+      selectedEnvironment = experienceSnapshot.env;
+      sendToUnity('experience', {tab: 'skin', id: selectedExperience, instrument: (selectedInstrument || 'guitar')});
+      sendToUnity('experience', {tab: 'environment', id: selectedEnvironment});
+    }
     sendToUnity('experienceClosed', {});
     buildPlayGrid();
     experienceSnapshot = null;
