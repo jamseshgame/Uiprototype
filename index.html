@@ -12503,9 +12503,8 @@ function openSoloPopup(songIdx, type) {
   var overlay = document.getElementById('solo-popup-overlay');
   var popup = document.getElementById('solo-popup');
 
-  popup.className = 'solo-popup';
+  popup.className = 'solo-popup std-popup';
   popup.innerHTML = '';
-  popup.style.position = 'relative';
 
   var closeBtn = document.createElement('button');
   closeBtn.className = 'popup-close-btn';
@@ -12513,10 +12512,17 @@ function openSoloPopup(songIdx, type) {
   closeBtn.onclick = function(e) { e.stopPropagation(); closeSoloPopup(); };
   popup.appendChild(closeBtn);
 
+  var stdHeader = document.createElement('div');
+  stdHeader.className = 'std-popup-header';
   var title = document.createElement('div');
   title.className = 'solo-popup-title';
   title.textContent = type === 'instrument' ? 'Choose Instrument' : 'Choose Difficulty';
-  popup.appendChild(title);
+  stdHeader.appendChild(title);
+  popup.appendChild(stdHeader);
+
+  var stdBody = document.createElement('div');
+  stdBody.className = 'std-popup-body';
+  popup.appendChild(stdBody);
 
   var options = type === 'instrument' ? instruments : difficulties;
   for (var i = 0; i < options.length; i++) {
@@ -12530,7 +12536,7 @@ function openSoloPopup(songIdx, type) {
     card.onclick = (function(sIdx, t, optId) {
       return function() { selectSoloOption(sIdx, t, optId); };
     })(songIdx, type, opt.id);
-    popup.appendChild(card);
+    stdBody.appendChild(card);
   }
 
   overlay.className = 'solo-popup-overlay active';
@@ -12572,7 +12578,6 @@ function openSpacePopup(songIdx) {
   var spaceConf = songSpaces[songIdx] || {};
 
   popup.innerHTML = '';
-  popup.style.position = 'relative';
 
   var closeBtn = document.createElement('button');
   closeBtn.className = 'popup-close-btn';
@@ -12580,10 +12585,17 @@ function openSpacePopup(songIdx) {
   closeBtn.onclick = function(e) { e.stopPropagation(); closeSoloPopup(); };
   popup.appendChild(closeBtn);
 
+  var stdHeader = document.createElement('div');
+  stdHeader.className = 'std-popup-header';
   var title = document.createElement('div');
   title.className = 'space-popup-title';
   title.textContent = 'Customise Space';
-  popup.appendChild(title);
+  stdHeader.appendChild(title);
+  popup.appendChild(stdHeader);
+
+  var stdBody = document.createElement('div');
+  stdBody.className = 'std-popup-body';
+  popup.appendChild(stdBody);
 
   for (var c = 0; c < spaceCategories.length; c++) {
     var cat = spaceCategories[c];
@@ -12612,10 +12624,10 @@ function openSpacePopup(songIdx) {
       optGrid.appendChild(card);
     }
     section.appendChild(optGrid);
-    popup.appendChild(section);
+    stdBody.appendChild(section);
   }
 
-  popup.className = 'space-popup';
+  popup.className = 'space-popup std-popup';
   overlay.className = 'solo-popup-overlay active';
 }
 
