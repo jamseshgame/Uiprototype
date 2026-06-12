@@ -5528,28 +5528,57 @@
   .season-tile.unlocked .season-reward-name { color: #0e2a20; }
   .season-tile.unlocked .season-xp { color: rgba(12,40,30,0.78); }
 
+  /* Unlocked ✓ sits top-LEFT so it never collides with the top-right LEVEL badge. */
   .season-tile.unlocked::before {
     content: '\2713';
     position: absolute;
-    top: 6px;
-    right: 8px;
-    font-size: 16px;
+    top: 12px;
+    left: 14px;
+    font-size: 18px;
     font-weight: 800;
     color: var(--mint);
-    z-index: 2;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.9);
+    z-index: 3;
   }
 
   .season-tile.locked {
     filter: brightness(0.62);
   }
 
-  .season-tile.locked::before {
-    content: '\1F512';
+  /* Compact "LEVEL N" badge in the top-right corner of every reward/mystery tile. */
+  .season-level-badge {
     position: absolute;
-    top: 6px;
-    right: 8px;
-    font-size: 18px;
+    top: 12px;
+    right: 14px;
     z-index: 2;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: #ffffff;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.9);
+  }
+
+  /* Level 4-6 "mystery" tiles (page 2): dark fill + big question mark. */
+  .season-mystery-art {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    border: none;
+    border-radius: 0;
+    background: linear-gradient(160deg, rgba(124,58,237,0.20), rgba(8,6,16,0.65));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .season-mystery-q {
+    position: relative;
+    z-index: 1;
+    font-size: 140px;
+    font-weight: 800;
+    line-height: 1;
+    color: rgba(255,255,255,0.28);
+    text-shadow: 0 2px 16px rgba(0,0,0,0.6);
   }
 
   .season-reward {
@@ -18108,6 +18137,10 @@ function challengeTimeLeft(ch) {
   return 'No expiry';
 }
 
+// Journeys is paginated: page 0 = levels 1-3 (real rewards), page 1 = levels 4-6
+// (locked "mystery" rewards shown as question marks).
+var seasonPage = 0;
+var SEASON_PAGES = 2;
 function buildSeasonGrid() {
   var container = document.getElementById('season-grid');
   if (!container) return;
@@ -18120,45 +18153,64 @@ function buildSeasonGrid() {
     var row = document.createElement('div');
     row.className = 'season-row';
 
-    // First tile of every row: the track name + a "how to earn XP" entry that
-    // opens the popup (replaces the old per-row .season-label heading).
+    // First tile of every row: the track name (SOLO / GROUP / CREATOR) over its
+    // hero art + a "How to earn XP" entry that opens the popup.
     var info = document.createElement('div');
     info.className = 'season-tile season-info';
     var infoArtCls = 'season-art' + (cat.infoImg ? ' season-art--img' : '');
     var infoArtStyle = cat.infoImg ? ' style="background-image:url(\'' + cat.infoImg + '\')"' : '';
     var infoShade = cat.infoImg ? '<div class="season-art-shade"></div>' : '';
     info.innerHTML =
-      '<div class="' + infoArtCls + '"' + infoArtStyle + '></div>' +
+      '<div class="' + infoArtCls + '"' + infoArtStyle + '>' + infoShade + '</div>' +
       '<div class="season-reward-name">' + cat.label + '</div>' +
       '<div class="season-xp">How to earn XP</div>';
     info.onclick = (function(idx) { return function() { openXpInfo(idx); }; })(c);
     row.appendChild(info);
 
-    for (var i = 0; i < cat.rewards.length; i++) {
-      var r = cat.rewards[i];
-      var tile = document.createElement('div');
-      tile.className = 'season-tile' + (r.unlocked ? ' unlocked' : ' locked');
+    if (seasonPage === 0) {
+      for (var i = 0; i < cat.rewards.length; i++) {
+        var r = cat.rewards[i];
+        var tile = document.createElement('div');
+        tile.className = 'season-tile' + (r.unlocked ? ' unlocked' : ' locked');
 
-      var progress = r.unlocked ? 100 : Math.min(r.xpEarned / r.xp * 100, 100);
-      var xpText = r.unlocked
-        ? 'Unlocked'
-        : r.xpEarned.toLocaleString() + ' / ' + r.xp.toLocaleString() + ' XP';
+        var progress = r.unlocked ? 100 : Math.min(r.xpEarned / r.xp * 100, 100);
+        var xpText = r.unlocked
+          ? 'Unlocked'
+          : r.xpEarned.toLocaleString() + ' / ' + r.xp.toLocaleString() + ' XP';
 
-      var artStyle = r.img ? ' style="background-image:url(\'' + r.img + '\')"' : '';
-      var artCls = 'season-art' + (r.img ? ' season-art--img' : '');
-      var artShade = r.img ? '<div class="season-art-shade"></div>' : '';
-      tile.innerHTML =
-        '<div class="' + artCls + '"' + artStyle + '>' + artShade + '<span class="season-level-cap">LEVEL</span><span class="season-level-num">' + (i + 1) + '</span></div>' +
-        '<div class="season-reward-name">' + r.name + '</div>' +
-        '<div class="season-xp">' + xpText + '</div>' +
-        '<div class="season-xp-bar"><div class="season-xp-fill" style="width:' + progress + '%"></div></div>';
-      row.appendChild(tile);
+        var artStyle = r.img ? ' style="background-image:url(\'' + r.img + '\')"' : '';
+        var artCls = 'season-art' + (r.img ? ' season-art--img' : '');
+        var artShade = r.img ? '<div class="season-art-shade"></div>' : '';
+        tile.innerHTML =
+          '<div class="' + artCls + '"' + artStyle + '>' + artShade + '<div class="season-level-badge">LEVEL ' + (i + 1) + '</div></div>' +
+          '<div class="season-reward-name">' + r.name + '</div>' +
+          '<div class="season-xp">' + xpText + '</div>' +
+          '<div class="season-xp-bar"><div class="season-xp-fill" style="width:' + progress + '%"></div></div>';
+        row.appendChild(tile);
+      }
+    } else {
+      // Page 2: levels 4-6 are still secret — locked "mystery" tiles.
+      for (var m = 0; m < 3; m++) {
+        var lvl = m + 4;
+        var mtile = document.createElement('div');
+        mtile.className = 'season-tile locked';
+        mtile.innerHTML =
+          '<div class="season-art season-mystery-art"><div class="season-art-shade"></div><div class="season-level-badge">LEVEL ' + lvl + '</div><span class="season-mystery-q">?</span></div>' +
+          '<div class="season-reward-name">???</div>' +
+          '<div class="season-xp">Keep playing to reveal</div>' +
+          '<div class="season-xp-bar"><div class="season-xp-fill" style="width:0%"></div></div>';
+        row.appendChild(mtile);
+      }
     }
     section.appendChild(row);
     container.appendChild(section);
   }
-  // Journeys is a fixed 3-track layout (12 tiles) — single disabled pager for frame parity.
-  renderPager(document.getElementById('journeys-pager'), 0, 1, null);
+  renderPager(document.getElementById('journeys-pager'), seasonPage, SEASON_PAGES, function(dir) {
+    seasonPage += dir;
+    if (seasonPage < 0) seasonPage = 0;
+    if (seasonPage > SEASON_PAGES - 1) seasonPage = SEASON_PAGES - 1;
+    buildSeasonGrid();
+  });
 }
 
 // "How to earn XP" popup for a journey track — reuses the option-picker overlay.
