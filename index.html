@@ -3009,7 +3009,8 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
-    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: hidden;
   }
   .std-popup-footer {
     flex-shrink: 0;
@@ -10376,7 +10377,7 @@ input, textarea, select {
 </div>
 
 <div class="load-overlay" id="load-overlay">
-  <div class="std-popup" onclick="event.stopPropagation()">
+  <div class="std-popup" onclick="event.stopPropagation()" style="background:var(--bg-panel);border:1px solid var(--btn-tab-border)">
     <button class="popup-close-btn" onclick="closeLoadOverlay()">&#10005;</button>
     <div class="std-popup-header"><div class="load-title">Load Setlist</div></div>
     <div class="std-popup-body">
@@ -15528,12 +15529,12 @@ function openOptionPicker(type) {
       {id: 'Arena',     label: 'Arena',     img: 'spaces/002.jpg'}
     ];
     var envGrid = document.createElement('div');
-    envGrid.style.cssText = 'display:grid;grid-template-columns:repeat(2,1fr);gap:24px;width:100%;margin-bottom:32px';
+    envGrid.style.cssText = 'display:grid;grid-template-columns:repeat(2,1fr);gap:24px;width:100%;margin-bottom:20px';
     for (var ei = 0; ei < envItems.length; ei++) {
       var env = envItems[ei];
       var envSelected = env.id === selectedEnvironment;
       var envTile = document.createElement('div');
-      envTile.style.cssText = 'position:relative;overflow:hidden;border-radius:var(--panel-radius);cursor:pointer;padding-top:100%;border:2px solid ' + (envSelected ? '#ffffff' : 'transparent');
+      envTile.style.cssText = 'position:relative;overflow:hidden;border-radius:var(--panel-radius);cursor:pointer;padding-top:42%;border:2px solid ' + (envSelected ? '#ffffff' : 'transparent');
       if (envSelected) envTile.style.boxShadow = '0 0 0 3px #ffffff, 0 0 12px rgba(255,255,255,0.4)';
       envTile.innerHTML =
         '<img src="' + env.img + '" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:0">' +
