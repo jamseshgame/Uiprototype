@@ -6417,8 +6417,6 @@
     justify-content: center;
   }
   .referral-code-overlay.active { display: flex; }
-  /* Doubled class beats .save-popup's later width:1600px declaration. */
-  .save-popup.referral-code-popup { width: 980px; }
   .referral-code-popup .save-input {
     text-transform: uppercase;
     letter-spacing: 4px;
@@ -10324,27 +10322,30 @@ input, textarea, select {
 
 <!-- Referral code entry popup (Profile ▸ Referrals — redeem a friend's code). -->
 <div class="referral-code-overlay" id="referral-code-overlay" onclick="closeReferralCodePopup(event)">
-  <div class="save-popup referral-code-popup" onclick="event.stopPropagation()" style="position:relative">
+  <div class="save-popup referral-code-popup std-popup" onclick="event.stopPropagation()">
     <button class="popup-close-btn" onclick="closeReferralCodePopup()">&#10005;</button>
-    <h2>Enter Referral Code</h2>
-    <div class="referral-code-popup-sub">Got a code from a friend? Enter it below &mdash; you <b>both</b> earn <b><span id="referral-code-popup-reward">500</span> Picks</b> when you finish your first jam.</div>
-    <input class="save-input" id="referral-code-input" type="text" maxlength="12" placeholder="e.g. J4M-53SH">
-    <div class="referral-code-error" id="referral-code-error"></div>
-    <div class="save-buttons">
-      <button class="save-btn-cancel" onclick="closeReferralCodePopup()">Cancel</button>
-      <button class="save-btn-confirm" onclick="confirmReferralCode()">Submit</button>
+    <div class="std-popup-header"><h2>Enter Referral Code</h2></div>
+    <div class="std-popup-body" style="justify-content:center">
+      <div class="referral-code-popup-sub">Got a code from a friend? Enter it below &mdash; you <b>both</b> earn <b><span id="referral-code-popup-reward">500</span> Picks</b> when you finish your first jam.</div>
+      <input class="save-input" id="referral-code-input" type="text" maxlength="12" placeholder="e.g. J4M-53SH">
+      <div class="referral-code-error" id="referral-code-error"></div>
+    </div>
+    <div class="std-popup-footer">
+      <button class="std-popup-btn" onclick="confirmReferralCode()">Submit</button>
     </div>
   </div>
 </div>
 
 <!-- Referral help popup (Profile ▸ Referrals — how the rewards work). -->
 <div class="referral-code-overlay" id="referral-help-overlay" onclick="closeReferralHelpPopup(event)">
-  <div class="save-popup referral-code-popup" onclick="event.stopPropagation()" style="position:relative">
+  <div class="save-popup referral-code-popup std-popup" onclick="event.stopPropagation()">
     <button class="popup-close-btn" onclick="closeReferralHelpPopup()">&#10005;</button>
-    <h2>How Referrals Work</h2>
-    <div class="referral-code-popup-sub" id="referral-help-text"></div>
-    <div class="save-buttons">
-      <button class="save-btn-confirm" onclick="closeReferralHelpPopup()">Got It</button>
+    <div class="std-popup-header"><h2>How Referrals Work</h2></div>
+    <div class="std-popup-body" style="justify-content:center">
+      <div class="referral-code-popup-sub" id="referral-help-text"></div>
+    </div>
+    <div class="std-popup-footer">
+      <button class="std-popup-btn" onclick="closeReferralHelpPopup()">Got It</button>
     </div>
   </div>
 </div>
