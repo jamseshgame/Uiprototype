@@ -2947,15 +2947,15 @@
   /* ── Shared Popup Close Button ──────────────────── */
   .popup-close-btn {
     position: absolute;
-    top: 16px;
-    right: 16px;
-    width: 64px;
-    height: 64px;
+    top: 32px;
+    right: 32px;
+    width: 80px;
+    height: 80px;
     border-radius: 50%;
     border: 1px solid var(--btn-panel-border);
     background: var(--btn-panel);
     color: #ffffff;
-    font-size: 32px;
+    font-size: 40px;
     font-weight: 400;
     cursor: pointer;
     font-family: 'Bebas Neue', sans-serif;
@@ -2973,6 +2973,70 @@
   .popup-close-btn:active {
     transform: scale(0.95);
   }
+
+  /* ───────────────────────────────────────────────
+     Standard popup frame — every content popup shares
+     this footprint: 1152×1152 square (1:1, 20% inset),
+     large X top-right, centered equal-size CTA row.
+     `!important` on size defeats inline panel.style.width
+     overrides set by JS-built pickers.
+     ─────────────────────────────────────────────── */
+  .std-popup {
+    position: relative;
+    width: 1152px !important;
+    height: 1152px !important;
+    max-width: 1152px !important;
+    max-height: 1152px !important;
+    box-sizing: border-box;
+    padding: 56px !important;
+    border-radius: var(--radius-outer);
+    display: flex !important;
+    flex-direction: column;
+    gap: 24px;
+    overflow: hidden;
+  }
+  .std-popup-header {
+    flex-shrink: 0;
+    min-height: 88px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+  .std-popup-body {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    overflow: hidden;
+  }
+  .std-popup-footer {
+    flex-shrink: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 24px;
+  }
+  .std-popup-btn {
+    width: 440px;
+    height: 104px;
+    flex: 0 0 440px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--panel-radius);
+    border: 1px solid var(--btn-primary-border);
+    background: var(--btn-primary);
+    color: #ffffff;
+    font-size: 28px;
+    font-weight: 700;
+    font-family: 'Bebas Neue', sans-serif;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
+  }
+  .std-popup-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.35); }
+  .std-popup-btn:active { transform: scale(0.97); }
 
   .solo-popup-overlay {
     display: none;
