@@ -12704,6 +12704,19 @@ function openLoadoutPopup(songIdx) {
   var popup = document.getElementById('loadout-popup');
   popup.innerHTML = '';
 
+  popup.className = 'loadout-popup std-popup';
+
+  var closeBtn = document.createElement('button');
+  closeBtn.className = 'popup-close-btn';
+  closeBtn.innerHTML = '&#10005;';
+  closeBtn.onclick = closeLoadoutPopup;
+  popup.appendChild(closeBtn);
+
+  var stdHeader = document.createElement('div');
+  stdHeader.className = 'std-popup-header';
+  var stdBody = document.createElement('div');
+  stdBody.className = 'std-popup-body';
+
   var instId = songInstruments[songIdx] || 'guitar';
   var instObj = null;
   for (var j = 0; j < instruments.length; j++) {
@@ -12714,7 +12727,9 @@ function openLoadoutPopup(songIdx) {
   var title = document.createElement('div');
   title.className = 'loadout-popup-title';
   title.textContent = instObj.label + ' Loadout';
-  popup.appendChild(title);
+  stdHeader.appendChild(title);
+  popup.appendChild(stdHeader);
+  popup.appendChild(stdBody);
 
   var loadout = songLoadouts[songIdx] || {};
   var skins = loadoutSkins[instId] || loadoutSkins.guitar;
@@ -12760,14 +12775,17 @@ function openLoadoutPopup(songIdx) {
       optGrid.appendChild(card);
     }
     section.appendChild(optGrid);
-    popup.appendChild(section);
+    stdBody.appendChild(section);
   }
 
-  var closeBtn = document.createElement('button');
-  closeBtn.className = 'loadout-close-btn';
-  closeBtn.textContent = 'Done';
-  closeBtn.onclick = closeLoadoutPopup;
-  popup.appendChild(closeBtn);
+  var stdFooter = document.createElement('div');
+  stdFooter.className = 'std-popup-footer';
+  var doneBtn = document.createElement('button');
+  doneBtn.className = 'std-popup-btn';
+  doneBtn.textContent = 'Done';
+  doneBtn.onclick = closeLoadoutPopup;
+  stdFooter.appendChild(doneBtn);
+  popup.appendChild(stdFooter);
 
   overlay.className = 'loadout-overlay active';
 }
