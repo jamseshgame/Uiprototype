@@ -10238,15 +10238,16 @@ input, textarea, select {
   </nav>
 
 <div class="purchase-overlay" id="purchase-overlay" onclick="closePurchasePopup(event)">
-  <div class="purchase-popup" onclick="event.stopPropagation()" style="position:relative">
+  <div class="purchase-popup std-popup" onclick="event.stopPropagation()">
     <button class="popup-close-btn" onclick="closePurchasePopup()">&#10005;</button>
-    <div class="purchase-preview" id="purchase-preview"></div>
-    <div class="purchase-title" id="purchase-title"></div>
-    <div class="purchase-cost" id="purchase-cost"></div>
-    <div class="purchase-balance" id="purchase-balance"></div>
-    <div class="purchase-buttons">
-      <button class="purchase-btn purchase-btn-cancel" onclick="closePurchasePopup()">Cancel</button>
-      <button class="purchase-btn purchase-btn-confirm" id="purchase-confirm-btn" onclick="confirmPurchase()">Unlock</button>
+    <div class="std-popup-header"><div class="purchase-title" id="purchase-title"></div></div>
+    <div class="std-popup-body" style="align-items:center;justify-content:center">
+      <div class="purchase-preview" id="purchase-preview"></div>
+      <div class="purchase-cost" id="purchase-cost"></div>
+      <div class="purchase-balance" id="purchase-balance"></div>
+    </div>
+    <div class="std-popup-footer">
+      <button class="std-popup-btn jamsesh-signature" id="purchase-confirm-btn" onclick="confirmPurchase()">Unlock</button>
     </div>
   </div>
 </div>
