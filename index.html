@@ -5611,13 +5611,13 @@
   .season-xp-bar:not(#zz9):not(#zz8) { background-color: #fff !important; border: 1px solid #000; }
   .season-xp-fill:not(#zz9):not(#zz8) { background-color: #000 !important; }
 
-  /* ── Reward tiles → full-bleed cosmetic art with the caption over a bottom
-     gradient (mirrors the Challenge .quest-art / .quest-fade treatment).
-     Scoped away from the dashed "How to earn XP" info tiles. ── */
-  .season-tile:not(.season-info) {
+  /* ── Journey tiles → full-bleed art with the caption over a bottom gradient
+     (mirrors the Challenge .quest-art / .quest-fade treatment). Applies to both
+     the reward tiles and the "SOLO / GROUP / CREATOR" info tiles. ── */
+  .season-tile {
     justify-content: flex-end;
   }
-  .season-tile:not(.season-info) .season-art--img {
+  .season-tile .season-art--img {
     position: absolute;
     inset: 0;
     z-index: 0;
@@ -5627,55 +5627,30 @@
     padding-top: 18px;
   }
   /* Dark gradient rising from the bottom so the caption stays legible over art. */
-  .season-tile:not(.season-info) .season-art-shade {
+  .season-tile .season-art-shade {
     background: linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.58) 36%, rgba(0,0,0,0.12) 66%, rgba(0,0,0,0) 100%);
   }
   /* Caption (name + status + bar) parked over the gradient at the bottom. */
-  .season-tile:not(.season-info) .season-reward-name,
-  .season-tile:not(.season-info) .season-xp,
-  .season-tile:not(.season-info) .season-xp-bar {
+  .season-tile .season-reward-name,
+  .season-tile .season-xp,
+  .season-tile .season-xp-bar {
     position: relative;
     z-index: 1;
   }
-  .season-tile:not(.season-info) .season-reward-name { height: auto; }
+  .season-tile .season-reward-name { height: auto; }
   /* Unlocked tiles keep the mint border + ✓, but the text now sits over the
      full-bleed art, so use light text instead of the dark-on-mint treatment. */
-  .season-tile:not(.season-info).unlocked .season-reward-name { color: var(--text-primary); }
-  .season-tile:not(.season-info).unlocked .season-xp { color: rgba(255,255,255,0.82); }
-  .season-tile:not(.season-info).unlocked .season-level-cap { color: rgba(255,255,255,0.7); }
+  .season-tile.unlocked .season-reward-name { color: var(--text-primary); }
+  .season-tile.unlocked .season-xp { color: rgba(255,255,255,0.82); }
+  .season-tile.unlocked .season-level-cap { color: rgba(255,255,255,0.7); }
 
-  /* ── "How to earn XP" info tile (first tile of each journey row) ── */
-  .season-tile.season-info {
-    border: 2px dashed var(--pink);
-    background: rgba(127,127,127,0.06);
-    justify-content: flex-start;
-  }
+  /* ── "How to earn XP" info tile (first tile of each journey row) ──
+     Full-bleed like the reward tiles: SOLO / GROUP / CREATOR as the main caption
+     with "How to earn XP" as a pink learn-hint subtitle. ── */
   .season-tile.season-info:hover {
     box-shadow: 0 0 16px var(--btn-primary-glow);
     border-color: var(--btn-primary-border);
   }
-  .season-tile.season-info .season-art {
-    border-style: dashed;
-    border-color: var(--pink);
-    background: rgba(0,0,0,0.12);
-  }
-  .season-info-glyph { width: 72px; height: 72px; fill: var(--pink); }
-  /* On photo-backed info tiles, lift the glyph + track name above the shade and
-     make them legible over the image. */
-  .season-art--img .season-info-glyph { position: relative; z-index: 1; fill: #ffffff; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.9)); }
-  .season-art--img .season-info-cat { position: relative; z-index: 1; color: #ffffff; text-shadow: 0 2px 10px rgba(0,0,0,0.9); }
-  /* Track name integrated into the info tile (replaces the old row label). */
-  .season-info-cat {
-    font-size: 30px;
-    font-weight: 800;
-    color: var(--text-primary);
-    text-align: center;
-    letter-spacing: 1px;
-    line-height: 1.1;
-    margin-top: 14px;
-    padding: 0 8px;
-  }
-  .season-tile.season-info .season-reward-name { color: var(--text-primary); }
   .season-tile.season-info .season-xp { color: var(--pink); }
 
   /* ── "How to earn XP" popup (reuses #option-picker-overlay) ── */
@@ -17896,7 +17871,7 @@ var XP_ICON_TIKTOK = '<svg viewBox="0 0 24 24"><path d="M16.6 5.82a4.28 4.28 0 0
 var XP_ICON_INSTA = '<svg viewBox="0 0 24 24"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41a3.7 3.7 0 0 1-1.38-.9 3.7 3.7 0 0 1-.9-1.38c-.16-.42-.36-1.06-.41-2.23C2.17 15.58 2.16 15.2 2.16 12s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41C8.42 2.17 8.8 2.16 12 2.16zm0 3.24A6.6 6.6 0 1 0 18.6 12 6.6 6.6 0 0 0 12 5.4zm0 10.88A4.28 4.28 0 1 1 16.28 12 4.28 4.28 0 0 1 12 16.28zm6.85-11.13a1.54 1.54 0 1 0 1.54 1.54 1.54 1.54 0 0 0-1.54-1.54z"/></svg>';
 
 var seasonData = [
-  {label: 'Solo', earnTitle: 'Earn Solo XP', infoImg: 'spaces/stage.png',
+  {label: 'Solo', earnTitle: 'Earn Solo XP', infoImg: 'journeys/solo.jpg',
    earnSub: 'Your personal XP grows every time you pick up the pick and play.',
    earn: [
     {icon: XP_ICON_PLAY,  title: 'Play a Show',        desc: 'Finish any track in Perform to bank XP toward your solo career.', xp: 50,  unit: 'Solo XP'},
@@ -17908,7 +17883,7 @@ var seasonData = [
     {name: 'Gold Frame',     xp: 3000, xpEarned: 2200, unlocked: false, img: 'plates/flames.jpg'},
     {name: 'Legend Banner',  xp: 6000, xpEarned: 0,    unlocked: false, img: 'banners/Space 1.png'}
   ]},
-  {label: 'Group', earnTitle: 'Earn Group XP', infoImg: 'home_tiles/mainstage_1x1.png',
+  {label: 'Group', earnTitle: 'Earn Group XP', infoImg: 'journeys/group.jpg',
    earnSub: 'Group XP is shared progress — jam with your band to level it up.',
    earn: [
     {icon: XP_ICON_BAND, title: 'Perform in a Band', desc: 'Complete a track in a Group session with your bandmates.',         xp: 75,  unit: 'Group XP'},
@@ -17920,8 +17895,8 @@ var seasonData = [
     {name: 'Gold Stage',     xp: 3000, xpEarned: 3000, unlocked: true,  img: 'spaces/stage.png'},
     {name: 'Star Backdrop',  xp: 6000, xpEarned: 1500, unlocked: false, img: 'plates/galaxy.jpg'}
   ]},
-  {label: 'Social', earnTitle: 'Earn Social XP', infoImg: 'spaces/social.png',
-   earnSub: 'Show the world your jams. Post, tag, and invite to climb the Social track.',
+  {label: 'Creator', earnTitle: 'Earn Creator XP', infoImg: 'journeys/creator.jpg',
+   earnSub: 'Show the world your jams. Post, tag, and invite to climb the Creator track.',
    earn: [
     {icon: XP_ICON_TIKTOK, title: 'Share a TikTok video', tiktok: true,
      desc: 'Post a TikTok of your session that includes <span class="xp-method-hashtag">#jamseshgame</span> in the title or description. We monitor TikTok and award you Social XP for every qualifying video.',
@@ -18149,14 +18124,13 @@ function buildSeasonGrid() {
     // opens the popup (replaces the old per-row .season-label heading).
     var info = document.createElement('div');
     info.className = 'season-tile season-info';
-    var infoGlyph = '<svg class="season-info-glyph" viewBox="0 0 24 24"><path d="M11 7h2v2h-2zm0 4h2v6h-2zm1-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>';
     var infoArtCls = 'season-art' + (cat.infoImg ? ' season-art--img' : '');
     var infoArtStyle = cat.infoImg ? ' style="background-image:url(\'' + cat.infoImg + '\')"' : '';
     var infoShade = cat.infoImg ? '<div class="season-art-shade"></div>' : '';
     info.innerHTML =
-      '<div class="' + infoArtCls + '"' + infoArtStyle + '>' + infoShade + infoGlyph + '<span class="season-info-cat">' + cat.label + '</span></div>' +
-      '<div class="season-reward-name">How to earn XP</div>' +
-      '<div class="season-xp">Tap to learn</div>';
+      '<div class="' + infoArtCls + '"' + infoArtStyle + '></div>' +
+      '<div class="season-reward-name">' + cat.label + '</div>' +
+      '<div class="season-xp">How to earn XP</div>';
     info.onclick = (function(idx) { return function() { openXpInfo(idx); }; })(c);
     row.appendChild(info);
 
