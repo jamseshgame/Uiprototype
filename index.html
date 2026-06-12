@@ -10407,28 +10407,29 @@ input, textarea, select {
 </div>
 
 <div class="create-group-overlay" id="create-group-overlay" onclick="closeCreateGroup(event)">
-  <div class="create-group-popup" onclick="event.stopPropagation()" style="position:relative">
+  <div class="create-group-popup std-popup" onclick="event.stopPropagation()">
     <button class="popup-close-btn" onclick="closeCreateGroup()">&#10005;</button>
-    <h2 style="font-size:40px;font-weight:800;color:var(--text-primary);margin:0;text-align:center">Create Group</h2>
-    <div class="create-group-header">
-      <div class="create-group-logo" id="create-group-logo" onclick="openLogoPicker()">
-        <span class="logo-plus">+</span>
+    <div class="std-popup-header"><h2 style="font-size:40px;font-weight:800;color:var(--text-primary);margin:0;text-align:center">Create Group</h2></div>
+    <div class="std-popup-body">
+      <div class="create-group-header" style="flex-shrink:0">
+        <div class="create-group-logo" id="create-group-logo" onclick="openLogoPicker()">
+          <span class="logo-plus">+</span>
+        </div>
+        <input class="save-input" id="create-group-name" type="text" placeholder="Group Name" inputmode="none" onclick="requestKeyboardForInput('create-group-name')" style="flex:1">
       </div>
-      <input class="save-input" id="create-group-name" type="text" placeholder="Group Name" inputmode="none" onclick="requestKeyboardForInput('create-group-name')" style="flex:1">
+      <div class="create-group-columns" style="flex:1;min-height:0">
+        <div class="create-group-col">
+          <div class="create-group-col-title">Available Friends</div>
+          <div class="create-group-list" id="create-group-available"></div>
+        </div>
+        <div class="create-group-col">
+          <div class="create-group-col-title">Group Members</div>
+          <div class="create-group-list" id="create-group-members"></div>
+        </div>
+      </div>
     </div>
-    <div class="create-group-columns">
-      <div class="create-group-col">
-        <div class="create-group-col-title">Available Friends</div>
-        <div class="create-group-list" id="create-group-available"></div>
-      </div>
-      <div class="create-group-col">
-        <div class="create-group-col-title">Group Members</div>
-        <div class="create-group-list" id="create-group-members"></div>
-      </div>
-    </div>
-    <div class="save-buttons">
-      <button class="save-btn-cancel" onclick="closeCreateGroup()">Cancel</button>
-      <button class="save-btn-confirm" onclick="confirmCreateGroup()">Create</button>
+    <div class="std-popup-footer">
+      <button class="std-popup-btn" onclick="confirmCreateGroup()">Create</button>
     </div>
   </div>
 </div>
