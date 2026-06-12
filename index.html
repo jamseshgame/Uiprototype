@@ -10352,17 +10352,19 @@ input, textarea, select {
 
 <!-- Challenge reward popup (Rate Us → verify → claim). -->
 <div class="challenge-overlay" id="challenge-overlay" onclick="closeChallengePopup(event)">
-  <div class="challenge-panel" onclick="event.stopPropagation()">
+  <div class="challenge-panel std-popup" onclick="event.stopPropagation()">
     <button class="popup-close-btn" onclick="closeChallengePopup()">&#10005;</button>
-    <div class="challenge-title" id="challenge-title"></div>
-    <div class="challenge-reward-wrap">
-      <div class="challenge-reward-grid" id="challenge-reward-grid"></div>
-    </div>
-    <div class="challenge-claim-msg" id="challenge-claim-msg"></div>
-    <div class="challenge-cta-row">
+    <div class="std-popup-header"><div class="challenge-title" id="challenge-title"></div></div>
+    <div class="std-popup-body" style="align-items:center;justify-content:center">
+      <div class="challenge-reward-wrap">
+        <div class="challenge-reward-grid" id="challenge-reward-grid"></div>
+      </div>
+      <div class="challenge-claim-msg" id="challenge-claim-msg"></div>
       <div class="challenge-expiry" id="challenge-expiry"></div>
-      <button class="challenge-action-btn jamsesh-signature" id="challenge-action-btn" onclick="challengeAction()">Rate Us</button>
       <div class="challenge-progress" id="challenge-progress"></div>
+    </div>
+    <div class="std-popup-footer">
+      <button class="std-popup-btn jamsesh-signature" id="challenge-action-btn" onclick="challengeAction()">Rate Us</button>
     </div>
     <button class="challenge-nav challenge-nav-prev" id="challenge-nav-prev" onclick="challengePrev()">&#9664;</button>
     <button class="challenge-nav challenge-nav-next" id="challenge-nav-next" onclick="challengeNext()">&#9654;</button>
