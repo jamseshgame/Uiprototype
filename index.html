@@ -10310,13 +10310,14 @@ input, textarea, select {
 </div>
 
 <div class="save-overlay" id="save-overlay" onclick="closeSaveOverlay(event)">
-  <div class="save-popup" onclick="event.stopPropagation()" style="position:relative">
+  <div class="save-popup std-popup" onclick="event.stopPropagation()">
     <button class="popup-close-btn" onclick="closeSaveOverlay()">&#10005;</button>
-    <h2>Save Setlist</h2>
-    <input class="save-input" id="save-setlist-input" type="text">
-    <div class="save-buttons">
-      <button class="save-btn-cancel" onclick="closeSaveOverlay()">Cancel</button>
-      <button class="save-btn-confirm" onclick="confirmSaveSetlist()">Save</button>
+    <div class="std-popup-header"><h2>Save Setlist</h2></div>
+    <div class="std-popup-body" style="justify-content:center">
+      <input class="save-input" id="save-setlist-input" type="text">
+    </div>
+    <div class="std-popup-footer">
+      <button class="std-popup-btn" onclick="confirmSaveSetlist()">Save</button>
     </div>
   </div>
 </div>
