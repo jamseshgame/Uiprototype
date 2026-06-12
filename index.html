@@ -183,7 +183,6 @@
   .solo-popup-option,
   .loadout-opt,
   .back-btn,
-  .purchase-btn,
   .space-popup-opt,
   .play-nameplate,
   .settings-tile {
@@ -705,7 +704,6 @@
   .play-solo-add,
   .play-bar-btn,
   .back-btn,
-  .purchase-btn,
   .song-tile,
   .play-tile,
   .play-coop-tile,
@@ -735,7 +733,6 @@
   .play-solo-add:hover,
   .play-bar-btn:hover,
   .back-btn:hover,
-  .purchase-btn:hover,
   .song-tile:hover,
   .play-tile:hover,
   .play-coop-tile:hover,
@@ -760,7 +757,6 @@
   .play-solo-add:active,
   .play-bar-btn:active,
   .back-btn:active,
-  .purchase-btn:active,
   .song-tile:active,
   .play-tile:active,
   .play-coop-tile:active,
@@ -2567,40 +2563,6 @@
     border-color: #ffffff;
     color: #000000;
   }
-  .filter-actions {
-    display: flex;
-    gap: 16px;
-    flex-shrink: 0;
-  }
-  .filter-apply-btn {
-    flex: 2;
-    height: 72px;
-    border-radius: var(--panel-radius);
-    border: none;
-    background: #ffffff;
-    color: #000000;
-    font-size: 28px;
-    font-weight: 400;
-    cursor: pointer;
-    font-family: 'Bebas Neue', sans-serif;
-    transition: opacity 0.15s;
-  }
-  .filter-apply-btn:hover { opacity: 0.85; }
-  .filter-clear-btn {
-    flex: 1;
-    height: 72px;
-    border-radius: var(--panel-radius);
-    border: 1px solid var(--border-strong);
-    background: var(--bg-surface);
-    color: #ffffff;
-    font-size: 28px;
-    font-weight: 400;
-    cursor: pointer;
-    font-family: 'Bebas Neue', sans-serif;
-    transition: background 0.15s;
-  }
-  .filter-clear-btn:hover { background: var(--bg-surface-hover); }
-
   .name-editor-input {
     width: 100%;
     height: 80px;
@@ -3038,6 +3000,15 @@
   }
   .std-popup-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.35); }
   .std-popup-btn:active { transform: scale(0.97); }
+  .std-popup-btn:disabled {
+    background: var(--btn-panel);
+    border-color: var(--btn-panel-border);
+    color: rgba(255,255,255,0.4);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+  .std-popup-btn:disabled:hover { transform: none; box-shadow: none; }
 
   .solo-popup-overlay {
     display: none;
@@ -3282,22 +3253,6 @@
     filter: brightness(0.15);
     pointer-events: none;
   }
-
-  .loadout-close-btn {
-    align-self: center;
-    padding: 20px 64px;
-    border-radius: var(--panel-radius);
-    border: none;
-    background: var(--bg-surface);
-    color: var(--text-primary);
-    font-size: 34px;
-    font-weight: 400;
-    cursor: pointer;
-    font-family: 'Bebas Neue', sans-serif;
-    transition: filter 0.15s;
-  }
-
-  .loadout-close-btn:hover { filter: brightness(1.15); }
 
   /* ── Co-op / Battle Panel ───────────────────────── */
   .play-coop-section-header {
@@ -6690,50 +6645,6 @@
     color: #dc2626;
   }
 
-  .purchase-buttons {
-    display: flex;
-    gap: var(--panel-gap);
-    justify-content: center;
-    margin-top: 6px;
-  }
-
-  .purchase-btn {
-    flex: 1;
-    max-width: 500px;
-    padding: 20px 0;
-    border-radius: var(--panel-radius);
-    border: none;
-    font-size: 28px;
-    font-weight: 400;
-    cursor: pointer;
-    font-family: 'Bebas Neue', sans-serif;
-    transition: filter 0.15s;
-  }
-
-  .purchase-btn:hover { filter: brightness(1.15); }
-
-  .purchase-btn-confirm {
-    background: var(--btn-primary);
-    border: 2px solid var(--btn-primary-border);
-    color: #ffffff;
-    box-shadow: 0 0 12px var(--btn-primary-glow);
-  }
-
-  .purchase-btn-confirm:disabled {
-    background: var(--btn-panel);
-    border-color: var(--btn-panel-border);
-    color: rgba(255,255,255,0.4);
-    cursor: not-allowed;
-    filter: none;
-    box-shadow: none;
-  }
-
-  .purchase-btn-cancel {
-    background: var(--btn-panel);
-    border: 1px solid var(--btn-panel-border);
-    color: #ffffff;
-  }
-
   /* ── Save/Load Bar Buttons ─────────────────────────── */
   .play-bar-btn {
     height: var(--nav-btn-h);
@@ -6834,15 +6745,6 @@
     text-align: center;
     letter-spacing: 0.01em;
   }
-  /* Bottom action row: expiry (left) · CTA button (centred) · progress (right),
-     all vertically centred with the button. */
-  .challenge-cta-row {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 24px;
-  }
   /* Expiry / time-left — left side of the CTA row. */
   .challenge-expiry {
     flex: 1;
@@ -6937,23 +6839,6 @@
     text-align: center;
     padding: 0 20px;
   }
-  .challenge-action-btn {
-    font-size: 40px;
-    font-weight: 800;
-    color: #ffffff;
-    /* Fixed width so the CTA is identical for every label (Rate Us / Perform Now /
-       Refer Now / Create Now / Claim Reward / OK) instead of hugging its text. */
-    width: 560px;
-    max-width: 100%;
-    box-sizing: border-box;
-    text-align: center;
-    padding: 24px 0;
-    border: none;
-    border-radius: 999px;
-    cursor: pointer;
-    flex-shrink: 0;
-  }
-
   /* Verifying spinner overlay — sits above everything and darkens the whole panel. */
   .challenge-spinner-overlay {
     display: none;
@@ -7063,28 +6948,6 @@
     padding: 0 28px;
     font-size: 24px;
   }
-
-  .save-buttons {
-    display: flex;
-    gap: var(--panel-gap);
-    justify-content: center;
-    margin-top: 6px;
-  }
-  .save-buttons button {
-    flex: 1;
-    max-width: 400px;
-    padding: 20px 0;
-    border-radius: var(--panel-radius);
-    border: none;
-    font-size: 28px;
-    font-weight: 400;
-    cursor: pointer;
-    font-family: 'Bebas Neue', sans-serif;
-    transition: filter 0.15s;
-  }
-  .save-buttons button:hover { filter: brightness(1.15); }
-  .save-btn-confirm { background: var(--btn-primary); border: 2px solid var(--btn-primary-border); color: #ffffff; box-shadow: 0 0 12px var(--btn-primary-glow); }
-  .save-btn-cancel { background: var(--btn-panel); border: 1px solid var(--btn-panel-border); color: #ffffff; }
 
   /* ── Load Setlist Overlay ──────────────────────────── */
   .load-overlay {
@@ -7617,8 +7480,6 @@
   .picker-filter:active {
     border-color: var(--pink);
   }
-  .purchase-btn:active,
-  .loadout-close-btn:active,
   .load-close-btn:active,
   .load-item-btn:active {
     filter: brightness(1.15);
@@ -9158,7 +9019,7 @@ body.vr-mode .play-grid i { animation: none !important; }
 .play-go-bar, .play-go-btn, .play-bar-btn, .back-btn,
 .play-mode-tabs, .play-mode-tab, .legal-agree-tabs, .legal-agree-tab,
 .legal-agree-ok, .perms-explain-ok, .early-access-ok,
-.purchase-btn, .purchase-button, .results-btn, .results-button, .setlist-btn,
+.purchase-button, .results-btn, .results-button, .setlist-btn,
 .lb-type-btn, .add-friend-btn, .friend-row,
 input, textarea, select {
   border-radius: var(--radius-bar);
