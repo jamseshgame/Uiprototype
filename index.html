@@ -5874,9 +5874,10 @@
     text-align: center;
   }
 
-  /* Name sits over the bottom gradient — white with a soft shadow for legibility. */
+  /* Name sits over the bottom gradient — white with a soft shadow for legibility.
+     Font size matches the Journey reward tiles (.season-reward-name). */
   .quest-name {
-    font-size: 100px;
+    font-size: 64px;
     font-weight: 400;
     line-height: 1.0;
     text-align: left;
@@ -6042,10 +6043,9 @@
     overflow: hidden;
     overflow-wrap: break-word;
     width: 100%;
-    /* Reserve exactly two lines (line-height 1.0 → 2em) so every tile's art box
-       is the same height regardless of whether the name is one or two lines —
-       keeps the medallion a uniform size across all badges. */
-    height: 2em;
+    /* Natural height (no 2-line reserve) so the name drops to just above the hint
+       — matching the Journey caption height — and the flex:1 art above grows to
+       give the medallion more room. */
     flex-shrink: 0;
     color: var(--text-primary);
   }
