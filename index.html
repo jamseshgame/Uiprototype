@@ -5611,6 +5611,39 @@
   .season-xp-bar:not(#zz9):not(#zz8) { background-color: #fff !important; border: 1px solid #000; }
   .season-xp-fill:not(#zz9):not(#zz8) { background-color: #000 !important; }
 
+  /* ── Reward tiles → full-bleed cosmetic art with the caption over a bottom
+     gradient (mirrors the Challenge .quest-art / .quest-fade treatment).
+     Scoped away from the dashed "How to earn XP" info tiles. ── */
+  .season-tile:not(.season-info) {
+    justify-content: flex-end;
+  }
+  .season-tile:not(.season-info) .season-art--img {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    border: none;
+    border-radius: 0;
+    justify-content: flex-start;
+    padding-top: 18px;
+  }
+  /* Dark gradient rising from the bottom so the caption stays legible over art. */
+  .season-tile:not(.season-info) .season-art-shade {
+    background: linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.58) 36%, rgba(0,0,0,0.12) 66%, rgba(0,0,0,0) 100%);
+  }
+  /* Caption (name + status + bar) parked over the gradient at the bottom. */
+  .season-tile:not(.season-info) .season-reward-name,
+  .season-tile:not(.season-info) .season-xp,
+  .season-tile:not(.season-info) .season-xp-bar {
+    position: relative;
+    z-index: 1;
+  }
+  .season-tile:not(.season-info) .season-reward-name { height: auto; }
+  /* Unlocked tiles keep the mint border + ✓, but the text now sits over the
+     full-bleed art, so use light text instead of the dark-on-mint treatment. */
+  .season-tile:not(.season-info).unlocked .season-reward-name { color: var(--text-primary); }
+  .season-tile:not(.season-info).unlocked .season-xp { color: rgba(255,255,255,0.82); }
+  .season-tile:not(.season-info).unlocked .season-level-cap { color: rgba(255,255,255,0.7); }
+
   /* ── "How to earn XP" info tile (first tile of each journey row) ── */
   .season-tile.season-info {
     border: 2px dashed var(--pink);
