@@ -10442,18 +10442,19 @@ input, textarea, select {
 </div>
 
 <div class="create-space-overlay" id="create-space-overlay" onclick="closeCreateSpace(event)">
-  <div class="create-space-popup" onclick="event.stopPropagation()" style="position:relative">
+  <div class="create-space-popup std-popup" onclick="event.stopPropagation()">
     <button class="popup-close-btn" onclick="closeCreateSpace()">&#10005;</button>
-    <h2 style="font-size:40px;font-weight:800;color:var(--text-primary);margin:0;text-align:center">Create Space</h2>
-    <input class="save-input" id="create-space-name" type="text" placeholder="Space Name">
-    <div class="create-space-toggle" id="create-space-toggle">
-      <button class="create-space-toggle-btn active" onclick="setCreateSpaceType('public')">Public</button>
-      <button class="create-space-toggle-btn" onclick="setCreateSpaceType('private')">Private</button>
+    <div class="std-popup-header"><h2 style="font-size:40px;font-weight:800;color:var(--text-primary);margin:0;text-align:center">Create Space</h2></div>
+    <div class="std-popup-body">
+      <input class="save-input" id="create-space-name" type="text" placeholder="Space Name" style="flex-shrink:0">
+      <div class="create-space-toggle" id="create-space-toggle" style="flex-shrink:0">
+        <button class="create-space-toggle-btn active" onclick="setCreateSpaceType('public')">Public</button>
+        <button class="create-space-toggle-btn" onclick="setCreateSpaceType('private')">Private</button>
+      </div>
+      <div class="create-space-env-grid" id="create-space-env-grid" style="flex:1;min-height:0"></div>
     </div>
-    <div class="create-space-env-grid" id="create-space-env-grid"></div>
-    <div class="save-buttons">
-      <button class="save-btn-cancel" onclick="closeCreateSpace()">Cancel</button>
-      <button class="save-btn-confirm" onclick="confirmCreateSpace()">Create</button>
+    <div class="std-popup-footer">
+      <button class="std-popup-btn" onclick="confirmCreateSpace()">Create</button>
     </div>
   </div>
 </div>
