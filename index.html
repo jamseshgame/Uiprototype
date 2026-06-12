@@ -13960,12 +13960,25 @@ function openFilterPicker(type) {
   var panel = document.getElementById('option-picker-panel');
   overlay.style.display = 'flex';
   panel.innerHTML = '';
-  panel.className = 'option-picker-panel filter-panel';
+  panel.className = 'option-picker-panel filter-panel std-popup';
 
+  var stdCloseBtn = document.createElement('button');
+  stdCloseBtn.className = 'popup-close-btn';
+  stdCloseBtn.setAttribute('onclick', 'closeOptionPicker()');
+  stdCloseBtn.innerHTML = '&#10005;';
+  panel.appendChild(stdCloseBtn);
+
+  var stdHeader = document.createElement('div');
+  stdHeader.className = 'std-popup-header';
   var title = document.createElement('div');
   title.className = 'option-picker-title';
   title.textContent = def.title;
-  panel.appendChild(title);
+  stdHeader.appendChild(title);
+  panel.appendChild(stdHeader);
+
+  var stdBody = document.createElement('div');
+  stdBody.className = 'std-popup-body';
+  panel.appendChild(stdBody);
 
   var grid = document.createElement('div');
   grid.className = 'filter-grid';
@@ -14032,15 +14045,15 @@ function openFilterPicker(type) {
     }
     grid.appendChild(tile);
   }
-  panel.appendChild(grid);
+  stdBody.appendChild(grid);
 
   // Multi-select gets Apply / Clear buttons
   if (def.multi) {
     var actions = document.createElement('div');
-    actions.className = 'filter-actions';
+    actions.className = 'std-popup-footer';
 
     var clearBtn = document.createElement('button');
-    clearBtn.className = 'filter-clear-btn';
+    clearBtn.className = 'std-popup-btn';
     clearBtn.textContent = 'Clear';
     clearBtn.onclick = function() {
       localSel.length = 0;
@@ -14052,7 +14065,7 @@ function openFilterPicker(type) {
     };
 
     var applyBtn = document.createElement('button');
-    applyBtn.className = 'filter-apply-btn';
+    applyBtn.className = 'std-popup-btn';
     applyBtn.textContent = 'Apply';
     applyBtn.onclick = function() {
       if (type === 'genre') pickerFilterGenres = localSel.slice();
@@ -14612,14 +14625,27 @@ function openManagePopup() {
   var panel = document.getElementById('option-picker-panel');
   overlay.style.display = 'flex';
   panel.innerHTML = '';
-  panel.className = 'option-picker-panel';
-  panel.style.width = '1200px';
-  panel.style.maxHeight = '900px';
+  panel.className = 'option-picker-panel std-popup';
+  panel.style.width = '';
+  panel.style.maxHeight = '';
 
+  var stdCloseBtn = document.createElement('button');
+  stdCloseBtn.className = 'popup-close-btn';
+  stdCloseBtn.setAttribute('onclick', 'closeOptionPicker()');
+  stdCloseBtn.innerHTML = '&#10005;';
+  panel.appendChild(stdCloseBtn);
+
+  var stdHeader = document.createElement('div');
+  stdHeader.className = 'std-popup-header';
   var title = document.createElement('div');
   title.className = 'option-picker-title';
   title.textContent = 'Manage Setlist';
-  panel.appendChild(title);
+  stdHeader.appendChild(title);
+  panel.appendChild(stdHeader);
+
+  var stdBody = document.createElement('div');
+  stdBody.className = 'std-popup-body';
+  panel.appendChild(stdBody);
 
   var items = [
     { label: 'Save Setlist', icon: '<svg viewBox="0 0 24 24"><path d="M17 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>', fn: function() { closeOptionPicker(); openSaveSetlist(); } },
@@ -14636,14 +14662,7 @@ function openManagePopup() {
     t.onclick = it.fn;
     g.appendChild(t);
   }
-  panel.appendChild(g);
-
-  var backBtn = document.createElement('button');
-  backBtn.className = 'play-bar-btn';
-  backBtn.style.cssText = 'width:100%;margin-top:24px;flex-shrink:0';
-  backBtn.innerHTML = '<svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>Back';
-  backBtn.onclick = function() { closeOptionPicker(); };
-  panel.appendChild(backBtn);
+  stdBody.appendChild(g);
 }
 
 function getSongInstrument(idx) {
@@ -15251,13 +15270,27 @@ function openAddPlayerPicker() {
   var panel = document.getElementById('option-picker-panel');
   overlay.style.display = 'flex';
   panel.innerHTML = '';
-  panel.style.width = '1400px';
-  panel.style.maxHeight = '1400px';
+  panel.className = 'option-picker-panel std-popup';
+  panel.style.width = '';
+  panel.style.maxHeight = '';
 
+  var stdCloseBtn = document.createElement('button');
+  stdCloseBtn.className = 'popup-close-btn';
+  stdCloseBtn.setAttribute('onclick', 'closeOptionPicker()');
+  stdCloseBtn.innerHTML = '&#10005;';
+  panel.appendChild(stdCloseBtn);
+
+  var stdHeader = document.createElement('div');
+  stdHeader.className = 'std-popup-header';
   var title = document.createElement('div');
   title.className = 'option-picker-title';
   title.textContent = inBandspace ? 'Invite Friend' : 'Add Player';
-  panel.appendChild(title);
+  stdHeader.appendChild(title);
+  panel.appendChild(stdHeader);
+
+  var stdBody = document.createElement('div');
+  stdBody.className = 'std-popup-body';
+  panel.appendChild(stdBody);
 
   var pool = (window._backendFriends && window._backendFriends.length) ? window._backendFriends : [
     { name: 'Jooleeno', online: true, avatar: 'avatars/jooleeno.jpg' },
@@ -15307,14 +15340,7 @@ function openAddPlayerPicker() {
     fgrid.style.gridTemplateColumns = '1fr';
     fgrid.innerHTML = '<div style="color:#888;font-size:24px;text-align:center;padding:48px 0">No friends available to add</div>';
   }
-  panel.appendChild(fgrid);
-
-  var backBtn = document.createElement('button');
-  backBtn.className = 'play-bar-btn';
-  backBtn.style.cssText = 'width:100%;margin-top:24px;flex-shrink:0';
-  backBtn.innerHTML = '<svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>Back';
-  backBtn.onclick = function() { closeOptionPicker(); };
-  panel.appendChild(backBtn);
+  stdBody.appendChild(fgrid);
 }
 
 function addCoopPlayer(friend) {
@@ -18266,20 +18292,33 @@ function openXpInfo(trackIdx) {
   var panel = document.getElementById('option-picker-panel');
   overlay.style.display = 'flex';
   panel.innerHTML = '';
-  panel.className = 'option-picker-panel';
-  panel.style.width = '1640px';
-  panel.style.maxHeight = '1200px';
+  panel.className = 'option-picker-panel std-popup';
+  panel.style.width = '';
+  panel.style.maxHeight = '';
 
+  var stdCloseBtn = document.createElement('button');
+  stdCloseBtn.className = 'popup-close-btn';
+  stdCloseBtn.setAttribute('onclick', 'closeOptionPicker()');
+  stdCloseBtn.innerHTML = '&#10005;';
+  panel.appendChild(stdCloseBtn);
+
+  var stdHeader = document.createElement('div');
+  stdHeader.className = 'std-popup-header';
   var title = document.createElement('div');
   title.className = 'option-picker-title';
   title.textContent = track.earnTitle || ('Earn ' + track.label + ' XP');
-  panel.appendChild(title);
+  stdHeader.appendChild(title);
+  panel.appendChild(stdHeader);
+
+  var stdBody = document.createElement('div');
+  stdBody.className = 'std-popup-body';
+  panel.appendChild(stdBody);
 
   if (track.earnSub) {
     var sub = document.createElement('div');
     sub.className = 'xp-info-sub';
     sub.textContent = track.earnSub;
-    panel.appendChild(sub);
+    stdBody.appendChild(sub);
   }
 
   var grid = document.createElement('div');
@@ -18305,18 +18344,11 @@ function openXpInfo(trackIdx) {
     tile.innerHTML = html;
     grid.appendChild(tile);
   }
-  panel.appendChild(grid);
+  stdBody.appendChild(grid);
 
   // Wire the TikTok handle Link/Update button (if present).
   var btn = document.getElementById('tiktok-handle-btn');
   if (btn) btn.onclick = saveTiktokHandle;
-
-  var backBtn = document.createElement('button');
-  backBtn.className = 'play-bar-btn';
-  backBtn.style.cssText = 'width:100%;margin-top:24px;flex-shrink:0';
-  backBtn.innerHTML = '<svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>Back';
-  backBtn.onclick = function() { closeOptionPicker(); };
-  panel.appendChild(backBtn);
 }
 
 // Persist the player's TikTok handle so posts tagged #jamseshgame can be credited.
