@@ -5979,7 +5979,7 @@
     border: none;
     background: none;
     box-sizing: border-box;
-    padding: 26px 0;
+    padding: 0;
   }
   .badge-art--img img {
     width: 100%;
@@ -5989,7 +5989,7 @@
   }
 
   .badge-name {
-    font-size: 100px;
+    font-size: 64px;
     font-weight: 400;
     line-height: 1.0;
     text-shadow: 0 2px 8px rgba(0,0,0,0.85);
@@ -6001,6 +6001,11 @@
     overflow: hidden;
     overflow-wrap: break-word;
     width: 100%;
+    /* Reserve exactly two lines (line-height 1.0 → 2em) so every tile's art box
+       is the same height regardless of whether the name is one or two lines —
+       keeps the medallion a uniform size across all badges. */
+    height: 2em;
+    flex-shrink: 0;
     color: var(--text-primary);
   }
 
