@@ -545,10 +545,10 @@
     background-position: calc(-1 * var(--pad)) calc(-1 * (var(--pad) + var(--topbar-h) + var(--panel-gap)));
   }
   @keyframes pageFadeIn {
-    0%   { opacity: 0; transform: translateY(8px); }
+    0%   { opacity: 0; transform: translateY(16px); }
     100% { opacity: 1; transform: translateY(0); }
   }
-  .page.active { display: flex; animation: pageFadeIn 0.2s ease-out both; }
+  .page.active { display: flex; animation: pageFadeIn 0.32s ease-out both; }
   .page:not(.active) * {
     animation-play-state: paused !important;
   }
@@ -5424,21 +5424,35 @@
   }
 
   /* ── Season Grid ──────────────────────────────────────── */
+  /* All three tracks share ONE panel: the grid hugs the tracks (centred) and
+     clips them flush inside a single rounded surface. */
   .season-grid {
     flex: 1;
+    align-self: center;
     display: flex;
-    flex-direction: column;
-    gap: 36px;        /* match the 4x3 standard (.spaces-grid / .badge-grid) */
-    padding: 24px;
+    flex-direction: row;            /* tracks sit side-by-side as vertical columns */
+    gap: 0;                          /* flush — they share the panel, no gutters */
+    margin: 24px auto;
     min-height: 0;
+    max-width: 100%;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-outer);
+    overflow: hidden;
   }
 
+  /* Each track (SOLO / GROUP / CREATOR) is a fixed-width column inside the panel,
+     reward levels stacking top-down (Level 3 → Level 1) above the base. */
   .season-category {
-    flex: 1;
+    flex: 0 0 auto;
+    width: 540px;
     min-height: 0;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+  }
+  /* Thin divider between adjacent tracks within the shared panel. */
+  .season-category + .season-category {
+    border-left: 1px solid rgba(255,255,255,0.10);
   }
 
   .season-row {
@@ -5450,7 +5464,7 @@
   }
 
   .season-tile {
-    height: 100%;
+    flex: 1 1 0;
     min-height: 0;
     border-radius: var(--panel-radius);
     overflow: hidden;
@@ -5681,6 +5695,79 @@
     border-color: var(--btn-primary-border);
   }
   .season-tile.season-info .season-xp { color: var(--pink); }
+
+  /* ── Single long tile per track: the track hero art (solo/group/creator.jpg)
+     fills the whole card; reward levels are overlaid rows climbing UP; the track
+     name + "How to earn XP" anchors the base. One .season-tile fills its column. ── */
+  .season-category > .season-tile { flex: 1 1 0; }
+  .season-track {
+    padding: 0;
+    align-items: stretch;
+    justify-content: stretch;
+    border-radius: 0;       /* flush inside the shared panel; outer corners clipped by .season-grid */
+    border: none;
+  }
+  .season-track .season-art--img {
+    position: absolute; inset: 0; z-index: 0;
+    border: none; border-radius: 0;
+  }
+  /* Stronger bottom-weighted shade so the stacked level rows + name stay legible. */
+  .season-track-shade {
+    background: linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.7) 30%, rgba(0,0,0,0.5) 64%, rgba(0,0,0,0.34) 100%);
+  }
+  .season-track-levels {
+    position: relative; z-index: 1;
+    flex: 1; min-height: 0;
+    display: flex; flex-direction: column;
+    gap: 12px;
+    padding: 16px 16px 6px;
+  }
+  /* Each reward level: a translucent row — small cosmetic thumb + name/XP/bar. */
+  .season-lvl {
+    flex: 1 1 0; min-height: 0;
+    display: flex; align-items: center; gap: 14px;
+    padding: 12px 16px;
+    border-radius: var(--panel-radius);
+    background: rgba(8,6,16,0.46);
+    border: 1px solid rgba(255,255,255,0.10);
+    backdrop-filter: blur(2px);
+  }
+  .season-lvl.unlocked { border-color: var(--mint); background: rgba(8,6,16,0.34); }
+  .season-lvl.locked { filter: none; }
+  .season-lvl-thumb {
+    width: 72px; height: 72px; flex-shrink: 0;
+    border-radius: 16px;
+    background-size: cover; background-position: center;
+    border: 1px solid rgba(255,255,255,0.16);
+  }
+  .season-lvl-thumb--myst {
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(160deg, rgba(124,58,237,0.30), rgba(8,6,16,0.7));
+  }
+  .season-lvl-q { font-size: 40px; font-weight: 800; color: rgba(255,255,255,0.4); line-height: 1; }
+  .season-lvl-main { flex: 1; min-width: 0; }
+  .season-lvl-top { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+  .season-lvl-name {
+    font-size: 27px; font-weight: 700; color: #fff;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;
+  }
+  .season-lvl-badge {
+    font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 2px;
+    color: rgba(255,255,255,0.72); flex-shrink: 0;
+  }
+  .season-lvl-xp { font-size: 16px; font-weight: 700; color: rgba(255,255,255,0.82); margin: 5px 0 8px; }
+  .season-lvl.unlocked .season-lvl-xp { color: var(--mint); }
+  .season-track-foot {
+    position: relative; z-index: 1;
+    padding: 8px 20px 20px;
+    text-align: left;
+  }
+  .season-track-name {
+    font-size: 56px; line-height: 1; font-weight: 400; letter-spacing: 1px;
+    color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,0.9);
+  }
+  .season-track-cta { font-size: 18px; font-weight: 800; color: var(--pink); margin-top: 6px; }
+  .season-track:hover { box-shadow: inset 0 0 0 2px var(--btn-primary-border); }
 
   /* ── "How to earn XP" popup (reuses #option-picker-overlay) ── */
   .xp-info-sub {
@@ -11257,6 +11344,12 @@ function navigateTo(pageName) {
       target.style.visibility = '';
       target.style.position = '';
       target.style.top = ''; target.style.right = ''; target.style.bottom = ''; target.style.left = '';
+      // Restart the entrance fade now that the page is genuinely on-screen — the
+      // .active class was added during the hidden swap window above, so without
+      // this the first ~22ms of the fade would play while invisible.
+      target.style.animation = 'none';
+      void target.offsetWidth;          // force reflow so the restart takes
+      target.style.animation = '';
       if (current && current !== target) current.classList.remove('active');
       setTimeout(function() {
         _navTransitioning = false;
@@ -18141,68 +18234,74 @@ function challengeTimeLeft(ch) {
 // (locked "mystery" rewards shown as question marks).
 var seasonPage = 0;
 var SEASON_PAGES = 2;
+// Journeys row preset — how many tracks (rows) of seasonData to render, top-down
+// (Solo, Group, Creator). Default = all 3. Overridden by the ?j1/?j2/?j3 URL
+// slugs in parseMode(): ?j1 = Solo only, ?j2 = Solo + Group, ?j3 = all three.
+var journeyRowCount = 3;
 function buildSeasonGrid() {
   var container = document.getElementById('season-grid');
   if (!container) return;
   container.innerHTML = '';
-  for (var c = 0; c < seasonData.length; c++) {
+  var rowMax = Math.min(journeyRowCount, seasonData.length);
+  for (var c = 0; c < rowMax; c++) {
     var cat = seasonData[c];
     var section = document.createElement('div');
     section.className = 'season-category';
 
-    var row = document.createElement('div');
-    row.className = 'season-row';
-
-    // First tile of every row: the track name (SOLO / GROUP / CREATOR) over its
-    // hero art + a "How to earn XP" entry that opens the popup.
-    var info = document.createElement('div');
-    info.className = 'season-tile season-info';
-    var infoArtCls = 'season-art' + (cat.infoImg ? ' season-art--img' : '');
-    var infoArtStyle = cat.infoImg ? ' style="background-image:url(\'' + cat.infoImg + '\')"' : '';
-    var infoShade = cat.infoImg ? '<div class="season-art-shade"></div>' : '';
-    info.innerHTML =
-      '<div class="' + infoArtCls + '"' + infoArtStyle + '>' + infoShade + '</div>' +
-      '<div class="season-reward-name">' + cat.label + '</div>' +
-      '<div class="season-xp">How to earn XP</div>';
-    info.onclick = (function(idx) { return function() { openXpInfo(idx); }; })(c);
-    row.appendChild(info);
+    // One long tile per track: the track hero art fills the whole card; reward
+    // levels are overlaid rows that climb UP (Level 3 at the top → Level 1 just
+    // above the base); the track name + "How to earn XP" anchors the bottom.
+    var track = document.createElement('div');
+    track.className = 'season-tile season-track';
+    var heroStyle = cat.infoImg ? ' style="background-image:url(\'' + cat.infoImg + '\')"' : '';
+    var html =
+      '<div class="season-art season-art--img"' + heroStyle + '><div class="season-art-shade season-track-shade"></div></div>' +
+      '<div class="season-track-levels">';
 
     if (seasonPage === 0) {
-      for (var i = 0; i < cat.rewards.length; i++) {
+      for (var i = cat.rewards.length - 1; i >= 0; i--) {
         var r = cat.rewards[i];
-        var tile = document.createElement('div');
-        tile.className = 'season-tile' + (r.unlocked ? ' unlocked' : ' locked');
-
         var progress = r.unlocked ? 100 : Math.min(r.xpEarned / r.xp * 100, 100);
         var xpText = r.unlocked
-          ? 'Unlocked'
+          ? '✓ Unlocked'
           : r.xpEarned.toLocaleString() + ' / ' + r.xp.toLocaleString() + ' XP';
-
-        var artStyle = r.img ? ' style="background-image:url(\'' + r.img + '\')"' : '';
-        var artCls = 'season-art' + (r.img ? ' season-art--img' : '');
-        var artShade = r.img ? '<div class="season-art-shade"></div>' : '';
-        tile.innerHTML =
-          '<div class="' + artCls + '"' + artStyle + '>' + artShade + '<div class="season-level-badge">LEVEL ' + (i + 1) + '</div></div>' +
-          '<div class="season-reward-name">' + r.name + '</div>' +
-          '<div class="season-xp">' + xpText + '</div>' +
-          '<div class="season-xp-bar"><div class="season-xp-fill" style="width:' + progress + '%"></div></div>';
-        row.appendChild(tile);
+        var thumbStyle = r.img ? ' style="background-image:url(\'' + r.img + '\')"' : '';
+        html +=
+          '<div class="season-lvl ' + (r.unlocked ? 'unlocked' : 'locked') + '">' +
+            '<div class="season-lvl-thumb"' + thumbStyle + '></div>' +
+            '<div class="season-lvl-main">' +
+              '<div class="season-lvl-top"><span class="season-lvl-name">' + r.name + '</span><span class="season-lvl-badge">LVL ' + (i + 1) + '</span></div>' +
+              '<div class="season-lvl-xp">' + xpText + '</div>' +
+              '<div class="season-xp-bar"><div class="season-xp-fill" style="width:' + progress + '%"></div></div>' +
+            '</div>' +
+          '</div>';
       }
     } else {
-      // Page 2: levels 4-6 are still secret — locked "mystery" tiles.
-      for (var m = 0; m < 3; m++) {
+      // Page 2: levels 6-4 (top-down) are still secret — locked "mystery" rows.
+      for (var m = 2; m >= 0; m--) {
         var lvl = m + 4;
-        var mtile = document.createElement('div');
-        mtile.className = 'season-tile locked';
-        mtile.innerHTML =
-          '<div class="season-art season-mystery-art"><div class="season-art-shade"></div><div class="season-level-badge">LEVEL ' + lvl + '</div><span class="season-mystery-q">?</span></div>' +
-          '<div class="season-reward-name">???</div>' +
-          '<div class="season-xp">Keep playing to reveal</div>' +
-          '<div class="season-xp-bar"><div class="season-xp-fill" style="width:0%"></div></div>';
-        row.appendChild(mtile);
+        html +=
+          '<div class="season-lvl locked">' +
+            '<div class="season-lvl-thumb season-lvl-thumb--myst"><span class="season-lvl-q">?</span></div>' +
+            '<div class="season-lvl-main">' +
+              '<div class="season-lvl-top"><span class="season-lvl-name">???</span><span class="season-lvl-badge">LVL ' + lvl + '</span></div>' +
+              '<div class="season-lvl-xp">Keep playing to reveal</div>' +
+              '<div class="season-xp-bar"><div class="season-xp-fill" style="width:0%"></div></div>' +
+            '</div>' +
+          '</div>';
       }
     }
-    section.appendChild(row);
+
+    html +=
+      '</div>' +
+      '<div class="season-track-foot">' +
+        '<div class="season-track-name">' + cat.label + '</div>' +
+        '<div class="season-track-cta">How to earn XP</div>' +
+      '</div>';
+
+    track.innerHTML = html;
+    track.onclick = (function(idx) { return function() { openXpInfo(idx); }; })(c);
+    section.appendChild(track);
     container.appendChild(section);
   }
   renderPager(document.getElementById('journeys-pager'), seasonPage, SEASON_PAGES, function(dir) {
@@ -19241,6 +19340,13 @@ function parseMode() {
       currentQuestLayout = questLayoutNum;
     }
   }
+
+  // ?j1 / ?j2 / ?j3 — Journeys row preset: how many tracks (Solo, Group, Creator)
+  // render on the Progress ▸ Journeys grid. j1 = Solo only, j2 = Solo + Group,
+  // j3 = all three (also the default when no slug is present).
+  if ('j1' in map) journeyRowCount = 1;
+  else if ('j2' in map) journeyRowCount = 2;
+  else if ('j3' in map) journeyRowCount = 3;
 
   // ?tiles=season,store,vault,... — override home tile priority order
   if (map.tiles) {
