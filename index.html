@@ -15333,15 +15333,30 @@ function openOptionPicker(type) {
   var panel = document.getElementById('option-picker-panel');
   overlay.style.display = 'flex';
   panel.innerHTML = '';
+  panel.className = 'option-picker-panel std-popup';
+  panel.style.width = '';
+  panel.style.maxHeight = '';
+
+  // Standard popup frame scaffold: X + header + body (+ optional footer).
+  var closeBtn = document.createElement('button');
+  closeBtn.className = 'popup-close-btn';
+  closeBtn.setAttribute('onclick', 'closeOptionPicker()');
+  closeBtn.innerHTML = '&#10005;';
+  panel.appendChild(closeBtn);
+
+  var stdHeader = document.createElement('div');
+  stdHeader.className = 'std-popup-header';
+  var stdBody = document.createElement('div');
+  stdBody.className = 'std-popup-body';
 
   var title = document.createElement('div');
   title.className = 'option-picker-title';
 
   if (type === 'instrument') {
     title.textContent = 'Select Instrument';
-    panel.appendChild(title);
-    panel.style.width = '1400px';
-    panel.style.maxHeight = '1500px';
+    stdHeader.appendChild(title);
+    panel.appendChild(stdHeader);
+    panel.appendChild(stdBody);
     // Keys removed (was "Coming Soon"). Layout is now always 3-in-a-row.
     var instItems = [
       {id: 'guitar', label: 'Guitar', img: 'instruments/guitar.png'},
@@ -15426,12 +15441,12 @@ function openOptionPicker(type) {
 
       instGrid.appendChild(col);
     }
-    panel.appendChild(instGrid);
+    stdBody.appendChild(instGrid);
   } else if (type === 'difficulty') {
     title.textContent = 'Select Difficulty';
-    panel.appendChild(title);
-    panel.style.width = '1400px';
-    panel.style.maxHeight = '1500px';
+    stdHeader.appendChild(title);
+    panel.appendChild(stdHeader);
+    panel.appendChild(stdBody);
     // 3-in-a-row, same card layout as the instrument picker. Expert dropped.
     // Imagery (shared with the options-row tile): gradient + signal bars.
     var diffItems = [
@@ -15465,18 +15480,18 @@ function openOptionPicker(type) {
       dCol.appendChild(dHeader);
       diffGrid.appendChild(dCol);
     }
-    panel.appendChild(diffGrid);
+    stdBody.appendChild(diffGrid);
   } else if (type === 'experience') {
     title.textContent = 'Vibe';
-    panel.appendChild(title);
-    panel.style.width = '1200px';
-    panel.style.maxHeight = '1400px';
+    stdHeader.appendChild(title);
+    panel.appendChild(stdHeader);
+    panel.appendChild(stdBody);
 
     // ── Environment ──
     var envHeader = document.createElement('div');
     envHeader.style.cssText = 'font-size:28px;font-weight:700;color:#ffffff;margin:8px 0 16px 0;letter-spacing:0.5px';
     envHeader.textContent = 'Environment';
-    panel.appendChild(envHeader);
+    stdBody.appendChild(envHeader);
 
     var envItems = [
       {id: 'Colosseum', label: 'Colosseum', img: 'spaces/001.jpg'},
@@ -15504,13 +15519,13 @@ function openOptionPicker(type) {
       })(env.id);
       envGrid.appendChild(envTile);
     }
-    panel.appendChild(envGrid);
+    stdBody.appendChild(envGrid);
 
     // ── Instrument Skin ──
     var skinHeader = document.createElement('div');
     skinHeader.style.cssText = 'font-size:28px;font-weight:700;color:#ffffff;margin:8px 0 16px 0;letter-spacing:0.5px';
     skinHeader.textContent = 'Instrument Skin';
-    panel.appendChild(skinHeader);
+    stdBody.appendChild(skinHeader);
 
     var skinItems = [
       {id: 'Original',      label: 'Original',      img: 'instruments/drums.png',         instruments: ['guitar','drums','vocals','keys','bass','mixed']},
@@ -15567,40 +15582,23 @@ function openOptionPicker(type) {
       })(skin.id, skinInstrument);
       skinGrid.appendChild(skinTile);
     }
-    panel.appendChild(skinGrid);
+    stdBody.appendChild(skinGrid);
 
-    // ── Accept / Cancel ──
-    var actionRow = document.createElement('div');
-    actionRow.style.cssText = 'display:flex;gap:24px;width:100%;margin-top:40px';
+    // ── Accept (footer) ──
+    // Cancel removed; the X / overlay tap dismisses and closeOptionPicker reverts.
+    var stdFooter = document.createElement('div');
+    stdFooter.className = 'std-popup-footer';
 
-    var cancelBtn = document.createElement('div');
-    cancelBtn.style.cssText = 'flex:1;text-align:center;padding:28px;border-radius:var(--panel-radius);cursor:pointer;font-size:30px;font-weight:800;color:#ffffff;background:rgba(255,255,255,0.12);border:2px solid rgba(255,255,255,0.3)';
-    cancelBtn.textContent = 'Cancel';
-    cancelBtn.onclick = (function(inst) {
-      return function() {
-        // Revert skin + environment to the snapshot taken when the screen opened.
-        if (experienceSnapshot) {
-          selectedExperience = experienceSnapshot.skin;
-          selectedEnvironment = experienceSnapshot.env;
-          sendToUnity('experience', {tab: 'skin', id: selectedExperience, instrument: inst});
-          sendToUnity('experience', {tab: 'environment', id: selectedEnvironment});
-        }
-        closeOptionPicker();
-      };
-    })(skinInstrument);
-    actionRow.appendChild(cancelBtn);
-
-    var acceptBtn = document.createElement('div');
-    acceptBtn.className = 'jamsesh-signature';
-    acceptBtn.style.cssText = 'flex:1;text-align:center;padding:28px;border-radius:var(--panel-radius);cursor:pointer;font-size:30px;font-weight:800;color:#ffffff';
+    var acceptBtn = document.createElement('button');
+    acceptBtn.className = 'std-popup-btn jamsesh-signature';
     acceptBtn.textContent = 'Accept';
     acceptBtn.onclick = function() {
       // Keep the current selection; closeOptionPicker fires experienceClosed + buildPlayGrid.
       closeOptionPicker();
     };
-    actionRow.appendChild(acceptBtn);
+    stdFooter.appendChild(acceptBtn);
 
-    panel.appendChild(actionRow);
+    panel.appendChild(stdFooter);
   }
 }
 
@@ -16145,18 +16143,34 @@ function openCreatorNamePicker() {
   var panel = document.getElementById('option-picker-panel');
   overlay.style.display = 'flex';
   panel.innerHTML = '';
-  panel.style.width = '1700px';
-  panel.style.maxHeight = '1600px';
+  panel.className = 'option-picker-panel std-popup';
+  panel.style.width = '';
+  panel.style.maxHeight = '';
+
+  // Standard popup frame scaffold: X + header + body (select-and-close, no footer).
+  var closeBtn = document.createElement('button');
+  closeBtn.className = 'popup-close-btn';
+  closeBtn.setAttribute('onclick', 'closeOptionPicker()');
+  closeBtn.innerHTML = '&#10005;';
+  panel.appendChild(closeBtn);
+
+  var stdHeader = document.createElement('div');
+  stdHeader.className = 'std-popup-header';
+  var stdBody = document.createElement('div');
+  stdBody.className = 'std-popup-body';
 
   var title = document.createElement('div');
   title.className = 'option-picker-title';
   title.textContent = 'Create for';
-  panel.appendChild(title);
+  stdHeader.appendChild(title);
+  panel.appendChild(stdHeader);
+  panel.appendChild(stdBody);
 
   var grid = document.createElement('div');
   grid.className = 'spaces-grid';
   grid.style.width = '100%';
-  grid.style.height = '1200px';
+  grid.style.flex = '1';
+  grid.style.minHeight = '0';
 
   var profileName = 'Rael';
   var profileEl = document.querySelector('.profile-name');
@@ -16223,7 +16237,7 @@ function openCreatorNamePicker() {
     grid.appendChild(tile);
   }
 
-  panel.appendChild(grid);
+  stdBody.appendChild(grid);
 }
 
 function updateCreatorNameBtn() {
