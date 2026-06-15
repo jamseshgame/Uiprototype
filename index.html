@@ -264,9 +264,10 @@
     display: flex;
     align-items: center;
     padding: var(--pad);
-    /* Reserve the top-right corner for the absolutely-positioned Settings
-       button (width + a gap each side) so the ticker/coin don't slide under it. */
-    padding-right: calc(var(--pad) * 2 + 200px);
+    /* Reserve the top-right corner for BOTH absolutely-positioned launchers
+       (Avatar + Settings, 200px each + a 16px gap) plus a pad gap, so the
+       right-side flex content (Picks balance) can't slide under them. */
+    padding-right: calc(var(--pad) * 2 + 416px);
     gap: var(--pad);
     min-height: 0;
     position: relative;
@@ -513,6 +514,50 @@
     width: 100%;
     height: 100%;
     transform-style: preserve-3d;
+  }
+
+  /* ── Jamsesh Picks balance (topbar) ──────────────────
+     Static JamPick emblem with the live count ("X Picks") beneath it. The
+     number is driven by Unity via the 'updatePicks' bridge message → setPicks().
+     No aspect-ratio (unsupported on Chromium 91) — fixed px sizes. */
+  .topbar-pick {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-right: var(--pad);
+    flex-shrink: 0;
+  }
+  .topbar-pick-icon {
+    width: 78px;
+    height: 92px;   /* pick asset is taller than wide (~5:6) */
+    background: url('branding/JamPick_hires.png') center center / contain no-repeat;
+    filter: drop-shadow(0 2px 6px rgba(0,0,0,0.4));
+  }
+  /* Stacked count — number over the "PICKS" label, so 4–5 digit balances
+     (e.g. 20,000) stay narrow instead of running wide on one line. */
+  .topbar-pick-count {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+  }
+  .topbar-pick-num {
+    font-size: 34px;
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1;
+    white-space: nowrap;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+  }
+  .topbar-pick-label {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    line-height: 1;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.65);
   }
 
   /* ── Main Content ─────────────────────────────────── */
@@ -1602,15 +1647,25 @@
   .play-grid-option--cover .play-grid-option-label { color: #dddddd; }
   /* Difficulty bars on the small options-row tile (smaller than the picker card) */
   .play-grid-option--cover .diff-picker__bars { width: auto; height: 52px; }
+  /* Small category caption (Instrument / Difficulty / Vibe / Save·Load) — sits
+     UNDER the hero value now (see the swapped DOM order in buildOptionsRow). */
   .play-grid-option-label {
-    font-size: 18px;
+    font-size: 17px;
     font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
     color: #aaaaaa;
+    order: 2;
   }
+  /* Hero value (Guitar / Easy / Original / Setlist) in the tall "long" font. */
   .play-grid-option-value {
-    font-size: 24px;
-    font-weight: 700;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 44px;
+    font-weight: 400;
+    letter-spacing: 1px;
+    line-height: 1;
     color: #ffffff;
+    order: 1;
   }
 
   /* Solo grid layout (vertical stacked) */
@@ -6147,6 +6202,32 @@
     color: var(--text-secondary);
   }
 
+  /* ── Badge display variants (?badgesBare / ?badgesBoxed) ──
+     Both hide the name/hint labels (the medallion art carries its own name +
+     requirement) and let the art expand to fill the cell. Bare drops the tile
+     box entirely; boxed keeps it. Both are driven from buildBadgeGrid(), which
+     forces every badge "earned" first, so no dim/checkmark cleanup is needed. */
+  .badge-grid.badges-bare .badge-name,
+  .badge-grid.badges-bare .badge-hint,
+  .badge-grid.badges-boxed .badge-name,
+  .badge-grid.badges-boxed .badge-hint { display: none; }
+
+  /* Bare: strip the bounding box, padding and earned tick → medallion only. */
+  .badge-grid.badges-bare .badge-tile {
+    border: none;
+    background: none;
+    padding: 0;
+    gap: 0;
+  }
+  .badge-grid.badges-bare .badge-tile::after { display: none; }
+  .badge-grid.badges-bare .badge-art { border: none; padding: 0; }
+
+  /* Boxed: keep the box but give the medallion the whole interior. Hide the
+     earned tick so the box frames just the medallion (all are forced earned). */
+  .badge-grid.badges-boxed .badge-tile { gap: 0; }
+  .badge-grid.badges-boxed .badge-tile::after { display: none; }
+  .badge-grid.badges-boxed .badge-art { border: none; }
+
   .badge-pagination {
     flex-shrink: 0;
     display: flex;
@@ -9284,6 +9365,9 @@ input, textarea, select {
   border: none !important;
   text-shadow: none !important;
   text-transform: uppercase;
+  /* Tall "long" font — needs !important here to beat the global
+     `button { font-family: Monda !important }` rule. */
+  font-family: 'Bebas Neue', sans-serif !important;
   flex-direction: row !important;        /* keep label + arrow on one line */
   align-items: center !important;
   justify-content: center !important;
@@ -9519,6 +9603,14 @@ input, textarea, select {
       <div class="profile-info profile-info-right" style="display:none">
         <div class="stat-ticker" id="stat-ticker"></div>
       </div>
+      <!-- Jamsesh Picks balance — count set by Unity via 'updatePicks' (setPicks). -->
+      <div class="topbar-pick" id="topbar-pick">
+        <div class="topbar-pick-icon"></div>
+        <div class="topbar-pick-count">
+          <span class="topbar-pick-num" id="pick-count">0</span>
+          <span class="topbar-pick-label">Picks</span>
+        </div>
+      </div>
     </div>
   </header>
 
@@ -9691,12 +9783,12 @@ input, textarea, select {
     </div>
     <div class="page" id="page-season">
       <div class="play-mode-tabs" id="progress-tabs">
-        <div class="play-mode-tab active" onclick="switchProgressTab('journeys')">Journeys</div>
-        <div class="play-mode-tab" onclick="switchProgressTab('challenges')">Challenges</div>
+        <div class="play-mode-tab" onclick="switchProgressTab('journeys')" style="display:none">Journeys</div>
+        <div class="play-mode-tab active" onclick="switchProgressTab('challenges')">Challenges</div>
         <div class="play-mode-tab" onclick="switchProgressTab('badges')">Badges</div>
       </div>
-      <div id="progress-tab-journeys" class="spaces-tab-content"><div class="season-grid" id="season-grid"></div><div id="journeys-pager"></div></div>
-      <div id="progress-tab-challenges" class="spaces-tab-content" style="display:none;position:relative"><div class="quest-grid" id="quest-grid"></div><div id="challenges-pager"></div><button class="home-layout-btn quest-layout-btn" id="quest-layout-btn" onclick="openQuestLayoutPicker()" style="display:none"></button></div>
+      <div id="progress-tab-journeys" class="spaces-tab-content" style="display:none"><div class="season-grid" id="season-grid"></div><div id="journeys-pager"></div></div>
+      <div id="progress-tab-challenges" class="spaces-tab-content" style="display:flex;position:relative"><div class="quest-grid" id="quest-grid"></div><div id="challenges-pager"></div><button class="home-layout-btn quest-layout-btn" id="quest-layout-btn" onclick="openQuestLayoutPicker()" style="display:none"></button></div>
       <div id="progress-tab-badges" class="spaces-tab-content" style="display:none"><div class="badge-grid" id="badge-grid"></div><div class="badge-pagination" id="badge-pagination"></div></div>
     </div>
     <div class="page" id="page-social">
@@ -10700,6 +10792,7 @@ function handleUnityMessage(msg) {
     case 'updateLobby': updateLobbyFromBackend(msg.data); break;
     case 'updateHubs': updateHubsFromBackend(msg.data); break;
     case 'updateCoins': updateCoinsFromBackend(msg.data); break;
+    case 'updatePicks': updatePicksFromBackend(msg.data); break;
     case 'updateProgression': updateProgression(msg.data); break;
     case 'updateChallenges': updateChallengesFromBackend(msg.data); break;
     case 'updateReferralRewards': updateReferralRewards(msg.data); break;
@@ -11271,6 +11364,33 @@ function updateProgression(data) {
     if (coinSpan) coinSpan.querySelector('span').textContent = data.currencyBalance.toLocaleString();
     rebuildStatTicker();
   }
+}
+
+// ── Jamsesh Picks balance (topbar) ──────────────────────────────────────
+// Writes the current pick count into the topbar "X Picks" label. Safe to call
+// any time; null-guards the element so it never throws during early init.
+function renderPicks() {
+  var el = document.getElementById('pick-count');
+  if (el) el.textContent = (userPicks || 0).toLocaleString();
+}
+
+// Set the pick balance. THE single entry point Unity uses — send
+//   { type: 'updatePicks', data: { picks: 42 } }   (or data: 42)
+// and this runs. Also callable directly from console/desktop: setPicks(42).
+function setPicks(n) {
+  var v = parseInt(n, 10);
+  if (isNaN(v) || v < 0) v = 0;
+  userPicks = v;
+  var profile = getActiveProfile();
+  if (profile) profile.picks = v;   // keep active profile in sync
+  renderPicks();
+}
+
+// Bridge handler — tolerant of { picks: N }, { count: N }, or a bare number.
+function updatePicksFromBackend(data) {
+  if (data == null) return;
+  var n = (typeof data === 'object') ? (data.picks != null ? data.picks : data.count) : data;
+  setPicks(n);
 }
 
 // Populates the existing Device/Firmware/UI/Game tile on the Career page
@@ -14235,7 +14355,9 @@ function buildSoloGrid(grid) {
   startBtn.id = 'play-go-btn';
   startBtn.onclick = function() { startGame(); };
   startBtn.textContent = 'Start';
-  startBtn.style.cssText = 'width:100%;flex:0.4;min-height:0;font-size:64px;font-weight:900;letter-spacing:6px';
+  // Bebas Neue is single-weight; keep weight 400 so it renders as the clean tall
+  // "long" font (faux-bold 900 looks clunky on it).
+  startBtn.style.cssText = 'width:100%;flex:0.4;min-height:0;font-size:72px;font-weight:400;letter-spacing:5px';
   grid.appendChild(startBtn);
 }
 
@@ -14750,6 +14872,27 @@ function diffBarsSvg(level) {
     bar(4, 36, 20, level >= 1) + bar(23, 24, 32, level >= 2) + bar(42, 10, 46, level >= 3) + '</svg>';
 }
 
+// Vibe tile assets — the player's selected experience pieces (Stage, Skin,
+// Highway, Gem). Rendered as diagonal slices on the Vibe option tile using the
+// same mechanic as the Challenges reward tiles (questSliceClip). Up to 4 slices;
+// sourced from the live experience selections with defaults for pieces that
+// aren't pickable yet. Unity can later drive these via the experience bridge.
+var VIBE_STAGE_IMAGES = { 'Colosseum': 'spaces/001.jpg', 'Arena': 'spaces/002.jpg' };
+var VIBE_SKIN_IMAGES = {
+  'Original': 'instruments/drums.png',
+  'Crystal': 'instruments/skins/crystal.png',
+  'Crystal Green': 'instruments/skins/crystal.png',
+  'Iridescent': 'instruments/skins/crystal.png'
+};
+function getVibeAssets() {
+  return [
+    { label: 'Stage',   img: VIBE_STAGE_IMAGES[selectedEnvironment] || 'spaces/001.jpg' },
+    { label: 'Skin',    img: VIBE_SKIN_IMAGES[selectedExperience] || 'instruments/skins/crystal.png' },
+    { label: 'Highway', img: 'vault/018.jpg' },
+    { label: 'Gem',     img: 'vault/014.jpg' }
+  ];
+}
+
 function buildOptionsRow(container) {
   var instNames = ['Guitar', 'Drums', 'Vocals', 'Keys', 'Mixed'];
   var diffNames = ['Easy', 'Normal', 'Hard', 'Expert'];
@@ -14788,6 +14931,7 @@ function buildOptionsRow(container) {
     {
       label: 'Vibe', value: selectedExperience,
       icon: '<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>',
+      slices: getVibeAssets(),
       onclick: function() { openExperiencePicker(); }
     },
     {
@@ -14802,7 +14946,24 @@ function buildOptionsRow(container) {
     var tile = document.createElement('div');
     tile.className = 'play-grid-option';
     tile.onclick = opt.onclick;
-    if (opt.coverBg) {
+    if (opt.slices) {
+      // Vibe tile: up to 4 selected experience assets (Stage/Skin/Highway/Gem)
+      // as diagonal slices — same mechanic as the Challenges reward tiles.
+      tile.className += ' play-grid-option--cover';
+      var assets = opt.slices;
+      var sn = Math.min(assets.length, 4);
+      var sliceHtml = '';
+      for (var sIdx = 0; sIdx < sn; sIdx++) {
+        var clip = questSliceClip(sIdx, sn);
+        sliceHtml += '<div class="quest-slice" style="background-image:url(\'' + assets[sIdx].img +
+          '\');-webkit-clip-path:' + clip + ';clip-path:' + clip + '"></div>';
+      }
+      tile.innerHTML =
+        '<div class="quest-slices">' + sliceHtml + '</div>' +
+        '<div class="play-grid-option-shade"></div>' +
+        '<div class="play-grid-option-label">' + opt.label + '</div>' +
+        '<div class="play-grid-option-value">' + opt.value + '</div>';
+    } else if (opt.coverBg) {
       // Cover tile (mirrors the picker card): full image/gradient + optional
       // icon + shade + label.
       tile.className += ' play-grid-option--cover';
@@ -16990,13 +17151,17 @@ function showPrivacy() {
 
 /* ── Profile Switcher ─────────────────────────────── */
 var profiles = [
-  { id: 'rael', name: 'RAELJAMSESH', avatar: 'avatars/rael_new.png', level: 24, xp: 6500, xpMax: 10000, coins: 5000 },
-  { id: 'jooleeno', name: 'Jooleeno', avatar: 'avatars/jooleeno.jpg', level: 12, xp: 2100, xpMax: 5000, coins: 3200 },
-  { id: 'ted', name: 'Ted', avatar: 'avatars/ted.png', level: 37, xp: 8200, xpMax: 12000, coins: 7800 },
-  { id: 'abbie', name: 'Abbie', avatar: 'avatars/abbie.png', level: 19, xp: 3400, xpMax: 7000, coins: 4500 },
-  { id: 'arthen', name: 'Arthen', avatar: 'avatars/arthen.jpg', level: 42, xp: 9800, xpMax: 15000, coins: 12400 }
+  { id: 'rael', name: 'RAELJAMSESH', avatar: 'avatars/rael_new.png', level: 24, xp: 6500, xpMax: 10000, coins: 5000, picks: 20000 },
+  { id: 'jooleeno', name: 'Jooleeno', avatar: 'avatars/jooleeno.jpg', level: 12, xp: 2100, xpMax: 5000, coins: 3200, picks: 3450 },
+  { id: 'ted', name: 'Ted', avatar: 'avatars/ted.png', level: 37, xp: 8200, xpMax: 12000, coins: 7800, picks: 28100 },
+  { id: 'abbie', name: 'Abbie', avatar: 'avatars/abbie.png', level: 19, xp: 3400, xpMax: 7000, coins: 4500, picks: 9020 },
+  { id: 'arthen', name: 'Arthen', avatar: 'avatars/arthen.jpg', level: 42, xp: 9800, xpMax: 15000, coins: 12400, picks: 47800 }
 ];
 var activeProfileId = 'rael';
+
+// Jamsesh Picks balance shown in the topbar. Live value; Unity drives it via the
+// 'updatePicks' bridge message (see setPicks / updatePicksFromBackend).
+var userPicks = 0;
 
 function showProfilesPanel() {
   document.getElementById('career-main').style.display = 'none';
@@ -17036,11 +17201,11 @@ function showReferralsSection() {
 // `earned`/`progress` here override the Badges screen state — referral tiers
 // track referral counts, not the badge's own unlock condition.
 var REFERRAL_BADGES = [
-  { name: 'Recruiter',     hint: 'Refer 1 person who plays Jamsesh',   earned: true },
-  { name: 'Band Together', hint: 'Refer 2 people who play Jamsesh',    earned: false,
+  { name: 'Recruiter',     hint: 'Refer 1 friend who plays Jamsesh',   earned: true },
+  { name: 'Band Together', hint: 'Refer 2 friends who play Jamsesh',   earned: false,
     progress: { pct: 50, label: '1 out of 2 referrals complete' } },
-  { name: 'Full Lineup',   hint: 'Refer 5 people who play Jamsesh',    earned: false },
-  { name: 'Going Viral',   hint: 'Refer 10 people who play Jamsesh',   earned: false }
+  { name: 'Full Lineup',   hint: 'Refer 5 friends who play Jamsesh',   earned: false },
+  { name: 'Top Promoter',  hint: 'Refer 10 friends who play Jamsesh',  earned: false }
 ];
 
 // ── Referral reward amounts ──
@@ -17909,6 +18074,8 @@ function switchProfile(profileId) {
   if (!profile) return;
   activeProfileId = profileId;
   userCoins = profile.coins;
+  userPicks = (profile.picks != null) ? profile.picks : userPicks;
+  renderPicks();
 
   // Update topbar
   document.querySelector('.profile-name').textContent = profile.name;
@@ -18708,41 +18875,22 @@ var BADGE_ICON = {
   calendar:'M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z'
 };
 
+// Each entry carries its own medallion art (badges/badge_*.png). The first row is
+// the 4-star performance ladder; the second row is the referral tiers (these four
+// names are also surfaced on the Referrals screen via REFERRAL_BADGES — keep the
+// names in sync).
 var badgeData = [
-  // ── Page 1: Performance & instruments ──
-  { name: 'First Show',     hint: 'Finish your first track',         icon: BADGE_ICON.play,    earned: true },
-  { name: 'Encore',         hint: 'Play 10 shows',                   icon: BADGE_ICON.encore,  earned: true },
-  { name: 'Setlist Master', hint: 'Play a 4-song setlist in one go', icon: BADGE_ICON.list,    earned: true },
-  { name: 'Perfect Score',  hint: 'Hit 100% on any track',          icon: BADGE_ICON.star,    earned: false },
-  { name: 'Flawless',       hint: 'Full-combo a song, no misses',    icon: BADGE_ICON.check,   earned: false },
-  { name: 'Combo King',     hint: 'Land a 100-note streak',          icon: BADGE_ICON.fire,    earned: false },
-  { name: 'Six-String Hero',hint: 'Play a show on Guitar',           icon: BADGE_ICON.guitar,  earned: true },
-  { name: 'Beat Keeper',    hint: 'Play a show on Drums',            icon: BADGE_ICON.note,    earned: false },
-  { name: 'Lead Vocalist',  hint: 'Play a show on Vocals',           icon: BADGE_ICON.mic,     earned: false },
-  { name: 'All-Rounder',    hint: 'Play every instrument',           icon: BADGE_ICON.apps,    earned: false },
-  { name: 'Expert',         hint: 'Clear a track on Expert',         icon: BADGE_ICON.bolt,    earned: false },
-  { name: 'Headliner',      hint: 'Reach a 1,000,000 score',         icon: BADGE_ICON.crown,   earned: false },
-  // ── Page 2: Band, social, creator, style ──
-  { name: 'Band Together',  hint: 'Play your first Group session',   icon: BADGE_ICON.people,    earned: true },
-  { name: 'In Sync',        hint: 'Win a Group show',                icon: BADGE_ICON.trophy,    earned: false },
-  { name: 'Full Lineup',    hint: 'Fill a band with bandmates',      icon: BADGE_ICON.addperson, earned: false },
-  { name: 'Going Viral',    hint: 'Share a TikTok with #jamseshgame',icon: BADGE_ICON.tiktok,    earned: false },
-  { name: 'Influencer',     hint: 'Share a clip to Instagram',       icon: BADGE_ICON.instagram, earned: false },
-  { name: 'Recruiter',      hint: 'Invite a friend who joins',       icon: BADGE_ICON.link,      earned: false },
-  { name: 'Shutterbug',     hint: 'Capture a photo in Design',      icon: BADGE_ICON.camera,    earned: true },
-  { name: 'Cover Artist',   hint: 'Create your first AI art',        icon: BADGE_ICON.brush,     earned: false },
-  { name: 'World Builder',  hint: 'Create a Space',                  icon: BADGE_ICON.home,      earned: false },
-  { name: 'Style Icon',     hint: 'Equip a theme, banner & frame',   icon: BADGE_ICON.palette,   earned: false },
-  { name: 'Fresh Look',     hint: 'Customize your avatar',           icon: BADGE_ICON.face,      earned: true },
-  { name: 'Daily Grind',    hint: 'Play 3 days in a row',            icon: BADGE_ICON.calendar,  earned: false }
+  // ── 4-star performance ladder ──
+  { name: 'Rising Star',   hint: 'Get 4 stars on 1 track',       img: 'badges/badge_risingstar_4starsin1track.png',    earned: true },
+  { name: 'Shooting Star', hint: 'Get 4 stars on 5 tracks',      img: 'badges/badge_shootingstar_4starsin5tracks.png', earned: false },
+  { name: 'Superstar',     hint: 'Get 4 stars on 10 tracks',     img: 'badges/badge_superstar_4starsin10tracks.png',   earned: false },
+  { name: 'All-Star Band', hint: 'Get 4 stars on a group track', img: 'badges/badge_allstarband_4starsasagroup.png',   earned: false },
+  // ── Referral tiers ──
+  { name: 'Recruiter',     hint: 'Refer 1 friend who plays Jamsesh',   img: 'badges/badge_recruiter_refer1friend.png',     earned: true },
+  { name: 'Band Together', hint: 'Refer 2 friends who play Jamsesh',    img: 'badges/badge_bandtogether_refer2friends.png', earned: false },
+  { name: 'Full Lineup',   hint: 'Refer 5 friends who play Jamsesh',    img: 'badges/badge_fulllineup_refer5friends.png',   earned: false },
+  { name: 'Top Promoter',  hint: 'Refer 10 friends who play Jamsesh',   img: 'badges/badge_toppromoter_refer10friends.png', earned: false }
 ];
-
-// Badge artwork. The first badge ("First Show") uses the finished colour medallion;
-// the remaining slots reuse a greyscale version as a placeholder until each gets
-// its own art. Swap in per-badge files here (e.g. 'badges/02.png') as they land.
-for (var _bi = 0; _bi < badgeData.length; _bi++) {
-  badgeData[_bi].img = _bi === 0 ? 'badges/01.png' : 'badges/locked.png';
-}
 
 // Single badge tile — shared by the Badges grid and the Referrals badge band.
 function makeBadgeTile(b) {
@@ -18767,6 +18915,9 @@ function makeBadgeTile(b) {
 function buildBadgeGrid() {
   var grid = document.getElementById('badge-grid');
   if (!grid) return;
+  // Display variant from ?badgesBare / ?badgesBoxed (empty = normal labelled view).
+  grid.className = 'badge-grid' +
+    (badgesViewMode === 'bare' ? ' badges-bare' : badgesViewMode === 'boxed' ? ' badges-boxed' : '');
   grid.innerHTML = '';
   var start = badgePage * BADGES_PER_PAGE;
   var pageItems = badgeData.slice(start, start + BADGES_PER_PAGE);
@@ -19259,6 +19410,8 @@ var questLayoutPickerEnabled = false; // ?challengeLayoutPicker — reveal the C
 var screenOverride = '';     // ?step=results1|results2 — direct-link to a results screen
 var onboardFlags = {};       // { legal: true, perms_explainer: true }
 var groupBootRole = '';      // ?host | ?client — pre-load the Group tab as host/client
+var badgesBoot = false;      // ?badges — boot straight into Progress ▸ Badges
+var badgesViewMode = '';     // ?badgesBare | ?badgesBoxed — Badges display variant
 
 function parseMode() {
   var params = window.location.search.substring(1).split('&');
@@ -19361,6 +19514,40 @@ function parseMode() {
   // outside the Unity flow.
   if ('host' in map) groupBootRole = 'host';
   else if ('client' in map) groupBootRole = 'client';
+
+  // ?badges / ?badgesBare / ?badgesBoxed — deep-link to Profile ▸ Progress ▸
+  // Badges. Treated as past onboarding so the screen is reachable on a fresh
+  // launch (mirrors the ?step=results direct-link). Navigation happens at the
+  // end of init(). The two *View* slugs are clean display variants:
+  //   Bare  — no tile box, no text labels, every medallion maxed (earned).
+  //   Boxed — keep the tile box, no text labels, medallion maxed inside it.
+  // The medallion art already carries its own name + requirement.
+  if ('badges' in map || 'badgesBare' in map || 'badgesBoxed' in map) {
+    badgesBoot = true;
+    onboardFlags.legal = true;
+    onboardFlags.legal_version = LEGAL_VERSION;
+    onboardFlags.perms_explainer = true;
+    onboardFlags.tutorial_play = true;
+    _saveOnboardFlags();
+    if ('badgesBare' in map) badgesViewMode = 'bare';
+    else if ('badgesBoxed' in map) badgesViewMode = 'boxed';
+    if (badgesViewMode) {
+      for (var _bv = 0; _bv < badgeData.length; _bv++) badgeData[_bv].earned = true;
+    }
+  }
+
+  // ?unlockAll — mark every badge as earned (demo/screenshot helper). Also
+  // unlocks all cosmetics so locked themes/banners/frames preview as owned.
+  if ('unlockAll' in map) {
+    for (var _ua = 0; _ua < badgeData.length; _ua++) badgeData[_ua].earned = true;
+    for (var _ur = 0; _ur < REFERRAL_BADGES.length; _ur++) {
+      REFERRAL_BADGES[_ur].earned = true;
+      delete REFERRAL_BADGES[_ur].progress;
+    }
+    for (var _ut = 0; _ut < themes.length; _ut++) unlockedThemes.push(themes[_ut].id);
+    for (var _ub = 0; _ub < banners.length; _ub++) unlockedBanners.push(banners[_ub].id);
+    for (var _uf = 0; _uf < frames.length; _uf++) unlockedFrames.push(frames[_uf].id);
+  }
 
   console.log('[Mode] demo=' + demoEnabled + ', onboard=' + onboardEnabled + ', layout=' + currentLayout + ', role=' + (groupBootRole || 'none') + ', flags=' + JSON.stringify(onboardFlags));
 }
@@ -19831,6 +20018,12 @@ function init() {
   initVuplexListener();
   initStatTicker();
 
+  // Seed the topbar Picks balance from the active profile (Unity overrides live
+  // via the 'updatePicks' bridge message).
+  var _pp = getActiveProfile();
+  if (_pp && _pp.picks != null) userPicks = _pp.picks;
+  renderPicks();
+
   // Initialize legal screen content on startup
   if (typeof onboardInitLegal === 'function') onboardInitLegal();
 
@@ -19847,6 +20040,12 @@ function init() {
   if (questLayoutPickerEnabled) {
     navigateTo('season');
     switchProgressTab('challenges');
+  }
+
+  // ?badges — deep-link straight to Profile ▸ Progress ▸ Badges.
+  if (badgesBoot) {
+    navigateTo('season');
+    switchProgressTab('badges');
   }
 }
 
@@ -20044,7 +20243,7 @@ var pageColorSchemes = {
   home:    { accent: [176,166,223], waves: [[176,166,223],[199,125,255],[150,140,210],[120,100,200],[200,180,255]], grad: ["#100C1F","#171234","#211A45","#2A1E55"], pt: [176,166,223], pb: [199,125,255] },
   social:  { accent: [0,229,199],   waves: [[0,229,199],[52,211,153],[16,200,170],[100,255,230],[20,180,160]],     grad: ["#0A1410","#0E2620","#0F3A30","#11463A"], pt: [0,229,199], pb: [100,255,230] },
   spaces:  { accent: [107,122,255], waves: [[107,122,255],[123,91,255],[96,140,250],[150,160,255],[80,100,220]],   grad: ["#0C0E2A","#121640","#1A1E55","#222866"], pt: [107,122,255], pb: [150,160,255] },
-  play:    { accent: [232,255,58],  waves: [[232,255,58],[0,229,199],[255,46,146],[200,230,40],[120,255,200]],     grad: ["#100C1F","#1C1A10","#26260A","#30320C"], pt: [232,255,58], pb: [0,229,199] },
+  play:    { accent: [232,255,58],  waves: [[232,255,58],[0,229,199],[255,46,146],[200,230,40],[120,255,200]],     grad: ["#100C1F","#171234","#211A45","#2A1E55"], pt: [232,255,58], pb: [0,229,199] },
   creator: { accent: [255,203,107], waves: [[255,203,107],[255,175,40],[255,111,46],[255,200,140],[220,150,60]],   grad: ["#1A1408","#2A1E0A","#3A280E","#4A3210"], pt: [255,203,107], pb: [255,175,40] },
   store:   { accent: [255,46,146],  waves: [[255,46,146],[244,114,182],[199,125,255],[255,100,170],[200,50,140]],  grad: ["#1A0A1A","#2E0E28","#401238","#501648"], pt: [255,46,146], pb: [244,114,182] },
   season:  { accent: [96,165,250], waves: [[96,165,250],[59,130,246],[147,197,253],[80,150,255],[37,99,235]], grad: ["#0A1428","#0E1E40","#123056","#163A6B"], pt: [96,165,250], pb: [147,197,253] },
