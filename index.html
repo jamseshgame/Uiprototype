@@ -9652,7 +9652,7 @@ input, textarea, select {
           </div>
           <div class="play-picker-lb">
             <button class="lb-type-btn" id="picker-inst-btn" onclick="rotatePickerInstrument()">&#127928; Guitar</button>
-            <button class="lb-type-btn" id="picker-diff-btn" onclick="rotatePickerDifficulty()">&#127922; Medium</button>
+            <button class="lb-type-btn" id="picker-diff-btn" onclick="rotatePickerDifficulty()">&#127919; Medium</button>
             <button class="lb-type-btn" id="lb-type-btn" onclick="rotateLbType()"><span>&#127757;</span> Worldwide</button>
             <div class="play-panel play-leaderboard">
               <div class="play-lb-list" id="play-lb-list"></div>
@@ -12231,7 +12231,7 @@ var allSongs = [];
 var setlist = [];
 var setlistName = 'My Setlist';
 var selectedInstrument = 'guitar';
-var selectedDifficulty = 'medium';
+var selectedDifficulty = 'easy';
 var playMode = 'solo';
 var inBandspace = false;
 var isHost = true;
@@ -12517,7 +12517,7 @@ function buildSoloPanel(panel) {
     inner.appendChild(instBtn);
 
     // Difficulty button
-    var selDiff = songDiffs[i] || 'medium';
+    var selDiff = songDiffs[i] || 'easy';
     var diffObj = null;
     for (var d = 0; d < difficulties.length; d++) {
       if (difficulties[d].id === selDiff) { diffObj = difficulties[d]; break; }
@@ -13015,7 +13015,7 @@ function buildNameplate(player) {
     badges.appendChild(instBadge);
     var diffBadge = document.createElement('span');
     diffBadge.className = 'play-np-badge';
-    diffBadge.textContent = (player.difficulty || 'medium').charAt(0).toUpperCase();
+    diffBadge.textContent = (player.difficulty || 'easy').charAt(0).toUpperCase();
     badges.appendChild(diffBadge);
     info.appendChild(badges);
   } else {
@@ -14860,7 +14860,7 @@ function removeSoloSong(idx) {
 // options-row Difficulty tile): colour gradient + signal bars (1/2/3).
 var DIFFICULTY_IMAGERY = {
   easy:   { level: 1, grad: 'linear-gradient(135deg,#14532d 0%,#16a34a 55%,#4ade80 100%)' },
-  normal: { level: 2, grad: 'linear-gradient(135deg,#713f12 0%,#ca8a04 55%,#facc15 100%)' },
+  medium: { level: 2, grad: 'linear-gradient(135deg,#713f12 0%,#ca8a04 55%,#facc15 100%)' },
   hard:   { level: 3, grad: 'linear-gradient(135deg,#7f1d1d 0%,#dc2626 55%,#f87171 100%)' }
 };
 function diffBarsSvg(level) {
@@ -14894,7 +14894,7 @@ function getVibeAssets() {
 
 function buildOptionsRow(container) {
   var instNames = ['Guitar', 'Drums', 'Vocals', 'Keys', 'Mixed'];
-  var diffNames = ['Easy', 'Normal', 'Hard', 'Expert'];
+  var diffNames = ['Easy', 'Medium', 'Hard', 'Expert'];
 
   // Use active song's settings
   var curInst = getSongInstrument(activeSongIdx);
@@ -15044,7 +15044,7 @@ function buildLateJoinSpectateView(grid) {
     }
     sendToUnity('startGame', {
       instrument: 'spectator',
-      difficulty: selectedDifficulty || 'medium',
+      difficulty: selectedDifficulty || 'easy',
       setlist: titles
     });
   };
@@ -15282,7 +15282,7 @@ function ensureSelfInRoster() {
     name: me.name,
     avatar: me.avatar,
     instrument: selectedInstrument || 'guitar',
-    difficulty: selectedDifficulty || 'medium',
+    difficulty: selectedDifficulty || 'easy',
     status: 'choosing',
     isSelf: true,
     plate: null,
@@ -15668,7 +15668,7 @@ function openOptionPicker(type) {
     // Imagery (shared with the options-row tile): gradient + signal bars.
     var diffItems = [
       {id: 'easy',   label: 'Easy'},
-      {id: 'normal', label: 'Normal'},
+      {id: 'medium', label: 'Medium'},
       {id: 'hard',   label: 'Hard'}
     ];
     var diffGrid = document.createElement('div');
@@ -20060,7 +20060,7 @@ function applyGroupBootRole() {
     name: me.name,
     avatar: me.avatar,
     instrument: selectedInstrument || 'guitar',
-    difficulty: selectedDifficulty || 'medium',
+    difficulty: selectedDifficulty || 'easy',
     status: 'choosing',
     isSelf: true,
     plate: null,
