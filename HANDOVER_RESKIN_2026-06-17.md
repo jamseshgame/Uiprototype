@@ -170,9 +170,8 @@ No incoming messages were removed; all existing handlers (`setInBandspace`,
 ## Notes / non-bridge
 
 - Difficulty vocabulary is unified on `easy` / `medium` / `hard` / `expert` (the
-  fix already on `main` in `14f9ca5`). One new reskin code path — the **Spectate**
-  button — still falls back to `'medium'` if `selectedDifficulty` is unset; Unity's
-  `ParseDifficulty` already maps `"medium" → Normal`, so this is harmless, just
-  noted for consistency.
+  fix already on `main` in `14f9ca5`), and all unset-state fallbacks — including the
+  reskin's new **Spectate** path — default to `easy`. Unity's `ParseDifficulty`
+  mapping (`"medium" → Normal`) is unchanged.
 - New asset: `branding/setlist-cover.png` (setlist cover art). The `art/` cover-art
   directory remains untracked in git (provided out-of-band as before).
