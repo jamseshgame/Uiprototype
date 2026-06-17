@@ -41,14 +41,17 @@
     --purple: #B0A6DF;    /* lavender */
     --lime: #E8FF3A;      /* signature primary */
     --bg-body: transparent;
-    --bg-panel: #1A1628;          /* white .04 over #100C1F */
-    --bg-surface: #1E1B2C;        /* white .06 over #100C1F */
-    --bg-surface-hover: #282435;  /* white .10 over #100C1F */
-    --text-primary: #f0ecf8;
-    --text-secondary: rgba(240,236,248,0.65);
-    --text-muted: rgba(255,255,255,0.45);
+    /* Surface stack — brand "dark canvas" (Perform default). Page #0A0816 sits on
+       <html>; panels lift toward violet. Overridden per-page by setPageColors(). */
+    --bg-panel: #1B1638;          /* Surface 1 */
+    --bg-surface: #261F49;        /* Surface 2 */
+    --bg-surface-hover: #322957;  /* Raised */
+    --text-primary: #FFFFFF;
+    --text-secondary: rgba(255,255,255,0.65);
+    --text-muted: rgba(255,255,255,0.40);
     --border-strong: rgba(255,255,255,0.18);
     --border-subtle: rgba(255,255,255,0.10);
+    --accent-ink: #100C1F;        /* text/icons sitting on a bright (acid) accent */
     --overlay-light: rgba(255,255,255,0.05);
     --scrollbar-color: rgba(255,255,255,0.15);
     --glow-pink: 0 0 0 3px var(--pink), 0 0 20px var(--pink-40);
@@ -894,24 +897,18 @@
     filter: drop-shadow(0 0 20px rgba(0,255,180,0.7)) drop-shadow(0 8px 16px rgba(0,0,0,0.5));
   }
 
-  /* Music Spaces = pink energy zone */
+  /* Spaces tiles — clean like the Challenges tiles: no border/outline/glow and no
+     hover lift. !important to beat the shared tile-hover rules (pink outline +
+     glow + scale) whose rectangular outline poked out at the rounded corners. */
   #page-spaces .space-tile,
-  #page-spaces .play-mode-tab {
-    border-image: none;
-    border-color: rgba(255,80,200,0.3);
-    outline-color: rgba(255,80,200,0.1);
-    box-shadow:
-      inset 0 0 0 1px rgba(255,80,200,0.2),
-      inset 0 6px 12px rgba(0,0,0,0.4);
-    filter: drop-shadow(0 0 10px rgba(255,80,200,0.3)) drop-shadow(0 12px 20px rgba(0,0,0,0.4));
-  }
   #page-spaces .space-tile:hover,
   #page-spaces .space-tile:active {
-    outline-color: rgba(255,80,200,0.4);
-    box-shadow:
-      0 0 0 3px rgba(255,80,200,0.6),
-      0 0 12px rgba(255,80,200,0.5);
-    filter: drop-shadow(0 0 20px rgba(255,80,200,0.7)) drop-shadow(0 8px 16px rgba(0,0,0,0.5));
+    border-color: transparent !important;
+    border-image: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    transform: none !important;
+    filter: drop-shadow(0 8px 16px rgba(0,0,0,0.35)) !important;
   }
 
   /* ── Enhanced hover lift ─────────────────────────── */
@@ -1047,7 +1044,7 @@
   .song-tile .tile-meta {
     display: flex;
     gap: 8px;
-    font-size: 14px;
+    font-size: 17px;   /* match the artist line */
     color: rgba(255,255,255,0.50);
     margin-top: 2px;
     white-space: nowrap;
@@ -1093,7 +1090,7 @@
     align-items: center;
     gap: 14px;
     padding: 10px 14px;
-    border-radius: var(--panel-radius);
+    border-radius: var(--radius-bar);
     cursor: pointer;
     transition: background 0.15s;
   }
@@ -1179,7 +1176,7 @@
     align-items: center;
     gap: 12px;
     padding: 0 16px;
-    border-radius: var(--panel-radius);
+    border-radius: var(--radius-bar);
     border: 1px solid var(--btn-panel-border);
     background: var(--btn-panel-hover);
     height: 100%;
@@ -1270,7 +1267,7 @@
   .lb-type-btn {
     width: 100%;
     height: var(--nav-btn-h);
-    border-radius: var(--panel-radius);
+    border-radius: var(--radius-bar);
     border: 1px solid var(--btn-tab-border);
     background: var(--btn-tab);
     color: #ffffff;
@@ -1320,7 +1317,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: var(--panel-radius);
+    border-radius: var(--radius-bar);
     border: 1px solid var(--btn-tab-border);
     background: var(--btn-tab);
     color: #ffffff;
@@ -1340,7 +1337,7 @@
 
   .play-mode-tab.active {
     background: var(--page-accent);
-    color: #000000;
+    color: var(--accent-ink);
     border-color: var(--page-accent);
     box-shadow: 0 0 0 2px var(--page-accent);
   }
@@ -1451,7 +1448,7 @@
   }
   .song-badge {
     background: rgba(0,0,0,0.7);
-    border-radius: var(--panel-radius);
+    border-radius: var(--radius-bar);
     padding: 6px 14px;
     font-size: 18px;
     font-weight: 700;
@@ -1517,15 +1514,48 @@
     right: 12px;
     gap: 10px;
   }
-  .song-tile .song-hover-btn,
+  /* VR reliability: keep the action buttons hit-testable at all times so the
+     laser-pointer click lands on the button instead of falling through to the
+     tile (which would consume it as a select/add). Hover/active are unreliable
+     on the Quest pointer, so we never gate pointer-events on them here. */
+  .song-tile .song-hover-actions,
+  .play-grid-song .song-hover-actions {
+    opacity: 1;
+    pointer-events: auto;
+  }
   .coop-song-tile .song-hover-btn {
     width: 86px;
     height: 86px;
   }
-  .song-tile .song-hover-btn svg,
   .coop-song-tile .song-hover-btn svg {
     width: 43px;
     height: 43px;
+  }
+  /* Picker tile: single, larger Play button (the whole tile adds the song). */
+  .song-tile .song-hover-btn {
+    width: 116px;
+    height: 116px;
+  }
+  .song-tile .song-hover-btn svg {
+    width: 58px;
+    height: 58px;
+  }
+  /* Setlist tile: three actions (play / swap / remove) on a ~240px square.
+     Size them so all three stay ON the tile — at 144px the row overflowed and
+     the leftmost (remove) button was clipped off the tile, hence "delete not
+     working". Always visible + interactive (no hover dependence) in VR. */
+  .play-grid-song .song-hover-actions {
+    top: 12px;
+    right: 12px;
+    gap: 8px;
+  }
+  .play-grid-song .song-hover-btn {
+    width: 64px;
+    height: 64px;
+  }
+  .play-grid-song .song-hover-btn svg {
+    width: 32px;
+    height: 32px;
   }
 
   .solo-drag-ghost {
@@ -1645,6 +1675,12 @@
     text-shadow: 0 1px 6px rgba(0,0,0,0.9);
   }
   .play-grid-option--cover .play-grid-option-label { color: #dddddd; }
+  /* Long values (e.g. a setlist name) wrap within the tile instead of overflowing. */
+  .play-grid-option--cover .play-grid-option-value {
+    max-width: 100%;
+    overflow-wrap: break-word;
+    text-align: left;
+  }
   /* Difficulty bars on the small options-row tile (smaller than the picker card) */
   .play-grid-option--cover .diff-picker__bars { width: auto; height: 52px; }
   /* Small category caption (Instrument / Difficulty / Vibe / Save·Load) — sits
@@ -1724,7 +1760,7 @@
     padding: 16px;
     background: var(--btn-panel);
     border: 1px solid var(--btn-panel-border);
-    border-radius: var(--panel-radius);
+    border-radius: var(--radius-bar);
     flex-shrink: 0;
   }
   .play-grid-summary-item {
@@ -1745,7 +1781,13 @@
     align-items: center;
   }
   /* Perform (solo): songs area and modifier row share the height 50/50. */
-  .play-grid--solo > .play-songs-area { flex: 1; }
+  .play-grid--solo > .play-songs-area {
+    flex: 1;
+    /* No surrounding panel box in solo — tiles float directly on the page. */
+    background: transparent;
+    border-color: transparent;
+    padding: 0;
+  }
   .play-grid--solo > .play-grid-options-row { flex: 1; }
   .play-grid-options-row .play-grid-option {
     flex: 1;
@@ -1945,7 +1987,7 @@
     padding: 6px 14px;
     background: rgba(255,255,255,0.04);
     border: 1px solid var(--btn-panel-border);
-    border-radius: var(--panel-radius);
+    border-radius: var(--radius-bar);
     overflow: hidden;
   }
   .coop-player-row--self {
@@ -1980,7 +2022,7 @@
     border-radius: 50%;
     overflow: hidden;
     flex-shrink: 0;
-    background: #1a1a1a;
+    background: var(--bg-surface);
     position: relative;
   }
   .coop-player-row .player-avatar img {
@@ -2106,7 +2148,7 @@
     position: relative;
     overflow: hidden;
     border-radius: var(--panel-radius);
-    background: #1a1a1a;
+    background: var(--bg-surface);
     border: 2px solid transparent;
     cursor: pointer;
     align-self: stretch;
@@ -2275,7 +2317,7 @@
   }
   .coop-friend-cell {
     background: var(--btn-panel);
-    border-radius: var(--panel-radius);
+    border-radius: var(--radius-bar);
     display: flex;
     align-items: center;
     gap: 10px;
@@ -2375,7 +2417,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: var(--panel-radius);
+    border-radius: var(--radius-bar);
     border: 1px solid var(--btn-tab-border);
     background: var(--btn-tab);
     color: #ffffff;
@@ -2416,7 +2458,7 @@
     gap: 20px;
     padding: 24px 32px;
     background: var(--btn-panel);
-    border-radius: var(--panel-radius);
+    border-radius: var(--radius-bar);
     cursor: pointer;
     border: 1px solid var(--btn-panel-border);
     transition: background 0.15s, border-color 0.15s;
@@ -2532,7 +2574,7 @@
     padding: 16px 20px;
     background: var(--btn-panel);
     border: 1px solid var(--btn-panel-border);
-    border-radius: var(--panel-radius);
+    border-radius: var(--radius-bar);
     color: #ffffff;
     font-size: 20px;
     font-weight: 400;
@@ -2621,7 +2663,7 @@
   .name-editor-input {
     width: 100%;
     height: 80px;
-    border-radius: var(--panel-radius);
+    border-radius: var(--radius-bar);
     border: 2px solid #555555;
     background: #2a2a2a;
     color: #ffffff;
@@ -2638,7 +2680,7 @@
   .name-editor-save {
     width: 100%;
     height: 80px;
-    border-radius: var(--panel-radius);
+    border-radius: var(--radius-bar);
     border: none;
     background: var(--pink);
     color: #ffffff;
@@ -2802,7 +2844,7 @@
     display: inline-flex;
     align-items: center;
     padding: 4px 14px;
-    border-radius: var(--panel-radius);
+    border-radius: var(--radius-bar);
     font-size: 16px;
     font-weight: 700;
     white-space: nowrap;
@@ -3043,7 +3085,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: var(--panel-radius);
+    border-radius: var(--radius-bar);   /* fixed px — wide/short button, avoids the stretched-oval % radius */
     border: 1px solid var(--btn-primary-border);
     background: var(--btn-primary);
     color: #ffffff;
@@ -3064,6 +3106,75 @@
     box-shadow: none;
   }
   .std-popup-btn:disabled:hover { transform: none; box-shadow: none; }
+
+  /* ── Large standard popup ──────────────────────────────
+     Secondary size for content-heavy popups (e.g. the Vibe picker's 4×4 grid).
+     Same frame as .std-popup, just bigger. Declared after .std-popup so the
+     equal-specificity !important width/height win. */
+  .std-popup--large {
+    width: 1720px !important;
+    height: 1720px !important;
+    max-width: 1720px !important;
+    max-height: 1720px !important;
+  }
+  /* Accept (and any footer button) in the tall "long" font — !important beats
+     the global `button { font-family: Monda !important }` rule. */
+  .std-popup--large .std-popup-btn {
+    font-family: 'Bebas Neue', sans-serif !important;
+    font-size: 42px;
+    font-weight: 400;
+    letter-spacing: 4px;
+  }
+
+  /* ── Vibe picker sections (Stage / Guitar Skin / Drum Skin / Highway) ──
+     Each section is a label + a single row of 4 cover tiles. */
+  .vibe-section-label {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 38px;
+    font-weight: 400;
+    color: #ffffff;
+    letter-spacing: 1.5px;
+    margin: 6px 0 2px 0;
+    flex-shrink: 0;
+  }
+  .vibe-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    width: 100%;
+    flex-shrink: 0;
+  }
+  .vibe-tile {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--panel-radius);
+    cursor: pointer;
+    padding-top: 56%;
+    border: 2px solid transparent;
+  }
+  .vibe-tile.selected {
+    border-color: #ffffff;
+    box-shadow: 0 0 0 3px #ffffff, 0 0 12px rgba(255,255,255,0.4);
+  }
+  .vibe-tile img {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    z-index: 0;
+  }
+  .vibe-tile-shade { position: absolute; inset: 0; background: rgba(0,0,0,0.4); z-index: 1; }
+  .vibe-tile-label {
+    position: absolute;
+    bottom: 12px; left: 16px;
+    z-index: 2;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    font-weight: 400;
+    letter-spacing: 1px;
+    color: #ffffff;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+  }
 
   .solo-popup-overlay {
     display: none;
@@ -3255,7 +3366,7 @@
 
   .loadout-opt {
     aspect-ratio: 2 / 1;
-    border-radius: var(--panel-radius);
+    border-radius: var(--radius-bar);
     cursor: pointer;
     display: flex;
     flex-direction: column;
@@ -3373,7 +3484,7 @@
   }
 
   .play-nameplate {
-    border-radius: var(--panel-radius);
+    border-radius: var(--radius-bar);
     overflow: hidden;
     position: relative;
     display: flex;
@@ -3438,7 +3549,7 @@
     font-size: 16px;
     font-weight: 700;
     padding: 2px 5px;
-    border-radius: var(--panel-radius);
+    border-radius: var(--radius-bar);
     background: #2a2a2a;
     color: var(--text-secondary);
     line-height: 1;
@@ -3467,7 +3578,7 @@
   .play-go-btn {
     height: var(--nav-btn-h);
     padding: 0 48px;
-    border-radius: var(--panel-radius);
+    border-radius: var(--radius-bar);
     border: 2px solid var(--btn-primary-border);
     background: var(--btn-primary);
     color: #ffffff;
@@ -3596,7 +3707,7 @@
   .setlist-btn {
     flex: 1;
     padding: 8px 0;
-    border-radius: var(--panel-radius);
+    border-radius: var(--radius-bar);
     border: none;
     background: #303030;
     color: #fff;
@@ -3678,7 +3789,7 @@
   .song-tile-btn {
     flex: 1;
     padding: 8px 0;
-    border-radius: var(--panel-radius);
+    border-radius: var(--radius-bar);
     border: none;
     background: #303030;
     color: #fff;
@@ -3709,7 +3820,7 @@
   .picker-filter {
     flex: 1;
     height: var(--nav-btn-h);
-    border-radius: var(--panel-radius);
+    border-radius: var(--radius-bar);
     border: 1px solid var(--btn-tab-border);
     background: var(--btn-tab);
     color: #ffffff;
@@ -3726,6 +3837,39 @@
     background: var(--btn-primary);
     border-color: var(--btn-primary-border);
     box-shadow: 0 0 12px var(--btn-primary-glow);
+  }
+
+  /* Song picker grid — exact 4x3 standard, same as the Challenges/Badges grids
+     (12 per page, paginated with the shared .pager). */
+  .picker-song-grid {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    /* minmax(0,1fr) so the 3 rows / 4 cols always shrink to fit the panel exactly
+       (plain 1fr keeps a content min and overflows). */
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-rows: repeat(3, minmax(0, 1fr));
+    gap: 36px;
+    padding: 24px;
+  }
+  /* Song tiles fill their grid cell — drop the old square-aspect padding hack
+     (padding-top:100%) that forced each tile taller than its 1fr row. */
+  .picker-song-grid .song-tile { padding-top: 0; }
+
+  /* "You Are Here" marker on the space the player is currently in. */
+  .space-here-badge {
+    position: absolute;
+    top: 16px; right: 16px;
+    z-index: 3;
+    padding: 9px 20px;
+    border-radius: 999px;
+    background: var(--page-accent, #6b7aff);
+    color: var(--accent-ink, #100C1F);   /* ink-on-accent: dark on bright accents, light on dark ones */
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.55);
   }
 
   /* ── Spaces Grid ─────────────────────────────────── */
@@ -3804,7 +3948,7 @@
     font-size: 24px;
     font-weight: 800;
     padding: 8px 20px;
-    border-radius: var(--panel-radius);
+    border-radius: var(--radius-bar);
     z-index: 2;
   }
 
@@ -3837,6 +3981,7 @@
     flex: 1;
     min-height: 0;
     overflow-y: auto;
+    overflow-x: hidden;   /* clip the friendSlideIn translateX overshoot so it can't flash a horizontal scrollbar */
     align-content: start;
   }
   .friend-item {
@@ -3953,7 +4098,7 @@
     min-height: 0;
   }
   .creator-tile {
-    background: #1a1a1a;
+    background: var(--bg-surface);
     border-radius: var(--panel-radius);
     display: flex;
     flex-direction: column;
@@ -3961,35 +4106,35 @@
     justify-content: center;
     gap: 16px;
     cursor: pointer;
-    border: 2px dashed #444444;
+    border: 2px dashed var(--border-strong);
     transition: background 0.15s, border-color 0.15s;
   }
   .creator-tile:hover {
-    background: #222222;
-    border-color: #666666;
+    background: var(--bg-surface-hover);
+    border-color: var(--page-accent);
   }
-  .creator-tile svg { width: 96px; height: 96px; fill: #ffffff; }
+  .creator-tile svg { width: 96px; height: 96px; fill: var(--text-primary); }
   .creator-tile-label {
     font-size: 40px;
     font-weight: 800;
-    color: #ffffff;
+    color: var(--text-primary);
   }
   .creator-tile-desc {
     font-size: 20px;
-    color: #888888;
+    color: var(--text-muted);
   }
   .creator-tile-shape {
-    border: 3px solid #ffffff;
-    background: #333333;
+    border: 3px solid var(--text-primary);
+    background: var(--bg-surface-hover);
     display: flex;
     align-items: center;
     justify-content: center;
   }
   .creator-tile-shape.portrait { width: 180px; height: 240px; border-radius: var(--panel-radius); }
-  .creator-tile-shape.wide { width: 300px; height: 180px; border-radius: var(--panel-radius); }
+  .creator-tile-shape.wide { width: 300px; height: 180px; border-radius: var(--radius-bar); }
   .creator-tile-shape.square { width: 220px; height: 220px; border-radius: var(--panel-radius); }
   .creator-tile-shape.circle { width: 220px; height: 220px; border-radius: 50%; }
-  .creator-tile-shape svg { width: 48px; height: 48px; fill: #888888; }
+  .creator-tile-shape svg { width: 48px; height: 48px; fill: var(--text-muted); }
 
   /* ── Creator Pagination ──────────────────────────── */
   .creator-pagination {
@@ -4006,7 +4151,7 @@
     position: absolute;
     top: 0; left: 0;
     width: 1920px; height: 1920px;
-    background: #000000;
+    background: var(--bg-panel);
     z-index: 998;
     display: none;
     flex-direction: column;
@@ -4039,7 +4184,7 @@
     background: #ff0000;
     color: #ffffff;
     padding: 24px 48px;
-    border-radius: var(--panel-radius);
+    border-radius: var(--radius-bar);
     font-size: 24px;
     font-weight: 600;
     text-align: center;
@@ -4092,7 +4237,7 @@
     width: 100%;
   }
   .creator-art-shape-tile {
-    background: #1a1a1a;
+    background: var(--bg-surface);
     border-radius: var(--panel-radius);
     border: 2px solid transparent;
     display: flex;
@@ -4103,13 +4248,14 @@
     cursor: pointer;
     transition: background 0.15s, border-color 0.15s;
   }
-  .creator-art-shape-tile:hover { background: #222222; }
+  .creator-art-shape-tile:hover { background: var(--bg-surface-hover); }
   .creator-art-shape-tile.selected {
-    background: #ffffff;
-    border-color: #ffffff;
-    box-shadow: 0 0 0 2px #ffffff;
+    background: var(--page-accent);
+    border-color: var(--page-accent);
+    box-shadow: 0 0 0 2px var(--page-accent);
   }
-  .creator-art-shape-tile.selected .creator-tile-label { color: #000000; }
+  .creator-art-shape-tile.selected .creator-tile-label,
+  .creator-art-shape-tile.selected .creator-tile-shape svg { color: var(--accent-ink); fill: var(--accent-ink); }
   .creator-word-cloud {
     display: flex;
     flex-wrap: wrap;
@@ -4120,9 +4266,9 @@
   }
   .creator-word {
     padding: 14px 28px;
-    background: #333333;
-    color: #ffffff;
-    border-radius: var(--panel-radius);
+    background: var(--bg-surface-hover);
+    color: var(--text-primary);
+    border-radius: var(--radius-bar);
     font-size: 24px;
     font-weight: 700;
     cursor: pointer;
@@ -4131,26 +4277,25 @@
     flex: 1 0 auto;
     text-align: center;
   }
-  .creator-word:hover { filter: brightness(1.3); }
+  .creator-word:hover { filter: brightness(1.15); }
   .creator-word.active {
-    border-color: #ffffff;
-    box-shadow: 0 0 0 2px #ffffff;
-    filter: brightness(1.4);
+    border-color: var(--page-accent);
+    box-shadow: 0 0 0 2px var(--page-accent);
   }
   .creator-prompt-input {
     width: 100%;
     padding: 20px 24px;
-    background: #1a1a1a;
-    border: 2px solid #444444;
-    border-radius: var(--panel-radius);
-    color: #ffffff;
+    background: var(--bg-surface);
+    border: 2px solid var(--border-strong);
+    border-radius: var(--radius-bar);
+    color: var(--text-primary);
     font-size: 24px;
     font-family: inherit;
     flex-shrink: 0;
   }
   .creator-prompt-input:focus {
     outline: none;
-    border-color: #ffffff;
+    border-color: var(--page-accent);
   }
   .creator-results-grid {
     display: grid;
@@ -4162,7 +4307,7 @@
     width: 100%;
   }
   .creator-result-tile {
-    background: #1a1a1a;
+    background: var(--bg-surface);
     border-radius: var(--panel-radius);
     overflow: hidden;
     position: relative;
@@ -4181,8 +4326,8 @@
     width: 48px;
     height: 48px;
     border-radius: 50%;
-    background: #333333;
-    border: 2px solid #666666;
+    background: var(--bg-surface-hover);
+    border: 2px solid var(--border-strong);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -4191,9 +4336,9 @@
     transition: background 0.15s;
   }
   .creator-result-check.checked {
-    background: #ffffff;
-    border-color: #ffffff;
-    color: #000000;
+    background: var(--page-accent);
+    border-color: var(--page-accent);
+    color: var(--accent-ink);
   }
 
   /* ── Career Grid ─────────────────────────────────── */
@@ -4348,13 +4493,28 @@
 
   /* ── Avatar Editor (Profile › Avatar) ───────────────── */
   .avatar-login-gate {
+    position: relative;
     flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 24px;
+    overflow: hidden;
+  }
+  /* Diffused AR-glasses backdrop behind the sign-in card. */
+  .avatar-login-gate::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url('branding/AR_Glasses.png') center center / contain no-repeat;
+    filter: blur(6px);
+    opacity: 0.16;
+    pointer-events: none;
+    z-index: 0;
   }
   .avatar-login-card {
+    position: relative;
+    z-index: 1;
     width: 1500px;
     max-width: 94%;
     background: var(--btn-panel);
@@ -4381,7 +4541,7 @@
   }
   .avatar-login-btn {
     border: 1px solid var(--btn-primary-border);
-    border-radius: var(--panel-radius);
+    border-radius: var(--radius-bar);   /* fixed px — avoids the stretched-oval % radius on this wide/short button */
     color: #ffffff;
     font-size: 40px;
     font-weight: 800;
@@ -4475,7 +4635,7 @@
   }
   .avatar-sso-btn {
     height: 72px;
-    border-radius: var(--panel-radius);
+    border-radius: var(--radius-bar);
     border: 1px solid var(--btn-tab-border);
     background: var(--btn-tab);
     color: #ffffff;
@@ -4530,7 +4690,7 @@
   }
   .avatar-auth-input {
     height: 92px;
-    border-radius: var(--panel-radius);
+    border-radius: var(--radius-bar);
     border: 1px solid var(--btn-tab-border);
     background: rgba(0,0,0,0.35);
     color: #ffffff;
@@ -4547,7 +4707,7 @@
   }
   .avatar-auth-submit {
     height: 104px;
-    border-radius: var(--panel-radius);
+    border-radius: var(--radius-bar);
     border: 1px solid var(--btn-primary-border);
     color: #ffffff;
     font-size: 34px;
@@ -4579,7 +4739,7 @@
   }
   .avatar-auth-secondary {
     height: 76px;
-    border-radius: var(--panel-radius);
+    border-radius: var(--radius-bar);
     border: 1px solid var(--btn-tab-border);
     background: transparent;
     color: #ffffff;
@@ -4601,7 +4761,7 @@
     font-weight: 600;
     text-align: center;
     padding: 18px 22px;
-    border-radius: var(--panel-radius);
+    border-radius: var(--radius-bar);
     margin-top: 6px;
   }
   .avatar-auth-signup-row {
@@ -4704,7 +4864,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: var(--panel-radius);
+    border-radius: var(--radius-bar);
     border: 1px solid var(--btn-tab-border);
     background: var(--btn-tab);
     color: #ffffff;
@@ -4820,7 +4980,7 @@
     padding: 16px 22px;
     background: var(--btn-panel);
     border: 1px solid var(--btn-tab-border);
-    border-radius: var(--panel-radius);
+    border-radius: var(--radius-bar);
   }
   .avatar-slider-label {
     flex: 0 0 320px;
@@ -4875,7 +5035,7 @@
     height: 62px;              /* ~10% taller for hand-tracking pinch targets */
     min-width: 200px;
     padding: 0 28px;
-    border-radius: var(--panel-radius);
+    border-radius: var(--radius-bar);
     border: 1px solid var(--btn-tab-border);
     background: var(--btn-tab);
     color: #ffffff;
@@ -4910,7 +5070,7 @@
   .avatar-action-btn {
     flex: 1;
     height: var(--nav-btn-h);
-    border-radius: var(--panel-radius);
+    border-radius: var(--radius-bar);
     border: 1px solid var(--btn-tab-border);
     background: var(--btn-tab);
     color: #ffffff;
@@ -5175,7 +5335,7 @@
     flex-shrink: 0;
   }
 
-  .nav-item.active .nav-icon { color: #000000; }
+  .nav-item.active .nav-icon { color: var(--accent-ink); }
 
   .nav-label {
     font-size: 21px;
@@ -5185,7 +5345,7 @@
     text-shadow: none;
   }
 
-  .nav-item.active .nav-label { color: #000000; }
+  .nav-item.active .nav-label { color: var(--accent-ink); }
 
   /* ── Back Button ─────────────────────────────────────── */
   .back-btn {
@@ -5196,7 +5356,7 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
-    border-radius: var(--panel-radius);
+    border-radius: var(--radius-bar);
     border: 1px solid var(--btn-panel-border);
     background: var(--btn-panel);
     color: #ffffff;
@@ -5212,6 +5372,14 @@
     background: var(--bg-surface-hover);
     color: var(--text-primary);
     box-shadow: 0 0 12px rgba(255,80,200,0.3);
+  }
+
+  /* The avatar-section "Profile" back button sits flush against the page's
+     overflow-x:hidden left edge, which clips its magenta hover glow. Inset it
+     so the glow stays fully on-screen. */
+  .avatar-section > .back-btn {
+    margin-left: 16px;
+    margin-top: 6px;
   }
 
   /* Settings sub-section back buttons are styled to match the PROFILE/GAMEPLAY
@@ -5286,7 +5454,7 @@
   }
 
   .settings-tile .tile-title {
-    font-size: 100px;       /* hero tile standard — Bebas inherited from the .tile-title base rule */
+    font-size: 64px;        /* matches the Badges screen .badge-name size */
     line-height: 1.0;
     font-weight: 400;
     letter-spacing: 0.02em;
@@ -5782,7 +5950,7 @@
     flex: 1 1 0; min-height: 0;
     display: flex; align-items: center; gap: 14px;
     padding: 12px 16px;
-    border-radius: var(--panel-radius);
+    border-radius: var(--radius-bar);
     background: rgba(8,6,16,0.46);
     border: 1px solid rgba(255,255,255,0.10);
     backdrop-filter: blur(2px);
@@ -5879,7 +6047,7 @@
     min-width: 0;
     font-size: 18px;
     padding: 14px 16px;
-    border-radius: var(--panel-radius);
+    border-radius: var(--radius-bar);
     border: 1px solid var(--btn-panel-border);
     background: var(--bg-body);
     color: var(--text-primary);
@@ -5890,7 +6058,7 @@
     font-size: 18px;
     font-weight: 800;
     padding: 14px 22px;
-    border-radius: var(--panel-radius);
+    border-radius: var(--radius-bar);
     border: 1px solid var(--btn-primary-border);
     background: var(--btn-primary);
     color: var(--text-primary);
@@ -6358,6 +6526,97 @@
     padding: 12px 36px;
   }
 
+  /* ── JamCreator: social handle inputs + confirmed-video counts ────────── */
+  .jamcreator-wrap {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 24px 32px;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+  .jc-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 64px;
+    font-weight: 400;
+    letter-spacing: 1px;
+    color: #ffffff;
+  }
+  .jc-sub {
+    font-size: 32px;
+    color: var(--text-secondary);
+    line-height: 1.4;
+    margin: 8px 0 36px;
+    max-width: 1200px;
+  }
+  /* Head + each row share one grid template so "Confirmed Videos" sits over the
+     number column: [logo] [@ input] [confirm] [videos]. */
+  .jc-head-row, .jc-row {
+    display: grid;
+    grid-template-columns: 96px 1fr 240px 280px;
+    gap: 24px;
+    align-items: end;   /* bottom-align so logo/confirm/videos line up with the boxed input under its label */
+  }
+  .jc-head-row { margin-bottom: 14px; }
+  /* Platform label stacked above its input box. */
+  .jc-field { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+  .jc-field-label { font-size: 24px; font-weight: 700; letter-spacing: 0.5px; color: var(--text-secondary); padding-left: 28px; }
+  .jc-head-handles {
+    grid-column: 1 / 4;
+    font-size: 26px; font-weight: 700; letter-spacing: 0.5px;
+    color: var(--text-secondary);
+  }
+  .jc-head-videos {
+    grid-column: 4;
+    text-align: center;
+    font-size: 26px; font-weight: 700; letter-spacing: 0.5px;
+    color: var(--text-secondary);
+  }
+  .jc-row { margin-bottom: 48px; }
+  .jc-logo { width: 96px; height: 96px; display: flex; align-items: center; justify-content: center; }
+  .jc-logo svg { width: 76px; height: 76px; }
+  /* @ prefix + text field as one box (the @ tells the user not to type it). */
+  .jc-input-wrap {
+    display: flex; align-items: center;
+    height: 96px;
+    padding: 0 24px;
+    background: var(--btn-panel);
+    border: 1px solid var(--btn-panel-border);
+    border-radius: var(--radius-bar);   /* fixed px — avoids the stretched-oval % radius on wide/short boxes */
+    min-width: 0;
+  }
+  .jc-input-wrap:focus-within { border-color: var(--btn-primary-border); box-shadow: 0 0 12px var(--btn-primary-glow); }
+  .jc-at { font-size: 40px; font-weight: 700; color: var(--text-muted); margin-right: 6px; flex-shrink: 0; }
+  .jc-input {
+    flex: 1; min-width: 0;
+    background: transparent; border: none; outline: none;
+    color: #ffffff; font-size: 36px;
+    font-family: 'Monda', sans-serif;
+  }
+  .jc-input::placeholder { color: rgba(255,255,255,0.3); }
+  .jc-confirm {
+    height: 96px;
+    border-radius: var(--radius-bar);
+    border: 1px solid var(--btn-primary-border);
+    background: var(--btn-primary);
+    color: #ffffff;
+    font-size: 30px; font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.12s;
+  }
+  .jc-confirm:hover { background: var(--btn-primary-hover); }
+  .jc-confirm:active { transform: scale(0.97); }
+  .jc-confirm.confirmed { background: #1f7a4d; border-color: #2fae6e; }
+  .jc-videos {
+    height: 96px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 52px; font-weight: 800; color: #ffffff;
+    background: rgba(0,0,0,0.25);
+    border: 1px solid var(--btn-panel-border);
+    border-radius: var(--radius-bar);
+  }
+
   /* ── Referrals (Share The Love): header + bandmates list + reward-tier tiles ── */
   /* Single centered row: code chip + enter-code button + reward summary. */
   .referral-head {
@@ -6447,40 +6706,10 @@
     padding: 24px 24px 24px;
     grid-template-rows: 1fr;
   }
-  /* Band-only treatment: badge art fills the tile edge-to-edge (uniform size
-     across all four), caption sits bottom-left over a readability gradient. */
-  .referral-tiers .badge-tile {
-    padding: 20px 24px;
-    overflow: hidden;
-    justify-content: flex-end;
-    align-items: flex-start;
-    gap: 4px;
-  }
-  .referral-tiers .badge-art {
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    padding: 0;
-    border: none;
-  }
-  .referral-tiers .badge-art img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-  .referral-tiers .badge-art::after {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.78) 100%);
-  }
-  .referral-tiers .badge-name,
-  .referral-tiers .badge-hint {
-    position: relative;
-    z-index: 1;
-    text-align: left;
-  }
-  .referral-tiers .badge-name { font-size: 56px; }
-  .referral-tiers .badge-hint { font-size: 20px; }
+  /* The band renders identically to the Badges screen — it reuses .badge-tile /
+     .badge-art--img / .badge-name / .badge-hint with no overrides, so the four
+     referral tiers match the Progress ▸ Badges look exactly (centred medallion,
+     name + requirement caption, earned mint border + ✓). */
   .referral-invite-pill {
     flex-shrink: 0;
     font-family: 'Bebas Neue', sans-serif;
@@ -6490,6 +6719,8 @@
     border: 2px solid currentColor;
     border-radius: 999px;
     padding: 8px 22px;
+    cursor: pointer;            /* it's a button, not selectable text — no I-beam */
+    user-select: none;
     transition: opacity 0.2s ease;
   }
   .referral-invite-pill.sent { opacity: 0.45; }
@@ -6598,6 +6829,9 @@
     line-height: 1.4;
   }
   .referral-code-popup-sub b { color: #ffffff; }
+  /* "How Referrals Work" explainer — maxed out (scoped so the code-entry popup
+     keeps its smaller sub). */
+  #referral-help-text { font-size: 40px; line-height: 1.45; }
   .referral-code-error {
     min-height: 30px;
     font-size: 24px;
@@ -6834,7 +7068,7 @@
 
   .purchase-preview {
     height: 160px;
-    border-radius: var(--panel-radius);
+    border-radius: var(--radius-bar);
     overflow: hidden;
   }
 
@@ -6863,10 +7097,10 @@
   .play-bar-btn {
     height: var(--nav-btn-h);
     padding: 0 48px;
-    border-radius: var(--panel-radius);
+    border-radius: var(--radius-bar);
     border: 1px solid var(--btn-panel-border);
     background: var(--btn-panel);
-    color: #ffffff;
+    color: var(--text-primary);
     font-size: 20px;
     font-weight: 400;
     cursor: pointer;
@@ -7113,7 +7347,7 @@
   .save-input {
     width: 100%;
     padding: 22px 28px;
-    border-radius: var(--panel-radius);
+    border-radius: var(--radius-bar);
     border: 2px solid var(--btn-panel-border);
     background: var(--btn-panel);
     color: #ffffff;
@@ -7272,7 +7506,7 @@
 
   .load-item-btn {
     padding: 14px 28px;
-    border-radius: var(--panel-radius);
+    border-radius: var(--radius-bar);
     border: none;
     font-size: 22px;
     font-weight: 400;
@@ -7309,7 +7543,8 @@
     display: none;
     position: absolute;
     top: 0; left: 0; right: 0; bottom: 0;
-    background: #111111;
+    /* Darker version of the Bandmates/Groups green gradient (not flat grey). */
+    background: linear-gradient(135deg, #050C09 0%, #071712 40%, #08231C 70%, #0A2B22 100%);
     z-index: 999;
     align-items: center;
     justify-content: center;
@@ -7317,19 +7552,11 @@
   .create-group-overlay.active { display: flex; }
 
   .create-group-popup {
-    background: rgba(10,10,30,0.95);
+    /* Geometry comes from .std-popup / .std-popup--large; only the surface here.
+       (Legacy width/overflow/radius were fighting the std frame and clipping the logo.)
+       BG matches the Bandmates/Groups panel gradient (social page scheme). */
+    background: linear-gradient(135deg, #0A1410 0%, #0E2620 40%, #0F3A30 70%, #11463A 100%);
     border: 1px solid var(--btn-tab-border);
-    border-radius: var(--panel-radius);
-    padding: 40px 52px;
-    width: 1600px;
-    max-width: 92%;
-    max-height: 95%;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: var(--scrollbar-color) transparent;
   }
 
   .create-group-header {
@@ -7339,10 +7566,11 @@
   }
 
   .create-group-logo {
+    position: relative;
     width: 180px;
     height: 180px;
-    border-radius: 50%;
-    border: 3px solid var(--border-strong);
+    border-radius: 28px;   /* fixed (not %-based --panel-radius) so the corner can't render oddly */
+    border: 2px solid var(--border-subtle);
     background: var(--bg-surface);
     cursor: pointer;
     display: flex;
@@ -7353,12 +7581,17 @@
     transition: border-color 0.15s;
   }
   .create-group-logo:hover {
-    border-color: var(--pink);
+    border-color: var(--mint);
   }
   .create-group-logo img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+  }
+  .create-group-logo img.cg-logo-fit {
+    object-fit: contain;   /* scale the whole pick emblem to fit, no cropping */
+    padding: 16px;
+    box-sizing: border-box;
   }
   .create-group-logo .logo-plus {
     font-size: 64px;
@@ -7366,15 +7599,50 @@
     color: var(--text-muted);
   }
 
+  /* Pencil "edit" affordance on the logo tile + group-name field. */
+  .cg-edit-badge {
+    position: absolute;
+    top: 8px; right: 8px;
+    width: 42px; height: 42px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.6);
+    border: 1px solid rgba(255,255,255,0.35);
+    display: flex; align-items: center; justify-content: center;
+    pointer-events: none;
+  }
+  .cg-edit-badge svg { width: 22px; height: 22px; fill: #ffffff; }
+  .create-group-name-wrap { position: relative; display: flex; align-items: center; height: 180px; }
+  .create-group-name-wrap .save-input {
+    height: 100%;
+    padding: 8px 64px 8px 28px;
+    border-radius: 28px;                          /* match the logo tile */
+    font-family: 'Bebas Neue', sans-serif !important;  /* long condensed font */
+    font-size: 120px;
+    line-height: 1;
+    font-weight: 400;
+    letter-spacing: 2px;
+  }
+  .cg-name-edit {
+    position: absolute;
+    top: 50%; right: 28px;
+    transform: translateY(-50%);
+    width: 34px; height: 34px;
+    display: flex; align-items: center; justify-content: center;
+    pointer-events: none;
+    opacity: 0.65;
+  }
+  .cg-name-edit svg { width: 28px; height: 28px; fill: var(--text-secondary); }
+
   .create-group-columns {
     display: flex;
-    gap: 24px;
+    flex-direction: column;   /* Available Friends stacked above Group Members */
+    gap: 28px;
     flex: 1;
     min-height: 0;
   }
 
   .create-group-col {
-    flex: 1;
+    flex: 0 0 auto;   /* natural height — keeps both lists packed at the top, no big gap */
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -7391,7 +7659,7 @@
   .create-group-list {
     flex: 1;
     min-height: 0;
-    max-height: 400px;
+    max-height: 560px;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
@@ -7401,13 +7669,35 @@
     scrollbar-color: var(--scrollbar-color) transparent;
   }
 
+  /* Standardised username list (matches the Friends / Referrals .friend-item grid),
+     but paginated left↔right via renderPager instead of an inner scrollbar.
+     Compact rows so two 2×5 grids (available + members) fit without scrolling. */
+  .create-group-friends {
+    flex: 0 0 auto;
+    overflow: hidden;
+    grid-auto-rows: 80px;
+    align-content: start;
+    padding: 6px;
+    gap: 8px 16px;
+  }
+  .create-group-friends .friend-item {
+    animation: none;   /* avoid the slide-in X-overshoot inside the popup */
+    height: 80px;
+    padding: 10px 18px;
+  }
+  .create-group-friends .friend-avatar { width: 48px; height: 48px; }
+  .create-group-friends .friend-name { font-size: 22px; }
+  .create-group-friends .friend-status { font-size: 16px; }
+  /* Paginated content fits the frame — never show the body scrollbar here. */
+  .create-group-popup .std-popup-body { overflow: hidden; }
+
   .create-group-friend {
     display: flex;
     align-items: center;
     gap: 16px;
     padding: 12px 16px;
     background: var(--bg-surface);
-    border-radius: var(--panel-radius);
+    border-radius: var(--radius-bar);
     transition: background 0.15s;
   }
 
@@ -7435,9 +7725,35 @@
     white-space: nowrap;
   }
 
+  .cg-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    padding: 7px 16px;
+    border-radius: 999px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 19px;
+    letter-spacing: 1px;
+    flex-shrink: 0;
+  }
+  .cg-pill-dot { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; }
+  .cg-pill-online  { background: rgba(0,229,199,0.14);  color: var(--mint); }
+  .cg-pill-online  .cg-pill-dot { background: var(--mint); box-shadow: 0 0 8px var(--mint); }
+  .cg-pill-offline { background: rgba(255,255,255,0.07); color: var(--text-muted); }
+  .cg-pill-offline .cg-pill-dot { background: var(--text-muted); }
+  .cg-pill-invited  { background: rgba(255,196,80,0.16); color: #ffc450; }
+  .cg-pill-accepted { background: rgba(0,229,199,0.14);  color: var(--mint); }
+  /* Group leader (auto-assigned to whoever created the group). */
+  .cg-pill-leader {
+    background: linear-gradient(135deg, rgba(255,215,90,0.22), rgba(255,170,40,0.22));
+    color: #ffd75a;
+    border: 1px solid rgba(255,215,90,0.55);
+    box-shadow: 0 0 10px rgba(255,200,60,0.3);
+  }
+
   .create-group-friend-btn {
     padding: 10px 20px;
-    border-radius: var(--panel-radius);
+    border-radius: var(--radius-bar);
     border: none;
     font-size: 20px;
     font-weight: 400;
@@ -7456,6 +7772,18 @@
     font-size: 22px;
     font-weight: 500;
     text-align: center;
+  }
+
+  /* Destructive "Leave Group" footer button (manage-mode). */
+  .create-group-leave-btn {
+    background: linear-gradient(135deg, #c0392b 0%, #e74c3c 100%) !important;
+    border: 1px solid rgba(231,76,60,0.7) !important;
+    box-shadow: 0 0 16px rgba(231,76,60,0.35) !important;
+  }
+  /* Secondary "Decline" footer button (group-invite). */
+  .cg-decline-btn {
+    background: var(--btn-panel) !important;
+    border: 1px solid var(--btn-panel-border) !important;
   }
 
   /* ── Create Space Overlay ──────────────────────────── */
@@ -7491,7 +7819,7 @@
     align-items: center;
     justify-content: center;
     gap: 0;
-    border-radius: var(--panel-radius);
+    border-radius: var(--radius-bar);
     overflow: hidden;
     border: 2px solid var(--border-strong);
     align-self: center;
@@ -7582,31 +7910,52 @@
 
   .logo-picker-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 28px;
+    /* Safety margin so the selected tile's outer glow never reaches the
+       popup's clipping edge, even on the corner tiles. */
+    padding: 8px;
+    overflow: visible;
+  }
+  /* The 2×2 grid always fits, so this body never needs to scroll/clip. Letting
+     it stay visible means the selected tile's outer glow (and the :hover scale)
+     render into the popup's 56px padding instead of being sliced at the body's
+     top-left edge. The .std-popup frame still contains everything. */
+  .logo-picker-popup .std-popup-body {
+    overflow: visible;
   }
 
   .logo-picker-item {
-    aspect-ratio: 1;
-    border-radius: 50%;
+    border-radius: var(--panel-radius);
     overflow: hidden;
     cursor: pointer;
-    border: 3px solid transparent;
-    transition: border-color 0.15s, transform 0.15s;
+    position: relative;
+    border: 2px solid var(--border-subtle);
+    transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s;
   }
   .logo-picker-item:hover {
     border-color: var(--border-strong);
-    transform: scale(1.05);
+    transform: scale(1.03);
   }
   .logo-picker-item.selected {
-    border-color: var(--pink);
-    box-shadow: 0 0 0 2px var(--pink);
+    border-color: var(--mint);
+    /* Outer mint ring + halo. The popup's 56px padding gives the glow room to
+       render fully inside the overflow:hidden frame, so it never clips — and
+       the grid carries matching padding (below) as a safety margin for the
+       corner tiles. */
+    box-shadow: 0 0 0 3px var(--mint), 0 0 26px 4px rgba(0,229,199,0.5);
   }
   .logo-picker-item img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
+  }
+  .logo-picker-item img.cg-logo-fit {
+    object-fit: contain;   /* the Jamsesh pick scales to fit, no cropping */
+    padding: 22px;
+    box-sizing: border-box;
   }
 
   /* ── Create-New Tile ───────────────────────────────── */
@@ -7826,7 +8175,9 @@
   }
   .home-tile-wrap:hover,
   .home-tile-wrap:active {
-    transform: translateY(-4px) scale(1.01);
+    /* No scale/lift — the topmost tile is flush against the clipped grid edge,
+       so any growth clipped its top. Hover feedback is the inner-border brighten. */
+    transform: none;
   }
 
   /* ── Per-tile neon glow — filter set inline via JS ── */
@@ -7884,25 +8235,11 @@
     animation-delay: var(--tile-delay, 0s) !important;
   }
 
-  /* Hover — brighter neon inset border */
+  /* No hover effect — home tiles stay static like the Badges tiles (no glow,
+     no border growth, no movement). */
   .home-tile:hover,
   .home-tile:active {
     transform: none !important;
-    border: none !important;
-    background:
-      radial-gradient(ellipse at 30% 50%, rgba(0,224,255,0.1) 0%, transparent 60%),
-      radial-gradient(ellipse at 70% 50%, rgba(168,85,247,0.08) 0%, transparent 60%),
-      radial-gradient(ellipse at 50% 80%, rgba(255,80,200,0.06) 0%, transparent 50%),
-      rgba(10,14,42,0.45) !important;
-    box-shadow:
-      inset 0 0 0 5px var(--glow-hover, rgba(255,80,200,0.9)),
-      inset 0 0 12px var(--glow-hover, rgba(255,80,200,0.6)) !important;
-  }
-  .home-tile:hover::before,
-  .home-tile:active::before {
-    background:
-      linear-gradient(135deg, rgba(255,255,255,0.32) 0%, rgba(255,255,255,0.32) 22%, transparent 22.5%, transparent 100%),
-      linear-gradient(to bottom, transparent 60%, rgba(0,0,0,0.2) 60%, rgba(0,0,0,0.2) 100%);
   }
 
   /* Floating icon — cel-shaded with thick ink outline */
@@ -8096,7 +8433,7 @@
     color: #ffffff;
     background: var(--pink, #e91e8c);
     border: none;
-    border-radius: var(--panel-radius);
+    border-radius: var(--radius-bar);
     padding: 36px 200px;
     cursor: pointer;
     text-shadow: none;
@@ -8140,7 +8477,7 @@
   }
   .legal-agree-tab {
     padding: 0 56px;
-    border-radius: var(--panel-radius);
+    border-radius: var(--radius-bar);
     border: 2px solid #555555;
     background: #3a3a3a;
     color: #bbbbbb;
@@ -8223,7 +8560,7 @@
     left: 50%;
     transform: translateX(-50%);
     padding: 36px 128px;
-    border-radius: var(--panel-radius);
+    border-radius: var(--radius-bar);
     border: none;
     background: #c0206a;
     color: #ffffff;
@@ -8308,7 +8645,7 @@
     left: 50%;
     transform: translateX(-50%);
     padding: 40px 160px;
-    border-radius: var(--panel-radius);
+    border-radius: var(--radius-bar);
     border: none;
     background: #c0206a;
     color: #ffffff;
@@ -8402,7 +8739,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: var(--panel-radius);
+    border-radius: var(--radius-bar);
     border: 1px solid transparent;
     font-size: 30px;
     font-weight: 400;
@@ -8551,7 +8888,7 @@
     align-items: center;
     gap: 16px;
     padding: 20px 24px;
-    border-radius: var(--panel-radius);
+    border-radius: var(--radius-bar);
     background: #2a2a2a;
     flex: 1;
     min-height: 0;
@@ -8608,7 +8945,7 @@
   .results-btn {
     height: var(--nav-btn-h);
     flex: 1;
-    border-radius: var(--panel-radius);
+    border-radius: var(--radius-bar);
     border: 1px solid transparent;
     font-size: 30px;
     font-weight: 400;
@@ -8703,7 +9040,7 @@
     padding: 20px 24px;
     background: #2a2a2a;
     border: 2px solid #444444;
-    border-radius: var(--panel-radius);
+    border-radius: var(--radius-bar);
     width: 100%;
     flex: 1;
     min-height: 0;
@@ -8728,7 +9065,7 @@
     font-size: 12px;
     font-weight: 700;
     padding: 3px 8px;
-    border-radius: var(--panel-radius);
+    border-radius: var(--radius-bar);
   }
   .rewards-badge-info { flex: 1; }
   .rewards-badge-name {
@@ -8781,13 +9118,13 @@
     width: 100%;
     height: 16px;
     background: #333333;
-    border-radius: var(--panel-radius);
+    border-radius: var(--radius-bar);
     overflow: hidden;
   }
   .rewards-xp-bar-fill {
     height: 100%;
     background: #ffffff;
-    border-radius: var(--panel-radius);
+    border-radius: var(--radius-bar);
     width: 67%;
   }
   .rewards-xp-labels {
@@ -9097,7 +9434,7 @@ button:focus,
   align-items: center;
   padding: 10px 14px;
   background: rgba(255,255,255,0.04);
-  border-radius: var(--panel-radius);
+  border-radius: var(--radius-bar);
   transition: background 0.15s;
 }
 .pause-menu .pause-lb-row.you {
@@ -9174,7 +9511,7 @@ button:focus,
   padding: 28px 24px;
   font-size: 40px;
   font-weight: 400;
-  border-radius: var(--panel-radius);
+  border-radius: var(--radius-bar);
   border: none;
   cursor: pointer;
   letter-spacing: 4px;
@@ -9354,7 +9691,7 @@ input, textarea, select {
   border: none !important;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
   filter: none !important;
-  color: #0a0a0a !important;
+  color: var(--accent-ink) !important;
 }
 
 /* ── Start button — bright lime gradient (overrides the jamsesh-signature
@@ -9393,7 +9730,7 @@ input, textarea, select {
   padding: 40px 44px; box-sizing: border-box; gap: 26px;
 }
 .r2-header { flex-shrink: 0; }
-.r2-eyebrow { font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 3px; color: var(--lime); }
+.r2-eyebrow { font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 3px; color: var(--pink); }
 .r2-title  { font-family: 'Bebas Neue', sans-serif; font-size: 104px; line-height: 0.9; margin: 4px 0 6px; color: #fff; letter-spacing: 1px; }
 .r2-sub    { font-size: 26px; color: rgba(255,255,255,0.5); }
 
@@ -9412,18 +9749,18 @@ input, textarea, select {
 .r2-grade {
   position: absolute; top: -18px; right: -18px;
   width: 84px; height: 84px; border-radius: 50%;
-  background: var(--lime); color: #0a0a0a;
+  background: var(--pink); color: #fff;
   display: flex; align-items: center; justify-content: center;
   font-family: 'Bebas Neue', sans-serif; font-size: 50px; font-weight: 800;
-  border: 4px solid #1a123a; box-shadow: 0 0 24px rgba(232,255,58,0.5);
+  border: 4px solid #1a123a; box-shadow: 0 0 24px rgba(255,46,146,0.55);
 }
 .r2-tabs { display: inline-flex; gap: 4px; padding: 4px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 999px; align-self: flex-start; margin-top: 22px; }
 .r2-tab  { padding: 8px 24px; border-radius: 999px; font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 1px; color: rgba(255,255,255,0.5); cursor: pointer; }
 .r2-tab.active { background: var(--lime); color: #0a0a0a; }
 .r2-score-label { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 2px; color: rgba(255,255,255,0.45); margin-top: 22px; }
-.r2-score { font-family: 'Bebas Neue', sans-serif; font-size: 82px; line-height: 1; color: var(--lime); text-shadow: 0 0 30px rgba(232,255,58,0.4); margin: 2px 0 14px; }
+.r2-score { font-family: 'Bebas Neue', sans-serif; font-size: 82px; line-height: 1; color: var(--pink); text-shadow: 0 0 30px rgba(255,46,146,0.45); margin: 2px 0 14px; }
 .r2-stars { display: flex; gap: 8px; font-size: 38px; line-height: 1; margin-bottom: 22px; }
-.r2-star { color: var(--lime); }
+.r2-star { color: var(--pink); }
 .r2-star.empty { color: rgba(255,255,255,0.2); }
 .r2-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: auto; }
 .r2-stat { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07); border-radius: 16px; padding: 18px 20px; }
@@ -9435,24 +9772,24 @@ input, textarea, select {
 .r2-lb-sub { font-size: 18px; color: rgba(255,255,255,0.4); margin: 2px 0 22px; }
 .r2-lb { display: flex; flex-direction: column; gap: 14px; }
 .r2-row { display: flex; align-items: center; gap: 20px; padding: 16px 22px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 18px; }
-.r2-row.you { border-color: var(--lime); box-shadow: 0 0 0 1px var(--lime), 0 0 22px rgba(232,255,58,0.22); }
+.r2-row.you { border-color: var(--pink); box-shadow: 0 0 0 1px var(--pink), 0 0 22px rgba(255,46,146,0.25); }
 .r2-rank { font-family: 'Bebas Neue', sans-serif; font-size: 30px; color: rgba(255,255,255,0.45); width: 46px; flex-shrink: 0; }
 .r2-avatar { width: 56px; height: 56px; border-radius: 50%; overflow: hidden; flex-shrink: 0; background: rgba(255,255,255,0.08); }
 .r2-avatar img { width: 100%; height: 100%; object-fit: cover; }
 .r2-row-info { flex: 0 0 220px; min-width: 0; }
 .r2-row-name { font-family: 'Bebas Neue', sans-serif; font-size: 26px; color: #fff; display: flex; align-items: center; gap: 10px; min-width: 0; }
 .r2-name-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
-.r2-you { background: var(--lime); color: #0a0a0a; font-family: 'Monda', sans-serif; font-size: 13px; font-weight: 700; padding: 2px 8px; border-radius: 6px; letter-spacing: 1px; }
+.r2-you { background: var(--pink); color: #fff; font-family: 'Monda', sans-serif; font-size: 13px; font-weight: 700; padding: 2px 8px; border-radius: 6px; letter-spacing: 1px; }
 .r2-row-meta { font-size: 16px; color: rgba(255,255,255,0.4); white-space: nowrap; }
 .r2-bar { flex: 1; height: 9px; border-radius: 999px; background: rgba(255,255,255,0.1); overflow: hidden; min-width: 40px; }
 .r2-bar-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--purple), var(--pink)); }
-.r2-row.you .r2-bar-fill { background: linear-gradient(90deg, var(--lime), var(--pink)); }
+.r2-row.you .r2-bar-fill { background: linear-gradient(90deg, var(--pink), #ff8ac0); }
 .r2-row-score { font-family: 'Bebas Neue', sans-serif; font-size: 30px; color: #fff; width: 132px; text-align: right; flex-shrink: 0; }
 
 .r2-actions { flex-shrink: 0; display: flex; gap: 24px; }
-.r2-back { flex: 1; padding: 28px; border-radius: var(--panel-radius); background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; font-family: 'Bebas Neue', sans-serif; font-size: 30px; letter-spacing: 1px; cursor: pointer; }
+.r2-back { flex: 1; padding: 28px; border-radius: var(--radius-bar); background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; font-family: 'Bebas Neue', sans-serif; font-size: 30px; letter-spacing: 1px; cursor: pointer; }
 .r2-back:hover { background: rgba(255,255,255,0.1); }
-.r2-continue { flex: 0 0 34%; padding: 28px; border-radius: var(--panel-radius); background: linear-gradient(180deg, #f4ff8e 0%, #c9e213 100%); color: #0a0a0a; font-family: 'Bebas Neue', sans-serif; font-size: 38px; letter-spacing: 1px; cursor: pointer; border: none; box-shadow: 0 0 32px rgba(201,226,19,0.5); }
+.r2-continue { flex: 0 0 34%; padding: 28px; border-radius: var(--radius-bar); background: linear-gradient(180deg, #f4ff8e 0%, #c9e213 100%); color: #0a0a0a; font-family: 'Bebas Neue', sans-serif; font-size: 38px; letter-spacing: 1px; cursor: pointer; border: none; box-shadow: 0 0 32px rgba(201,226,19,0.5); }
 
 /* ════════════════════════════════════════════════════════════════════════
    REWARDS v2 — "STACKED UP" rewards screen
@@ -9460,7 +9797,7 @@ input, textarea, select {
 .rewards-v2 { background: radial-gradient(120% 100% at 80% 0%, #2a1840 0%, #1a1030 52%, #140d28 100%) !important; color: #f3eefc; }
 .rw-wrap { position: absolute; inset: 0; overflow-y: auto; padding: 40px 44px 36px; box-sizing: border-box; }
 .rw-header { margin-bottom: 20px; }
-.rw-eyebrow { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 6px; color: var(--lime); }
+.rw-eyebrow { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 6px; color: var(--pink); }
 .rw-title { font-family: 'Bebas Neue', sans-serif; font-size: 84px; line-height: 0.9; margin: 2px 0 6px; color: #fff; }
 .rw-sub { font-size: 22px; color: rgba(255,255,255,0.45); }
 .rw-section-label { font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 3px; margin: 26px 0 16px; display: flex; align-items: center; }
@@ -9635,57 +9972,22 @@ input, textarea, select {
         </div>
       </div>
       <div class="play-picker" id="play-picker">
-        <div class="play-picker-body">
-          <div class="picker-songs-col">
-            <div class="picker-filters">
-              <button class="picker-filter" id="filter-genre-btn" onclick="openFilterPicker('genre')">All Genres</button>
-              <button class="picker-filter" id="filter-decade-btn" onclick="openFilterPicker('decade')">All Decades</button>
-              <button class="picker-filter" id="filter-duration-btn" onclick="openFilterPicker('duration')">Any Length</button>
-              <button class="picker-filter" id="filter-sort-btn" onclick="openFilterPicker('sort')">Popularity</button>
-            </div>
-            <div class="picker-grid-row">
-              <div class="grid-viewport">
-                <div class="grid-track" id="grid-track"></div>
-              </div>
-              <div class="grid-nav" id="grid-nav-right"></div>
-            </div>
-          </div>
-          <div class="play-picker-lb">
-            <button class="lb-type-btn" id="picker-inst-btn" onclick="rotatePickerInstrument()">&#127928; Guitar</button>
-            <button class="lb-type-btn" id="picker-diff-btn" onclick="rotatePickerDifficulty()">&#127922; Medium</button>
-            <button class="lb-type-btn" id="lb-type-btn" onclick="rotateLbType()"><span>&#127757;</span> Worldwide</button>
-            <div class="play-panel play-leaderboard">
-              <div class="play-lb-list" id="play-lb-list"></div>
-            </div>
-          </div>
+        <!-- Filters hidden (no reserved space) for now. -->
+        <div class="picker-filters" id="picker-filters" style="display:none">
+          <button class="picker-filter" id="filter-genre-btn" onclick="openFilterPicker('genre')">All Genres</button>
+          <button class="picker-filter" id="filter-decade-btn" onclick="openFilterPicker('decade')">All Decades</button>
+          <button class="picker-filter" id="filter-duration-btn" onclick="openFilterPicker('duration')">Any Length</button>
+          <button class="picker-filter" id="filter-sort-btn" onclick="openFilterPicker('sort')">Popularity</button>
         </div>
+        <div class="picker-song-grid" id="picker-song-grid"></div>
+        <div id="picker-song-pager" style="display:none"></div>
       </div>
     </div>
     <div class="page" id="page-career">
-      <div id="career-main" style="display:flex;flex-direction:column;flex:1;min-height:0">
-        <div class="career-grid">
-          <div class="career-btn career-btn-name" style="grid-column:1;grid-row:1;position:relative;overflow:hidden" onclick="openNameEditor()"><div class="career-btn-neon-name" id="career-neon-name">RAELJAMSESH</div><div class="career-btn-banner">Name<div class="career-btn-sub">Change your username</div></div></div>
-          <div class="career-btn career-btn-picture" style="grid-column:2;grid-row:1;overflow:hidden;position:relative"><div class="career-btn-picture-wrap"><img src="avatars/rael_new.png" alt=""></div><div class="career-btn-banner">Picture<div class="career-btn-sub">Change your profile picture</div></div></div>
-          <div class="career-btn career-btn-avatar" style="grid-column:3;grid-row:1" onclick="showAvatarSection()"><img class="career-btn-avatar-img" src="branding/AR_Glasses.png" alt=""><div class="career-btn-banner">Avatar<div class="career-btn-sub">Customise your avatar</div></div></div>
-          <div class="career-btn career-btn-news" style="grid-column:1;grid-row:2;position:relative;overflow:hidden" onclick="navigateTo('career')"><img class="career-btn-news-img" src="branding/news-banner.jfif" alt=""><div class="career-btn-banner">News<div class="career-btn-sub">Update v0.25 — New battle mode added!</div></div></div>
-          <div class="career-btn" style="grid-column:2;grid-row:2;position:relative;overflow:hidden">
-            <div class="home-tile-avatar" style="width:160px;height:160px;left:10%;top:8%;animation-duration:9s;animation-delay:0s"><img src="avatars/rael_new.png" alt=""></div>
-            <div class="home-tile-avatar" style="width:120px;height:120px;left:60%;top:5%;animation-duration:11s;animation-delay:-2s"><img src="avatars/jooleeno.jpg" alt=""></div>
-            <div class="home-tile-avatar" style="width:140px;height:140px;left:50%;top:45%;animation-duration:8s;animation-delay:-4s"><img src="avatars/ted.png" alt=""></div>
-            <div class="home-tile-avatar" style="width:110px;height:110px;left:15%;top:50%;animation-duration:10s;animation-delay:-6s"><img src="avatars/abbie.png" alt=""></div>
-            <div class="home-tile-avatar" style="width:130px;height:130px;left:70%;top:55%;animation-duration:12s;animation-delay:-3s"><img src="avatars/arthen.jpg" alt=""></div>
-            <div class="career-btn-banner">Credits<div class="career-btn-sub">Meet the team</div></div>
-          </div>
-          <div class="career-btn" style="grid-column:3;grid-row:2;position:relative;overflow:hidden;cursor:default;pointer-events:none">
-            <div style="position:absolute;top:0;left:0;right:0;bottom:0;display:flex;flex-direction:column;justify-content:center;padding:28px;gap:12px;z-index:1">
-              <div style="font-size:36px;color:rgba(255,255,255,0.4);font-weight:700">Device <span id="client-info-device" style="color:#ffffff;font-weight:900">Quest 3</span></div>
-              <div style="font-size:36px;color:rgba(255,255,255,0.4);font-weight:700">Firmware <span id="client-info-firmware" style="color:#ffffff;font-weight:900">203</span></div>
-              <div style="font-size:36px;color:rgba(255,255,255,0.4);font-weight:700">UI <span id="client-info-ui" style="color:#ffffff;font-weight:900">v1.0.0.0</span></div>
-              <div style="font-size:36px;color:rgba(255,255,255,0.4);font-weight:700">Game <span id="client-info-game" style="color:#ffffff;font-weight:900">v1.0.0.0</span></div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <!-- Old profile grid (Name/Picture/Avatar/News/Credits/Device) removed. This page
+           is now a link-less host for the avatar editor (Settings ▸ Profile ▸ Avatar);
+           the #career-main wrapper is kept only so the display-toggle refs stay valid. -->
+      <div id="career-main" style="display:none"></div>
       <div class="avatar-section" id="avatar-section" style="display:none">
         <button class="back-btn" onclick="hideAvatarSection()">&#8617; Profile</button>
 
@@ -9693,9 +9995,9 @@ input, textarea, select {
         <div class="avatar-login-gate" id="avatar-login-gate" style="display:none">
           <div class="avatar-login-card">
             <div class="avatar-login-title">Sign in to customise your avatar</div>
-            <div class="avatar-login-sub">A Genies account is required to save changes and sync your look to bandmates.</div>
+            <div class="avatar-login-sub">Save your look and sync it to your bandmates.</div>
             <button class="avatar-login-btn jamsesh-signature" onclick="avatarShowAuthScreen()">Sign in with Genies</button>
-            <div class="avatar-login-note">You can keep playing anonymously — but customising, saving, and syncing your look to bandmates all need a real account.</div>
+            <div class="avatar-login-note">Not now? Keep playing — your avatar just won't save.</div>
           </div>
         </div>
 
@@ -9817,14 +10119,14 @@ input, textarea, select {
     </div>
     <div class="page" id="page-store">
       <div class="play-mode-tabs" id="store-tabs">
-        <button class="play-mode-tab active" onclick="switchStoreTab('songs')">Songs</button>
-        <button class="play-mode-tab" onclick="switchStoreTab('packs')">Packs</button>
-        <button class="play-mode-tab" onclick="switchStoreTab('items')">Items</button>
+        <button class="play-mode-tab" onclick="switchStoreTab('songs')" style="display:none">Songs</button>
+        <button class="play-mode-tab" onclick="switchStoreTab('packs')" style="display:none">Packs</button>
+        <button class="play-mode-tab active" onclick="switchStoreTab('items')">Items</button>
         <button class="play-mode-tab" onclick="switchStoreTab('vault')">My Collection</button>
       </div>
-      <div id="store-tab-songs" class="vault-tab-content"><div class="spaces-grid" id="store-songs-grid"></div><div id="store-songs-pager"></div></div>
+      <div id="store-tab-songs" class="vault-tab-content" style="display:none"><div class="spaces-grid" id="store-songs-grid"></div><div id="store-songs-pager"></div></div>
       <div id="store-tab-packs" class="vault-tab-content" style="display:none"><div class="spaces-grid" id="store-packs-grid"></div><div id="store-packs-pager"></div></div>
-      <div id="store-tab-items" class="vault-tab-content" style="display:none"><div class="spaces-grid" id="store-items-grid"></div><div id="store-items-pager"></div></div>
+      <div id="store-tab-items" class="vault-tab-content"><div class="spaces-grid" id="store-items-grid"></div><div id="store-items-pager"></div></div>
       <div id="store-tab-vault" class="vault-tab-content" style="display:none"><div class="spaces-grid" id="vault-grid"></div><div class="vault-creator-grid" id="vault-creator-grid" style="display:none"></div><div id="store-vault-pager"></div></div>
     </div>
     <div class="page" id="page-settings">
@@ -9835,15 +10137,10 @@ input, textarea, select {
         </div>
         <div id="settings-tab-profile" class="spaces-tab-content">
           <div class="settings-grid">
-            <div class="settings-tile" onclick="openNameEditor()"><div class="tile-info"><div class="tile-title">Name</div></div></div>
-            <div class="settings-tile"><div class="tile-info"><div class="tile-title">Picture</div></div></div>
-            <div class="settings-tile" id="themes-tile" onclick="showThemes()"><div class="tile-info"><div class="tile-title">Themes</div></div></div>
-            <div class="settings-tile" id="banners-tile" onclick="showBanners()"><div class="tile-info"><div class="tile-title">Banners</div></div></div>
-            <div class="settings-tile" id="frames-tile" onclick="showFrames()"><div class="tile-info"><div class="tile-title">Frames</div></div></div>
-            <div class="settings-tile" onclick="showJamCreatorSection()"><div class="tile-info"><div class="tile-title">JamCreator</div></div></div>
             <div class="settings-tile" onclick="showReferralsSection()"><div class="tile-info"><div class="tile-title">Referrals</div></div></div>
-            <div class="settings-tile"><div class="tile-info"><div class="tile-title">Credits</div></div></div>
-            <div class="settings-tile" style="cursor:default"><div class="tile-info"><div class="tile-title" style="font-size:16px;line-height:1.4">Device<br>0.1.0 (508)</div></div></div>
+            <div class="settings-tile" onclick="showJamCreatorSection()"><div class="tile-info"><div class="tile-title">JamCreator</div></div></div>
+            <div class="settings-tile" onclick="showTos()"><div class="tile-info"><div class="tile-title">Terms of Service</div></div></div>
+            <div class="settings-tile" onclick="showPrivacy()"><div class="tile-info"><div class="tile-title">Privacy Policy</div></div></div>
           </div>
           <div id="settings-profile-pager"></div>
         </div>
@@ -9852,8 +10149,6 @@ input, textarea, select {
             <div class="settings-tile"><div class="tile-info"><div class="tile-title">Volume Mixer</div></div></div>
             <div class="settings-tile"><div class="tile-info"><div class="tile-title">Language</div></div></div>
             <div class="settings-tile"><div class="tile-info"><div class="tile-title">Gameplay</div></div></div>
-            <div class="settings-tile" onclick="showTos()"><div class="tile-info"><div class="tile-title">Terms of Service</div></div></div>
-            <div class="settings-tile" onclick="showPrivacy()"><div class="tile-info"><div class="tile-title">Privacy Policy</div></div></div>
             <div class="settings-tile"><div class="tile-info"><div class="tile-title">Rate Us</div></div></div>
             <div class="settings-tile"><div class="tile-info"><div class="tile-title">Report a Bug</div></div></div>
             <div class="settings-tile"><div class="tile-info"><div class="tile-title">Send Feedback</div></div></div>
@@ -9876,12 +10171,7 @@ input, textarea, select {
       </div>
       <div class="profile-section" id="profile-section-jamcreator">
         <button class="back-btn" onclick="hideSettingsSub()">&#9664; Profile</button>
-        <div class="profile-subsection">
-          <svg class="profile-subsection-icon" viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
-          <div class="profile-subsection-title">JamCreator</div>
-          <div class="profile-subsection-sub">Record, edit and share videos of your performances — and complete the Share Videos challenge.</div>
-          <div class="profile-subsection-soon">Coming Soon</div>
-        </div>
+        <div class="jamcreator-wrap" id="jamcreator-wrap"></div>
       </div>
       <div class="profile-section" id="profile-section-referrals">
         <button class="back-btn" onclick="hideSettingsSub()">&#9664; Profile</button>
@@ -9903,7 +10193,7 @@ input, textarea, select {
         <div class="badge-grid referral-tiers" id="referral-tiers"></div>
       </div>
       <div class="legal-section" id="tos-section">
-        <button class="back-btn" onclick="hideSettingsSub()">&#9664; Gameplay</button>
+        <button class="back-btn" onclick="hideSettingsSub()">&#9664; Profile</button>
         <div class="legal-content" id="tos-content">
           <h2>Terms of Service</h2>
           <p class="legal-version">Version 1 &mdash; Effective date: 1 November 2025 | Last update: 1 November 2025</p>
@@ -10203,7 +10493,7 @@ input, textarea, select {
         </div>
       </div>
       <div class="legal-section" id="pp-section">
-        <button class="back-btn" onclick="hideSettingsSub()">&#9664; Gameplay</button>
+        <button class="back-btn" onclick="hideSettingsSub()">&#9664; Profile</button>
         <div class="legal-content" id="pp-content">
           <h2>Privacy Policy</h2>
           <p class="legal-version">Version 1 &mdash; Effective date: 4 September 2025 | Last update: 4 September 2025</p>
@@ -10354,7 +10644,7 @@ input, textarea, select {
 </div>
 
 <div class="creator-screen" id="creator-art-pick-screen">
-  <div style="font-size:36px;font-weight:800;color:#ffffff;text-align:center;flex-shrink:0">Select a photo</div>
+  <div style="font-size:36px;font-weight:800;color:var(--text-primary);text-align:center;flex-shrink:0">Select a photo</div>
   <div class="spaces-grid" id="creator-art-photo-grid" style="flex:1;min-height:0;width:100%"></div>
   <div style="flex-shrink:0;display:flex;gap:var(--grid-gap);width:100%">
     <button class="play-bar-btn" style="flex:1" onclick="closeCreatorScreen()"><svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>Back</button>
@@ -10362,7 +10652,7 @@ input, textarea, select {
 </div>
 
 <div class="creator-screen" id="creator-art-config-screen">
-  <div style="font-size:36px;font-weight:800;color:#ffffff;text-align:center;flex-shrink:0">What would you like to create?</div>
+  <div style="font-size:36px;font-weight:800;color:var(--text-primary);text-align:center;flex-shrink:0">What would you like to create?</div>
   <button class="play-bar-btn" id="creator-name-btn" style="width:100%;flex-shrink:0" onclick="openCreatorNamePicker()"><svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg><span id="creator-name-label">Solo - Rael</span></button>
   <div class="creator-art-shapes" id="creator-art-shapes"></div>
   <div class="creator-word-cloud" id="creator-word-cloud"></div>
@@ -10371,7 +10661,7 @@ input, textarea, select {
 </div>
 
 <div class="creator-screen" id="creator-art-results-screen">
-  <div style="font-size:36px;font-weight:800;color:#ffffff;text-align:center;flex-shrink:0">Select your favourites</div>
+  <div style="font-size:36px;font-weight:800;color:var(--text-primary);text-align:center;flex-shrink:0">Select your favourites</div>
   <div class="creator-results-grid" id="creator-results-grid"></div>
   <button class="play-go-btn" style="width:100%;flex-shrink:0" onclick="saveCreatorResults()"><svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor"><path d="M17 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>Save</button>
 </div>
@@ -10428,10 +10718,11 @@ input, textarea, select {
     <button class="popup-close-btn" onclick="closeReferralHelpPopup()">&#10005;</button>
     <div class="std-popup-header"><h2>How Referrals Work</h2></div>
     <div class="std-popup-body" style="justify-content:center">
+      <img src="branding/JamPick_hires.png" alt="" style="width:150px;height:auto;display:block;margin:0 auto 32px;filter:drop-shadow(0 4px 14px rgba(0,0,0,0.5))">
       <div class="referral-code-popup-sub" id="referral-help-text"></div>
     </div>
     <div class="std-popup-footer">
-      <button class="std-popup-btn" onclick="closeReferralHelpPopup()">Got It</button>
+      <button class="std-popup-btn" onclick="closeReferralHelpPopup()">OK</button>
     </div>
   </div>
 </div>
@@ -10456,6 +10747,36 @@ input, textarea, select {
     <button class="challenge-nav challenge-nav-next" id="challenge-nav-next" onclick="challengeNext()">&#9654;</button>
   </div>
 </div>
+<!-- Join-group confirmation — warns the player they'll leave their active group. -->
+<div class="challenge-overlay" id="group-join-overlay" onclick="closeGroupJoinConfirm(event)">
+  <div class="std-popup" onclick="event.stopPropagation()" style="background:var(--bg-panel);border:1px solid var(--border-subtle)">
+    <button class="popup-close-btn" onclick="closeGroupJoinConfirm()">&#10005;</button>
+    <div class="std-popup-header"><div class="challenge-title" id="group-join-title">Switch Group?</div></div>
+    <div class="std-popup-body" style="align-items:center;justify-content:center;text-align:center;gap:52px">
+      <div class="group-swap-row" id="group-swap-row" style="display:flex;align-items:center;justify-content:center;gap:36px"></div>
+      <div id="group-join-msg" style="font-size:34px;line-height:1.45;color:var(--text-primary);max-width:820px"></div>
+    </div>
+    <div class="std-popup-footer">
+      <button class="std-popup-btn jamsesh-signature" id="group-join-confirm-btn" onclick="confirmGroupJoin()">Join Group</button>
+    </div>
+  </div>
+</div>
+
+<!-- Switch-space confirmation — warns the player they'll leave their current space. -->
+<div class="challenge-overlay" id="space-switch-overlay" onclick="closeSpaceSwitchConfirm(event)">
+  <div class="std-popup" onclick="event.stopPropagation()" style="background:var(--bg-panel);border:1px solid var(--border-subtle)">
+    <button class="popup-close-btn" onclick="closeSpaceSwitchConfirm()">&#10005;</button>
+    <div class="std-popup-header"><div class="challenge-title">Switch Space?</div></div>
+    <div class="std-popup-body" style="align-items:center;justify-content:center;text-align:center;gap:52px">
+      <div class="group-swap-row" id="space-swap-row" style="display:flex;align-items:center;justify-content:center;gap:36px"></div>
+      <div id="space-switch-msg" style="font-size:34px;line-height:1.45;color:var(--text-primary);max-width:820px"></div>
+    </div>
+    <div class="std-popup-footer">
+      <button class="std-popup-btn jamsesh-signature" id="space-switch-confirm-btn" onclick="confirmSpaceSwitch()">Switch</button>
+    </div>
+  </div>
+</div>
+
 <!-- Full-panel verifying spinner (darkens everything underneath). -->
 <div class="challenge-spinner-overlay" id="challenge-spinner-overlay">
   <div class="challenge-spinner"></div>
@@ -10497,29 +10818,86 @@ input, textarea, select {
 </div>
 
 <div class="create-group-overlay" id="create-group-overlay" onclick="closeCreateGroup(event)">
-  <div class="create-group-popup std-popup" onclick="event.stopPropagation()">
+  <div class="create-group-popup std-popup std-popup--large" onclick="event.stopPropagation()">
     <button class="popup-close-btn" onclick="closeCreateGroup()">&#10005;</button>
-    <div class="std-popup-header"><h2 style="font-size:40px;font-weight:800;color:var(--text-primary);margin:0;text-align:center">Create Group</h2></div>
-    <div class="std-popup-body">
-      <div class="create-group-header" style="flex-shrink:0">
-        <div class="create-group-logo" id="create-group-logo" onclick="openLogoPicker()">
-          <span class="logo-plus">+</span>
-        </div>
-        <input class="save-input" id="create-group-name" type="text" placeholder="Group Name" inputmode="none" onclick="requestKeyboardForInput('create-group-name')" style="flex:1">
+    <div class="std-popup-header"><h2 id="create-group-title" style="font-size:40px;font-weight:800;color:var(--text-primary);margin:0;text-align:center">Create Group</h2></div>
+    <div class="create-group-header" style="flex-shrink:0">
+      <div class="create-group-logo" id="create-group-logo" onclick="openLogoPicker()">
+        <span class="logo-plus">+</span>
       </div>
+      <div class="create-group-name-wrap" style="flex:1">
+        <input class="save-input" id="create-group-name" type="text" placeholder="Group Name" inputmode="none" onclick="requestKeyboardForInput('create-group-name')" style="flex:1">
+        <span class="cg-name-edit"><svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></span>
+      </div>
+    </div>
+    <div class="std-popup-body">
       <div class="create-group-columns" style="flex:1;min-height:0">
         <div class="create-group-col">
-          <div class="create-group-col-title">Available Friends</div>
-          <div class="create-group-list" id="create-group-available"></div>
+          <div class="friends-list-wrap create-group-friends" id="create-group-available"></div>
+          <div id="create-group-available-pager"></div>
         </div>
         <div class="create-group-col">
           <div class="create-group-col-title">Group Members</div>
-          <div class="create-group-list" id="create-group-members"></div>
+          <div class="friends-list-wrap create-group-friends create-group-friends--members" id="create-group-members"></div>
+          <div id="create-group-members-pager"></div>
         </div>
       </div>
     </div>
     <div class="std-popup-footer">
-      <button class="std-popup-btn" onclick="confirmCreateGroup()">Create</button>
+      <button class="std-popup-btn" id="create-group-primary-btn" onclick="createGroupPrimaryAction()">Create</button>
+    </div>
+  </div>
+</div>
+
+<!-- Reusable standard-size info popup (OK only). Sits above other popups. -->
+<div class="challenge-overlay" id="info-overlay" style="z-index:1003" onclick="closeInfoPopup(event)">
+  <div class="std-popup" onclick="event.stopPropagation()" style="background:var(--bg-panel);border:1px solid var(--border-subtle)">
+    <button class="popup-close-btn" onclick="closeInfoPopup()">&#10005;</button>
+    <div class="std-popup-header"><div class="challenge-title" id="info-title">Heads Up</div></div>
+    <div class="std-popup-body" style="align-items:center;justify-content:center;text-align:center">
+      <div id="info-msg" style="font-size:36px;line-height:1.45;color:var(--text-primary);max-width:820px"></div>
+    </div>
+    <div class="std-popup-footer">
+      <button class="std-popup-btn jamsesh-signature" onclick="closeInfoPopup()">OK</button>
+    </div>
+  </div>
+</div>
+
+<!-- Reusable "Are you sure?" confirm popup (Cancel + confirm). Driven by
+     showConfirmPopup(message, opts). Sits above every other popup. -->
+<div class="challenge-overlay" id="confirm-overlay" style="z-index:1004" onclick="closeConfirmPopup(event)">
+  <div class="std-popup" onclick="event.stopPropagation()" style="background:var(--bg-panel);border:1px solid var(--border-subtle)">
+    <button class="popup-close-btn" onclick="closeConfirmPopup()">&#10005;</button>
+    <div class="std-popup-header"><div class="challenge-title" id="confirm-title">Are You Sure?</div></div>
+    <div class="std-popup-body" style="align-items:center;justify-content:center;text-align:center">
+      <div id="confirm-msg" style="font-size:36px;line-height:1.45;color:var(--text-primary);max-width:820px"></div>
+    </div>
+    <div class="std-popup-footer">
+      <button class="std-popup-btn cg-decline-btn" id="confirm-cancel-btn" onclick="closeConfirmPopup()">Cancel</button>
+      <button class="std-popup-btn jamsesh-signature" id="confirm-ok-btn" onclick="confirmPopupConfirm()">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- Incoming group invite — openable on any tab (?invite slug or Unity 'groupInvite'). -->
+<div class="create-group-overlay" id="group-invite-overlay" onclick="closeGroupInvite(event)">
+  <div class="create-group-popup std-popup" onclick="event.stopPropagation()">
+    <button class="popup-close-btn" onclick="closeGroupInvite()">&#10005;</button>
+    <div class="std-popup-header"><h2 style="font-size:40px;font-weight:800;color:var(--text-primary);margin:0;text-align:center">Group Invite</h2></div>
+    <div style="flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:14px">
+      <div class="create-group-logo" id="group-invite-logo" style="cursor:default;width:150px;height:150px"></div>
+      <div id="group-invite-name" style="font-family:'Bebas Neue',sans-serif;font-size:54px;letter-spacing:1px;color:var(--text-primary);line-height:1"></div>
+      <div id="group-invite-msg" style="font-size:28px;color:var(--text-secondary);text-align:center"></div>
+    </div>
+    <div class="std-popup-body">
+      <div class="create-group-col">
+        <div class="create-group-col-title">Group Members</div>
+        <div class="friends-list-wrap create-group-friends" id="group-invite-members"></div>
+      </div>
+    </div>
+    <div class="std-popup-footer">
+      <button class="std-popup-btn cg-decline-btn" onclick="declineGroupInvite()">Decline</button>
+      <button class="std-popup-btn jamsesh-signature" onclick="acceptGroupInvite()">Join</button>
     </div>
   </div>
 </div>
@@ -10528,7 +10906,10 @@ input, textarea, select {
   <div class="logo-picker-popup std-popup" onclick="event.stopPropagation()">
     <button class="popup-close-btn" onclick="closeLogoPicker()">&#10005;</button>
     <div class="std-popup-header"><h2 style="font-size:36px;font-weight:800;color:var(--text-primary);margin:0">Choose Logo</h2></div>
-    <div class="std-popup-body"><div class="logo-picker-grid" id="logo-picker-grid" style="flex:1;min-height:0"></div></div>
+    <div class="std-popup-body">
+      <div class="logo-picker-grid" id="logo-picker-grid" style="flex:1;min-height:0"></div>
+      <div id="logo-picker-pager" style="flex-shrink:0"></div>
+    </div>
   </div>
 </div>
 
@@ -10789,12 +11170,15 @@ function handleUnityMessage(msg) {
     case 'updateLeaderboard': updateLeaderboardFromBackend(msg.data); break;
     case 'updateFriends': updateFriendsFromBackend(msg.data); break;
     case 'updateGroups': updateGroupsFromBackend(msg.data); break;
+    case 'setActiveGroup': window._activeGroupName = msg.data; break;
+    case 'groupInvite': openGroupInvite(msg.data); break;
     case 'updateLobby': updateLobbyFromBackend(msg.data); break;
     case 'updateHubs': updateHubsFromBackend(msg.data); break;
     case 'updateCoins': updateCoinsFromBackend(msg.data); break;
     case 'updatePicks': updatePicksFromBackend(msg.data); break;
     case 'updateProgression': updateProgression(msg.data); break;
     case 'updateChallenges': updateChallengesFromBackend(msg.data); break;
+    case 'updateCreatorSocials': updateCreatorSocialsFromBackend(msg.data); break;
     case 'updateReferralRewards': updateReferralRewards(msg.data); break;
     case 'setChallengeVerifySeconds': setChallengeVerifySeconds(msg.data); break;
     case 'gameResults': showGameResults(msg.data); break;
@@ -11436,6 +11820,7 @@ function navigateTo(pageName) {
   for (var i = 0; i < gridNavs.length; i++) gridNavs[i].style.display = 'none';
   if (typeof setPageColors === 'function') setPageColors(pageName);
   sendToUnity('navigate', pageName);
+  updateDeeplinkUrl(pageName);
   if (pageName === 'creator') sendToUnity('creatorPageOpened', {});
 
   // Same-page tap: no swap needed.
@@ -11510,28 +11895,42 @@ function buildNavButtons(container, id) {
   container.appendChild(next);
 }
 
-function buildGrid(songs) {
-  var track = document.getElementById('grid-track');
-  track.innerHTML = '';
-  var grid = document.createElement('div');
-  grid.className = 'grid-page';
-  grid.id = 'grid-content';
+// Song picker — paginated 4x3 grid (12/page), same mechanic as Challenges/Badges.
+var SONGS_PER_PAGE = 12;
+var pickerSongs = [];
+var pickerPage = 0;
 
-  for (var i = 0; i < songs.length; i++) {
-    var song = songs[i];
+function buildGrid(songs) {
+  pickerSongs = songs || [];
+  pickerPage = 0;              // new list (open / filter change) → first page
+  buildPickerGridPage();
+}
+
+function buildPickerGridPage() {
+  var grid = document.getElementById('picker-song-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  var total = Math.max(1, Math.ceil(pickerSongs.length / SONGS_PER_PAGE));
+  if (pickerPage >= total) pickerPage = total - 1;
+  if (pickerPage < 0) pickerPage = 0;
+  var start = pickerPage * SONGS_PER_PAGE;
+  var pageSongs = pickerSongs.slice(start, start + SONGS_PER_PAGE);
+  for (var i = 0; i < pageSongs.length; i++) {
+    var song = pageSongs[i];
     var tile = document.createElement('div');
     tile.className = 'song-tile';
-    tile.setAttribute('data-song-index', i);
+    tile.setAttribute('data-song-index', start + i);
     tile._song = song;
+    // Whole tile adds the song (the picker closes on add). The play button is the
+    // only nested control — it stops propagation so previewing never adds.
     tile.onclick = (function(s) {
-      return function() { selectPickerSong(s, this); };
+      return function() { addSongToSetlist(s); };
     })(song);
     var dm = Math.floor(song.duration / 60);
     var ds = song.duration % 60;
     var durTxt = dm + ':' + (ds < 10 ? '0' : '') + ds;
     tile.innerHTML =
       '<img src="' + song.file + '" alt="" loading="lazy">' +
-      '<span class="tile-rank">#' + song.rank + '</span>' +
       '<div class="tile-info">' +
         '<div class="tile-title">' + song.title + '</div>' +
         '<div class="tile-artist">' + song.artist + '</div>' +
@@ -11539,29 +11938,17 @@ function buildGrid(songs) {
       '</div>' +
       '<div class="song-hover-actions">' +
         '<button class="song-hover-btn song-hover-btn-play"><svg width="72" height="72" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>' +
-        '<button class="song-hover-btn song-hover-btn-add"><svg width="72" height="72" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></button>' +
       '</div>';
     (function(s, t) {
       t.querySelector('.song-hover-btn-play').onclick = function(e) {
         e.stopPropagation();
         sendToUnity('previewSong', s.title);
       };
-      t.querySelector('.song-hover-btn-add').onclick = function(e) {
-        e.stopPropagation();
-        addSongToSetlist(s);
-      };
     })(song, tile);
     grid.appendChild(tile);
   }
-  track.appendChild(grid);
-
-  buildNavButtons(document.getElementById('grid-nav-right'), 'right');
-  sizePickerGrid();
-  pickerScrollOffset = 0;
-  setPickerScroll(0, false);
-  setupPickerScrollObserver();
-  setupPickerDrag();
-  setupPickerGamepad();
+  renderPager(document.getElementById('picker-song-pager'), pickerPage, total,
+    function(dir) { pickerPage += dir; buildPickerGridPage(); });
 }
 
 // Compute square tile size so 4 cols × 3 rows fit inside the viewport.
@@ -11784,6 +12171,7 @@ function switchSocialTab(tab) {
     tabs[i].className = 'play-mode-tab' + (names[i] === tab ? ' active' : '');
     document.getElementById('social-tab-' + names[i]).style.display = names[i] === tab ? 'flex' : 'none';
   }
+  updateDeeplinkUrl('social', tab);
 }
 
 function switchSpacesTab(tab) {
@@ -11793,6 +12181,7 @@ function switchSpacesTab(tab) {
     tabs[i].className = 'play-mode-tab' + (names[i] === tab ? ' active' : '');
     document.getElementById('spaces-tab-' + names[i]).style.display = names[i] === tab ? 'flex' : 'none';
   }
+  updateDeeplinkUrl('spaces', tab);
 }
 
 // ── Shared pagination row ───────────────────────────────────────────────
@@ -11866,18 +12255,16 @@ function buildSocialPage() {
   var groupGrid = document.getElementById('social-grid-groups');
   groupGrid.innerHTML = '';
 
+  // Mock "Jamsesh" group (the player's active band) until Unity pushes a real
+  // roster via window._backendGroups (updateGroups).
   var groups = window._backendGroups || [
-    { name: 'Jamsesh Hunters', members: '8/10', file: '' },
-    { name: 'Neon Phantoms', members: '10/10', file: '' },
-    { name: 'Electric Dreams', members: '6/10', file: '' },
-    { name: 'Rhythm Rebels', members: '9/10', file: '' },
-    { name: 'Sonic Wolves', members: '7/10', file: '' },
-    { name: 'Bass Bandits', members: '5/10', file: '' },
-    { name: 'Velvet Crush', members: '10/10', file: '' }
+    { name: 'Jamsesh', members: '10/10', online: '8/10', file: 'art/benchango.jpg', active: true }
   ];
   // Full cell list: the Create-New tile is cell 0, then the groups.
   var groupCells = [{ create: true }];
   for (var gci = 0; gci < groups.length; gci++) groupCells.push({ create: false, g: groups[gci] });
+  // Placeholder "joinable" group — tapping it asks to confirm leaving the active group.
+  groupCells.push({ create: false, temp: true });
   var gTotal = pageCount(groupCells.length);
   if (socialGroupsPage >= gTotal) socialGroupsPage = gTotal - 1;
   if (socialGroupsPage < 0) socialGroupsPage = 0;
@@ -11891,24 +12278,47 @@ function buildSocialPage() {
       groupGrid.appendChild(createTile);
       continue;
     }
+    if (gPage[i].temp) {
+      var tempTile = document.createElement('div');
+      tempTile.className = 'space-tile';
+      tempTile.onclick = function() {
+        if (getActiveGroupName() === 'The Picks') {
+          openManageGroup({ name: 'The Picks', file: 'art/benchango.jpg', members: '10/10', online: '8/10' });
+        } else {
+          openGroupJoinConfirm('The Picks', 'art/benchango.jpg', '8/10');
+        }
+      };
+      var tempPill = (getActiveGroupName() === 'The Picks') ? '<div class="space-here-badge">Active Group</div>' : '';
+      tempTile.innerHTML = tempPill +
+        '<img src="art/benchango.jpg" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;pointer-events:none" alt="">' +
+        '<div class="tile-info" style="pointer-events:none;position:absolute;bottom:0;left:0;right:0;padding:48px 20px 18px;background:linear-gradient(0deg,rgba(0,0,0,0.95) 0%,rgba(0,0,0,0.9) 40%,rgba(0,0,0,0.6) 70%,transparent 100%);display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-end;gap:4px">' +
+          '<div class="tile-hero-title" style="font-size:64px">The Picks</div>' +
+          '<div class="tile-hero-sub">8/10 Members Online</div>' +
+        '</div>';
+      groupGrid.appendChild(tempTile);
+      continue;
+    }
     var g = gPage[i].g;
     var tile = document.createElement('div');
     tile.className = 'space-tile';
     tile.onclick = (function(grp) {
       return function() {
         console.log('[Social] Band tile clicked: ' + grp.name + ' id=' + grp.id);
-        if (grp.id) {
-          sendToUnity('enterBandspace', { id: grp.id, name: grp.name });
+        // Tapping a non-active group asks the player to confirm the switch first;
+        // tapping the active group opens the manage popup (Leave Group).
+        if (grp.name !== getActiveGroupName()) {
+          openGroupJoinConfirm(grp.name, grp.file, grp.online);
         } else {
-          sendToUnity('viewGroup', grp.name);
+          openManageGroup(grp);
         }
       };
     })(g);
-    tile.innerHTML =
+    var activePill = (g.name === getActiveGroupName()) ? '<div class="space-here-badge">Active Group</div>' : '';
+    tile.innerHTML = activePill +
       '<img src="' + g.file + '" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;pointer-events:none" alt="">' +
       '<div class="tile-info" style="pointer-events:none;position:absolute;bottom:0;left:0;right:0;padding:48px 20px 18px;background:linear-gradient(0deg,rgba(0,0,0,0.95) 0%,rgba(0,0,0,0.9) 40%,rgba(0,0,0,0.6) 70%,transparent 100%);display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-end;gap:4px">' +
-        '<div class="tile-hero-title">' + g.name + '</div>' +
-        '<div class="tile-hero-sub">' + g.members + ' Members</div>' +
+        '<div class="tile-hero-title" style="font-size:64px">' + g.name + '</div>' +
+        '<div class="tile-hero-sub">' + (g.online || g.members) + ' Members Online</div>' +
       '</div>';
     groupGrid.appendChild(tile);
   }
@@ -11946,7 +12356,116 @@ function buildSocialPage() {
   renderPager(document.getElementById('social-friends-pager'), socialFriendsPage, fTotal, function(dir) { socialFriendsPage += dir; buildSocialPage(); });
 }
 
+// Active-group name shown in the join-confirmation popup. Unity may push it via
+// `setActiveGroup`; otherwise fall back to whichever group is flagged active.
+function getActiveGroupName() {
+  if (window._activeGroupName) return window._activeGroupName;
+  var grp = getActiveGroup();
+  return grp ? grp.name : 'Jamsesh';
+}
+
+function getActiveGroup() {
+  var groups = window._backendGroups;
+  if (groups) {
+    for (var i = 0; i < groups.length; i++) {
+      if (groups[i].active) return groups[i];
+    }
+  }
+  return { name: 'Jamsesh', file: 'art/benchango.jpg', online: '4/5' };
+}
+
+// One group card (rounded thumbnail + caption + online count) for the swap row.
+function groupSwapTile(label, labelColor, img, name, online, unit) {
+  unit = unit || 'Members Online';
+  var onlineLine = online ?
+    '<div style="display:flex;align-items:center;gap:10px;font-family:\'Bebas Neue\',sans-serif;font-size:30px;letter-spacing:1px;color:var(--mint);line-height:1">' +
+      '<span style="width:14px;height:14px;border-radius:50%;background:var(--mint);box-shadow:0 0 10px var(--mint)"></span>' + online + ' ' + unit +
+    '</div>' : '';
+  return '<div style="display:flex;flex-direction:column;align-items:center;gap:18px;width:300px">' +
+    '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:32px;letter-spacing:3px;color:' + labelColor + '">' + label + '</div>' +
+    '<div style="width:300px;height:300px;border-radius:var(--panel-radius);overflow:hidden;border:2px solid var(--border-subtle);background:var(--bg-surface)">' +
+      '<img src="' + img + '" style="width:100%;height:100%;object-fit:cover" alt="">' +
+    '</div>' +
+    '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:54px;letter-spacing:0.02em;color:var(--text-primary);line-height:1">' + name + '</div>' +
+    onlineLine +
+  '</div>';
+}
+
+var _pendingJoinGroup = null;
+
+function openGroupJoinConfirm(groupName, groupImg, groupOnline) {
+  _pendingJoinGroup = groupName;
+  var active = getActiveGroup();
+  var newImg = groupImg || 'art/benchango.jpg';
+  document.getElementById('group-swap-row').innerHTML =
+    groupSwapTile('Current', 'var(--text-muted)', active.file || 'art/benchango.jpg', getActiveGroupName(), active.online) +
+    '<svg viewBox="0 0 24 24" style="width:72px;height:72px;flex:0 0 auto;fill:var(--mint)" aria-hidden="true"><path d="M4 11h12.17l-5.59-5.59L12 4l8 8-8 8-1.41-1.41L16.17 13H4z"/></svg>' +
+    groupSwapTile('Joining', 'var(--mint)', newImg, groupName, groupOnline);
+  document.getElementById('group-join-msg').textContent =
+    'Joining this group will disconnect you from ' + getActiveGroupName() + '.';
+  document.getElementById('group-join-confirm-btn').textContent = 'Switch to ' + groupName;
+  document.getElementById('group-join-overlay').classList.add('active');
+}
+
+function closeGroupJoinConfirm(e) {
+  if (e && e.target && e.target.id !== 'group-join-overlay') return;
+  document.getElementById('group-join-overlay').classList.remove('active');
+  _pendingJoinGroup = null;
+}
+
+function confirmGroupJoin() {
+  if (_pendingJoinGroup) {
+    sendToUnity('joinGroup', _pendingJoinGroup);
+    // Reflect the swap locally — the active-group pill moves to the joined group.
+    window._activeGroupName = _pendingJoinGroup;
+    buildSocialPage();
+  }
+  document.getElementById('group-join-overlay').classList.remove('active');
+  _pendingJoinGroup = null;
+}
+
+// ── Switch-space confirmation (mirrors the group-switch popup) ──
+function openSpaceSwitchConfirm(hub) {
+  _pendingSwitchHub = hub;
+  var current = null;
+  for (var i = 0; i < spaceHubs.length; i++) {
+    if (spaceHubs[i].name === currentHub) { current = spaceHubs[i]; break; }
+  }
+  var curImg = current ? current.img : 'spaces/social.png';
+  var curCount = current ? current.count : '';
+  document.getElementById('space-swap-row').innerHTML =
+    groupSwapTile('Current', 'var(--text-muted)', curImg, currentHub, curCount, 'Jammers') +
+    '<svg viewBox="0 0 24 24" style="width:72px;height:72px;flex:0 0 auto;fill:var(--mint)" aria-hidden="true"><path d="M4 11h12.17l-5.59-5.59L12 4l8 8-8 8-1.41-1.41L16.17 13H4z"/></svg>' +
+    groupSwapTile('Joining', 'var(--mint)', hub.img, hub.name, hub.count, 'Jammers');
+  document.getElementById('space-switch-msg').textContent =
+    'Switching will move you from ' + currentHub + ' to ' + hub.name + '.';
+  document.getElementById('space-switch-confirm-btn').textContent = 'Switch to ' + hub.name;
+  document.getElementById('space-switch-overlay').classList.add('active');
+}
+
+function closeSpaceSwitchConfirm(e) {
+  if (e && e.target && e.target.id !== 'space-switch-overlay') return;
+  document.getElementById('space-switch-overlay').classList.remove('active');
+  _pendingSwitchHub = null;
+}
+
+function confirmSpaceSwitch() {
+  if (_pendingSwitchHub) {
+    currentHub = _pendingSwitchHub.name;
+    sendToUnity('joinHub', _pendingSwitchHub.name);
+    buildSpacesGrid();
+  }
+  document.getElementById('space-switch-overlay').classList.remove('active');
+  _pendingSwitchHub = null;
+}
+
 var spacesPublicPage = 0;
+var currentHub = 'Jamsesh Hub';   // which public hub shows the "You Are Here" badge
+var _pendingSwitchHub = null;
+var spaceHubs = [
+  { name: 'Jamsesh Hub', count: '8/25', img: 'spaces/social.png' },
+  { name: 'Pastel Loft', count: '0/25', img: 'spaces/lobby.png' }
+];
 
 function buildSpacesGrid() {
   // Public hub tiles map to a real Unity-side destination (the shared open
@@ -11959,10 +12478,7 @@ function buildSpacesGrid() {
   var pubGrid = document.getElementById('spaces-grid-public');
   pubGrid.innerHTML = '';
 
-  var hubs = [
-    { name: 'Jamsesh Hub', count: '8/25', img: 'spaces/social.png' },
-    { name: 'Pastel Loft', count: '0/25', img: 'spaces/lobby.png' }
-  ];
+  var hubs = spaceHubs;
   var pubTotal = pageCount(hubs.length);
   if (spacesPublicPage >= pubTotal) spacesPublicPage = pubTotal - 1;
   if (spacesPublicPage < 0) spacesPublicPage = 0;
@@ -11976,20 +12492,33 @@ function buildSpacesGrid() {
     tile.style.overflow = 'hidden';
     tile.style.cursor = 'pointer';
     tile.onclick = (function(hub) {
-      return function() { sendToUnity('joinHub', hub.name); };
+      return function() {
+        if (hub.name === currentHub) return;   // already here — no-op
+        openSpaceSwitchConfirm(hub);
+      };
     })(h);
-    tile.innerHTML =
-      '<div style="position:absolute;bottom:0;left:0;right:0;padding:24px 20px 18px;background:linear-gradient(0deg,rgba(0,0,0,0.95) 0%,rgba(0,0,0,0.9) 40%,rgba(0,0,0,0.6) 70%,transparent 100%);">' +
-        '<div class="tile-hero-title">' + h.name + '</div>' +
-        '<div class="tile-hero-sub">' + h.count + ' Jammers</div>' +
+    var hereBadge = (h.name === currentHub) ? '<div class="space-here-badge">You Are Here</div>' : '';
+    // Title/sub sizes + fade gradient match the Challenges/Badges tile family.
+    tile.innerHTML = hereBadge +
+      '<div class="quest-fade"></div>' +
+      '<div class="quest-caption">' +
+        '<div class="quest-name">' + h.name + '</div>' +
+        '<div class="quest-time">' + h.count + ' Jammers</div>' +
       '</div>';
     pubGrid.appendChild(tile);
   }
   renderPager(document.getElementById('spaces-public-pager'), spacesPublicPage, pubTotal, function(dir) { spacesPublicPage += dir; buildSpacesGrid(); });
 
-  // ── Private ── (no backend content yet; keep grid empty but render the frame)
+  // ── Private ── Create-New tile (player's own private spaces arrive via backend).
   var privGrid = document.getElementById('spaces-grid-private');
-  if (privGrid) privGrid.innerHTML = '';
+  if (privGrid) {
+    privGrid.innerHTML = '';
+    var privCreate = document.createElement('div');
+    privCreate.className = 'space-tile-create';
+    privCreate.onclick = function() { openCreateSpace('private'); };
+    privCreate.innerHTML = '<div class="space-tile-create-plus">+</div><div class="space-tile-create-label">New Private Space</div>';
+    privGrid.appendChild(privCreate);
+  }
   renderPager(document.getElementById('spaces-private-pager'), 0, 1, null);
 }
 
@@ -11998,36 +12527,106 @@ var createGroupMembers = [];
 var createGroupLogo = '';
 
 var groupLogoOptions = [
-  '',
-  '',
-  '',
-  '',
-  '',
-  '',
-  ''
+  'art/benchango.jpg',
+  'art/benchango.jpg',
+  'art/benchango.jpg',
+  'art/benchango.jpg'
 ];
 
 var availableFriends = [
-  { name: 'Jooleeno', avatar: 'avatars/jooleeno.jpg' },
-  { name: 'Ted', avatar: 'avatars/ted.png' },
-  { name: 'Abbie', avatar: 'avatars/abbie.png' },
-  { name: 'Arthen', avatar: 'avatars/arthen.jpg' },
-  { name: 'xShadowPick', avatar: '' },
-  { name: 'MelodyQueen', avatar: '' },
-  { name: 'BeatDropper99', avatar: '' },
-  { name: 'FretNinja', avatar: '' },
-  { name: 'GrooveMonkey', avatar: '' },
-  { name: 'RiffLord420', avatar: '' }
+  { name: 'Jooleeno', avatar: 'avatars/jooleeno.jpg', online: true },
+  { name: 'Ted', avatar: 'avatars/ted.png', online: true },
+  { name: 'Abbie', avatar: 'avatars/abbie.png', online: false },
+  { name: 'Arthen', avatar: 'avatars/arthen.jpg', online: true },
+  { name: 'xShadowPick', avatar: 'avatars/ted.png', online: false },
+  { name: 'MelodyQueen', avatar: 'avatars/abbie.png', online: true },
+  { name: 'BeatDropper99', avatar: 'avatars/arthen.jpg', online: false },
+  { name: 'FretNinja', avatar: 'avatars/jooleeno.jpg', online: true },
+  { name: 'GrooveMonkey', avatar: 'avatars/rael_new.png', online: false },
+  { name: 'RiffLord420', avatar: 'avatars/ted.png', online: false },
+  { name: 'SynthWolf', avatar: 'avatars/arthen.jpg', online: true },
+  { name: 'PixelDrumr', avatar: 'avatars/abbie.png', online: true },
+  { name: 'NovaStrum', avatar: 'avatars/jooleeno.jpg', online: false },
+  { name: 'BassBandit', avatar: 'avatars/ted.png', online: true },
+  { name: 'EchoFox', avatar: 'avatars/rael_new.png', online: false },
+  { name: 'VinylViper', avatar: 'avatars/arthen.jpg', online: true },
+  { name: 'KeyCrusher', avatar: 'avatars/abbie.png', online: false },
+  { name: 'TempoKid', avatar: 'avatars/jooleeno.jpg', online: true },
+  { name: 'LoopQueen', avatar: 'avatars/rael_new.png', online: true },
+  { name: 'DiscoDuck', avatar: 'avatars/ted.png', online: false }
 ];
 
+var createGroupMode = 'create';   // 'create' (new group) | 'manage' (existing active group)
+var JAMSESH_DEFAULT_LOGO = 'branding/jamsesh-pick.png';   // default band logo when the user doesn't pick one
+
+// Small pencil "edit" badge so users know the logo / name can be changed.
+function cgEditBadge() {
+  return '<span class="cg-edit-badge"><svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></span>';
+}
+
+// Render the logo tile (chosen logo, or the Jamsesh pick by default) + edit badge.
+function cgRenderLogo() {
+  var src = createGroupLogo || JAMSESH_DEFAULT_LOGO;
+  // The default pick emblem is scaled to fit (contain); real band photos fill (cover).
+  var cls = (src === JAMSESH_DEFAULT_LOGO) ? ' class="cg-logo-fit"' : '';
+  document.getElementById('create-group-logo').innerHTML =
+    '<img' + cls + ' src="' + src + '" alt="">' + cgEditBadge();
+}
+
 function openCreateGroup() {
+  createGroupMode = 'create';
   createGroupMembers = [];
-  createGroupLogo = '';
-  document.getElementById('create-group-name').value = '';
-  var logoEl = document.getElementById('create-group-logo');
-  logoEl.innerHTML = '<span class="logo-plus">+</span>';
+  createGroupLogo = JAMSESH_DEFAULT_LOGO;   // default to the Jamsesh pick
+  var me = getActiveProfile();
+  document.getElementById('create-group-name').value = me.name + "'s Group";   // prefilled, editable
+  document.getElementById('create-group-title').textContent = 'Create Group';
+  cgRenderLogo();
+  createGroupAvailPage = 0;
+  createGroupMembersPage = 0;
   renderCreateGroupLists();
   document.getElementById('create-group-overlay').className = 'create-group-overlay active';
+}
+
+// Manage the active group: same big popup, prefilled with the group's
+// logo/name/members and a destructive "Leave Group" button at the bottom.
+function openManageGroup(grp) {
+  createGroupMode = 'manage';
+  createGroupLogo = grp.file || '';
+  document.getElementById('create-group-name').value = grp.name;
+  document.getElementById('create-group-title').textContent = grp.name;
+  cgRenderLogo();
+
+  // Mock current roster from the friends pool. The current user occupies slot 1,
+  // so we add up to (count - 1) others, capped so the block never exceeds the max.
+  var count = parseInt(((grp.members || '5/10') + '').split('/')[0], 10) || 5;
+  var others = Math.min(count - 1, CG_MEMBERS_MAX - 1);
+  var pool = (window._backendGroupMembers || window._backendFriends || availableFriends);
+  createGroupMembers = [];
+  for (var i = 0; i < others && i < pool.length; i++) {
+    createGroupMembers.push({ name: pool[i].name, avatar: pool[i].avatar, online: pool[i].online, status: 'accepted' });
+  }
+  createGroupAvailPage = 0;
+  createGroupMembersPage = 0;
+  renderCreateGroupLists();
+  document.getElementById('create-group-overlay').className = 'create-group-overlay active';
+}
+
+function createGroupPrimaryAction() {
+  if (createGroupMode === 'manage') leaveActiveGroup();
+  else confirmCreateGroup();
+}
+
+function leaveActiveGroup() {
+  var name = document.getElementById('create-group-name').value.trim() || getActiveGroupName();
+  showConfirmPopup('Leave ' + (name || 'this group') + '? You can be invited back later.', {
+    title: 'Leave Group',
+    confirmLabel: 'Leave Group',
+    destructive: true,
+    onConfirm: function() {
+      sendToUnity('leaveGroup', name);
+      closeCreateGroup();
+    }
+  });
 }
 
 function closeCreateGroup(e) {
@@ -12036,62 +12635,223 @@ function closeCreateGroup(e) {
   sendToUnity('closeKeyboard', {});
 }
 
+// Invite-status pill for group members (Invited amber / Accepted mint).
+function cgInvitePill(status) {
+  return (status === 'accepted')
+    ? '<span class="cg-pill cg-pill-accepted">Accepted</span>'
+    : '<span class="cg-pill cg-pill-invited">Invited</span>';
+}
+
+// Standard username row (matches the Friends / Referrals .friend-item style):
+// avatar + name + online/offline status line, with action markup on the right.
+function cgFriendItem(f, rightHtml) {
+  var item = document.createElement('div');
+  item.className = 'friend-item' + (f.online ? ' online' : '');
+  item.innerHTML =
+    '<div class="friend-avatar"><img src="' + f.avatar + '" alt=""></div>' +
+    '<div class="friend-info">' +
+      '<div class="friend-name">' + f.name + '</div>' +
+      '<div class="friend-status' + (f.online ? ' online' : '') + '">' +
+        '<span class="friend-dot' + (f.online ? ' online' : '') + '"></span>' +
+        (f.online ? 'Online' : 'Offline') +
+      '</div>' +
+    '</div>' + rightHtml;
+  return item;
+}
+
+var createGroupAvailPage = 0;
+var createGroupMembersPage = 0;
+var CG_AVAIL_PER_PAGE = 10;    // 2 cols x 5 rows
+var CG_MEMBERS_PER_PAGE = 10;  // 2 cols x 5 rows
+
+// Column-major fill: items go DOWN the left column (up to 5) before the right column.
+// Pass fixedRows to always reserve that many rows (keeps the block height constant
+// across pages so the block below it never shifts).
+function cgSetColumnFlow(gridEl, count, fixedRows) {
+  var rows = fixedRows || Math.min(count, 5);
+  if (rows > 0) {
+    gridEl.style.gridAutoFlow = 'column';
+    gridEl.style.gridTemplateRows = 'repeat(' + rows + ', 80px)';
+  } else {
+    gridEl.style.gridAutoFlow = '';
+    gridEl.style.gridTemplateRows = '';
+  }
+}
+
 function renderCreateGroupLists() {
   var avail = document.getElementById('create-group-available');
   var members = document.getElementById('create-group-members');
   avail.innerHTML = '';
   members.innerHTML = '';
 
+  var me = getActiveProfile();
   var addedNames = {};
+  addedNames[me.name] = true;   // the current user is always a member — never offer them in "available"
   for (var m = 0; m < createGroupMembers.length; m++) {
     addedNames[createGroupMembers[m].name] = true;
   }
 
-  var friendSource = window._backendFriends || availableFriends;
-  for (var i = 0; i < friendSource.length; i++) {
-    var f = friendSource[i];
-    if (addedNames[f.name]) continue;
-    var row = document.createElement('div');
-    row.className = 'create-group-friend';
-    row.innerHTML =
-      '<div class="create-group-friend-avatar"><img src="' + f.avatar + '" alt=""></div>' +
-      '<div class="create-group-friend-name">' + f.name + '</div>';
-    var btn = document.createElement('button');
-    btn.className = 'create-group-friend-btn create-group-friend-btn-add';
-    btn.textContent = 'Add';
-    btn.onclick = (function(friend) {
-      return function() { addFriendToGroup(friend); };
-    })(f);
-    row.appendChild(btn);
-    avail.appendChild(row);
+  // ── Available friends — TOP block (online sorted to top, already-added removed, paginated) ──
+  var source = (window._backendFriends || availableFriends).slice();
+  source.sort(function(a, b) { return (b.online ? 1 : 0) - (a.online ? 1 : 0); });
+  var avFriends = [];
+  for (var i = 0; i < source.length; i++) {
+    if (!addedNames[source[i].name]) avFriends.push(source[i]);
   }
-  if (!avail.children.length) {
-    avail.innerHTML = '<div class="create-group-empty">No more friends to add</div>';
+  var avTotal = Math.max(1, Math.ceil(avFriends.length / CG_AVAIL_PER_PAGE));
+  if (createGroupAvailPage >= avTotal) createGroupAvailPage = avTotal - 1;
+  if (createGroupAvailPage < 0) createGroupAvailPage = 0;
+  if (!avFriends.length) {
+    avail.innerHTML = '<div class="create-group-empty" style="grid-column:1/-1">No more friends to add</div>';
+    cgSetColumnFlow(avail, 0, 5);
+  } else {
+    var avStart = createGroupAvailPage * CG_AVAIL_PER_PAGE;
+    var avPage = avFriends.slice(avStart, avStart + CG_AVAIL_PER_PAGE);
+    for (var a = 0; a < avPage.length; a++) {
+      var f = avPage[a];
+      var row = cgFriendItem(f, '<div class="referral-claim-pill" data-add="1">Invite</div>');
+      row.querySelector('[data-add]').onclick = (function(friend) {
+        return function(e) { e.stopPropagation(); addFriendToGroup(friend); };
+      })(f);
+      avail.appendChild(row);
+    }
+    cgSetColumnFlow(avail, avPage.length, 5);   // always 5 rows tall so the members block below stays put
   }
+  renderPager(document.getElementById('create-group-available-pager'), createGroupAvailPage, avTotal, function(dir) {
+    createGroupAvailPage += dir; renderCreateGroupLists();
+  });
 
+  // ── Group members — BOTTOM block (capped at 10, never paginated). The current
+  //    user is always slot 1, labelled "(You)" and non-removable. ──
+  var youItem = cgFriendItem(
+    { name: me.name + ' (You)', avatar: me.avatar, online: true },
+    '<span class="cg-pill cg-pill-leader">Leader</span>'
+  );
+  members.appendChild(youItem);
   for (var j = 0; j < createGroupMembers.length; j++) {
     var mf = createGroupMembers[j];
-    var mrow = document.createElement('div');
-    mrow.className = 'create-group-friend';
-    mrow.innerHTML =
-      '<div class="create-group-friend-avatar"><img src="' + mf.avatar + '" alt=""></div>' +
-      '<div class="create-group-friend-name">' + mf.name + '</div>';
-    var rbtn = document.createElement('button');
-    rbtn.className = 'create-group-friend-btn create-group-friend-btn-remove';
-    rbtn.textContent = 'Remove';
-    rbtn.onclick = (function(idx) {
-      return function() { removeFriendFromGroup(idx); };
+    var mrow = cgFriendItem(mf, cgInvitePill(mf.status) + '<div class="referral-invite-pill" data-remove="1">Remove</div>');
+    mrow.querySelector('[data-remove]').onclick = (function(idx) {
+      return function(e) { e.stopPropagation(); removeFriendFromGroup(idx); };
     })(j);
-    mrow.appendChild(rbtn);
     members.appendChild(mrow);
   }
-  if (!createGroupMembers.length) {
-    members.innerHTML = '<div class="create-group-empty">Add friends to your group</div>';
+  cgSetColumnFlow(members, 1 + createGroupMembers.length);
+  // Bottom block never paginates — keep the pager row present but empty/hidden.
+  renderPager(document.getElementById('create-group-members-pager'), 0, 1, function() {});
+
+  cgUpdatePrimaryButton();
+}
+
+// Footer button state: Leave (manage), or Create — styled + enabled only once a
+// member has been invited (the signature gradient button when active).
+function cgUpdatePrimaryButton() {
+  var btn = document.getElementById('create-group-primary-btn');
+  if (!btn) return;
+  if (createGroupMode === 'manage') {
+    btn.textContent = 'Leave Group';
+    btn.className = 'std-popup-btn create-group-leave-btn';
+    btn.disabled = false;
+    return;
   }
+  btn.textContent = 'Create';
+  var ready = createGroupMembers.length > 0;
+  btn.disabled = !ready;
+  btn.className = 'std-popup-btn' + (ready ? ' jamsesh-signature' : '');
+}
+
+var CG_MEMBERS_MAX = 10;   // including the current user ("You")
+
+// Reusable standard-size info popup with a single OK button.
+function showInfoPopup(message, title) {
+  document.getElementById('info-msg').textContent = message;
+  document.getElementById('info-title').textContent = title || 'Heads Up';
+  document.getElementById('info-overlay').classList.add('active');
+}
+function closeInfoPopup(e) {
+  if (e && e.target && e.target.id !== 'info-overlay') return;
+  document.getElementById('info-overlay').classList.remove('active');
+}
+
+// Reusable confirm / "are you sure?" popup.
+//   showConfirmPopup(message, { title, confirmLabel, destructive, onConfirm })
+// onConfirm runs only when the user taps the confirm button.
+var _confirmCallback = null;
+function showConfirmPopup(message, opts) {
+  opts = opts || {};
+  document.getElementById('confirm-msg').textContent = message;
+  document.getElementById('confirm-title').textContent = opts.title || 'Are You Sure?';
+  var okBtn = document.getElementById('confirm-ok-btn');
+  okBtn.textContent = opts.confirmLabel || 'Confirm';
+  // Red destructive styling for irreversible actions, else the signature gradient.
+  okBtn.className = 'std-popup-btn' + (opts.destructive ? ' create-group-leave-btn' : ' jamsesh-signature');
+  _confirmCallback = (typeof opts.onConfirm === 'function') ? opts.onConfirm : null;
+  document.getElementById('confirm-overlay').classList.add('active');
+}
+function closeConfirmPopup(e) {
+  if (e && e.target && e.target.id !== 'confirm-overlay') return;
+  document.getElementById('confirm-overlay').classList.remove('active');
+  _confirmCallback = null;
+}
+function confirmPopupConfirm() {
+  var cb = _confirmCallback;
+  _confirmCallback = null;
+  document.getElementById('confirm-overlay').classList.remove('active');
+  if (cb) cb();
+}
+
+// ── Incoming group invite popup ─────────────────────────
+// data: { groupName, logo, inviter, members:[{name,avatar,online}] }
+function mockGroupInvite() {
+  var pool = (window._backendFriends || availableFriends);
+  var members = [];
+  for (var i = 0; i < 10 && i < pool.length; i++) {
+    members.push({ name: pool[i].name, avatar: pool[i].avatar, online: pool[i].online });
+  }
+  return { groupName: 'The Pixels', logo: 'art/benchango.jpg', inviter: 'Jooleeno', members: members };
+}
+
+function openGroupInvite(data) {
+  var inv = data || mockGroupInvite();
+  window._pendingInvite = inv;
+  document.getElementById('group-invite-name').textContent = inv.groupName;
+  document.getElementById('group-invite-msg').textContent =
+    (inv.inviter ? inv.inviter + ' invited you to join ' : "You've been invited to join ") + inv.groupName + '.';
+  var logoSrc = inv.logo || JAMSESH_DEFAULT_LOGO;
+  var fit = (logoSrc === JAMSESH_DEFAULT_LOGO) ? ' class="cg-logo-fit"' : '';
+  document.getElementById('group-invite-logo').innerHTML = '<img' + fit + ' src="' + logoSrc + '" alt="">';
+  // Up to 10 members in the standard 2×5 block.
+  var grid = document.getElementById('group-invite-members');
+  grid.innerHTML = '';
+  var mem = (inv.members || []).slice(0, 10);
+  for (var i = 0; i < mem.length; i++) grid.appendChild(cgFriendItem(mem[i], ''));
+  cgSetColumnFlow(grid, mem.length);
+  document.getElementById('group-invite-overlay').classList.add('active');
+}
+
+function closeGroupInvite(e) {
+  if (e && e.target && e.target.id !== 'group-invite-overlay') return;
+  document.getElementById('group-invite-overlay').classList.remove('active');
+}
+
+function acceptGroupInvite() {
+  if (window._pendingInvite) sendToUnity('acceptGroupInvite', window._pendingInvite.groupName);
+  closeGroupInvite();
+}
+
+function declineGroupInvite() {
+  if (window._pendingInvite) sendToUnity('declineGroupInvite', window._pendingInvite.groupName);
+  closeGroupInvite();
 }
 
 function addFriendToGroup(friend) {
-  createGroupMembers.push(friend);
+  // The bottom block (incl. the current user) can never exceed CG_MEMBERS_MAX.
+  if (1 + createGroupMembers.length >= CG_MEMBERS_MAX) {
+    showInfoPopup('10 is the maximum for a band.', 'Group Full');
+    return;
+  }
+  // Copy so the source list keeps its data; new members start as "invited".
+  createGroupMembers.push({ name: friend.name, avatar: friend.avatar, online: friend.online, status: 'invited' });
   renderCreateGroupLists();
 }
 
@@ -12114,8 +12874,12 @@ function confirmCreateGroup() {
 // ── Keyboard Bridge ─────────────────────────────────────
 function requestKeyboardForInput(inputId) {
   var el = document.getElementById(inputId);
-  if (el) el.blur();
-  sendToUnity('requestKeyboard', { inputId: inputId, value: (el ? el.value : '') });
+  // On Quest/Vuplex, Unity supplies the keyboard, so blur to avoid the WebView's
+  // own IME. On desktop (no bridge) keep focus so the field can be typed natively.
+  if (window.vuplex) {
+    if (el) el.blur();
+    sendToUnity('requestKeyboard', { inputId: inputId, value: (el ? el.value : '') });
+  }
 }
 
 function setKeyboardText(inputId, text) {
@@ -12124,19 +12888,42 @@ function setKeyboardText(inputId, text) {
 }
 
 // ── Logo Picker ─────────────────────────────────────────
+var logoPickerPage = 0;
+var LOGO_PER_PAGE = 4;   // 2x2 grid
+
+// The Jamsesh pick is always the first option.
+function getLogoOptions() {
+  return [JAMSESH_DEFAULT_LOGO].concat(groupLogoOptions);
+}
+
 function openLogoPicker() {
+  logoPickerPage = 0;
+  renderLogoPicker();
+  document.getElementById('logo-picker-overlay').className = 'logo-picker-overlay active';
+}
+
+function renderLogoPicker() {
   var grid = document.getElementById('logo-picker-grid');
   grid.innerHTML = '';
-  for (var i = 0; i < groupLogoOptions.length; i++) {
+  var opts = getLogoOptions();
+  var total = Math.max(1, Math.ceil(opts.length / LOGO_PER_PAGE));
+  if (logoPickerPage >= total) logoPickerPage = total - 1;
+  if (logoPickerPage < 0) logoPickerPage = 0;
+  var start = logoPickerPage * LOGO_PER_PAGE;
+  var page = opts.slice(start, start + LOGO_PER_PAGE);
+  for (var i = 0; i < page.length; i++) {
+    var logo = page[i];
     var item = document.createElement('div');
-    item.className = 'logo-picker-item' + (groupLogoOptions[i] === createGroupLogo ? ' selected' : '');
-    item.innerHTML = '<img src="' + groupLogoOptions[i] + '" alt="">';
-    item.onclick = (function(logo) {
-      return function() { selectGroupLogo(logo); };
-    })(groupLogoOptions[i]);
+    item.className = 'logo-picker-item' + (logo === createGroupLogo ? ' selected' : '');
+    var fit = (logo === JAMSESH_DEFAULT_LOGO) ? ' class="cg-logo-fit"' : '';
+    item.innerHTML = '<img' + fit + ' src="' + logo + '" alt="">';
+    item.onclick = (function(l) { return function() { selectGroupLogo(l); }; })(logo);
     grid.appendChild(item);
   }
-  document.getElementById('logo-picker-overlay').className = 'logo-picker-overlay active';
+  // Paginate left↔right once there are more than 4 logos.
+  renderPager(document.getElementById('logo-picker-pager'), logoPickerPage, total, function(dir) {
+    logoPickerPage += dir; renderLogoPicker();
+  });
 }
 
 function closeLogoPicker(e) {
@@ -12146,8 +12933,7 @@ function closeLogoPicker(e) {
 
 function selectGroupLogo(logoFile) {
   createGroupLogo = logoFile;
-  var logoEl = document.getElementById('create-group-logo');
-  logoEl.innerHTML = '<img src="' + logoFile + '" alt="">';
+  cgRenderLogo();
   closeLogoPicker();
 }
 
@@ -12344,8 +13130,9 @@ var modeTabImages = {};
 function buildModeTabs() {
   var container = document.getElementById('play-mode-tabs');
   container.innerHTML = '';
-  var modes = ['Solo', 'Group', 'Battle'];
-  var modeIds = ['solo', 'coop', 'battle'];
+  // Battle mode hidden for now — re-add 'Battle' / 'battle' to restore it.
+  var modes = ['Solo', 'Group'];
+  var modeIds = ['solo', 'coop'];
   for (var i = 0; i < modes.length; i++) {
     var btn = document.createElement('button');
     btn.className = 'play-mode-tab' + (modeIds[i] === playMode ? ' active' : '');
@@ -12369,6 +13156,7 @@ function setPlayMode(mode) {
   buildModeTabs();
   buildPlayGrid();
   sendToUnity('playMode', mode);
+  updateDeeplinkUrl('play', mode === 'coop' ? 'group' : 'solo');
 }
 
 // ── Song Column ────────────────────────────────────────
@@ -13635,7 +14423,7 @@ function buildArtGrid(songs, container) {
 
   if (count === 0) {
     container.className = 'load-art-grid art-1';
-    container.style.background = '#1a1a1a';
+    container.style.background = 'var(--bg-surface)';
     return;
   }
 
@@ -13890,6 +14678,7 @@ function shortPos(n) {
 
 function buildLeaderboard() {
   var list = document.getElementById('play-lb-list');
+  if (!list) return;   // leaderboard removed from the picker
   list.innerHTML = '';
   var typeName = lbTypes[currentLbType].label;
   var songTitle = pickerSelectedSong ? pickerSelectedSong.title : 'default';
@@ -13966,15 +14755,12 @@ function showPlayPicker() {
   pickerFilterDuration = '';
   pickerFilterSort = 'rank';
   updateFilterButtons();
-  var gridNavs = document.querySelectorAll('.grid-nav');
-  for (var i = 0; i < gridNavs.length; i++) gridNavs[i].style.display = 'flex';
-  // buildGrid sizes the grid, resets scroll, and wires drag/gamepad
-  buildGrid(allSongs);
-  constrainGridNav();
-  // Auto-select first song tile
+  // Limited to 5 songs for now, all using the Benchango cover art (also shows on
+  // the setlist tiles once added, since we set song.file on the shared objects).
+  var pickerList = allSongs.slice(0, 5);
+  for (var pi = 0; pi < pickerList.length; pi++) pickerList[pi].file = 'art/benchango.jpg';
+  buildGrid(pickerList);
   pickerSelectedSong = null;
-  var firstTile = document.querySelector('.song-tile');
-  if (firstTile) firstTile.click();
 }
 
 function hidePlayPicker() {
@@ -14317,8 +15103,13 @@ function syncSetlistToUnity() {
 }
 
 var soloGridPage = 0;
+var currentSetlistName = 'Early Access Setlist';   // shown on the Setlist option tile; set on save/load
 var selectedExperience = 'Original';
 var selectedEnvironment = 'Colosseum';
+// Vibe picker selections — one per section (Stage uses selectedEnvironment).
+var selectedGuitarSkin = 'Original';
+var selectedDrumSkin = 'Original';
+var selectedHighway = 'Neon';
 
 function buildPlayGrid() {
   var grid = document.getElementById('play-grid');
@@ -14357,7 +15148,7 @@ function buildSoloGrid(grid) {
   startBtn.textContent = 'Start';
   // Bebas Neue is single-weight; keep weight 400 so it renders as the clean tall
   // "long" font (faux-bold 900 looks clunky on it).
-  startBtn.style.cssText = 'width:100%;flex:0.4;min-height:0;font-size:72px;font-weight:400;letter-spacing:5px';
+  startBtn.style.cssText = 'width:100%;flex:0.4;min-height:0;font-size:140px;line-height:1;font-weight:400;letter-spacing:6px';
   grid.appendChild(startBtn);
 }
 
@@ -14657,8 +15448,9 @@ function buildSoloSongsArea(container) {
     return;
   }
 
-  // 3 cols × up-to-2 rows = 6 tiles per page; 6+ songs paginates
-  var SOLO_COLS = 3;
+  // Up to 4 tiles sit in one row (e.g. 3 songs + the Add tile); 5–8 tiles wrap
+  // to a 4×2 grid, 9+ paginates.
+  var SOLO_COLS = 4;
   var SOLO_PER_PAGE = SOLO_COLS * 2;
   var pageTiles = []; // entries: {type:'song', idx} | {type:'add'}
   var needsPagination = songCount + 1 > SOLO_PER_PAGE;
@@ -14691,7 +15483,8 @@ function buildSoloSongsArea(container) {
     return;
   }
 
-  var cols = SOLO_COLS;
+  // ≤4 tiles → a single row sized to the tile count; 5–8 → two rows of 4.
+  var cols = pageTiles.length <= SOLO_COLS ? pageTiles.length : SOLO_COLS;
   var rows = pageTiles.length <= SOLO_COLS ? 1 : 2;
 
   // Count songs on this page so we know where the add tile lands in its row
@@ -14872,24 +15665,45 @@ function diffBarsSvg(level) {
     bar(4, 36, 20, level >= 1) + bar(23, 24, 32, level >= 2) + bar(42, 10, 46, level >= 3) + '</svg>';
 }
 
-// Vibe tile assets — the player's selected experience pieces (Stage, Skin,
-// Highway, Gem). Rendered as diagonal slices on the Vibe option tile using the
-// same mechanic as the Challenges reward tiles (questSliceClip). Up to 4 slices;
-// sourced from the live experience selections with defaults for pieces that
-// aren't pickable yet. Unity can later drive these via the experience bridge.
-var VIBE_STAGE_IMAGES = { 'Colosseum': 'spaces/001.jpg', 'Arena': 'spaces/002.jpg' };
-var VIBE_SKIN_IMAGES = {
-  'Original': 'instruments/drums.png',
-  'Crystal': 'instruments/skins/crystal.png',
-  'Crystal Green': 'instruments/skins/crystal.png',
-  'Iridescent': 'instruments/skins/crystal.png'
-};
+// Vibe catalog — the four experience sections, each a row of 4 tiles. Shared by
+// the Vibe picker (large popup) and the Vibe option-tile slices so they always
+// agree. Unity can later drive these lists via the experience bridge.
+var VIBE_STAGES = [
+  { id: 'Colosseum', label: 'Colosseum', img: 'spaces/001.jpg' },
+  { id: 'Arena',     label: 'Arena',     img: 'spaces/002.jpg' },
+  { id: 'Stadium',   label: 'Stadium',   img: 'spaces/003.jpg' },
+  { id: 'Forest',    label: 'Forest',    img: 'spaces/004.jpg' }
+];
+var VIBE_GUITAR_SKINS = [
+  { id: 'Original',      label: 'Original',      img: 'instruments/guitar.png' },
+  { id: 'Crystal',       label: 'Crystal',       img: 'instruments/skins/crystal.png' },
+  { id: 'Crystal Green', label: 'Crystal Green', img: 'instruments/skins/crystal.png' },
+  { id: 'Iridescent',    label: 'Iridescent',    img: 'instruments/skins/crystal.png' }
+];
+var VIBE_DRUM_SKINS = [
+  { id: 'Original',    label: 'Original',    img: 'instruments/drums.png' },
+  { id: 'Prehistoric', label: 'Prehistoric', img: 'instruments/drums.png' },
+  { id: 'Flower',      label: 'Flower',      img: 'instruments/drums.png' },
+  { id: 'Nautical',    label: 'Nautical',    img: 'instruments/drums.png' }
+];
+var VIBE_HIGHWAYS = [
+  { id: 'Neon',    label: 'Neon',    img: 'vault/018.jpg' },
+  { id: 'Rainbow', label: 'Rainbow', img: 'vault/019.jpg' },
+  { id: 'Dark',    label: 'Dark',    img: 'vault/020.jpg' },
+  { id: 'Lava',    label: 'Lava',    img: 'vault/021.jpg' }
+];
+function vibeImg(list, id) {
+  for (var i = 0; i < list.length; i++) { if (list[i].id === id) return list[i].img; }
+  return list[0].img;
+}
+// Up-to-4 asset images for the Vibe option-tile diagonal slices (same mechanic
+// as the Challenges reward tiles) — one per section, from the live selections.
 function getVibeAssets() {
   return [
-    { label: 'Stage',   img: VIBE_STAGE_IMAGES[selectedEnvironment] || 'spaces/001.jpg' },
-    { label: 'Skin',    img: VIBE_SKIN_IMAGES[selectedExperience] || 'instruments/skins/crystal.png' },
-    { label: 'Highway', img: 'vault/018.jpg' },
-    { label: 'Gem',     img: 'vault/014.jpg' }
+    { label: 'Stage',       img: vibeImg(VIBE_STAGES, selectedEnvironment) },
+    { label: 'Guitar Skin', img: vibeImg(VIBE_GUITAR_SKINS, selectedGuitarSkin) },
+    { label: 'Drum Skin',   img: vibeImg(VIBE_DRUM_SKINS, selectedDrumSkin) },
+    { label: 'Highway',     img: vibeImg(VIBE_HIGHWAYS, selectedHighway) }
   ];
 }
 
@@ -14935,8 +15749,9 @@ function buildOptionsRow(container) {
       onclick: function() { openExperiencePicker(); }
     },
     {
-      label: 'Save / Load', value: 'Setlist',
+      label: 'Save / Load', value: currentSetlistName,
       icon: '<svg viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/></svg>',
+      coverBg: 'url("branding/setlist-cover.png") center center / cover no-repeat #1a1a1a',
       onclick: function() { openManagePopup(); }
     }
   ];
@@ -15700,122 +16515,63 @@ function openOptionPicker(type) {
     }
     stdBody.appendChild(diffGrid);
   } else if (type === 'experience') {
+    panel.className += ' std-popup--large';   // bigger frame for the 4×4 grid
     title.textContent = 'Vibe';
     stdHeader.appendChild(title);
     panel.appendChild(stdHeader);
     panel.appendChild(stdBody);
 
-    // ── Environment ──
-    var envHeader = document.createElement('div');
-    envHeader.style.cssText = 'font-size:28px;font-weight:700;color:#ffffff;margin:8px 0 16px 0;letter-spacing:0.5px';
-    envHeader.textContent = 'Environment';
-    stdBody.appendChild(envHeader);
-
-    var envItems = [
-      {id: 'Colosseum', label: 'Colosseum', img: 'spaces/001.jpg'},
-      {id: 'Arena',     label: 'Arena',     img: 'spaces/002.jpg'}
-    ];
-    var envGrid = document.createElement('div');
-    envGrid.style.cssText = 'display:grid;grid-template-columns:repeat(2,1fr);gap:24px;width:100%;margin-bottom:20px';
-    for (var ei = 0; ei < envItems.length; ei++) {
-      var env = envItems[ei];
-      var envSelected = env.id === selectedEnvironment;
-      var envTile = document.createElement('div');
-      envTile.style.cssText = 'position:relative;overflow:hidden;border-radius:var(--panel-radius);cursor:pointer;padding-top:42%;border:2px solid ' + (envSelected ? '#ffffff' : 'transparent');
-      if (envSelected) envTile.style.boxShadow = '0 0 0 3px #ffffff, 0 0 12px rgba(255,255,255,0.4)';
-      envTile.innerHTML =
-        '<img src="' + env.img + '" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:0">' +
-        '<div style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);z-index:1"></div>' +
-        '<div style="position:absolute;bottom:24px;left:24px;z-index:2;font-size:36px;font-weight:800;color:#ffffff;text-shadow:0 2px 8px rgba(0,0,0,0.8)">' + env.label + '</div>';
-      envTile.onclick = (function(id) {
-        return function() {
-          selectedEnvironment = id;
-          sendToUnity('experience', {tab: 'environment', id: id});
-          // Keep the picker open (rebuild for the highlight); Accept/Cancel close it.
-          openOptionPicker('experience');
-        };
-      })(env.id);
-      envGrid.appendChild(envTile);
-    }
-    stdBody.appendChild(envGrid);
-
-    // ── Instrument Skin ──
-    var skinHeader = document.createElement('div');
-    skinHeader.style.cssText = 'font-size:28px;font-weight:700;color:#ffffff;margin:8px 0 16px 0;letter-spacing:0.5px';
-    skinHeader.textContent = 'Instrument Skin';
-    stdBody.appendChild(skinHeader);
-
-    var skinItems = [
-      {id: 'Original',      label: 'Original',      img: 'instruments/drums.png',         instruments: ['guitar','drums','vocals','keys','bass','mixed']},
-      {id: 'Crystal',       label: 'Crystal',       img: 'instruments/skins/crystal.png', instruments: ['guitar','drums']},
-      {id: 'Crystal Green', label: 'Crystal Green', img: 'instruments/skins/crystal.png', instruments: ['guitar']},
-      {id: 'Iridescent',    label: 'Iridescent',    img: 'instruments/skins/crystal.png', instruments: ['guitar']},
-      {id: 'Prehistoric',   label: 'Prehistoric',   img: 'instruments/drums.png',         instruments: ['drums']},
-      {id: 'Flower',        label: 'Flower',        img: 'instruments/drums.png',         instruments: ['drums']},
-      {id: 'Nautical',      label: 'Nautical',      img: 'instruments/drums.png',         instruments: ['drums']},
-      {id: 'FastFood',      label: 'Fast Food',     img: 'instruments/drums.png',         instruments: ['drums']}
-    ];
-    var skinInstrument = selectedInstrument || 'guitar';
-    var availableSkins = [];
-    for (var fi = 0; fi < skinItems.length; fi++) {
-      var fitem = skinItems[fi];
-      if (!fitem.instruments || fitem.instruments.indexOf(skinInstrument) !== -1) {
-        availableSkins.push(fitem);
-      }
-    }
-    var skinStillAvailable = false;
-    for (var ci = 0; ci < availableSkins.length; ci++) {
-      if (availableSkins[ci].id === selectedExperience) { skinStillAvailable = true; break; }
-    }
-    if (!skinStillAvailable) {
-      selectedExperience = 'Original';
-      sendToUnity('experience', {tab: 'skin', id: 'Original'});
-    }
-    // Capture the revert point once per fresh open (after any auto-correction above).
+    // Capture the revert point once per fresh open (X / backdrop reverts to it).
     if (experiencePendingSnapshot) {
-      experienceSnapshot = { skin: selectedExperience, env: selectedEnvironment };
+      experienceSnapshot = {
+        env: selectedEnvironment, guitar: selectedGuitarSkin,
+        drum: selectedDrumSkin, highway: selectedHighway
+      };
       experiencePendingSnapshot = false;
     }
-    var skinGrid = document.createElement('div');
-    skinGrid.style.cssText = 'display:grid;grid-template-columns:repeat(4,1fr);gap:16px;width:100%';
-    for (var si = 0; si < availableSkins.length; si++) {
-      var skin = availableSkins[si];
-      var isSelected = skin.id === selectedExperience;
-      var skinTile = document.createElement('div');
-      skinTile.style.cssText = 'position:relative;overflow:hidden;border-radius:var(--panel-radius);cursor:pointer;padding-top:100%;border:2px solid ' + (isSelected ? '#ffffff' : 'transparent');
-      if (isSelected) skinTile.style.boxShadow = '0 0 0 3px #ffffff, 0 0 12px rgba(255,255,255,0.4)';
-      skinTile.innerHTML =
-        '<img src="' + skin.img + '" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:0">' +
-        '<div style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);z-index:1"></div>' +
-        '<div style="position:absolute;bottom:16px;left:16px;z-index:2;font-size:22px;font-weight:800;color:#ffffff;text-shadow:0 2px 8px rgba(0,0,0,0.8)">' + skin.label + '</div>';
-      skinTile.onclick = (function(id, inst) {
-        return function() {
-          selectedExperience = id;
-          // Pass the instrument so Unity spawns the right preview model. Keep the
-          // picker open (rebuild it so the new selection is highlighted) — the
-          // rotating preview at the avatar spot lives until the picker is closed.
-          sendToUnity('experience', {tab: 'skin', id: id, instrument: inst});
-          openOptionPicker('experience');
-        };
-      })(skin.id, skinInstrument);
-      skinGrid.appendChild(skinTile);
-    }
-    stdBody.appendChild(skinGrid);
 
-    // ── Accept (footer) ──
-    // Cancel removed; the X / overlay tap dismisses and closeOptionPicker reverts.
+    // One section = label + a row of 4 cover tiles. Picking sets the state var,
+    // tells Unity, and rebuilds the picker so the new tile highlights.
+    function vibeSection(label, items, currentId, tab, setter) {
+      var head = document.createElement('div');
+      head.className = 'vibe-section-label';
+      head.textContent = label;
+      stdBody.appendChild(head);
+      var row = document.createElement('div');
+      row.className = 'vibe-row';
+      for (var i = 0; i < items.length; i++) {
+        var it = items[i];
+        var tile = document.createElement('div');
+        tile.className = 'vibe-tile' + (it.id === currentId ? ' selected' : '');
+        tile.innerHTML =
+          '<img src="' + it.img + '">' +
+          '<div class="vibe-tile-shade"></div>' +
+          '<div class="vibe-tile-label">' + it.label + '</div>';
+        tile.onclick = (function(id) {
+          return function() {
+            setter(id);
+            sendToUnity('experience', { tab: tab, id: id, instrument: (selectedInstrument || 'guitar') });
+            openOptionPicker('experience');
+          };
+        })(it.id);
+        row.appendChild(tile);
+      }
+      stdBody.appendChild(row);
+    }
+
+    vibeSection('Stage',       VIBE_STAGES,       selectedEnvironment, 'environment', function(id){ selectedEnvironment = id; });
+    vibeSection('Guitar Skin', VIBE_GUITAR_SKINS, selectedGuitarSkin,  'guitarSkin',  function(id){ selectedGuitarSkin = id; });
+    vibeSection('Drum Skin',   VIBE_DRUM_SKINS,   selectedDrumSkin,    'drumSkin',    function(id){ selectedDrumSkin = id; });
+    vibeSection('Highway',     VIBE_HIGHWAYS,     selectedHighway,     'highway',     function(id){ selectedHighway = id; });
+
+    // ── Accept (footer) ── X / backdrop tap reverts via closeOptionPicker.
     var stdFooter = document.createElement('div');
     stdFooter.className = 'std-popup-footer';
-
     var acceptBtn = document.createElement('button');
     acceptBtn.className = 'std-popup-btn jamsesh-signature';
     acceptBtn.textContent = 'Accept';
-    acceptBtn.onclick = function() {
-      // Commit the current selection (accept=true skips the snapshot revert).
-      closeOptionPicker(true);
-    };
+    acceptBtn.onclick = function() { closeOptionPicker(true); };
     stdFooter.appendChild(acceptBtn);
-
     panel.appendChild(stdFooter);
   }
 }
@@ -15884,10 +16640,14 @@ function closeOptionPicker(accept) {
   // no accept arg) reverts skin+environment to the snapshot taken on open; Accept keeps them.
   if (currentPickerType === 'experience') {
     if (!accept && experienceSnapshot) {
-      selectedExperience = experienceSnapshot.skin;
       selectedEnvironment = experienceSnapshot.env;
-      sendToUnity('experience', {tab: 'skin', id: selectedExperience, instrument: (selectedInstrument || 'guitar')});
+      selectedGuitarSkin  = experienceSnapshot.guitar;
+      selectedDrumSkin    = experienceSnapshot.drum;
+      selectedHighway     = experienceSnapshot.highway;
       sendToUnity('experience', {tab: 'environment', id: selectedEnvironment});
+      sendToUnity('experience', {tab: 'guitarSkin',  id: selectedGuitarSkin});
+      sendToUnity('experience', {tab: 'drumSkin',    id: selectedDrumSkin});
+      sendToUnity('experience', {tab: 'highway',     id: selectedHighway});
     }
     sendToUnity('experienceClosed', {});
     buildPlayGrid();
@@ -15934,7 +16694,7 @@ function buildVaultGrid() {
   buildUniformGrid(grid, pageSlice(vaultItems, storeVaultPage), function(v, w, h, gc) {
     var tile = document.createElement('div');
     tile.className = 'space-tile';
-    tile.style.background = 'url(' + v.file + ') center center / cover no-repeat #1a1a1a';
+    tile.style.background = 'url(' + v.file + ') center center / cover no-repeat var(--bg-surface)';
     tile.style.position = 'relative';
     tile.style.overflow = 'hidden';
     tile.style.cursor = 'pointer';
@@ -16011,6 +16771,7 @@ function switchCreatorTab(tab) {
     tabs[i].className = 'play-mode-tab' + (names[i] === tab ? ' active' : '');
     document.getElementById('creator-tab-' + names[i]).style.display = names[i] === tab ? 'flex' : 'none';
   }
+  updateDeeplinkUrl('creator', tab);
 }
 
 function buildCreatorGrids() {
@@ -16030,16 +16791,16 @@ function buildCreatorPhotosGrid() {
   if (creatorPhotosPage === 0) {
     var addTile = document.createElement('div');
     addTile.className = 'space-tile';
-    addTile.style.background = '#1a1a1a';
+    addTile.style.background = 'var(--bg-surface)';
     addTile.style.display = 'flex';
     addTile.style.flexDirection = 'column';
     addTile.style.alignItems = 'center';
     addTile.style.justifyContent = 'center';
     addTile.style.gap = '12px';
     addTile.style.cursor = 'pointer';
-    addTile.style.border = '2px dashed #444444';
+    addTile.style.border = '2px dashed var(--border-strong)';
     addTile.onclick = function() { openCreatorCamera(); };
-    addTile.innerHTML = '<div style="font-size:64px;color:#ffffff">+</div><div style="font-size:24px;font-weight:700;color:#888888">Take Photo</div>';
+    addTile.innerHTML = '<div style="font-size:64px;color:var(--text-secondary)">+</div><div style="font-size:24px;font-weight:700;color:var(--text-muted)">Take Photo</div>';
     grid.appendChild(addTile);
     offset = 1;
     start = 0;
@@ -16051,7 +16812,7 @@ function buildCreatorPhotosGrid() {
   for (var i = start; i < start + count && i < creatorPhotos.length; i++) {
     var tile = document.createElement('div');
     tile.className = 'space-tile';
-    tile.style.background = 'url(' + creatorPhotos[i] + ') center center / cover no-repeat #1a1a1a';
+    tile.style.background = 'url(' + creatorPhotos[i] + ') center center / cover no-repeat var(--bg-surface)';
     tile.style.cursor = 'pointer';
     tile.onclick = (function(src) {
       return function() { openPhotoPreview(src); };
@@ -16073,16 +16834,16 @@ function buildCreatorArtGrid() {
   if (creatorArtPage === 0) {
     var addTile = document.createElement('div');
     addTile.className = 'space-tile';
-    addTile.style.background = '#1a1a1a';
+    addTile.style.background = 'var(--bg-surface)';
     addTile.style.display = 'flex';
     addTile.style.flexDirection = 'column';
     addTile.style.alignItems = 'center';
     addTile.style.justifyContent = 'center';
     addTile.style.gap = '12px';
     addTile.style.cursor = 'pointer';
-    addTile.style.border = '2px dashed #444444';
+    addTile.style.border = '2px dashed var(--border-strong)';
     addTile.onclick = function() { openArtPhotoPicker(); };
-    addTile.innerHTML = '<div style="font-size:64px;color:#ffffff">+</div><div style="font-size:24px;font-weight:700;color:#888888">Create Art</div>';
+    addTile.innerHTML = '<div style="font-size:64px;color:var(--text-secondary)">+</div><div style="font-size:24px;font-weight:700;color:var(--text-muted)">Create Art</div>';
     grid.appendChild(addTile);
     offset = 1;
     start = 0;
@@ -16094,7 +16855,7 @@ function buildCreatorArtGrid() {
   for (var i = start; i < start + count && i < creatorArtLogos.length; i++) {
     var tile = document.createElement('div');
     tile.className = 'space-tile';
-    tile.style.background = 'url(' + creatorArtLogos[i] + ') center center / cover no-repeat #1a1a1a';
+    tile.style.background = 'url(' + creatorArtLogos[i] + ') center center / cover no-repeat var(--bg-surface)';
     tile.style.cursor = 'pointer';
     tile.onclick = (function(src) {
       return function() { openArtPreview(src); };
@@ -16149,22 +16910,22 @@ function openArtPhotoPicker() {
   // + New tile
   var addTile = document.createElement('div');
   addTile.className = 'space-tile';
-  addTile.style.background = '#1a1a1a';
+  addTile.style.background = 'var(--bg-surface)';
   addTile.style.display = 'flex';
   addTile.style.flexDirection = 'column';
   addTile.style.alignItems = 'center';
   addTile.style.justifyContent = 'center';
   addTile.style.gap = '12px';
   addTile.style.cursor = 'pointer';
-  addTile.style.border = '2px dashed #444444';
+  addTile.style.border = '2px dashed var(--border-strong)';
   addTile.onclick = function() { creatorCameraReturnTo = 'artpicker'; closeCreatorScreen(); openCreatorCamera(); };
-  addTile.innerHTML = '<div style="font-size:64px;color:#ffffff">+</div><div style="font-size:24px;font-weight:700;color:#888888">New Photo</div>';
+  addTile.innerHTML = '<div style="font-size:64px;color:var(--text-secondary)">+</div><div style="font-size:24px;font-weight:700;color:var(--text-muted)">New Photo</div>';
   grid.appendChild(addTile);
 
   for (var i = 0; i < Math.min(8, creatorPhotos.length); i++) {
     var tile = document.createElement('div');
     tile.className = 'space-tile';
-    tile.style.background = 'url(' + creatorPhotos[i] + ') center center / cover no-repeat #1a1a1a';
+    tile.style.background = 'url(' + creatorPhotos[i] + ') center center / cover no-repeat var(--bg-surface)';
     tile.style.cursor = 'pointer';
     tile.onclick = (function(photo) {
       return function() { openArtConfig(photo); };
@@ -16276,9 +17037,9 @@ function createArt() {
   tile.className = 'creator-result-tile';
   tile.id = 'cr-tile-0';
   tile.innerHTML =
-    '<div style="position:absolute;top:0;left:0;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;z-index:2;background:#1a1a1a" id="cr-loading-0">' +
-      '<div style="width:60px;height:60px;border:5px solid #333;border-top-color:#ffffff;border-radius:50%;animation:spin 1s linear infinite"></div>' +
-      '<div style="font-size:24px;font-weight:600;color:#888">Generating...</div>' +
+    '<div style="position:absolute;top:0;left:0;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;z-index:2;background:var(--bg-surface)" id="cr-loading-0">' +
+      '<div style="width:60px;height:60px;border:5px solid var(--border-strong);border-top-color:var(--page-accent);border-radius:50%;animation:spin 1s linear infinite"></div>' +
+      '<div style="font-size:24px;font-weight:600;color:var(--text-muted)">Generating...</div>' +
     '</div>';
   grid.appendChild(tile);
 
@@ -16438,7 +17199,7 @@ function openCreatorNamePicker() {
     tile.style.justifyContent = 'flex-end';
     tile.style.padding = '20px';
     if (item.img) {
-      tile.style.background = 'url(' + item.img + ') center center / cover no-repeat #1a1a1a';
+      tile.style.background = 'url(' + item.img + ') center center / cover no-repeat var(--bg-surface)';
     } else {
       tile.style.background = '#2a2a2a';
     }
@@ -16486,6 +17247,7 @@ function switchStoreTab(tab) {
     tabs[i].className = 'play-mode-tab' + (names[i] === tab ? ' active' : '');
     document.getElementById('store-tab-' + names[i]).style.display = names[i] === tab ? 'flex' : 'none';
   }
+  updateDeeplinkUrl('store', tab);
 }
 
 // Shared glow palette (matches home-grid colors)
@@ -16566,7 +17328,7 @@ function buildStoreGrid() {
   buildUniformGrid(songsGrid, pageSlice(allSongs, storeSongsPage), function(s, w, h, gc) {
     var tile = document.createElement('div');
     tile.className = 'space-tile';
-    tile.style.background = 'url(' + (s.file || '') + ') center center / cover no-repeat #1a1a1a';
+    tile.style.background = 'url(' + (s.file || '') + ') center center / cover no-repeat var(--bg-surface)';
     tile.style.position = 'relative';
     tile.style.overflow = 'hidden';
     tile.style.cursor = 'pointer';
@@ -16623,10 +17385,10 @@ function buildStoreGrid() {
         '<div class="tile-hero-sub">' + p.picks + ' Picks</div>' +
         '<div class="tile-hero-sub" style="color:rgba(255,255,255,0.6)">' + p.items[0] + ' + ' + p.items[1] + '</div>';
     } else {
-      tile.style.background = '#1a1a1a';
+      tile.style.background = 'var(--bg-surface)';
       tile.innerHTML =
         '<div style="font-size:48px;line-height:1">&#128274;</div>' +
-        '<div style="font-size:28px;font-weight:700;color:#ffffff">' + p.unlock + '</div>';
+        '<div style="font-size:28px;font-weight:700;color:var(--text-primary)">' + p.unlock + '</div>';
     }
     return tile;
   });
@@ -16651,7 +17413,7 @@ function buildStoreGrid() {
   buildUniformGrid(itemsGrid, pageSlice(storeCategories, storeItemsPage), function(c, w, h, gc) {
     var tile = document.createElement('div');
     tile.className = 'space-tile';
-    tile.style.background = 'url(' + c.file + ') center center / cover no-repeat #1a1a1a';
+    tile.style.background = 'url(' + c.file + ') center center / cover no-repeat var(--bg-surface)';
     tile.style.position = 'relative';
     tile.style.overflow = 'hidden';
     tile.style.cursor = 'pointer';
@@ -16659,7 +17421,7 @@ function buildStoreGrid() {
       return function() { sendToUnity('storeCategory', {cat: cat.cat}); };
     })(c);
     tile.innerHTML =
-      '<div style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-end;gap:12px;padding:24px 20px 18px">' +
+      '<div style="position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(0deg,rgba(0,0,0,0.55) 0%,rgba(0,0,0,0.12) 100%);display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-end;gap:12px;padding:24px 20px 18px">' +
         '<div style="font-size:64px;line-height:1">' + c.icon + '</div>' +
         '<div class="tile-hero-title">' + c.cat + '</div>' +
       '</div>';
@@ -16670,7 +17432,7 @@ function buildStoreGrid() {
 
 // ── Themes ──────────────────────────────────────────────
 var themes = [
-  { id: 'hyperpop',        name: 'Hyperpop',        bg: '#100c1f', panel: '#1a1628', tile: '#1e1b2c', tileHover: '#282435', accent: '#ff2e92' },
+  { id: 'hyperpop',        name: 'Hyperpop',        bg: '#100C1F', panel: '#1B1638', tile: '#261F49', tileHover: '#322957', accent: '#FF2E92' },
   { id: 'wireframe-dark',  name: 'Wireframe Dark',  bg: '#000000', panel: '#0a0a0a', tile: '#141414', tileHover: '#1e1e1e', accent: '#ffffff', cssClass: 'theme-wireframe' }
 ];
 
@@ -17119,18 +17881,21 @@ function hideSettingsSub() {
 function showThemes() {
   document.getElementById('settings-main').style.display = 'none';
   document.getElementById('theme-section').className = 'theme-section active';
+  updateDeeplinkUrl('settings', 'themes');
 }
 
 function showBanners() {
   document.getElementById('settings-main').style.display = 'none';
   document.getElementById('banner-section').className = 'banner-section active';
   buildBannerGrid();
+  updateDeeplinkUrl('settings', 'banners');
 }
 
 function showFrames() {
   document.getElementById('settings-main').style.display = 'none';
   document.getElementById('frame-section').className = 'frame-section active';
   buildFrameGrid();
+  updateDeeplinkUrl('settings', 'frames');
 }
 
 function showTos() {
@@ -17139,6 +17904,7 @@ function showTos() {
   activeLegalEl = document.getElementById('tos-content');
   activeLegalEl.scrollTop = 0;
   buildScrollNav();
+  updateDeeplinkUrl('settings', 'tos');
 }
 
 function showPrivacy() {
@@ -17147,6 +17913,7 @@ function showPrivacy() {
   activeLegalEl = document.getElementById('pp-content');
   activeLegalEl.scrollTop = 0;
   buildScrollNav();
+  updateDeeplinkUrl('settings', 'privacy');
 }
 
 /* ── Profile Switcher ─────────────────────────────── */
@@ -17183,7 +17950,110 @@ function showJamCreatorSection() {
   navigateTo('settings');
   document.getElementById('settings-main').style.display = 'none';
   document.getElementById('profile-section-jamcreator').className = 'profile-section active';
+  buildJamCreatorSection();
   sendToUnity('jamCreatorOpened', {});
+}
+
+// ── JamCreator: social handle linking + confirmed-video counts ──────────────
+// handle = player's @ on each platform (saved locally + pushed to PlayFab on
+// Confirm). videos = count of posts PlayFab has credited (#jamseshgame); driven
+// inbound via 'updateCreatorSocials'. Both are wired for PlayFab.
+var creatorSocials = {
+  tiktok:    { handle: '', videos: 0 },
+  instagram: { handle: '', videos: 0 },
+  youtube:   { handle: '', videos: 0 }
+};
+(function() {   // restore saved handles (videos always come from the backend)
+  try {
+    var raw = localStorage.getItem('jamsesh_socials');
+    if (raw) {
+      var o = JSON.parse(raw);
+      if (o.tiktok != null)    creatorSocials.tiktok.handle = o.tiktok;
+      if (o.instagram != null) creatorSocials.instagram.handle = o.instagram;
+      if (o.youtube != null)   creatorSocials.youtube.handle = o.youtube;
+    }
+  } catch (e) {}
+})();
+
+// Official brand marks (inline SVG, brand colours).
+var JC_PLATFORMS = [
+  { id: 'tiktok', label: 'TikTok', svg: '<svg viewBox="0 0 448 512"><path fill="#ffffff" d="M448 209.91a210.06 210.06 0 0 1-122.77-39.25V349.38A162.55 162.55 0 1 1 185 188.31V278.2a74.62 74.62 0 1 0 52.23 71.18V0h88a121.18 121.18 0 0 0 1.86 22.17A122.18 122.18 0 0 0 381 102.39a121.43 121.43 0 0 0 67 20.14z"/></svg>' },
+  { id: 'instagram', label: 'Instagram', svg: '<svg viewBox="0 0 448 512"><path fill="#E1306C" d="M224.1 141c-63.6 0-114.9 51.3-114.9 114.9s51.3 114.9 114.9 114.9S339 319.5 339 255.9 287.7 141 224.1 141zm0 189.6c-41.1 0-74.7-33.5-74.7-74.7s33.5-74.7 74.7-74.7 74.7 33.5 74.7 74.7-33.6 74.7-74.7 74.7zm146.4-194.3c0 14.9-12 26.8-26.8 26.8-14.9 0-26.8-12-26.8-26.8s12-26.8 26.8-26.8 26.8 12 26.8 26.8zm76.1 27.2c-1.7-35.9-9.9-67.7-36.2-93.9-26.2-26.2-58-34.4-93.9-36.2-37-2.1-147.9-2.1-184.9 0-35.8 1.7-67.6 9.9-93.9 36.1s-34.4 58-36.2 93.9c-2.1 37-2.1 147.9 0 184.9 1.7 35.9 9.9 67.7 36.2 93.9s58 34.4 93.9 36.2c37 2.1 147.9 2.1 184.9 0 35.9-1.7 67.7-9.9 93.9-36.2 26.2-26.2 34.4-58 36.2-93.9 2.1-37 2.1-147.8 0-184.8zM398.8 388c-7.8 19.6-22.9 34.7-42.6 42.6-29.5 11.7-99.5 9-132.1 9s-102.7 2.6-132.1-9c-19.6-7.8-34.7-22.9-42.6-42.6-11.7-29.5-9-99.5-9-132.1s-2.6-102.7 9-132.1c7.8-19.6 22.9-34.7 42.6-42.6 29.5-11.7 99.5-9 132.1-9s102.7-2.6 132.1 9c19.6 7.8 34.7 22.9 42.6 42.6 11.7 29.5 9 99.5 9 132.1s2.7 102.7-9 132.1z"/></svg>' },
+  { id: 'youtube', label: 'YouTube', svg: '<svg viewBox="0 0 576 512"><path fill="#FF0000" d="M549.7 124.1c-6.3-23.7-24.8-42.3-48.3-48.6C458.8 64 288 64 288 64S117.2 64 74.6 75.5c-23.5 6.3-42 24.9-48.3 48.6-11.4 42.9-11.4 132.3-11.4 132.3s0 89.4 11.4 132.3c6.3 23.7 24.8 41.5 48.3 47.8C117.2 448 288 448 288 448s170.8 0 213.4-11.5c23.5-6.3 42-24.1 48.3-47.8 11.4-42.9 11.4-132.3 11.4-132.3s0-89.4-11.4-132.3zm-317.5 213.5V175.2l142.7 81.2-142.7 81.2z"/></svg>' }
+];
+
+function buildJamCreatorSection() {
+  var wrap = document.getElementById('jamcreator-wrap');
+  if (!wrap) return;
+  var html =
+    '<div class="jc-title">JamCreator</div>' +
+    '<div class="jc-sub">Link your socials so videos you post with #jamseshgame are credited toward the Share Videos challenge. Confirmed videos update automatically.</div>' +
+    '<div class="jc-head-row"><div class="jc-head-videos">Confirmed Videos</div></div>' +
+    '<div class="jc-rows">';
+  for (var i = 0; i < JC_PLATFORMS.length; i++) {
+    var pf = JC_PLATFORMS[i];
+    var s = creatorSocials[pf.id];
+    var safe = String(s.handle || '').replace(/"/g, '&quot;');
+    html +=
+      '<div class="jc-row">' +
+        '<div class="jc-logo">' + pf.svg + '</div>' +
+        '<div class="jc-field">' +
+          '<div class="jc-field-label">' + pf.label + '</div>' +
+          '<div class="jc-input-wrap">' +
+            '<span class="jc-at">@</span>' +
+            '<input type="text" class="jc-input" id="jc-input-' + pf.id + '" placeholder="yourhandle" value="' + safe + '" autocomplete="off" autocapitalize="off" spellcheck="false">' +
+          '</div>' +
+        '</div>' +
+        '<button class="jc-confirm' + (s.handle ? ' confirmed' : '') + '" id="jc-confirm-' + pf.id + '" onclick="confirmCreatorSocial(\'' + pf.id + '\')">' + (s.handle ? 'Confirmed' : 'Confirm') + '</button>' +
+        '<div class="jc-videos" id="jc-videos-' + pf.id + '">' + (s.videos || 0).toLocaleString() + '</div>' +
+      '</div>';
+  }
+  html += '</div>';
+  wrap.innerHTML = html;
+}
+
+// Confirm button: save the typed handle (strip any leading @ the user added),
+// persist locally, and push to PlayFab via the bridge.
+function confirmCreatorSocial(platform) {
+  var s = creatorSocials[platform];
+  if (!s) return;
+  var input = document.getElementById('jc-input-' + platform);
+  if (!input) return;
+  var val = input.value.replace(/^\s+|\s+$/g, '').replace(/^@+/, '');
+  s.handle = val;
+  if (platform === 'tiktok') tiktokHandle = val ? ('@' + val) : '';   // keep challenge popup in sync
+  try {
+    localStorage.setItem('jamsesh_socials', JSON.stringify({
+      tiktok: creatorSocials.tiktok.handle,
+      instagram: creatorSocials.instagram.handle,
+      youtube: creatorSocials.youtube.handle
+    }));
+  } catch (e) {}
+  sendToUnity('linkSocialHandle', { platform: platform, handle: val });
+  var btn = document.getElementById('jc-confirm-' + platform);
+  if (btn) {
+    btn.textContent = val ? 'Confirmed' : 'Confirm';
+    btn.className = 'jc-confirm' + (val ? ' confirmed' : '');
+  }
+}
+
+// Unity → WebView: confirmed-video counts (and optionally handles) from PlayFab.
+//   { type:'updateCreatorSocials', data:{ tiktok:{videos:N,handle:'x'}, instagram:{...}, youtube:{...} } }
+// Also tolerates a flat shape: { tiktok: N, instagram: N, youtube: N }.
+function updateCreatorSocialsFromBackend(data) {
+  if (!data) return;
+  var plats = ['tiktok', 'instagram', 'youtube'];
+  for (var i = 0; i < plats.length; i++) {
+    var p = plats[i], d = data[p];
+    if (d == null) continue;
+    if (typeof d === 'number') {
+      creatorSocials[p].videos = d;
+    } else {
+      if (d.videos != null) creatorSocials[p].videos = d.videos;
+      if (d.handle != null) creatorSocials[p].handle = d.handle;
+    }
+  }
+  if (document.getElementById('jamcreator-wrap')) buildJamCreatorSection();
 }
 function showReferralsSection() {
   navigateTo('settings');
@@ -18553,6 +19423,7 @@ function saveTiktokHandle() {
   var val = input.value.replace(/^\s+|\s+$/g, '');
   if (val && val.charAt(0) !== '@') val = '@' + val;
   tiktokHandle = val;
+  if (typeof creatorSocials !== 'undefined') creatorSocials.tiktok.handle = val.replace(/^@+/, '');
   try { localStorage.setItem('jamsesh_tiktok_handle', val); } catch (e) {}
   var saved = document.getElementById('tiktok-handle-saved');
   if (saved) saved.textContent = val ? 'Linked as ' + val : '';
@@ -18569,6 +19440,7 @@ function switchProgressTab(tab) {
     tabs[i].className = 'play-mode-tab' + (names[i] === tab ? ' active' : '');
     document.getElementById('progress-tab-' + names[i]).style.display = names[i] === tab ? 'flex' : 'none';
   }
+  updateDeeplinkUrl('season', tab);
 }
 
 // Diagonal slice for reward i of n in a challenge tile's art box. Outer edges are
@@ -19011,7 +19883,7 @@ var homeTileDefs = {
     action: function() { navigateTo('play'); } },
   season:  { id: 'season',  title: 'Grammys Progress', sub: '8 Days Left', detail: '40% Complete', ext: 'jpg', action: function() { navigateTo('season'); } },
   store:   { id: 'store',   title: 'Store', sub: 'Golden Stratocaster', detail: '10,000 Picks - 7 days left', ext: 'jfif', action: function() { navigateTo('store'); } },
-  vault:   { id: 'vault',   title: 'My Collection', sub: '2 New Items Unlocked', detail: 'Check out your new gear', ext: 'webp', action: function() { navigateTo('store', {tab: 'vault'}); } },
+  vault:   { id: 'vault',   title: 'My Collection', sub: '2 New Items Unlocked', detail: 'Check out your new gear', ext: 'webp', action: function() { applyDeeplink('store.vault'); } },
   creator: { id: 'creator', title: 'Design', sub: 'Your Creations', detail: 'Build and share content', ext: 'jpg', action: function() { navigateTo('creator'); } },
   spaces:  { id: 'spaces',  title: 'Spaces', sub: 'K-Pop Zone', detail: '20/25 Jammers online!', ext: 'jfif', action: function() { navigateTo('spaces'); } },
   news:    { id: 'news',    title: 'News', sub: 'Update v0.25', detail: 'New battle mode added!', ext: 'jfif', action: function() { navigateTo('settings'); } },
@@ -19087,14 +19959,8 @@ function buildHomeGrid(layoutIndex) {
     wrap.className = 'home-tile-wrap';
     wrap.style.gridColumn = (t.c + 1) + ' / span ' + t.w;
     wrap.style.gridRow = (t.r + 1) + ' / span ' + t.h;
-    wrap.style.filter = gc.f;
+    // No outer-glow drop-shadow — the tiles read flat like the Badges tiles.
     wrap.style.cursor = 'pointer';
-
-    // Hover glow
-    (function(el, normal, hover) {
-      el.addEventListener('mouseenter', function() { el.style.filter = hover; }, false);
-      el.addEventListener('mouseleave', function() { el.style.filter = normal; }, false);
-    })(wrap, gc.f, gc.fh);
 
     wrap.onclick = (function(a) { return function() { a(); }; })(ht.action);
 
@@ -19110,12 +19976,11 @@ function buildHomeGrid(layoutIndex) {
 
     var overlayColor = gc.c.replace(/[\d.]+\)$/, '0.25)');
     var overlayMid = gc.c.replace(/[\d.]+\)$/, '0.4)');
+    // Subtext (sub + detail) removed — home tiles show the hero title only.
     tile.innerHTML =
       '<img src="' + bgSrc + '" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:0;border-radius:var(--panel-radius)" alt="">' +
       '<div style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:1;background:linear-gradient(180deg,' + overlayColor + ' 0%,' + overlayMid + ' 40%,rgba(0,0,0,0.7) 100%);border-radius:var(--panel-radius)"></div>' +
-      '<div class="tile-hero-title" style="position:relative;z-index:3">' + ht.title + '</div>' +
-      '<div class="tile-hero-sub" style="position:relative;z-index:3">' + ht.sub + '</div>' +
-      '<div class="tile-hero-sub" style="position:relative;z-index:3;color:rgba(255,255,255,0.6)">' + ht.detail + '</div>';
+      '<div class="tile-hero-title" style="position:relative;z-index:3">' + ht.title + '</div>';
 
     wrap.appendChild(tile);
     container.appendChild(wrap);
@@ -19410,8 +20275,82 @@ var questLayoutPickerEnabled = false; // ?challengeLayoutPicker — reveal the C
 var screenOverride = '';     // ?step=results1|results2 — direct-link to a results screen
 var onboardFlags = {};       // { legal: true, perms_explainer: true }
 var groupBootRole = '';      // ?host | ?client — pre-load the Group tab as host/client
+var inviteBoot = false;      // ?invite — show the "you've been invited to a group" popup
 var badgesBoot = false;      // ?badges — boot straight into Progress ▸ Badges
 var badgesViewMode = '';     // ?badgesBare | ?badgesBoxed — Badges display variant
+var deeplinkBoot = '';       // ?goto=<page>[/<tab>] — unified deeplink target
+
+// ── Deeplink router ─────────────────────────────────────────────────────
+// Every page (and its tab) has a unique URL via ?goto=<page>[/<tab>], e.g.
+//   ?goto=store/vault   ?goto=perform/group   ?goto=progress/badges
+//   ?goto=design/art    ?goto=settings/themes  ?goto=profile
+// User-facing names (perform/progress/design/bandmates) and internal page ids
+// (play/season/creator/social) both resolve. The address bar is kept in sync as
+// the user navigates, so any section is copy-pasteable as a deeplink.
+function setSettingsSub(sub) {
+  hideSettingsSub();
+  if (sub === 'themes') showThemes();
+  else if (sub === 'banners') showBanners();
+  else if (sub === 'frames') showFrames();
+  else if (sub === 'tos') showTos();
+  else if (sub === 'privacy') showPrivacy();
+}
+// key → { page: <navigateTo id>, setTab: fn, special: fn }
+var DEEPLINK_ROUTES = {
+  home:      { page: 'home' },
+  bandmates: { page: 'social',  setTab: switchSocialTab },
+  spaces:    { page: 'spaces',  setTab: switchSpacesTab },
+  perform:   { page: 'play',    setTab: function(t){ setPlayMode(t === 'group' ? 'coop' : 'solo'); } },
+  design:    { page: 'creator', setTab: switchCreatorTab },
+  store:     { page: 'store',   setTab: switchStoreTab },
+  progress:  { page: 'season',  setTab: switchProgressTab },
+  profile:   { page: 'career' },
+  settings:  { page: 'settings', setTab: setSettingsSub },
+  avatar:    { page: 'career',  special: function(){ showAvatarSection(); } }
+};
+// internal page id / synonym → canonical deeplink key
+var DEEPLINK_ALIASES = {
+  play: 'perform', season: 'progress', creator: 'design', social: 'bandmates',
+  career: 'profile', friends: 'bandmates', group: 'perform'
+};
+// reverse: page id → canonical key (for live URL sync)
+var DEEPLINK_PAGE_TO_KEY = {
+  home: 'home', social: 'bandmates', spaces: 'spaces', play: 'perform',
+  creator: 'design', store: 'store', season: 'progress', career: 'profile',
+  settings: 'settings'
+};
+// Route to a page[/tab] from a "<page>/<tab>" (or "<page>.<tab>") spec.
+function applyDeeplink(spec) {
+  if (!spec) return false;
+  try { spec = decodeURIComponent(String(spec)); } catch (e) { spec = String(spec); }
+  var parts = spec.split(/[\/.]/);
+  var key = (parts[0] || '').toLowerCase();
+  var tab = (parts[1] || '').toLowerCase();
+  key = DEEPLINK_ALIASES[key] || key;
+  var route = DEEPLINK_ROUTES[key];
+  if (!route) return false;
+  navigateTo(route.page);
+  if (route.special) { route.special(); return true; }
+  if (tab && route.setTab) {
+    // Defer one tick so the page is active before its tab toggles/measures.
+    setTimeout((function(fn, t){ return function(){ fn(t); }; })(route.setTab, tab), 0);
+  }
+  return true;
+}
+// Keep the address bar in sync with the current page/tab (once main UI is up),
+// so every section is a copy-pasteable deeplink. Preserves other query params.
+var _deeplinkReady = false;
+function updateDeeplinkUrl(pageId, tab) {
+  if (!_deeplinkReady) return;
+  var key = DEEPLINK_PAGE_TO_KEY[pageId] || pageId;
+  var val = key + (tab ? '.' + tab : '');   // '.' stays unencoded in the query (clean URL)
+  try {
+    var u = new URL(window.location.href);
+    u.searchParams.set('goto', val);
+    u.searchParams.delete('step');   // drop the transient onboarding step marker
+    history.replaceState(null, '', u.toString());
+  } catch (e) {}
+}
 
 function parseMode() {
   var params = window.location.search.substring(1).split('&');
@@ -19515,6 +20454,9 @@ function parseMode() {
   if ('host' in map) groupBootRole = 'host';
   else if ('client' in map) groupBootRole = 'client';
 
+  // ?invite — show the incoming group-invite popup over whatever tab is active.
+  if ('invite' in map) inviteBoot = true;
+
   // ?badges / ?badgesBare / ?badgesBoxed — deep-link to Profile ▸ Progress ▸
   // Badges. Treated as past onboarding so the screen is reachable on a fresh
   // launch (mirrors the ?step=results direct-link). Navigation happens at the
@@ -19534,6 +20476,18 @@ function parseMode() {
     if (badgesViewMode) {
       for (var _bv = 0; _bv < badgeData.length; _bv++) badgeData[_bv].earned = true;
     }
+  }
+
+  // ?goto=<page>[/<tab>] — unified deeplink to any page/tab (applyDeeplink runs
+  // at the end of init). Bypasses onboarding so the target is reachable on a
+  // fresh launch, same as the ?badges direct-link.
+  if (map.goto) {
+    deeplinkBoot = map.goto;
+    onboardFlags.legal = true;
+    onboardFlags.legal_version = LEGAL_VERSION;
+    onboardFlags.perms_explainer = true;
+    onboardFlags.tutorial_play = true;
+    _saveOnboardFlags();
   }
 
   // ?unlockAll — mark every badge as earned (demo/screenshot helper). Also
@@ -19712,6 +20666,7 @@ function scheduleFitUsername() {
 }
 
 function _showMainUI() {
+  _deeplinkReady = true;   // main UI is live — start syncing the ?goto deeplink URL
   var topbar = document.querySelector('.topbar');
   var navbar = document.querySelector('.navbar');
   if (topbar) topbar.style.display = '';
@@ -20047,6 +21002,13 @@ function init() {
     navigateTo('season');
     switchProgressTab('badges');
   }
+
+  // ?goto=<page>/<tab> — unified deeplink. Runs last so it wins over the
+  // default tab / other boot navigations above.
+  if (deeplinkBoot) applyDeeplink(deeplinkBoot);
+
+  // ?invite — pop the incoming group-invite over the current tab.
+  if (inviteBoot) openGroupInvite();
 }
 
 function applyGroupBootRole() {
@@ -20238,25 +21200,57 @@ new MutationObserver((muts) => {
 /* The animated particle/wave canvas was removed. setPageColors() now applies
    a static per-page gradient to .viewport plus the page-accent button vars. */
 
-/* Per-page colour palettes: gradient + accent (waves/particle tints unused) */
+/* Per-page brand themes (Brand Book v1.0). Each section reskins the four accent
+   slots + surface stack while layout/type/components stay identical — the token
+   roles never move, only their values:
+     accent  = the page's PRIMARY (CTAs, active nav, selected ring)
+     ink     = text/icons that sit ON the accent
+     panel/surface/surfaceHover = the surface stack (--bg-panel etc.)
+     textPrimary/Secondary/Muted = the three text tiers
+     grad    = the page background gradient (deepest → lifted)
+     light   = true for the one light theme (Creator) — flips text dark + borders. */
+var BRAND = {
+  perform:  { accent:[232,255,58],  ink:'#100C1F', panel:'#1B1638', surface:'#261F49', surfaceHover:'#322957',
+              textPrimary:'#FFFFFF', textSecondary:'rgba(255,255,255,0.65)', textMuted:'rgba(255,255,255,0.40)',
+              grad:["#0A0816","#100C1F","#1B1638","#261F49"] },
+  bandmates:{ accent:[166,255,232], ink:'#051A12', panel:'#1A4338', surface:'#255A4B', surfaceHover:'#2E6B58',
+              textPrimary:'#FFFFFF', textSecondary:'rgba(255,255,255,0.65)', textMuted:'rgba(255,255,255,0.40)',
+              grad:["#051A12","#0F2A22","#1A4338","#255A4B"] },
+  spaces:   { accent:[166,255,232], ink:'#0A1A4A', panel:'#1E3FA0', surface:'#2A52BE', surfaceHover:'#3460D0',
+              textPrimary:'#FFFFFF', textSecondary:'rgba(255,255,255,0.65)', textMuted:'rgba(255,255,255,0.42)',
+              grad:["#0A1A4A","#142F7A","#1E3FA0","#2A52BE"] },
+  creator:  { accent:[53,30,40],    ink:'#FFFFFF', panel:'#F2DCC8', surface:'#EACBB4', surfaceHover:'#E0BCA0',
+              textPrimary:'#351E28', textSecondary:'rgba(53,30,40,0.72)', textMuted:'rgba(53,30,40,0.50)',
+              grad:["#E8C4AC","#D89A7E","#C97862","#B5654F"], light:true },
+  store:    { accent:[215,239,255], ink:'#1F1218', panel:'#4A2A37', surface:'#5C3447', surfaceHover:'#6E3F54',
+              textPrimary:'#FFFFFF', textSecondary:'rgba(255,255,255,0.65)', textMuted:'rgba(255,255,255,0.40)',
+              grad:["#1F1218","#351E28","#4A2A37","#5C3447"] },
+  // Season keeps Perform's violet surfaces but a celebratory Gold Flare accent.
+  season:   { accent:[255,210,74],  ink:'#100C1F', panel:'#1B1638', surface:'#261F49', surfaceHover:'#322957',
+              textPrimary:'#FFFFFF', textSecondary:'rgba(255,255,255,0.65)', textMuted:'rgba(255,255,255,0.40)',
+              grad:["#0A0816","#100C1F","#1B1638","#261F49"] }
+};
 var pageColorSchemes = {
-  home:    { accent: [176,166,223], waves: [[176,166,223],[199,125,255],[150,140,210],[120,100,200],[200,180,255]], grad: ["#100C1F","#171234","#211A45","#2A1E55"], pt: [176,166,223], pb: [199,125,255] },
-  social:  { accent: [0,229,199],   waves: [[0,229,199],[52,211,153],[16,200,170],[100,255,230],[20,180,160]],     grad: ["#0A1410","#0E2620","#0F3A30","#11463A"], pt: [0,229,199], pb: [100,255,230] },
-  spaces:  { accent: [107,122,255], waves: [[107,122,255],[123,91,255],[96,140,250],[150,160,255],[80,100,220]],   grad: ["#0C0E2A","#121640","#1A1E55","#222866"], pt: [107,122,255], pb: [150,160,255] },
-  play:    { accent: [232,255,58],  waves: [[232,255,58],[0,229,199],[255,46,146],[200,230,40],[120,255,200]],     grad: ["#100C1F","#171234","#211A45","#2A1E55"], pt: [232,255,58], pb: [0,229,199] },
-  creator: { accent: [255,203,107], waves: [[255,203,107],[255,175,40],[255,111,46],[255,200,140],[220,150,60]],   grad: ["#1A1408","#2A1E0A","#3A280E","#4A3210"], pt: [255,203,107], pb: [255,175,40] },
-  store:   { accent: [255,46,146],  waves: [[255,46,146],[244,114,182],[199,125,255],[255,100,170],[200,50,140]],  grad: ["#1A0A1A","#2E0E28","#401238","#501648"], pt: [255,46,146], pb: [244,114,182] },
-  season:  { accent: [96,165,250], waves: [[96,165,250],[59,130,246],[147,197,253],[80,150,255],[37,99,235]], grad: ["#0A1428","#0E1E40","#123056","#163A6B"], pt: [96,165,250], pb: [147,197,253] },
-  career:  { accent: [176,166,223], waves: [[176,166,223],[199,125,255],[150,140,210],[124,90,255],[200,180,255]], grad: ["#100C1F","#171234","#211A45","#2A1E55"], pt: [176,166,223], pb: [199,125,255] },
-  settings:{ accent: [176,166,223], waves: [[176,166,223],[199,125,255],[150,140,210],[124,90,255],[200,180,255]], grad: ["#100C1F","#171234","#211A45","#2A1E55"], pt: [176,166,223], pb: [199,125,255] }
+  home: BRAND.perform, play: BRAND.perform, career: BRAND.perform, settings: BRAND.perform,
+  social: BRAND.bandmates, spaces: BRAND.spaces, creator: BRAND.creator,
+  store: BRAND.store, season: BRAND.season
 };
 var activePageScheme = 'home';
+
+function _hexRgb(h) {
+  h = (h || '').trim();
+  if (h.charAt(0) === '#' && h.length >= 7) {
+    return [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
+  }
+  return null;
+}
 
 function setPageColors(pageName) {
   var scheme = pageColorSchemes[pageName] || pageColorSchemes.home;
   activePageScheme = pageName;
+  var r = document.documentElement;
 
-  // Static per-page background gradient (replaces the old animated canvas).
+  // Static per-page background gradient (deepest → lifted).
   var vp = document.querySelector('.viewport');
   if (vp) {
     vp.style.background =
@@ -20265,17 +21259,56 @@ function setPageColors(pageName) {
       scheme.grad[3] + ' 100%)';
   }
 
-  // Set button CSS variables from page accent — backgrounds flattened to solid hex (no bg alpha; VR perf rule)
   var a = scheme.accent;
-  var r = document.documentElement;
   var rgb = a[0] + ',' + a[1] + ',' + a[2];
   r.style.setProperty('--page-accent', 'rgb(' + rgb + ')');
-  // Blend over the ACTIVE theme's panel colour (read live from --bg-panel) so this works across all themes.
-  var panelHex = (getComputedStyle(r).getPropertyValue('--bg-panel') || '').trim();
-  var pbase = [26, 22, 40]; // fallback = #1a1628 (hyperpop panel)
-  if (panelHex.charAt(0) === '#' && panelHex.length >= 7) {
-    pbase = [parseInt(panelHex.slice(1, 3), 16), parseInt(panelHex.slice(3, 5), 16), parseInt(panelHex.slice(5, 7), 16)];
+
+  // Per-page surface stack / text tiers are part of the DEFAULT brand experience.
+  // When the player has equipped a non-default cosmetic theme, leave those alone
+  // (that theme owns the surfaces) and only drive the accent + button system.
+  var brandActive = (typeof currentTheme === 'undefined') || currentTheme === 'hyperpop';
+  if (brandActive) {
+    r.style.setProperty('--bg-panel', scheme.panel);
+    r.style.setProperty('--bg-surface', scheme.surface);
+    r.style.setProperty('--bg-surface-hover', scheme.surfaceHover);
+    r.style.setProperty('--text-primary', scheme.textPrimary);
+    r.style.setProperty('--text-secondary', scheme.textSecondary);
+    r.style.setProperty('--text-muted', scheme.textMuted);
+    r.style.setProperty('--accent-ink', scheme.ink);
+    if (scheme.light) {
+      // Light theme (Creator): hairlines & scrollbars flip dark to stay visible.
+      r.style.setProperty('--border-subtle', 'rgba(53,30,40,0.14)');
+      r.style.setProperty('--border-strong', 'rgba(53,30,40,0.30)');
+      r.style.setProperty('--scrollbar-color', 'rgba(53,30,40,0.28)');
+    } else {
+      r.style.setProperty('--border-subtle', 'rgba(255,255,255,0.10)');
+      r.style.setProperty('--border-strong', 'rgba(255,255,255,0.18)');
+      r.style.setProperty('--scrollbar-color', 'rgba(255,255,255,0.15)');
+    }
   }
+
+  if (scheme.light) {
+    // Dark accent on a light page — keep buttons solid + dark so their (white)
+    // labels stay legible; tints stay translucent so they read on the cream bg.
+    function lite(amt) {
+      function ch(i) { var v = Math.round(a[i] + (255 - a[i]) * amt); return (v < 16 ? '0' : '') + v.toString(16); }
+      return '#' + ch(0) + ch(1) + ch(2);
+    }
+    r.style.setProperty('--btn-primary',       'rgb(' + rgb + ')');
+    r.style.setProperty('--btn-primary-hover',  lite(0.18));
+    r.style.setProperty('--btn-primary-border', 'rgb(' + rgb + ')');
+    r.style.setProperty('--btn-primary-glow',  'rgba(' + rgb + ',0.30)');
+    r.style.setProperty('--btn-tab',           'rgba(' + rgb + ',0.16)');
+    r.style.setProperty('--btn-tab-hover',     'rgba(' + rgb + ',0.26)');
+    r.style.setProperty('--btn-tab-border',    'rgba(' + rgb + ',0.45)');
+    r.style.setProperty('--btn-panel',         'rgba(' + rgb + ',0.08)');
+    r.style.setProperty('--btn-panel-hover',   'rgba(' + rgb + ',0.16)');
+    r.style.setProperty('--btn-panel-border',  'rgba(' + rgb + ',0.35)');
+    return;
+  }
+
+  // Dark themes: tint the accent over the page panel for soft glassy buttons.
+  var pbase = _hexRgb(scheme.panel) || [27, 22, 56];
   function mix(al) {
     function ch(i) { var v = Math.round(al * a[i] + (1 - al) * pbase[i]); return (v < 16 ? '0' : '') + v.toString(16); }
     return '#' + ch(0) + ch(1) + ch(2);
