@@ -130,13 +130,13 @@ There are no tests, no linter, and no build step for `index.html` / `results.htm
 - **Lesson setlists**: `lessonSetlists[]` (Basic, Advanced, Expert) are still used by the Tutorial Play onboarding step but no longer surface in the standard Load popup.
 
 ### Group Lobby (Bandspace)
-When Unity flips `inBandspace=true`, the Group tab becomes available and `buildCoopGrid()` renders a vertical list of up to **10 players** (host + 9). Each row shows avatar, name, instrument icon, colour-coded difficulty star, and a status pill — `CHOOSING` (amber) or `READY` (green). See `HANDOVER.md` for the full Unity contract.
+When Unity flips `inBandspace=true`, the Group tab becomes available and `buildCoopGrid()` renders a vertical list of up to **4 players** (host + 3) — the group member limit (`COOP_PLAYERS_MAX`). Each row shows avatar, name, instrument icon, colour-coded difficulty bars, and a status pill — `CHOOSING` (amber) or `READY` (green). See `HANDOVER.md` for the full Unity contract.
 
 - **`?host`** URL slug: sets `inBandspace=true`, `isHost=true`, `hostName=<active profile>`. Active profile renders as host at top of list. `+ Add Player` enabled.
 - **`?client`** URL slug: sets `inBandspace=true`, `isHost=false`, `hostName=<first mock entry>`. Active profile renders second with a `YOU` badge. `+ Add Player` hidden, lobby is read-only.
 - Bottom button is **Ready** (not Start). Host tapping Ready fires `startGame`; client tapping Ready toggles their own pill via `playerReady`.
-- Songs side max = 9 (featured 2×2 + small tiles, transitioning to 3×3 at 7+). Players side max = 10 (vertical list, fixed slot height).
-- Unity → WebView messages: `setInBandspace`, `updateIsHost`, `lobbyRoster` (canonical 10-slot roster), `sessionInProgress` (toggles late-join Spectate), `updateInstrumentAvailability`.
+- Songs side max = 9 (featured 2×2 + small tiles, transitioning to 3×3 at 7+). Players side max = 4 (the group member limit, `COOP_PLAYERS_MAX`).
+- Unity → WebView messages: `setInBandspace`, `updateIsHost`, `lobbyRoster` (canonical roster, max 4 — the group member limit), `sessionInProgress` (toggles late-join Spectate), `updateInstrumentAvailability`.
 - WebView → Unity messages: `playerReady {ready}`, `startGame {instrument, difficulty, setlist[]}`, `invitePlayer {name}`, `kickPlayer {name}`, `playMode "solo"|"coop"`.
 - Mock lobby data exists on the `main` branch for in-browser demos; the `production` branch strips placeholder media and mock arrays.
 
@@ -310,7 +310,7 @@ Frame variables: `--frame-color-1`, `--frame-color-2`.
 - `var currentPage = 0` — pagination state for song picker
 - `var allTilings = []`, `var currentLayout = 317` — home grid tiling data and selected layout
 - `var avatarCatalogs = {}`, `var avatarSelected = {}`, `var avatarMorphValues = {}`, `var avatarLoggedIn` — Genies avatar state (all populated from Unity)
-- `var lobbyPlayers = [9]` — mock roster for the Group lobby (replaced by Unity-pushed `lobbyRoster` in production)
+- `var lobbyPlayers = [...]` — mock roster for the Group lobby, max 4 incl. host (replaced by Unity-pushed `lobbyRoster` in production). Group member limit = `COOP_PLAYERS_MAX` (4) / `CG_MEMBERS_MAX` (4).
 - `var inBandspace`, `var isHost`, `var hostName` — Group lobby state pushed by Unity (or set by `?host`/`?client` URL slugs)
 - `var demoEnabled = false`, `var onboardEnabled = false` — URL flag toggles
 - `var onboardFlags = {}` — onboarding step completion state (persisted to localStorage)
