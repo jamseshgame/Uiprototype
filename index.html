@@ -8152,6 +8152,15 @@
   }
   .cg-name-edit svg { width: 28px; height: 28px; fill: var(--text-secondary); }
 
+  /* Manage Group: the name is already the banner, so drop the duplicate text
+     header and slim the banner (narrower + shorter) — this reclaims the vertical
+     room the Group Space tile needs to sit on-screen above the footer. */
+  .cg-manage .std-popup-header { display: none; }
+  .cg-manage .create-group-header { max-width: 1280px; margin: 0 auto; width: 100%; gap: 18px; }
+  .cg-manage .create-group-logo { width: 112px; height: 112px; }
+  .cg-manage .create-group-name-wrap { height: 112px; }
+  .cg-manage .create-group-name-wrap .save-input { font-size: 72px; }
+
   .create-group-columns {
     display: flex;
     flex-direction: column;   /* Available Friends stacked above Group Members */
@@ -13717,7 +13726,9 @@ function openManageGroup(grp) {
   } else {
     spaceCol.style.display = 'none';
   }
-  document.getElementById('create-group-overlay').className = 'create-group-overlay active';
+  // cg-manage: the group name already shows in the banner, so the redundant text
+  // header is hidden and the banner is slimmed — freeing room for the Group Space.
+  document.getElementById('create-group-overlay').className = 'create-group-overlay active cg-manage';
 }
 
 // Studio-space tile for the Manage Group popup — a short full-width landscape tile
@@ -14047,8 +14058,44 @@ function closeGroupInvite(e) {
 }
 
 function acceptGroupInvite() {
-  if (window._pendingInvite) sendToUnity('acceptGroupInvite', window._pendingInvite.groupName);
+  var inv = window._pendingInvite || mockGroupInvite();
+  var name = inv.groupName;
+  sendToUnity('acceptGroupInvite', name);
+
+  // Build the joined band locally so it shows on Bandmates ▸ Groups. You're a
+  // member (not the leader), so isOwn:false — leaving won't disband it.
+  var logo = inv.logo || JAMSESH_DEFAULT_LOGO;
+  var members = (inv.members || []).map(function(m) {
+    return { name: m.name, avatar: m.avatar, online: m.online !== false, leader: !!m.leader,
+             instrument: 'guitar', difficulty: 'medium', status: 'accepted', ready: false };
+  });
+  var onlineCount = 1;   // you
+  for (var i = 0; i < members.length; i++) { if (members[i].online) onlineCount++; }
+  var grp = {
+    id: 'grp-' + name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+    name: name,
+    logo: logo,
+    photo: logo,
+    online: onlineCount + '/' + COOP_PLAYERS_MAX,
+    active: true,
+    isOwn: false,     // you joined someone else's band
+    created: true,    // a real band → shows the Active Group pill
+    members: members
+  };
+  // Dedupe (re-joining moves it to the front) then place at position 1.
+  var groups = getBandGroups();
+  for (var j = groups.length - 1; j >= 0; j--) {
+    if (groups[j].name === name || groups[j].id === grp.id) groups.splice(j, 1);
+  }
+  groups.unshift(grp);
+  applyActiveGroup(name);
+
   closeGroupInvite();
+  // Land on the Groups page with The Pixels in position 1.
+  navigateTo('social');
+  switchSocialTab('groups');
+  socialGroupsPage = 0;   // first page so the new band (position 1) is visible
+  buildSocialPage();
 }
 
 function declineGroupInvite() {
@@ -14278,6 +14325,7 @@ function selectGroupLogo(logoFile) {
 var createSpaceType = 'public';
 var createSpaceEnv = '';
 var createSpacePage = 0;
+var CS_ENV_PER_PAGE = 4;           // env picker: a single paginated row of 4 tiles
 var createSpaceInvited = {};       // name → true: people invited to the new space
 var createSpaceInvitePage = 0;
 var CREATE_SPACE_PER_PAGE = 4;   // self-contained 2×2 — paginate, never scroll
@@ -14368,9 +14416,15 @@ function updateCreateSpaceToggle() {
 function buildCreateSpaceEnvGrid() {
   var grid = document.getElementById('create-space-env-grid');
   grid.innerHTML = '';
-  // No pagination — show every possible space (the 4-col grid wraps as needed).
-  for (var i = 0; i < spaceEnvironments.length; i++) {
-    var env = spaceEnvironments[i];
+  // Single paginated row of 4 tiles — Prev/Next steps through the rest so the
+  // picker stays one row at the bottom (no wrapping into the invite list above).
+  var envTotal = Math.max(1, Math.ceil(spaceEnvironments.length / CS_ENV_PER_PAGE));
+  if (createSpacePage >= envTotal) createSpacePage = envTotal - 1;
+  if (createSpacePage < 0) createSpacePage = 0;
+  var start = createSpacePage * CS_ENV_PER_PAGE;
+  var pageEnvs = spaceEnvironments.slice(start, start + CS_ENV_PER_PAGE);
+  for (var i = 0; i < pageEnvs.length; i++) {
+    var env = pageEnvs[i];
     var card = document.createElement('div');
     card.className = 'create-space-env' + (createSpaceEnv === env.id ? ' selected' : '');
     card.innerHTML =
@@ -14381,8 +14435,9 @@ function buildCreateSpaceEnvGrid() {
     })(env.id);
     grid.appendChild(card);
   }
-  var pager = document.getElementById('create-space-pager');
-  if (pager) pager.style.display = 'none';
+  renderPager(document.getElementById('create-space-pager'), createSpacePage, envTotal, function(dir) {
+    createSpacePage += dir; buildCreateSpaceEnvGrid();
+  });
 }
 
 function selectSpaceEnv(envId) {

@@ -3,3 +3,6 @@
 
 # npm dependencies (local dev tooling only, e.g. browser-sync; regenerable via npm install)
 node_modules/
+
+# DigitalOcean API token (never commit)
+do.txt
