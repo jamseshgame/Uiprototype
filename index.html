@@ -7806,6 +7806,23 @@
     text-align: center;
     padding: 0 20px;
   }
+  /* Avatar catalog loading spinner — overlays the grid while Unity streams a heavy tab's items in pages. */
+  .avatar-grid-wrap { position: relative; }
+  .avatar-catalog-spinner {
+    display: none;
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    align-items: center; justify-content: center;
+    background: rgba(0,0,0,0.35);
+    border-radius: var(--panel-radius, 28px);
+    z-index: 5; pointer-events: none;
+  }
+  .avatar-catalog-spinner.active { display: flex; }
+  .avatar-catalog-spinner-ring {
+    width: 64px; height: 64px; border-radius: 50%;
+    border: 6px solid rgba(255,255,255,0.18);
+    border-top-color: var(--pink, #e879f9);
+    animation: spin 0.8s linear infinite;
+  }
   /* Verifying spinner overlay — sits above everything and darkens the whole panel. */
   .challenge-spinner-overlay {
     display: none;
@@ -10730,9 +10747,10 @@ input, textarea, select {
           <div class="play-mode-tabs" id="play-mode-tabs"></div>
           <div class="play-grid" id="play-grid"></div>
           <div class="play-go-bar">
-            <button class="play-bar-btn" onclick="openSaveSetlist()"><svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor"><path d="M17 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>Save</button>
+            <!-- Save/Load setlist hidden for launch (#7 scope cut) — setlists still work, just no persist UI. Remove the inline display:none to restore. -->
+            <button class="play-bar-btn" style="display:none" onclick="openSaveSetlist()"><svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor"><path d="M17 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>Save</button>
             <button class="play-go-btn" id="play-go-btn" onclick="startGame()"><svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>Start</button>
-            <button class="play-bar-btn" onclick="openLoadSetlist()"><svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor"><path d="M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/></svg>Load</button>
+            <button class="play-bar-btn" style="display:none" onclick="openLoadSetlist()"><svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor"><path d="M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/></svg>Load</button>
           </div>
         </div>
       </div>
@@ -10826,6 +10844,7 @@ input, textarea, select {
 
           <div class="avatar-grid-wrap">
             <div class="avatar-grid" id="avatar-editor-grid"></div>
+            <div class="avatar-catalog-spinner" id="avatar-catalog-spinner"><div class="avatar-catalog-spinner-ring"></div></div>
           </div>
 
           <div class="pager" id="avatar-pagination">
@@ -12055,6 +12074,9 @@ function handleUnityMessage(msg) {
     case 'updateChallenges': updateChallengesFromBackend(msg.data); break;
     case 'updateCreatorSocials': updateCreatorSocialsFromBackend(msg.data); break;
     case 'updateReferralRewards': updateReferralRewards(msg.data); break;
+    case 'updateReferralCode': updateReferralCodeFromBackend(msg.data); break;
+    case 'updateReferralCount': updateReferralCountFromBackend(msg.data); break;
+    case 'updateReferralList': updateReferralListFromBackend(msg.data); break;
     case 'setChallengeVerifySeconds': setChallengeVerifySeconds(msg.data); break;
     case 'gameResults': showGameResults(msg.data); break;
     case 'gameResultsGroupScore': applyGroupScore(msg.data); break;
@@ -14334,7 +14356,6 @@ var spaceEnvironments = [
   { id: 'stage',      name: 'Stage',       img: 'spaces/stage.png' },
   { id: 'social-hub', name: 'Social Hub',  img: 'spaces/social.png' },
   { id: 'lobby',      name: 'Lobby',       img: 'spaces/lobby.png' },
-  { id: 'arena',      name: 'Arena',       img: 'spaces/stage.png' },
   { id: 'beach',      name: 'Beach',       img: 'spaces/social.png' },
   { id: 'forest',     name: 'Forest',      img: 'spaces/lobby.png' },
   { id: 'rooftop',    name: 'Rooftop',     img: 'spaces/stage.png' },
@@ -14504,7 +14525,6 @@ var defaultIconStyle = 'position:absolute;bottom:0;right:0;height:80%;filter:bri
 var spaceCategories = [
   {id:'stage', label:'Stage', options:[
     {id:'classic',   label:'Classic',   desc:'Traditional concert stage',  bg:'#1e3a5f'},
-    {id:'arena',     label:'Arena',     desc:'Massive stadium platform',   bg:'#4a1942'},
     {id:'intimate',  label:'Intimate',  desc:'Small club feel',            bg:'#2d1b4e'},
     {id:'festival',  label:'Festival',  desc:'Open air main stage',        bg:'#1b4332'}
   ]},
@@ -17323,7 +17343,6 @@ var DIFF_BAR_LEVELS = { easy: 1, medium: 2, hard: 3, expert: 3 };
 // agree. Unity can later drive these lists via the experience bridge.
 var VIBE_STAGES = [
   { id: 'Colosseum', label: 'Colosseum', img: 'spaces/001.jpg' },
-  { id: 'Arena',     label: 'Arena',     img: 'spaces/002.jpg' },
   { id: 'Stadium',   label: 'Stadium',   img: 'spaces/003.jpg' },
   { id: 'Forest',    label: 'Forest',    img: 'spaces/004.jpg' }
 ];
@@ -17419,13 +17438,9 @@ function buildOptionTiles() {
       icon: '<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>',
       slices: getVibeAssets(),
       onclick: function() { openExperiencePicker(); }
-    },
-    {
-      label: 'Setlist', value: currentSetlistName,
-      icon: '<svg viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/></svg>',
-      coverBg: 'url("branding/setlist-cover.png") center center / cover no-repeat #1a1a1a',
-      onclick: function() { openManagePopup(); }
     }
+    // 'Setlist' (Save/Load) option tile removed for launch (#7 scope cut) — setlists still work; no persist UI.
+    // openManagePopup / openSaveSetlist / openLoadSetlist remain defined (dead) for easy restore.
   ];
 
   for (var i = 0; i < optData.length; i++) {
@@ -20218,6 +20233,33 @@ function updateReferralRewards(data) {
   renderReferralRewards();
 }
 
+// Unity pushes the player's real 6-char share code ({type:'updateReferralCode', data:{code}}),
+// replacing the mock. We store it and stamp the displayed code element if it's on screen.
+function updateReferralCodeFromBackend(data) {
+  if (!data || !data.code) return;
+  referralCode = data.code;
+  var el = document.getElementById('referral-code');
+  if (el) el.textContent = referralCode;
+  if (typeof data.canRedeem === 'boolean') myCanRedeemCode = data.canRedeem;
+  updateReferralCodeBtn();
+}
+
+// Unity pushes the player's confirmed referral count ({type:'updateReferralCount', data:{count}}).
+// Stored for badges/quests; renders into #referral-count if/when that element exists.
+function updateReferralCountFromBackend(data) {
+  if (!data || typeof data.count !== 'number') return;
+  myReferralCount = data.count;
+  var el = document.getElementById('referral-count');
+  if (el) el.textContent = myReferralCount.toLocaleString();
+}
+
+// Unity pushes the list of people who used the player's code / they referred (real referrals).
+// Each item: { name, viaCode, joinedUtc }. Replaces the old Meta-friends list on this page.
+function updateReferralListFromBackend(data) {
+  window._myReferrals = (data && data.referrals) ? data.referrals : [];
+  buildReferralsSection();
+}
+
 // Stamp the current reward amounts into every spot that displays them:
 // the header reward line, the help popup body, and the code-entry blurb.
 function renderReferralRewards() {
@@ -20251,16 +20293,13 @@ function closeReferralHelpPopup(e) {
 // state: 'sent' (invite sent → referralRewards.send Picks) | 'complete'
 // (first jam done → referralRewards.join Picks) | 'jamming' (already plays —
 // not referrable, no action); absent = not yet invited (row click sends the invite).
-var referralStates = {
-  'Jooleeno':    { state: 'complete', claimed: false },
-  'Ted':         { state: 'complete', claimed: true },
-  'Abbie':       { state: 'sent',     claimed: false },
-  'Arthen':      { state: 'jamming' },
-  'xShadowPick': { state: 'sent',     claimed: false },
-  'MelodyQueen': { state: 'complete', claimed: false },
-  'FretNinja':   { state: 'complete', claimed: true }
-};
-var referralCode = 'J4M-53SH';   // mock; Unity pushes the player's real code later
+// Per-friend referral state, keyed by name. Starts EMPTY so real friends don't inherit mock
+// 'complete'/'sent' pills — state is driven by the real refer action (and later by backend
+// per-friend status, if/when that's added). Tapping a friend fires referFriend → CreatePendingReferral.
+var referralStates = {};
+var referralCode = 'J4M-53SH';   // mock fallback; Unity pushes the player's real code via updateReferralCode
+var myReferralCount = 0;         // confirmed referrals; Unity pushes via updateReferralCount
+var myCanRedeemCode = true;      // Unity pushes this on updateReferralCode: account <=1 day old OR internal user
 var enteredReferralCode = '';    // friend's code this player redeemed (Unity validates for real)
 
 // ── Referral code entry popup ──
@@ -20292,6 +20331,8 @@ function confirmReferralCode() {
 function updateReferralCodeBtn() {
   var btn = document.getElementById('referral-enter-code-btn');
   if (!btn) return;
+  // Code entry is only for new players (account <=1 day) or internal/test users — Unity sets this.
+  btn.style.display = myCanRedeemCode ? '' : 'none';
   if (enteredReferralCode) {
     btn.textContent = 'Code Applied: ' + enteredReferralCode;
     btn.className = 'referral-enter-code-btn applied';
@@ -20312,67 +20353,43 @@ function buildReferralsSection() {
   updateReferralCodeBtn();
   renderReferralRewards();
 
-  // ── Friends (2-column list, paginated) ──
+  // ── Your referrals: people who used your code / you referred (paginated, read-only) ──
+  // Populated by Unity via updateReferralList (window._myReferrals). The reward is granted
+  // automatically server-side; the actual "refer" happens by sharing your code, so there's no
+  // per-row action here. (Replaces the old Meta-friends list, which only ever held friends who
+  // already have the app and so couldn't be newly referred.)
   var list = document.getElementById('referral-friends-list');
   if (!list) return;
   list.innerHTML = '';
-  var friends = getFriendsData();
-  var fTotal = Math.max(1, Math.ceil(friends.length / REFERRAL_FRIENDS_PER_PAGE));
+  var refs = (window._myReferrals && window._myReferrals.length) ? window._myReferrals : [];
+  if (!refs.length) {
+    var empty = document.createElement('div');
+    empty.style.cssText = 'padding:24px;text-align:center;color:var(--text-secondary);';
+    empty.textContent = 'No referrals yet — share your code with friends!';
+    list.appendChild(empty);
+    renderPager(document.getElementById('referral-friends-pager'), 0, 1, function() {});
+    return;
+  }
+  var fTotal = Math.max(1, Math.ceil(refs.length / REFERRAL_FRIENDS_PER_PAGE));
   if (referralFriendsPage >= fTotal) referralFriendsPage = fTotal - 1;
   if (referralFriendsPage < 0) referralFriendsPage = 0;
   var fStart = referralFriendsPage * REFERRAL_FRIENDS_PER_PAGE;
-  var fPage = friends.slice(fStart, fStart + REFERRAL_FRIENDS_PER_PAGE);
+  var fPage = refs.slice(fStart, fStart + REFERRAL_FRIENDS_PER_PAGE);
   for (var i = 0; i < fPage.length; i++) {
-    var f = fPage[i];
-    var st = referralStates[f.name];
+    var r = fPage[i];
+    var nm = (r && r.name) ? r.name : 'A friend';
+    var via = (r && r.viaCode) ? 'Joined via your code' : 'Referred by you';
     var item = document.createElement('div');
-    item.className = 'friend-item' + (f.online ? ' online' : '');
+    item.className = 'friend-item online';
     item.style.setProperty('--friend-delay', (i * 0.06) + 's');
-    var rightHtml;
-    if (!st) {
-      rightHtml = '<div class="referral-invite-pill">Invite</div>';
-    } else if (st.state === 'jamming') {
-      rightHtml = '<div class="referral-status-tag jamming">Already Jamming</div>';
-    } else {
-      rightHtml =
-        '<div class="referral-status-tag ' + st.state + '">' + (st.state === 'complete' ? 'Complete' : 'Sent') + '</div>' +
-        (st.claimed
-          ? '<div class="referral-claim-pill claimed">Claimed</div>'
-          : '<div class="referral-claim-pill" data-claim="1">Claim Picks</div>');
-    }
     item.innerHTML =
-      '<div class="friend-avatar"><img src="' + f.avatar + '" alt=""></div>' +
       '<div class="friend-info">' +
-        '<div class="friend-name">' + f.name + '</div>' +
-        '<div class="friend-status' + (f.online ? ' online' : '') + '">' +
-          '<span class="friend-dot' + (f.online ? ' online' : '') + '"></span>' +
-          (f.online ? 'Online' : 'Offline') +
+        '<div class="friend-name">' + nm + '</div>' +
+        '<div class="friend-status online">' +
+          '<span class="friend-dot online"></span>' + via +
         '</div>' +
       '</div>' +
-      rightHtml;
-    if (!st) {
-      // Not yet invited — whole row sends the invite (pill flips to "Invited").
-      item.onclick = (function(fr, el) {
-        return function() {
-          var pill = el.querySelector('.referral-invite-pill');
-          if (pill && pill.className.indexOf('sent') === -1) {
-            pill.className += ' sent';
-            pill.textContent = 'Invited';
-          }
-          sendToUnity('referFriend', { name: fr.name });
-        };
-      })(f, item);
-    } else if (st.state !== 'jamming' && !st.claimed) {
-      var claimBtn = item.querySelector('[data-claim]');
-      claimBtn.onclick = (function(fr, s) {
-        return function(e) {
-          e.stopPropagation();
-          s.claimed = true;
-          sendToUnity('claimReferralPicks', { name: fr.name, reward: s.state === 'complete' ? referralRewards.join : referralRewards.send });
-          buildReferralsSection();
-        };
-      })(f, st);
-    }
+      '<div class="referral-status-tag complete">Joined</div>';
     list.appendChild(item);
   }
   renderPager(document.getElementById('referral-friends-pager'), referralFriendsPage, fTotal, function(dir) {
@@ -21009,10 +21026,25 @@ function makeAvatarMockItems(section, subId) {
 function applyAvatarLoginStatus(data) {
   setAvatarLoggedIn(data && data.loggedIn === true);
 }
+function setAvatarCatalogLoading(on) {
+  var el = document.getElementById('avatar-catalog-spinner');
+  if (el) el.className = 'avatar-catalog-spinner' + (on ? ' active' : '');
+}
 function applyAvatarCatalog(data) {
   if (!data || !data.section || typeof data.subId !== 'string') return;
-  avatarCatalogs[data.section + '/' + data.subId] = data.items || [];
-  if (data.section === avatarSection && data.subId === avatarCurrentSubId()) renderAvatarGrid();
+  var key = data.section + '/' + data.subId;
+  var incoming = data.items || [];
+  // Unity streams heavy catalogs in pages: append=false replaces (first page / loading-start),
+  // append=true adds the next page; loading drives the spinner, done (loading=false) clears it.
+  if (data.append) {
+    avatarCatalogs[key] = (avatarCatalogs[key] || []).concat(incoming);
+  } else {
+    avatarCatalogs[key] = incoming;
+  }
+  if (data.section === avatarSection && data.subId === avatarCurrentSubId()) {
+    setAvatarCatalogLoading(data.loading === true);
+    renderAvatarGrid();
+  }
 }
 function applyAvatarMorphValues(data) {
   if (!data || !data.stats) return;
