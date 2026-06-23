@@ -16413,11 +16413,10 @@ function showPlayPicker() {
   pickerFilterDuration = '';
   pickerFilterSort = 'rank';
   updateFilterButtons();
-  // Limited to 5 songs for now, all using the Benchango cover art (also shows on
-  // the setlist tiles once added, since we set song.file on the shared objects).
-  var pickerList = allSongs.slice(0, 5);
-  for (var pi = 0; pi < pickerList.length; pi++) pickerList[pi].file = 'art/benchango.jpg';
-  buildGrid(pickerList);
+  // Show the full song list. Real cover art arrives per-song via updateSongCover()
+  // (pushed by the Unity bridge by index), so we no longer slice to 5 or force the
+  // placeholder Benchango art here.
+  buildGrid(allSongs);
   pickerSelectedSong = null;
 }
 
