@@ -12074,6 +12074,7 @@ function handleUnityMessage(msg) {
     case 'updateHubs': updateHubsFromBackend(msg.data); break;
     case 'updateCoins': updateCoinsFromBackend(msg.data); break;
     case 'updatePicks': updatePicksFromBackend(msg.data); break;
+    case 'updateOwnedItems': updateOwnedItemsFromBackend(msg.data); break;
     case 'updateXp': updateXpFromBackend(msg.data); break;
     case 'updateProgression': updateProgression(msg.data); break;
     case 'updateChallenges': updateChallengesFromBackend(msg.data); break;
@@ -12735,6 +12736,19 @@ function updatePicksFromBackend(data) {
   if (data == null) return;
   var n = (typeof data === 'object') ? (data.picks != null ? data.picks : data.count) : data;
   setPicks(n);
+}
+
+// ── Owned items (economy / unlockables) ──────────────────────────────────
+// Unity pushes { type:'updateOwnedItems', data:{ items:[...] } } — the owned_items_v1
+// list. Used to gate the lobby loadout: a non-original instrument skin only appears in
+// the Vibe picker once it's owned.
+var ownedItems = {};
+function updateOwnedItemsFromBackend(data) {
+  ownedItems = {};
+  var items = (data && data.items) ? data.items : (Object.prototype.toString.call(data) === '[object Array]' ? data : []);
+  for (var i = 0; i < items.length; i++) {
+    if (items[i] != null) ownedItems['' + items[i]] = true;
+  }
 }
 
 // ── Topbar XP bar ────────────────────────────────────────────────────────
@@ -17655,6 +17669,19 @@ var VIBE_HIGHWAYS = [
   { id: 'Dark',    label: 'Dark',    img: 'vault/020.jpg' },
   { id: 'Lava',    label: 'Lava',    img: 'vault/021.jpg' }
 ];
+
+// Lobby loadout availability: a Vibe tile shows only if it's always-free (e.g. the
+// 'Original' skin, the 'Colosseum' stage) OR the player owns it (owned_items_v1 via
+// updateOwnedItems). Keeps unowned instrument skins / locked stages out of the picker
+// entirely — they reappear automatically once purchased.
+function vibeAvailable(items, freeIds) {
+  var out = [];
+  for (var i = 0; i < items.length; i++) {
+    var it = items[i];
+    if ((freeIds && freeIds.indexOf(it.id) >= 0) || ownedItems[it.id]) out.push(it);
+  }
+  return out;
+}
 function vibeImg(list, id) {
   for (var i = 0; i < list.length; i++) { if (list[i].id === id) return list[i].img; }
   return list[0].img;
@@ -18453,7 +18480,7 @@ function buildCoopPlayersArea(container) {
       nameInput.value = band.name || '';
       (function(b) {
         nameInput.oninput = function() { b.name = nameInput.value; };
-        nameInput.onchange = function() { sendToUnity('renameGroup', { name: b.name }); };
+        nameInput.onchange = function() { sendToUnity('renameGroup', { id: b.id || '', name: b.name }); };
       })(band);
       header.appendChild(nameInput);
     } else {
@@ -18967,9 +18994,11 @@ function openOptionPicker(type) {
       stdBody.appendChild(row);
     }
 
-    vibeSection('Stage',       VIBE_STAGES,       selectedEnvironment, 'environment', function(id){ selectedEnvironment = id; });
-    vibeSection('Guitar Skin', VIBE_GUITAR_SKINS, selectedGuitarSkin,  'guitarSkin',  function(id){ selectedGuitarSkin = id; });
-    vibeSection('Drum Skin',   VIBE_DRUM_SKINS,   selectedDrumSkin,    'drumSkin',    function(id){ selectedDrumSkin = id; });
+    // Only show what's available/owned: Colosseum is the only live stage; instrument skins
+    // are limited to 'Original' until the matching item is owned (then it reappears here).
+    vibeSection('Stage',       vibeAvailable(VIBE_STAGES, ['Colosseum']),      selectedEnvironment, 'environment', function(id){ selectedEnvironment = id; });
+    vibeSection('Guitar Skin', vibeAvailable(VIBE_GUITAR_SKINS, ['Original']), selectedGuitarSkin,  'guitarSkin',  function(id){ selectedGuitarSkin = id; });
+    vibeSection('Drum Skin',   vibeAvailable(VIBE_DRUM_SKINS, ['Original']),   selectedDrumSkin,    'drumSkin',    function(id){ selectedDrumSkin = id; });
     vibeSection('Highway',     VIBE_HIGHWAYS,     selectedHighway,     'highway',     function(id){ selectedHighway = id; });
 
     // ── Accept (footer) ── X / backdrop tap reverts via closeOptionPicker.
