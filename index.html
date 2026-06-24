@@ -8193,6 +8193,25 @@
     gap: 8px;
     min-height: 0;
   }
+  /* Group Members (+ Group Space in manage mode) pin to the BOTTOM of the body;
+     the freed slack sits above, so the Available-friends list fills the top. */
+  #create-group-members-col { margin-top: auto; }
+
+  /* Invite-only popup (Perform ▸ Group ▸ Invite): no band header / members / space —
+     just the people grid. The rows stretch (1fr) to fill the whole body so the
+     panel reads as a full people list rather than a small block. The 1fr override
+     beats the inline `repeat(N, 80px)` cgSetColumnFlow writes, hence !important. */
+  .cg-invite .create-group-col { flex: 1; min-height: 0; }
+  .cg-invite .create-group-friends {
+    flex: 1;
+    grid-template-rows: repeat(5, 1fr) !important;
+    align-content: stretch;
+    gap: 18px 16px;
+  }
+  .cg-invite .create-group-friends .friend-item { height: 100%; padding: 18px 26px; }
+  .cg-invite .create-group-friends .friend-avatar { width: 96px; height: 96px; }
+  .cg-invite .create-group-friends .friend-name { font-size: 30px; }
+  .cg-invite .create-group-friends .friend-status { font-size: 22px; }
 
   .create-group-col-title {
     font-size: 24px;
@@ -10374,7 +10393,7 @@ input, textarea, select {
   display: flex; flex-direction: column;
   padding: 40px 44px; box-sizing: border-box; gap: 26px;
 }
-.r2-header { flex-shrink: 0; }
+.r2-header { flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
 .r2-eyebrow { font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 3px; color: var(--pink); }
 .r2-title  { font-family: 'Bebas Neue', sans-serif; font-size: 104px; line-height: 0.9; margin: 4px 0 6px; color: #fff; letter-spacing: 1px; }
 .r2-sub    { font-size: 26px; color: rgba(255,255,255,0.5); }
@@ -10389,8 +10408,18 @@ input, textarea, select {
 .r2-left  { flex: 0 0 38%; display: flex; flex-direction: column; }
 .r2-right { flex: 1; display: flex; flex-direction: column; min-width: 0; }
 
-.r2-art-wrap { position: relative; width: 100%; flex-shrink: 0; }
-.r2-art { display: block; width: 100%; height: 236px; object-fit: cover; border-radius: var(--panel-radius); background: #1a1628; }
+/* Full square (1:1) cover art — Chromium 91 has no aspect-ratio, so use the
+   padding-top:100% box trick with the img absolutely filling it. */
+.r2-art-wrap { position: relative; width: 100%; flex-shrink: 0; padding-top: 100%; }
+.r2-art { position: absolute; top: 0; left: 0; display: block; width: 100%; height: 100%; object-fit: cover; border-radius: var(--panel-radius); background: #1a1628; }
+/* Per-song results pager — ◄ 1/3 ► under the cover art when the setlist has >1 song. */
+#results-song-pager { display: flex; align-items: center; justify-content: center; gap: 24px; margin-top: 18px; }
+.r2-song-nav { width: 66px; height: 66px; border-radius: 50%; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.16); color: #fff; font-size: 26px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; }
+.r2-song-nav:disabled { opacity: 0.3; cursor: default; }
+.r2-song-pageinfo { font-family: 'Bebas Neue', sans-serif; font-size: 30px; letter-spacing: 1px; color: rgba(255,255,255,0.7); min-width: 92px; text-align: center; }
+.r2-song { margin-top: 20px; }
+.r2-song-title { font-family: 'Bebas Neue', sans-serif; font-size: 44px; line-height: 1.04; color: #fff; }
+.r2-song-meta { font-size: 24px; color: rgba(255,255,255,0.5); margin-top: 4px; }
 .r2-grade {
   position: absolute; top: -18px; right: -18px;
   width: 84px; height: 84px; border-radius: 50%;
@@ -10399,8 +10428,8 @@ input, textarea, select {
   font-family: 'Bebas Neue', sans-serif; font-size: 50px; font-weight: 800;
   border: 4px solid #1a123a; box-shadow: 0 0 24px rgba(255,46,146,0.55);
 }
-.r2-tabs { display: inline-flex; gap: 4px; padding: 4px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 999px; align-self: flex-start; margin-top: 22px; }
-.r2-tab  { padding: 8px 24px; border-radius: 999px; font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 1px; color: rgba(255,255,255,0.5); cursor: pointer; }
+.r2-tabs { display: inline-flex; gap: 6px; padding: 6px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 999px; flex-shrink: 0; }
+.r2-tab  { padding: 14px 46px; border-radius: 999px; font-family: 'Bebas Neue', sans-serif; font-size: 38px; letter-spacing: 1px; color: rgba(255,255,255,0.5); cursor: pointer; }
 .r2-tab.active { background: var(--lime); color: #0a0a0a; }
 .r2-score-label { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 2px; color: rgba(255,255,255,0.45); margin-top: 22px; }
 .r2-score { font-family: 'Bebas Neue', sans-serif; font-size: 82px; line-height: 1; color: var(--pink); text-shadow: 0 0 30px rgba(255,46,146,0.45); margin: 2px 0 14px; }
@@ -10415,21 +10444,21 @@ input, textarea, select {
 
 .r2-lb-title { font-family: 'Bebas Neue', sans-serif; font-size: 34px; letter-spacing: 1px; color: #fff; }
 .r2-lb-sub { font-size: 18px; color: rgba(255,255,255,0.4); margin: 2px 0 22px; }
-.r2-lb { display: flex; flex-direction: column; gap: 14px; }
+.r2-lb { display: flex; flex-direction: column; gap: 14px; flex: 1; min-height: 0; overflow: hidden; }
 .r2-row { display: flex; align-items: center; gap: 20px; padding: 16px 22px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 18px; }
 .r2-row.you { border-color: var(--pink); box-shadow: 0 0 0 1px var(--pink), 0 0 22px rgba(255,46,146,0.25); }
-.r2-rank { font-family: 'Bebas Neue', sans-serif; font-size: 30px; color: rgba(255,255,255,0.45); width: 46px; flex-shrink: 0; }
-.r2-avatar { width: 56px; height: 56px; border-radius: 50%; overflow: hidden; flex-shrink: 0; background: rgba(255,255,255,0.08); }
+.r2-rank { font-family: 'Bebas Neue', sans-serif; font-size: 38px; color: rgba(255,255,255,0.45); width: 56px; flex-shrink: 0; }
+.r2-avatar { width: 64px; height: 64px; border-radius: 50%; overflow: hidden; flex-shrink: 0; background: rgba(255,255,255,0.08); }
 .r2-avatar img { width: 100%; height: 100%; object-fit: cover; }
-.r2-row-info { flex: 0 0 220px; min-width: 0; }
-.r2-row-name { font-family: 'Bebas Neue', sans-serif; font-size: 26px; color: #fff; display: flex; align-items: center; gap: 10px; min-width: 0; }
+.r2-row-info { flex: 0 0 260px; min-width: 0; }
+.r2-row-name { font-family: 'Bebas Neue', sans-serif; font-size: 34px; color: #fff; display: flex; align-items: center; gap: 10px; min-width: 0; }
 .r2-name-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
-.r2-you { background: var(--pink); color: #fff; font-family: 'Monda', sans-serif; font-size: 13px; font-weight: 700; padding: 2px 8px; border-radius: 6px; letter-spacing: 1px; }
-.r2-row-meta { font-size: 17px; color: rgba(255,255,255,0.4); white-space: nowrap; }
+.r2-you { background: var(--pink); color: #fff; font-family: 'Monda', sans-serif; font-size: 15px; font-weight: 700; padding: 2px 9px; border-radius: 6px; letter-spacing: 1px; }
+.r2-row-meta { font-size: 22px; color: rgba(255,255,255,0.4); white-space: nowrap; }
 .r2-bar { flex: 1; height: 9px; border-radius: 999px; background: rgba(255,255,255,0.1); overflow: hidden; min-width: 40px; }
 .r2-bar-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--purple), var(--pink)); }
 .r2-row.you .r2-bar-fill { background: linear-gradient(90deg, var(--pink), #ff8ac0); }
-.r2-row-score { font-family: 'Bebas Neue', sans-serif; font-size: 30px; color: #fff; width: 132px; text-align: right; flex-shrink: 0; }
+.r2-row-score { font-family: 'Bebas Neue', sans-serif; font-size: 40px; color: #fff; width: 150px; text-align: right; flex-shrink: 0; }
 
 .r2-actions { flex-shrink: 0; display: flex; gap: 24px; }
 .r2-back { flex: 1; padding: 28px; border-radius: var(--radius-bar); background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; font-family: 'Bebas Neue', sans-serif; font-size: 30px; letter-spacing: 1px; cursor: pointer; }
@@ -11834,20 +11863,22 @@ input, textarea, select {
 <div class="game-screen results-v2" id="screen-results1">
   <div class="r2-wrap">
     <div class="r2-header">
-      <div class="r2-eyebrow">SET COMPLETE &middot; <span id="r2-mode">SOLO</span></div>
-      <h1 class="r2-title">RESULTS.</h1>
-      <div class="r2-sub" id="r2-sub">Glass Highway &middot; Lunaris Velocity &middot; Hard</div>
+      <h1 class="r2-title">RESULTS</h1>
+      <div class="r2-tabs" id="score-tabs">
+        <div class="r2-tab active" onclick="switchResultsTab('me')">Me</div>
+        <div class="r2-tab" onclick="switchResultsTab('group')">Group</div>
+      </div>
     </div>
     <div class="r2-body">
       <!-- Left card: art + score + stats -->
       <div class="r2-card r2-left">
         <div class="r2-art-wrap">
           <img class="r2-art" id="results-album-art" alt="">
-          <div class="r2-grade" id="r2-grade">A</div>
         </div>
-        <div class="r2-tabs" id="score-tabs">
-          <div class="r2-tab active" onclick="switchResultsTab('me')">Me</div>
-          <div class="r2-tab" onclick="switchResultsTab('group')">Group</div>
+        <div id="results-song-pager" style="display:none"></div>
+        <div class="r2-song">
+          <div class="r2-song-title" id="results-song-title">Song Title</div>
+          <div class="r2-song-meta" id="results-song-meta">Artist &middot; Difficulty</div>
         </div>
         <div class="r2-score-label">YOUR SCORE</div>
         <div class="r2-score" id="results-big-score">184,720</div>
@@ -11857,13 +11888,11 @@ input, textarea, select {
       <!-- Right card: leaderboard -->
       <div class="r2-card r2-right">
         <div class="r2-lb-title">LEADERBOARD</div>
-        <div class="r2-lb-sub" id="r2-lb-sub">Top 5 &middot; this track &middot; Hard difficulty</div>
         <div class="r2-lb" id="results-lb"></div>
       </div>
     </div>
     <div class="r2-actions">
-      <button class="r2-back" onclick="resultsBackToSetlist()">BACK TO SETLIST</button>
-      <button class="r2-continue" onclick="showResults2()">CONTINUE &#8594;</button>
+      <button class="play-go-btn play-start-attract jamsesh-signature" onclick="showResults2()" style="width:100%;height:199px;flex:0 0 auto;min-height:0;font-size:140px;line-height:1;font-weight:400;letter-spacing:6px">CONTINUE</button>
     </div>
   </div>
 </div>
@@ -12273,6 +12302,7 @@ function songsReady() {
 function updateSongsFromBackend(data) {
   // data: [{rank,title,artist,file,duration,bpm,genre,decade}, ...]
   if (data && data.length) {
+    for (var ci = 0; ci < data.length; ci++) { if (!data[ci].file) data[ci].file = SONG_COVER_PLACEHOLDER; }
     allSongs = data;
     showPlayLoading(false);
     buildGrid(allSongs);
@@ -13883,7 +13913,7 @@ function cgMemberCard(f, role, idx) {
 
 var createGroupAvailPage = 0;
 var createGroupMembersPage = 0;
-var CG_AVAIL_PER_PAGE = 6;     // 2 cols x 3 rows
+var CG_AVAIL_PER_PAGE = 10;    // 2 cols x 5 rows
 var CG_MEMBERS_PER_PAGE = 10;  // 2 cols x 5 rows
 
 // Column-major fill: items go DOWN the left column (up to 3) before the right column.
@@ -13927,7 +13957,7 @@ function renderCreateGroupLists() {
   if (createGroupAvailPage < 0) createGroupAvailPage = 0;
   if (!avFriends.length) {
     avail.innerHTML = '<div class="create-group-empty" style="grid-column:1/-1">No more friends to add</div>';
-    cgSetColumnFlow(avail, 0, 3);
+    cgSetColumnFlow(avail, 0, 5);
   } else {
     var avStart = createGroupAvailPage * CG_AVAIL_PER_PAGE;
     var avPage = avFriends.slice(avStart, avStart + CG_AVAIL_PER_PAGE);
@@ -13945,7 +13975,7 @@ function renderCreateGroupLists() {
       }
       avail.appendChild(row);
     }
-    cgSetColumnFlow(avail, avPage.length, 3);   // always 3 rows tall so the members block below stays put
+    cgSetColumnFlow(avail, avPage.length, 5);   // always 5 rows tall — fills the top; members block pins to the bottom
   }
   renderPager(document.getElementById('create-group-available-pager'), createGroupAvailPage, avTotal, function(dir) {
     createGroupAvailPage += dir; renderCreateGroupLists();
@@ -13980,7 +14010,7 @@ function cgUpdatePrimaryButton() {
   if (createGroupMode === 'invite') {
     // Invite-only popup (from the Perform tab): just a Done button.
     btn.style.display = 'none';
-    if (okBtn) { okBtn.style.display = ''; okBtn.textContent = 'Done'; }
+    if (okBtn) { okBtn.style.display = ''; okBtn.textContent = 'OK'; }
     return;
   }
   if (createGroupMode === 'manage') {
@@ -14495,6 +14525,9 @@ function confirmCreateSpace() {
 
 // ── Play Panel ──────────────────────────────────────────
 var allSongs = [];
+// Single shared cover image used everywhere a song has no real art yet (songs.json
+// ships empty `file`s; Unity pushes per-song covers later via updateSongCover).
+var SONG_COVER_PLACEHOLDER = 'art/benchango.jpg';
 var setlist = [];
 var setlistName = 'My Setlist';
 var selectedInstrument = 'guitar';
@@ -15463,6 +15496,81 @@ var _resultsGroupName = 'Jamsesh Hunters';
 var groupScoreData = { score: '0', stars: 0, perInstrument: null };
 var meScoreData = { score: '184,720', stars: 4, accuracy: '94.1%', combo: '87', perfect: '—', notes: '412/438', mult: '×4', grade: 'A' };
 
+// ── Per-song results navigation ────────────────────────────────────────────
+// With a >1-song setlist, the cover art carries ◄ ► arrows to flick through each
+// song's own score / stats / leaderboard. resultsPerSong[0] is the real (played)
+// result; the rest are deterministic mock variations for the demo (Unity can push
+// real per-song results later). meScoreData is never mutated — the score panel and
+// both leaderboards read the current song through _resultsMeData()/_resultsGroupData().
+var resultsSongIndex = 0;
+var resultsPerSong = [];
+function _resultsSongFactor(idx) {
+  if (!idx) return 1;
+  var seq = [1, 0.88, 1.14, 0.82, 1.06, 0.93, 1.17, 0.79, 1.09];
+  return seq[idx % seq.length];
+}
+function _resultsMeData() {
+  return (resultsPerSong.length > 1 && resultsPerSong[resultsSongIndex]) ? resultsPerSong[resultsSongIndex] : meScoreData;
+}
+function _resultsGroupData() {
+  if (resultsPerSong.length <= 1) return groupScoreData;
+  var me = _resultsMeData();
+  var meNum = parseInt((me.score || '0').replace(/[^0-9]/g, ''), 10) || 0;
+  return { score: (meNum ? Math.round(meNum * 3.9 / 10) * 10 : 700000).toLocaleString(), stars: me.stars, perInstrument: groupScoreData.perInstrument };
+}
+function _buildResultsPerSong() {
+  resultsPerSong = [];
+  var n = Math.max(1, setlist.length);
+  if (n <= 1) return;   // single song → no per-song nav
+  var base = meScoreData;
+  var baseNum = parseInt((base.score || '0').replace(/[^0-9]/g, ''), 10) || 184720;
+  for (var i = 0; i < n; i++) {
+    if (i === 0) { resultsPerSong.push(base); continue; }
+    var f = _resultsSongFactor(i);
+    var score = Math.round(baseNum * f / 10) * 10;
+    var stars = Math.max(1, Math.min(5, Math.round((base.stars || 4) * f)));
+    var accNum = 84 + ((i * 31) % 15) + (((i * 7) % 10) / 10);
+    if (accNum > 99.9) accNum = 99.9;
+    var notesTotal = 380 + ((i * 53) % 160);
+    var notesHit = Math.round(notesTotal * accNum / 100);
+    var combo = 30 + ((i * 47) % 90);
+    resultsPerSong.push({
+      score: score.toLocaleString(), stars: stars, accuracy: accNum.toFixed(1) + '%',
+      combo: String(combo), perfect: '—', notes: notesHit + '/' + notesTotal,
+      mult: '×' + (2 + (i % 4)), grade: _gradeFromStars(stars)
+    });
+  }
+}
+function _applyResultsSong(idx) {
+  var n = resultsPerSong.length;
+  if (!n) return;
+  if (idx < 0) idx = 0;
+  if (idx >= n) idx = n - 1;
+  resultsSongIndex = idx;
+  var song = setlist[idx] || null;
+  var diff = (selectedDifficulty || 'hard'); diff = diff.charAt(0).toUpperCase() + diff.slice(1);
+  var artEl = document.getElementById('results-album-art');
+  if (artEl) artEl.src = (song && song.file) ? song.file : SONG_COVER_PLACEHOLDER;
+  var titleEl = document.getElementById('results-song-title');
+  if (titleEl) titleEl.textContent = song ? (song.title || 'Unknown') : 'Set Complete';
+  var metaEl = document.getElementById('results-song-meta');
+  if (metaEl) metaEl.textContent = (song ? (song.artist || 'Unknown') + ' · ' : '') + diff;
+  switchResultsTab(resultsScoreTab);   // refreshes score, stars, stats + leaderboard for this song
+  _renderResultsSongPager();
+}
+function resultsSongNav(dir) { _applyResultsSong(resultsSongIndex + dir); }
+function _renderResultsSongPager() {
+  var pager = document.getElementById('results-song-pager');
+  if (!pager) return;
+  var n = resultsPerSong.length;
+  if (n <= 1) { pager.style.display = 'none'; pager.innerHTML = ''; return; }
+  pager.style.display = 'flex';
+  pager.innerHTML =
+    '<button class="r2-song-nav"' + (resultsSongIndex <= 0 ? ' disabled' : '') + ' onclick="resultsSongNav(-1)">&#9664;</button>' +
+    '<div class="r2-song-pageinfo">' + (resultsSongIndex + 1) + ' / ' + n + '</div>' +
+    '<button class="r2-song-nav"' + (resultsSongIndex >= n - 1 ? ' disabled' : '') + ' onclick="resultsSongNav(1)">&#9654;</button>';
+}
+
 function _renderResultsStats(tab) {
   var statsEl = document.getElementById('results-stats');
   if (tab === 'group') {
@@ -15482,7 +15590,7 @@ function _renderResultsStats(tab) {
     statsEl.innerHTML = html || '<div class="r2-stat" style="grid-column:span 2"><div class="r2-stat-label">Band Breakdown</div><div class="r2-stat-val">—</div></div>';
   }
   else {
-    var d = meScoreData;
+    var d = _resultsMeData();
     var notes = (d.notes || '0/0').split('/');
     statsEl.innerHTML =
       '<div class="r2-stat"><div class="r2-stat-label">NOTES HIT</div><div class="r2-stat-val">' + notes[0] + '</div><div class="r2-stat-sub">of ' + (notes[1] || '0') + '</div></div>' +
@@ -15499,7 +15607,7 @@ function _gradeFromStars(n) {
 function switchResultsTab(tab) {
   resultsScoreTab = tab;
   resultsLbTab = tab;
-  var data = tab === 'group' ? groupScoreData : meScoreData;
+  var data = tab === 'group' ? _resultsGroupData() : _resultsMeData();
 
   // Tabs (Me first, Group second)
   var scoreTabs = document.getElementById('score-tabs').children;
@@ -15519,6 +15627,7 @@ function switchResultsTab(tab) {
   starsEl.innerHTML = starsHtml;
 
   _renderResultsStats(tab);
+  buildResultsLeaderboard();   // Me → players list, Group → bands list
 }
 
 function startGame() {
@@ -15542,31 +15651,53 @@ function _initResultsScreen() {
   if (modeEl) modeEl.textContent = isGroup ? 'GROUP' : 'SOLO';
   var song = setlist.length > 0 ? setlist[0] : null;
   var diff = (selectedDifficulty || 'hard'); diff = diff.charAt(0).toUpperCase() + diff.slice(1);
-  var subEl = document.getElementById('r2-sub');
-  if (subEl) subEl.textContent = (song ? (song.title || 'Unknown') + ' · ' + (song.artist || 'Unknown') : 'Set Complete') + ' · ' + diff;
-  var lbSub = document.getElementById('r2-lb-sub');
-  if (lbSub) lbSub.textContent = 'Top 5 · this track · ' + diff + ' difficulty';
-  buildResultsLeaderboard();
+  var artEl = document.getElementById('results-album-art');
+  if (artEl) artEl.src = (song && song.file) ? song.file : SONG_COVER_PLACEHOLDER;
+  // Song name + details now live under the cover art in the left card.
+  var titleEl = document.getElementById('results-song-title');
+  if (titleEl) titleEl.textContent = song ? (song.title || 'Unknown') : 'Set Complete';
+  var metaEl = document.getElementById('results-song-meta');
+  if (metaEl) metaEl.textContent = (song ? (song.artist || 'Unknown') + ' · ' : '') + diff;
+  // Per-song nav: multi-song setlists get the ◄ ► pager + per-song score/leaderboard.
+  _buildResultsPerSong();
+  resultsSongIndex = 0;
+  _renderResultsSongPager();
+  if (resultsPerSong.length > 1) { _applyResultsSong(0); }
+  else { buildResultsLeaderboard(); }
 }
+
+var RESULTS_LB_COUNT = 12;   // leaderboard rows shown — fills the right panel
 
 function buildResultsLeaderboard() {
   var lbEl = document.getElementById('results-lb');
   if (!lbEl) return;
+  // Group tab → a band leaderboard instead of the per-player one.
+  if (resultsLbTab === 'group') { buildResultsBandLeaderboard(lbEl); return; }
   var meName = 'RAEL';
   var meEl = document.querySelector('.profile-name');
   if (meEl && meEl.textContent && /[A-Za-z]/.test(meEl.textContent)) meName = meEl.textContent.toUpperCase();
-  var myScore = parseInt((meScoreData.score || '0').replace(/[^0-9]/g, ''), 10) || 0;
+  var myScore = parseInt((_resultsMeData().score || '0').replace(/[^0-9]/g, ''), 10) || 0;
   var diff = (selectedDifficulty || 'hard'); diff = diff.charAt(0).toUpperCase() + diff.slice(1);
   var inst = (selectedInstrument || 'guitar'); inst = inst.charAt(0).toUpperCase() + inst.slice(1);
   var entries = [
-    { name: 'KAISERWAVE', lv: 34, avatar: 'avatars/jooleeno.jpg', score: 254300 },
-    { name: 'NYTEFALL',   lv: 31, avatar: 'avatars/ted.png',      score: 221800 },
-    { name: 'GHOSTLIGHT', lv: 25, avatar: 'avatars/arthen.jpg',   score: 173040 },
-    { name: 'ABBIE.FM',   lv: 22, avatar: 'avatars/abbie.png',    score: 169100 },
+    { name: 'KAISERWAVE',  lv: 34, avatar: 'avatars/jooleeno.jpg', score: 254300 },
+    { name: 'NYTEFALL',    lv: 31, avatar: 'avatars/ted.png',      score: 221800 },
+    { name: 'XSHADOWPICK', lv: 30, avatar: 'avatars/arthen.jpg',   score: 205400 },
+    { name: 'MELODYQUEEN', lv: 29, avatar: 'avatars/abbie.png',    score: 198320 },
+    { name: 'GHOSTLIGHT',  lv: 25, avatar: 'avatars/arthen.jpg',   score: 173040 },
+    { name: 'ABBIE.FM',    lv: 22, avatar: 'avatars/abbie.png',    score: 169100 },
+    { name: 'FRETNINJA',   lv: 27, avatar: 'avatars/jooleeno.jpg', score: 165880 },
+    { name: 'BEATDROPPER', lv: 24, avatar: 'avatars/ted.png',      score: 158650 },
+    { name: 'RIFFLORD420', lv: 21, avatar: 'avatars/arthen.jpg',   score: 151550 },
+    { name: 'GROOVEMONKEY',lv: 19, avatar: 'avatars/jooleeno.jpg', score: 143210 },
+    { name: 'PICKSLINGER', lv: 18, avatar: 'avatars/ted.png',      score: 138770 },
     { name: meName, lv: 28, avatar: 'avatars/rael_new.png', score: myScore, you: true }
   ];
+  // Per-song variation: rivals' scores shift each song so the board reshuffles.
+  var pf = _resultsSongFactor(resultsSongIndex);
+  if (pf !== 1) { for (var z = 0; z < entries.length; z++) { if (!entries[z].you) entries[z].score = Math.round(entries[z].score * pf / 10) * 10; } }
   entries.sort(function (a, b) { return b.score - a.score; });
-  entries = entries.slice(0, 5);
+  entries = entries.slice(0, RESULTS_LB_COUNT);
   var top = entries[0].score || 1;
   var html = '';
   for (var i = 0; i < entries.length; i++) {
@@ -15579,6 +15710,55 @@ function buildResultsLeaderboard() {
         '<div class="r2-row-info">' +
           '<div class="r2-row-name"><span class="r2-name-text">' + e.name + '</span>' + (e.you ? '<span class="r2-you">YOU</span>' : '') + '</div>' +
           '<div class="r2-row-meta">Lv ' + e.lv + ' · ' + inst + ' · ' + diff + '</div>' +
+        '</div>' +
+        '<div class="r2-bar"><div class="r2-bar-fill" style="width:' + pct + '%"></div></div>' +
+        '<div class="r2-row-score">' + e.score.toLocaleString() + '</div>' +
+      '</div>';
+  }
+  lbEl.innerHTML = html;
+}
+
+// Group-tab leaderboard: a list of BANDS (combined score), with the player's own
+// band highlighted. Mock data for the browser demo; Unity can push real band
+// standings later into the same #results-lb container.
+function buildResultsBandLeaderboard(lbEl) {
+  var myBand = (typeof getActiveGroupName === 'function' && getActiveGroupName()) || '';
+  if (!myBand) { var me = getActiveProfile(); myBand = (me && me.name ? me.name : 'Your') + "'s Group"; }
+  myBand = myBand.toUpperCase();
+  var diff = (selectedDifficulty || 'hard'); diff = diff.charAt(0).toUpperCase() + diff.slice(1);
+  var myScore = parseInt((_resultsGroupData().score || '').replace(/[^0-9]/g, ''), 10) || 0;
+  if (!myScore) myScore = 762400;   // demo fallback while the band total is still "Pending…"
+  var entries = [
+    { name: 'NEON PHANTOMS',   players: 4, avatar: 'art/benchango.jpg',    score: 982400 },
+    { name: 'JAMSESH HUNTERS', players: 4, avatar: 'avatars/jooleeno.jpg', score: 921800 },
+    { name: 'ELECTRIC DREAMS', players: 4, avatar: 'avatars/ted.png',      score: 875400 },
+    { name: 'RHYTHM REBELS',   players: 3, avatar: 'avatars/arthen.jpg',   score: 838320 },
+    { name: 'CRIMSON ECHO',    players: 4, avatar: 'avatars/abbie.png',    score: 793040 },
+    { name: 'SONIC WOLVES',    players: 4, avatar: 'art/benchango.jpg',    score: 729100 },
+    { name: 'BASS BANDITS',    players: 3, avatar: 'avatars/jooleeno.jpg', score: 685880 },
+    { name: 'VELVET CRUSH',    players: 4, avatar: 'avatars/ted.png',      score: 651550 },
+    { name: 'MIDNIGHT RIFF',   players: 4, avatar: 'avatars/arthen.jpg',   score: 623210 },
+    { name: 'STATIC KINGS',    players: 3, avatar: 'avatars/abbie.png',    score: 598770 },
+    { name: 'GLASS TIGERS',    players: 4, avatar: 'art/benchango.jpg',    score: 562040 },
+    { name: myBand, players: 4, avatar: JAMSESH_DEFAULT_LOGO, score: myScore, you: true }
+  ];
+  // Per-song variation: rival bands shift each song so the board reshuffles.
+  var bf = _resultsSongFactor(resultsSongIndex);
+  if (bf !== 1) { for (var z = 0; z < entries.length; z++) { if (!entries[z].you) entries[z].score = Math.round(entries[z].score * bf / 10) * 10; } }
+  entries.sort(function (a, b) { return b.score - a.score; });
+  entries = entries.slice(0, RESULTS_LB_COUNT);
+  var top = entries[0].score || 1;
+  var html = '';
+  for (var i = 0; i < entries.length; i++) {
+    var e = entries[i];
+    var pct = Math.max(6, Math.round(e.score / top * 100));
+    html +=
+      '<div class="r2-row' + (e.you ? ' you' : '') + '">' +
+        '<div class="r2-rank">#' + (i + 1) + '</div>' +
+        '<div class="r2-avatar"><img src="' + e.avatar + '" alt=""></div>' +
+        '<div class="r2-row-info">' +
+          '<div class="r2-row-name"><span class="r2-name-text">' + e.name + '</span>' + (e.you ? '<span class="r2-you">YOU</span>' : '') + '</div>' +
+          '<div class="r2-row-meta">' + e.players + ' players · ' + diff + '</div>' +
         '</div>' +
         '<div class="r2-bar"><div class="r2-bar-fill" style="width:' + pct + '%"></div></div>' +
         '<div class="r2-row-score">' + e.score.toLocaleString() + '</div>' +
@@ -17794,8 +17974,9 @@ function buildCoopMemberTile(p, idx) {
 // Invite-only popup (from the Perform tab): just the user/invite grid — no group
 // header, member cards or space tile. Falls back to Create Group if in no band.
 function openGroupInvitePopup(band) {
-  var b = band || getActiveBand();
-  if (!b) { openCreateGroup(); return; }
+  // Always open the people grid — even with no active band, fall back to the
+  // player's own band so we never bounce to the Create Group popup.
+  var b = band || getActiveBand() || getOwnDefaultBand();
   createGroupMode = 'invite';
   createGroupLogo = b.logo || b.photo || '';
   createGroupMembers = [];
@@ -17808,14 +17989,14 @@ function openGroupInvitePopup(band) {
         status: m.status === 'accepted' ? 'accepted' : 'invited' });
     }
   }
-  document.getElementById('create-group-title').textContent = 'Invite to ' + b.name;
+  document.getElementById('create-group-title').textContent = 'Invite People';
   createGroupAvailPage = 0;
-  renderCreateGroupLists();   // renders the available grid; cgUpdatePrimaryButton sets the Done button
-  // Show ONLY the available user grid.
+  renderCreateGroupLists();   // renders the available grid; cgUpdatePrimaryButton sets the OK button
+  // Show ONLY the available user grid (cg-invite makes it fill the popup body).
   document.querySelector('#create-group-overlay .create-group-header').style.display = 'none';
   document.getElementById('create-group-members-col').style.display = 'none';
   document.getElementById('create-group-space-col').style.display = 'none';
-  document.getElementById('create-group-overlay').className = 'create-group-overlay active';
+  document.getElementById('create-group-overlay').className = 'create-group-overlay active cg-invite';
 }
 
 function buildCoopInviteTile(band) {
@@ -18567,6 +18748,7 @@ function openOptionPicker(type) {
     ];
     var diffGrid = document.createElement('div');
     diffGrid.className = 'instrument-picker--single';
+    diffGrid.style.margin = 'auto 0';   // centre the row vertically in the popup body
     for (var di = 0; di < diffItems.length; di++) {
       var d = diffItems[di];
       var dMeta = DIFFICULTY_IMAGERY[d.id];
@@ -23140,7 +23322,6 @@ function init() {
     updateSongChartsFromBackend(msg);
     console.log('[debugMaxCharts] Seeded charts on:', msg.title || msg.rank);
   };
-  ensureDefaultGroup();
   ensureDefaultPrivateSpace();
   buildSocialPage();
   buildSpacesGrid();
@@ -23406,7 +23587,7 @@ function getJourneyTickerStats() {
    already sits inside a tagged control; transform-positioned controls are
    excluded (FX_SKIP) because they have their own CSS rules that keep the offset. */
 const FX_SELECTOR = 'button, .nav-item, .home-tile-wrap, [class*="-tile"], [class*="-card"], [class*="-opt"], [class*="-btn"], .play-mode-tab, .legal-agree-tab, .avatar-sub-tab, .picker-filter';
-const FX_SKIP = '.topbar-settings-btn, .topbar-avatar-btn, .legal-agree-ok, .perms-explain-ok, .play-grid-options-row, .challenge-nav';
+const FX_SKIP = '.topbar-settings-btn, .topbar-avatar-btn, .legal-agree-ok, .perms-explain-ok, .play-grid-options-row, .challenge-nav, .r2-card';
 
 function fxTag(el) {
   if (el.classList.contains('fx-press')) return;
