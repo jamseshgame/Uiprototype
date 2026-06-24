@@ -19916,7 +19916,8 @@ function buildStoreGrid() {
     tile.style.position = 'relative';
     tile.style.overflow = 'hidden';
     tile.style.cursor = 'pointer';
-    tile.onclick = function() { openItemPurchase(); };
+    // Owned → open the Equip popup (no purchase path); otherwise the purchase popup.
+    tile.onclick = function() { openItemPurchase(storeGuitarOwned ? 'equip' : undefined); };
     var priceHtml = storeGuitarOwned
       ? '<div class="store-item-owned">Owned</div>'
       : '<div class="store-item-price"><img class="store-item-pick" src="branding/jamsesh-pick.png" alt="">' +
