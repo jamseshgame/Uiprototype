@@ -113,6 +113,29 @@ Changing these payload shapes breaks the feature even if the message name is unc
 
 ---
 
+## Coop / bandspace lobby rendering invariants
+
+The group lobby renders a **networked** roster pushed from Unity (`updateLobby`). These invariants
+are easy to break with a "polish" pass and the breakage only shows up in a live multiplayer session:
+
+- **The local player MUST be rendered.** Do NOT `continue`/filter on `isSelf` in the member-row
+  loop. Each player's roster includes themselves with `isSelf:true`; the tile renderer gives self
+  the `YOU` badge. In a live bandspace there is no band header to stand in for self, so skipping
+  `isSelf` means **you never see yourself** (this shipped once — see cautionary tales).
+- **Host comes from Unity, not local guesswork.** `hostName`/`isHost` are set only from the
+  `updateIsHost` push. The HOST badge is `p.name === hostName`. Don't infer the host from roster
+  order or set `hostName = me.name` in a live session (that's mock-only `?host`/`?client` code).
+- **`getCoopRoster()` is the source of truth** — in a bandspace it returns `lobbyPlayers` (the Unity
+  roster). Don't render the coop lobby from a different array.
+- **Pending invite tiles must survive `updateLobby` rebuilds.** `updateLobbyFromBackend` preserves
+  `pending` entries and drops them once the invitee appears in the networked roster (matched by
+  `platformId`, then name). Don't clobber the whole roster on each push.
+- **Ready/Start gating must ignore pending + disconnected.** `coopReadyCounts` and `_allNonHostReady`
+  skip `pending` and `disconnected` players, or an invited-but-not-joined friend ransoms the host's
+  Start button (it can never reach N/N).
+- **Remove/kick is host-only.** A non-host must not be able to remove anyone; nobody removes self or
+  the host. (Enforced at the web tile, AND server-side — don't rely on the UI alone.)
+
 ## Cautionary tales (real regressions this has caused)
 
 - **`addCoopPlayer` → dead code.** A reskin rewired the stage "Add Player" to a new path, leaving the
@@ -122,6 +145,9 @@ Changing these payload shapes breaks the feature even if the message name is unc
   listened for the old name → entering a band did nothing until the bridge added the new case.
 - **`experience{tab:'skin'}` → `'guitarSkin'`/`'drumSkin'`.** The reskin split the skin tab into
   per-instrument tabs; the bridge only handled `'skin'`, so skin selection silently no-op'd.
+- **Coop lobby skipped self.** A "coop lobby polish" reskin added `if (roster[i].isSelf) continue;`
+  in `buildCoopMembersRow`, so in a live bandspace **every player saw everyone except themselves**.
+  No error — it only showed up in a 3-player on-device playtest. (See the rendering invariants above.)
 
 The pattern is always the same: **a rename on the UI side, no error, a dead feature.** This file
 exists so the next rename gets caught in review instead of in a playtest.

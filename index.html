@@ -18068,7 +18068,10 @@ function buildCoopMembersRow(grid) {
   // Bandmates ▸ Groups tile.
   if (band) row.appendChild(coopGroupTile(band));
   for (var i = 0; i < roster.length && i < maxTiles; i++) {
-    if (roster[i].isSelf) continue;   // self ("YOU") is not shown in the member row
+    // Render every roster member INCLUDING self — buildCoopMemberTile gives self the
+    // "YOU" badge + --self styling. (A reskin had `continue`d on isSelf here, which in a
+    // live bandspace — where there's no band header to stand in — meant you never saw
+    // yourself in the roster.)
     row.appendChild(buildCoopMemberTile(roster[i], i));
   }
   // Exactly ONE add/invite tile after the members — no empty-slot placeholders.
