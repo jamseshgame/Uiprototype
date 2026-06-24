@@ -74,6 +74,43 @@ Renaming or removing any of these **breaks the matching feature**. Grouped by ar
 > are **emitted by the UI but have no Unity handler yet** — they currently do nothing. Don't assume
 > they work; they're tracked separately for wiring.
 
+## Wiring status — handled vs pending (snapshot 2026-06-24)
+
+The Unity client only acts on a message if it has a handler; everything else hits the silent
+`default:`. This is the audited status of every message the UI emits. **The "NOT YET WIRED" list is
+the important one: the C# side intends to wire each of those *later, against exactly this name +
+payload*. If you rename one, change its payload, or stop emitting it, FLAG IT** — otherwise the
+eventual handler silently won't match. Re-run the audit (above) after every UI bump and diff against
+this snapshot; if a pending message changed, the wiring plan changed.
+
+### ✅ WIRED — a handler exists; renaming/reshaping BREAKS a live feature
+Everything in the **Inbound contract** list below is handled. Most recently wired:
+`inviteToGroup`, `acceptGroupInvite`, `declineGroupInvite`, `renameGroup`, plus the `experience`
+skin tabs `guitarSkin`/`drumSkin` (these were silently dropped by a reskin — see cautionary tales).
+
+### ⏳ NOT YET WIRED — emitted, no handler yet. Keep the name + payload stable or flag the change
+Each is parked pending the backend/feature in *italics*. The payload shown is what the future handler
+will be written against:
+
+- `sendFriendRequest {name}` · `removeFriend {name}` — *no in-app friend graph exists (friends are Meta-only).*
+- `inviteToSpace {name}` · `createSpace {name,type,env,forGroup}` · `deleteSpace {name,forGroup}` — *no "spaces" backend exists.*
+- `songSpace songIdx:catId:optId` · `loadout idx:catId:optId` — per-song env / loadout. *No per-song apply system (per-song settings currently collapse to session-level).*
+- `themeChanged` · `themePurchased` · `bannerChanged` · `bannerPurchased` · `frameChanged` · `framePurchased` `<id>` — *cosmetic persistence + economy; uses a MOCK "Coins" currency (NOT the real Picks/JC), hardcoded unlocks, no persistence.*
+- `storeBuySong {title,artist}` — *song-DLC; needs IAP SKUs + entitlement + content gating. Payload has no SKU/id.*
+- `layoutChanged <index>` · `challengeLayoutChanged <index>` — *home / challenges grid tiling; hidden dev pickers; needs PlayFab user-data persistence.*
+- `updateName <newName>` — *custom display name; `UpdateDisplayName` exists but login re-syncs the Meta name, so it needs persist + override-gate first.*
+- `linkSocialHandle {platform,handle}` · `linkTiktokHandle {handle}` — *creator socials; no persistence backend.*
+- `onboardStepComplete {step,flags}` — *onboarding server-mirror; already in localStorage, server side needs user-data.*
+- `pauseToggle {id,value}` — *in-game settings toggles; needs per-toggle meaning.*
+- `resumeGame {}` · `restartGame {}` · `exitToHome {}` — pause-menu transport. **These map 1:1 onto existing `JamseshEvents.Gameplay.OnGameplayResumed/Restarted/Exited`** (live systems already act on them) — a 3-case wire the moment the pause-menu UI is finalized. **Keep these exact names.**
+
+### 🗑️ STALE / REDUNDANT — do NOT wire; safe to delete from the UI
+- `getLobby` — only a comment, never actually emitted; Unity already pushes `updateLobby` proactively.
+- `selectVaultItem {name,cat}` — fires alongside `openItemPurchase('equip')` → `equipItem`, which already handles the equip; carries no usable id.
+- `leaderboardType <label>` — results scope (Group/Me) switches locally; both datasets already pushed via `gameResultsLeaderboard`.
+- `creatorPhoto {}` — demo stand-in (empty payload); the real capture flow is `creatorOpenCamera` → `creatorPhotos`.
+- `pauseOpened {instrument}` — Unity has already paused before this fires (it's emitted from `showPause`, which Unity triggered via `openPause`); it's a confirmation only.
+
 ## Outbound contract — `handleUnityMessage` `case 'TYPE':` the UI must keep
 
 The game pushes these to the UI; if the UI drops the matching `case`, the game's update is ignored:
