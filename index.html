@@ -17655,7 +17655,7 @@ var VIBE_GUITAR_SKINS = [
   { id: 'Original',      label: 'Original',      img: 'instruments/guitar.png' },
   { id: 'Crystal',       label: 'Crystal',       img: 'instruments/skins/crystal.png' },
   { id: 'Crystal Green', label: 'Crystal Green', img: 'instruments/skins/crystal.png' },
-  { id: 'Iridescent',    label: 'Iridescent',    img: 'instruments/skins/crystal.png' }
+  { id: 'iridescent-guitar', label: 'Iridescent', img: 'instruments/skins/iridescent-guitar.png' }
 ];
 var VIBE_DRUM_SKINS = [
   { id: 'Original',    label: 'Original',    img: 'instruments/drums.png' },
@@ -18999,7 +18999,7 @@ function openOptionPicker(type) {
     vibeSection('Stage',       vibeAvailable(VIBE_STAGES, ['Colosseum']),      selectedEnvironment, 'environment', function(id){ selectedEnvironment = id; });
     vibeSection('Guitar Skin', vibeAvailable(VIBE_GUITAR_SKINS, ['Original']), selectedGuitarSkin,  'guitarSkin',  function(id){ selectedGuitarSkin = id; });
     vibeSection('Drum Skin',   vibeAvailable(VIBE_DRUM_SKINS, ['Original']),   selectedDrumSkin,    'drumSkin',    function(id){ selectedDrumSkin = id; });
-    vibeSection('Highway',     VIBE_HIGHWAYS,     selectedHighway,     'highway',     function(id){ selectedHighway = id; });
+    vibeSection('Highway',     vibeAvailable(VIBE_HIGHWAYS, ['Neon']),         selectedHighway,     'highway',     function(id){ selectedHighway = id; });
 
     // ── Accept (footer) ── X / backdrop tap reverts via closeOptionPicker.
     var stdFooter = document.createElement('div');
