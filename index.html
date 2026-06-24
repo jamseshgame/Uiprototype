@@ -387,10 +387,19 @@
     flex-direction: column;
     justify-content: center;
     gap: 2px;
+    flex: 1;        /* grow so the XP bar beneath the name can stretch toward the Picks */
+    min-width: 0;
   }
 
+  /* Name + level share a row; the XP bar spans the full width beneath both. */
+  .profile-topline {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 28px;
+  }
   .profile-name {
-    font-size: 32px;
+    font-size: 44px;
     font-weight: 400;
     color: #ffffff;
     line-height: 1;
@@ -452,6 +461,14 @@
   .profile-info-right { text-align: right; align-items: flex-end; padding-right: var(--pad); }
 
   .topbar-spacer { flex: 1; }
+
+  /* Topbar XP bar — teal brand accent (--cyan), high-contrast against the dark-purple
+     topbar and the gold Picks. The bar sits under the username (matching its width);
+     fill is driven live by Unity via updateXp(). The level label sits immediately
+     left of the Picks balance. */
+  .topbar-xp-track { height: 14px; margin-top: 10px; margin-right: 24px; border-radius: 999px; background: rgba(255,255,255,0.10); overflow: hidden; box-shadow: inset 0 1px 3px rgba(0,0,0,0.45); }
+  .topbar-xp-fill { height: 100%; width: 0; border-radius: 999px; background: linear-gradient(90deg, #00E5C7, #5BF5DF); box-shadow: 0 0 14px rgba(0,229,199,0.6); transition: width 0.6s ease; }
+  .topbar-xp-level { flex-shrink: 0; font-size: 32px; font-weight: 800; letter-spacing: 1px; color: #00E5C7; white-space: nowrap; line-height: 1; text-shadow: 0 0 10px rgba(0,229,199,0.35); }
 
   .xp-bar-full {
     height: 5px;
@@ -10436,10 +10453,10 @@ input, textarea, select {
 .r2-stars { display: flex; gap: 8px; font-size: 38px; line-height: 1; margin-bottom: 22px; }
 .r2-star { color: var(--pink); }
 .r2-star.empty { color: rgba(255,255,255,0.2); }
-.r2-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: auto; }
-.r2-stat { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07); border-radius: 16px; padding: 18px 20px; }
-.r2-stat-label { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 1px; color: rgba(255,255,255,0.45); }
-.r2-stat-val { font-family: 'Bebas Neue', sans-serif; font-size: 42px; line-height: 1; color: #fff; margin: 6px 0 2px; }
+.r2-stats { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 16px; flex: 1; min-height: 0; margin-top: 20px; }
+.r2-stat { display: flex; flex-direction: column; justify-content: center; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07); border-radius: 16px; padding: 24px 28px; }
+.r2-stat-label { font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 1px; color: rgba(255,255,255,0.55); }
+.r2-stat-val { font-family: 'Bebas Neue', sans-serif; font-size: 56px; line-height: 1; color: #fff; margin: 8px 0 4px; }
 .r2-stat-sub { font-size: 15px; color: rgba(255,255,255,0.4); }
 
 .r2-lb-title { font-family: 'Bebas Neue', sans-serif; font-size: 34px; letter-spacing: 1px; color: #fff; }
@@ -10469,10 +10486,10 @@ input, textarea, select {
    REWARDS v2 — "STACKED UP" rewards screen
    ════════════════════════════════════════════════════════════════════════ */
 .rewards-v2 { background: radial-gradient(120% 100% at 80% 0%, #2a1840 0%, #1a1030 52%, #140d28 100%) !important; color: #f3eefc; }
-.rw-wrap { position: absolute; inset: 0; overflow-y: auto; padding: 40px 44px 36px; box-sizing: border-box; }
+.rw-wrap { position: absolute; inset: 0; display: flex; flex-direction: column; padding: 40px 44px 36px; box-sizing: border-box; }
 .rw-header { margin-bottom: 20px; }
-.rw-eyebrow { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 6px; color: var(--pink); }
-.rw-title { font-family: 'Bebas Neue', sans-serif; font-size: 84px; line-height: 0.9; margin: 2px 0 6px; color: #fff; }
+.rw-eyebrow { font-family: 'Bebas Neue', sans-serif; font-size: 36px; letter-spacing: 8px; color: var(--pink); }
+.rw-title { font-family: 'Bebas Neue', sans-serif; font-size: 168px; line-height: 0.88; margin: 4px 0 6px; color: #fff; }
 .rw-sub { font-size: 22px; color: rgba(255,255,255,0.45); }
 .rw-section-label { font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 3px; margin: 26px 0 16px; display: flex; align-items: center; }
 .rw-section-label::before { content: ''; width: 5px; height: 26px; border-radius: 3px; margin-right: 14px; background: currentColor; }
@@ -10501,6 +10518,19 @@ input, textarea, select {
 .rw-bar2-fill { height: 100%; border-radius: 999px; }
 .rw-fill-teal { background: linear-gradient(90deg, #00E5C7, #00b3a0); }
 .rw-fill-purple { background: linear-gradient(90deg, var(--purple), #7c5bf5); }
+.rw-fill-lime { background: linear-gradient(90deg, #E8FF3A, #c9e213); }
+.rw-fill-gold { background: linear-gradient(90deg, #f0c84a, #d4a017); }
+
+  /* Rewards: 3 equal tiles, centred vertically. The icon/art grows (flex:1) to fill the
+     tile just like the badge medallion (.badge-art) does, so text + bar pin to the bottom. */
+  .rw-grid-rewards { margin: auto 0; align-items: stretch; }
+  .rw-grid-rewards .rw-card { display: flex; flex-direction: column; }
+  .rw-grid-rewards .rw-icon { flex: 1; width: 100%; height: auto; min-height: 0; max-height: none; border-radius: 18px; margin-bottom: 18px; }
+  .rw-grid-rewards .rw-icon svg { width: 150px; height: 150px; }
+  .rw-grid-rewards .rw-icon--img { background: transparent; }
+  .rw-grid-rewards .rw-icon--img img { width: 100%; height: 100%; object-fit: contain; }
+  /* The "back to" CTA reuses the lime Start button but drops its forward ▶ arrow. */
+  .rewards-cta::after { content: none !important; }
 
 .rw-payout { background: linear-gradient(150deg, #3a2470 0%, #2a1a56 60%, #241652 100%); border-color: rgba(150,120,255,0.3); }
 .rw-card-eyebrow { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 3px; color: rgba(255,255,255,0.55); }
@@ -10744,9 +10774,13 @@ input, textarea, select {
         <img src="avatars/rael_new.png" alt="USERNAME">
       </div>
       <div class="profile-info">
-        <div class="profile-name">RAELJAMSESH</div>
+        <div class="profile-topline">
+          <div class="profile-name">RAELJAMSESH</div>
+          <span class="topbar-xp-level" id="topbar-xp-level">LVL 1</span>
+        </div>
+        <!-- XP bar spans the full width under the name + level; fill driven by Unity via 'updateXp'. -->
+        <div class="topbar-xp-track"><div class="topbar-xp-fill" id="topbar-xp-fill"></div></div>
       </div>
-      <div class="topbar-spacer"></div>
       <!-- Progression ticker disabled for now (kept for later use). -->
       <div class="profile-info profile-info-right" style="display:none">
         <div class="stat-ticker" id="stat-ticker"></div>
@@ -11903,21 +11937,10 @@ input, textarea, select {
     <div class="rw-header">
       <div class="rw-eyebrow">REWARDS EARNED</div>
       <h1 class="rw-title">STACKED UP.</h1>
-      <div class="rw-sub">your payout + band payout &middot; 2 badges &middot; 1 unlock &middot; 1 still locked</div>
     </div>
 
-    <div class="rw-section-label rw-lime">YOUR PAYOUT &middot; SOLO <em>earned this run</em></div>
-    <div class="rw-grid">
-      <div class="rw-card rw-payout">
-        <div class="rw-card-eyebrow">YOUR PAYOUT</div>
-        <div class="rw-payout-big">+1,250<br>PICKS</div>
-        <div class="rw-payout-note">3&times; Trending bonus applied for a top-3 Velocity run on Glass Highway.</div>
-        <div class="rw-balance">
-          <div class="rw-coin"></div>
-          <div><div class="rw-balance-label">PICK BALANCE</div><div class="rw-balance-val">16,070</div></div>
-        </div>
-      </div>
-
+    <!-- 3 reward tiles (XP / Picks / Badges) — equal-size, centred vertically. -->
+    <div class="rw-grid rw-grid-rewards">
       <div class="rw-card">
         <div class="rw-icon rw-i-teal"><svg viewBox="0 0 24 24"><path d="M13 2L3 14h7l-1 8 10-12h-7z"/></svg></div>
         <div class="rw-card-title">XP EARNED</div>
@@ -11927,81 +11950,28 @@ input, textarea, select {
       </div>
 
       <div class="rw-card">
-        <div class="rw-icon rw-i-gold"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.27 5.82 21 7 14.14l-5-4.87 6.91-1.01z"/></svg></div>
-        <div class="rw-card-title">2 NEW BADGES</div>
-        <div class="rw-card-big rw-pink">&times;2</div>
-        <div class="rw-card-meta">Streak Master &middot; 87-note streak<br>Band Anchor &middot; MVP-2 in a band run</div>
+        <div class="rw-icon rw-icon--img"><img src="branding/JamPick_hires.png" alt=""></div>
+        <div class="rw-card-title">PICKS EARNED</div>
+        <div class="rw-card-big rw-lime">+1,250</div>
+        <div class="rw-card-meta">Pick balance &middot; 16,070</div>
+        <div class="rw-bar2"><div class="rw-bar2-fill rw-fill-lime" style="width:72%"></div></div>
       </div>
 
-      <div class="rw-card">
-        <div class="rw-icon"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8z"/></svg></div>
-        <div class="rw-card-title">SEASON PASS</div>
-        <div class="rw-card-big">68%</div>
-        <div class="rw-card-meta">Grammys &middot; Week 4 &middot; 2 days left</div>
-        <div class="rw-bar2"><div class="rw-bar2-fill rw-fill-purple" style="width:68%"></div></div>
-        <div class="rw-card-meta rw-meta2">218 / 500 XP &middot; keep your streak next track</div>
-      </div>
-
-      <div class="rw-card">
-        <div class="rw-icon rw-i-pink"><svg viewBox="0 0 24 24"><path d="M13.5.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67z"/></svg></div>
-        <div class="rw-card-title">DAILY STREAK</div>
-        <div class="rw-card-big rw-pink">DAY 12</div>
-        <div class="rw-card-meta">+200 Picks bonus already in &middot; keep it alive</div>
-        <div class="rw-card-meta rw-meta2">next milestone: Day 14 &rarr; free pack</div>
-      </div>
-
-      <div class="rw-card rw-locked">
-        <div class="rw-icon"><svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6z"/></svg></div>
-        <div class="rw-card-title">HOLOGRAM SKIN</div>
-        <div class="rw-card-big rw-muted">STILL LOCKED</div>
-        <div class="rw-chip">&#9733; 5-star Glass Highway on Expert</div>
-      </div>
-    </div>
-
-    <div class="rw-section-label rw-pink-label">VELOCITY &middot; BAND PAYOUT <em>splits the 4-piece haul &middot; shared across the lineup</em></div>
-    <div class="rw-grid rw-grid-3">
-      <div class="rw-card rw-tint-pink">
-        <div class="rw-icon rw-i-pink"><svg viewBox="0 0 24 24"><path d="M13.5.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67z"/></svg></div>
-        <div class="rw-card-title">TOTAL BAND PAYOUT</div>
-        <div class="rw-card-big rw-pink">+4,820 PICKS</div>
-        <div class="rw-card-meta">band pot &middot; split 4 ways &rarr; 1,205 ea. &middot; band vault tops the rest</div>
-        <div class="rw-members">
-          <div class="rw-member"><div class="rw-m-av"><img src="avatars/rael_new.png" alt=""></div><div class="rw-m-name">RAEL <span class="r2-you">YOU</span></div><div class="rw-m-amt rw-pink">+1,205</div></div>
-          <div class="rw-member"><div class="rw-m-av"><img src="avatars/ted.png" alt=""></div><div class="rw-m-name">TED</div><div class="rw-m-amt rw-pink">+1,205</div></div>
-          <div class="rw-member"><div class="rw-m-av"><img src="avatars/jooleeno.jpg" alt=""></div><div class="rw-m-name">JOOLEENO</div><div class="rw-m-amt rw-pink">+1,205</div></div>
-          <div class="rw-member"><div class="rw-m-av"><img src="avatars/abbie.png" alt=""></div><div class="rw-m-name">ABBIE</div><div class="rw-m-amt rw-pink">+1,205</div></div>
-        </div>
-      </div>
-
-      <div class="rw-card rw-tint-teal">
-        <div class="rw-icon rw-i-teal"><svg viewBox="0 0 24 24"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg></div>
-        <div class="rw-card-title">BAND FAME XP</div>
-        <div class="rw-card-big rw-teal">+5,140</div>
-        <div class="rw-card-meta">Band Lv 12 &rarr; 13 &middot; unlocks Velocity tour-bus space</div>
-        <div class="rw-bar2"><div class="rw-bar2-fill rw-fill-teal" style="width:82%"></div></div>
-        <div class="rw-card-meta rw-meta2">820 / 1,000 to Lv 13 &middot; +25% new-PB multiplier</div>
-        <div class="rw-substats">
-          <div class="rw-substat"><div class="rw-substat-label">FANS GAINED</div><div class="rw-substat-val rw-teal">+118</div></div>
-          <div class="rw-substat"><div class="rw-substat-label">CHARTS</div><div class="rw-substat-val">#14 &uarr;6</div></div>
-        </div>
-      </div>
-
-      <div class="rw-card">
-        <div class="rw-icon rw-i-gold"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.27 5.82 21 7 14.14l-5-4.87 6.91-1.01z"/></svg></div>
-        <div class="rw-card-title">BAND BADGES</div>
-        <div class="rw-card-big rw-gold">2 EARNED</div>
-        <div class="rw-card-meta">awarded to the whole lineup &middot; live on every member's profile</div>
-        <div class="rw-badge-rows">
-          <div class="rw-badge-row"><div class="rw-badge-ico rw-i-gold"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.27 5.82 21 7 14.14l-5-4.87 6.91-1.01z"/></svg></div><div><div class="rw-badge-name">NEW BAND PB</div><div class="rw-badge-sub">Glass Highway &middot; 667,240</div></div></div>
-          <div class="rw-badge-row"><div class="rw-badge-ico rw-i-gold"><svg viewBox="0 0 24 24"><path d="M13 2L3 14h7l-1 8 10-12h-7z"/></svg></div><div><div class="rw-badge-name">FULL LINEUP</div><div class="rw-badge-sub">4-of-4 finish &middot; ranked</div></div></div>
-          <div class="rw-badge-row rw-locked"><div class="rw-badge-ico"><svg viewBox="0 0 24 24"><path d="M12 2l4 6-4 14-4-14z"/></svg></div><div><div class="rw-badge-name">SET CONQUEROR</div><div class="rw-badge-sub">5&#9733; this track as a band</div></div></div>
+      <!-- Badges Earned — the exact .badge-tile element from the Badges page (makeBadgeTile output). -->
+      <div class="badge-tile earned">
+        <div class="badge-art badge-art--img"><img src="badges/badge_recruiter_refer1friend.png" alt=""></div>
+        <div class="badge-name">RECRUITER</div>
+        <div class="badge-hint">Refer 1 friend who plays Jamsesh</div>
+        <div class="badge-progress">
+          <div class="badge-progress-bar"><div class="badge-progress-fill" style="width:100%"></div></div>
+          <div class="badge-progress-label">Completed</div>
         </div>
       </div>
     </div>
 
+    <!-- Single long green CTA — label set per mode by showResults2() (solo vs group). -->
     <div class="rw-actions">
-      <button class="r2-back" onclick="backToResults1()">BACK</button>
-      <button class="r2-continue" onclick="exitResults()">DONE &#8594;</button>
+      <button class="play-go-btn play-start-attract jamsesh-signature rewards-cta" id="rewards-cta" onclick="exitResults()" style="width:100%;height:170px;flex:0 0 auto;min-height:0;font-size:100px;line-height:1;font-weight:400;letter-spacing:4px">BACK TO SOCIAL HUB</button>
     </div>
   </div>
 </div>
@@ -12099,6 +12069,7 @@ function handleUnityMessage(msg) {
     case 'updateHubs': updateHubsFromBackend(msg.data); break;
     case 'updateCoins': updateCoinsFromBackend(msg.data); break;
     case 'updatePicks': updatePicksFromBackend(msg.data); break;
+    case 'updateXp': updateXpFromBackend(msg.data); break;
     case 'updateProgression': updateProgression(msg.data); break;
     case 'updateChallenges': updateChallengesFromBackend(msg.data); break;
     case 'updateCreatorSocials': updateCreatorSocialsFromBackend(msg.data); break;
@@ -12705,6 +12676,37 @@ function updatePicksFromBackend(data) {
   if (data == null) return;
   var n = (typeof data === 'object') ? (data.picks != null ? data.picks : data.count) : data;
   setPicks(n);
+}
+
+// ── Topbar XP bar ────────────────────────────────────────────────────────
+// Fill = userXp / userXpMax; the level label sits to the left of the Picks balance.
+function renderXp() {
+  var fill = document.getElementById('topbar-xp-fill');
+  var lvl = document.getElementById('topbar-xp-level');
+  var pct = (userXpMax > 0) ? Math.max(0, Math.min(100, Math.round(userXp / userXpMax * 100))) : 0;
+  if (fill) fill.style.width = pct + '%';
+  if (lvl) lvl.textContent = 'LVL ' + (userLevel || 1);
+}
+// Direct setter (console/desktop): setXp(currentXp, xpMax, level)
+function setXp(xp, xpMax, level) {
+  if (xp != null) userXp = Number(xp) || 0;
+  if (xpMax != null) userXpMax = Number(xpMax) || 1;
+  if (level != null) userLevel = Number(level) || userLevel;
+  renderXp();
+}
+// Bridge handler — Unity sends { type:'updateXp', data:{ level, xp, xpMax } } over time.
+// Also tolerant of a bare number (current xp toward the existing xpMax).
+function updateXpFromBackend(data) {
+  if (data == null) return;
+  if (typeof data === 'object') {
+    if (data.level != null) userLevel = Number(data.level) || userLevel;
+    if (data.xp != null) userXp = Number(data.xp) || 0;
+    var max = (data.xpMax != null) ? data.xpMax : data.max;
+    if (max != null) userXpMax = Number(max) || 1;
+  } else {
+    userXp = Number(data) || 0;
+  }
+  renderXp();
 }
 
 // Populates the existing Device/Firmware/UI/Game tile on the Career page
@@ -15574,29 +15576,17 @@ function _renderResultsSongPager() {
 function _renderResultsStats(tab) {
   var statsEl = document.getElementById('results-stats');
   if (tab === 'group') {
-    var pi = groupScoreData.perInstrument;
-    if (!pi) {
-      statsEl.innerHTML = '<div class="r2-stat" style="grid-column:span 2"><div class="r2-stat-label">Band Breakdown</div><div class="r2-stat-val">—</div><div class="r2-stat-sub">pending</div></div>';
-      return;
-    }
-    var html = '';
-    var keys = ['drums', 'guitar', 'vocals', 'bass', 'keys'];
-    for (var k = 0; k < keys.length; k++) {
-      if (pi[keys[k]] != null) {
-        html += '<div class="r2-stat"><div class="r2-stat-label">' + keys[k].toUpperCase() +
-                '</div><div class="r2-stat-val">' + Number(pi[keys[k]]).toLocaleString() + '</div><div class="r2-stat-sub">points</div></div>';
-      }
-    }
-    statsEl.innerHTML = html || '<div class="r2-stat" style="grid-column:span 2"><div class="r2-stat-label">Band Breakdown</div><div class="r2-stat-val">—</div></div>';
+    // Group tab shows no stat boxes — the band score + leaderboard carry the info.
+    statsEl.innerHTML = '';
+    return;
   }
   else {
     var d = _resultsMeData();
-    var notes = (d.notes || '0/0').split('/');
     statsEl.innerHTML =
-      '<div class="r2-stat"><div class="r2-stat-label">NOTES HIT</div><div class="r2-stat-val">' + notes[0] + '</div><div class="r2-stat-sub">of ' + (notes[1] || '0') + '</div></div>' +
-      '<div class="r2-stat"><div class="r2-stat-label">BEST STREAK</div><div class="r2-stat-val">' + d.combo + '</div><div class="r2-stat-sub">notes</div></div>' +
-      '<div class="r2-stat"><div class="r2-stat-label">ACCURACY</div><div class="r2-stat-val">' + d.accuracy + '</div><div class="r2-stat-sub">&nbsp;</div></div>' +
-      '<div class="r2-stat"><div class="r2-stat-label">TOP MULT.</div><div class="r2-stat-val">' + (d.mult || '×4') + '</div><div class="r2-stat-sub">max</div></div>';
+      '<div class="r2-stat"><div class="r2-stat-label">NOTES HIT</div><div class="r2-stat-val">' + (d.notes || '0/0') + '</div></div>' +
+      '<div class="r2-stat"><div class="r2-stat-label">BEST STREAK</div><div class="r2-stat-val">' + d.combo + '</div></div>' +
+      '<div class="r2-stat"><div class="r2-stat-label">ACCURACY</div><div class="r2-stat-val">' + d.accuracy + '</div></div>' +
+      '<div class="r2-stat"><div class="r2-stat-label">TOP STARPOWER</div><div class="r2-stat-val">' + (d.mult || '×4') + '</div></div>';
   }
 }
 
@@ -15798,6 +15788,9 @@ function showResults1() {
 }
 
 function showResults2() {
+  // Single CTA label depends on mode: solo → Social Hub, group → Lobby.
+  var cta = document.getElementById('rewards-cta');
+  if (cta) cta.textContent = (playMode === 'coop') ? 'BACK TO LOBBY' : 'BACK TO SOCIAL HUB';
   var black = document.getElementById('onboard-black');
   black.className = 'visible';
   setTimeout(function() {
@@ -20245,6 +20238,12 @@ var activeProfileId = 'rael';
 // Jamsesh Picks balance shown in the topbar. Live value; Unity drives it via the
 // 'updatePicks' bridge message (see setPicks / updatePicksFromBackend).
 var userPicks = 0;
+// Topbar XP — level + progress toward the next level. Unity drives these live via the
+// 'updateXp' bridge message (see setXp / updateXpFromBackend); seeded from the active
+// profile until then.
+var userLevel = 1;
+var userXp = 0;
+var userXpMax = 1;
 
 function showProfilesPanel() {
   document.getElementById('career-main').style.display = 'none';
@@ -21288,6 +21287,10 @@ function switchProfile(profileId) {
   userCoins = profile.coins;
   userPicks = (profile.picks != null) ? profile.picks : userPicks;
   renderPicks();
+  if (profile.level != null) userLevel = profile.level;
+  if (profile.xp != null) userXp = profile.xp;
+  if (profile.xpMax != null) userXpMax = profile.xpMax;
+  renderXp();
 
   // Owned items are per-profile — don't leak the guitar across profiles.
   storeGuitarOwned = !!_ownedByProfile[profileId];
@@ -23359,6 +23362,13 @@ function init() {
   var _pp = getActiveProfile();
   if (_pp && _pp.picks != null) userPicks = _pp.picks;
   renderPicks();
+  // Seed the topbar XP bar from the active profile (Unity overrides live via 'updateXp').
+  if (_pp) {
+    if (_pp.level != null) userLevel = _pp.level;
+    if (_pp.xp != null) userXp = _pp.xp;
+    if (_pp.xpMax != null) userXpMax = _pp.xpMax;
+  }
+  renderXp();
 
   // Initialize legal screen content on startup
   if (typeof onboardInitLegal === 'function') onboardInitLegal();
