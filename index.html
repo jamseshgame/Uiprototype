@@ -12749,6 +12749,15 @@ function updateOwnedItemsFromBackend(data) {
   for (var i = 0; i < items.length; i++) {
     if (items[i] != null) ownedItems['' + items[i]] = true;
   }
+  // Drive the store/vault "Owned" UI from server truth (replaces the old optimistic local flag).
+  if (typeof STORE_GUITAR !== 'undefined' && ownedItems[STORE_GUITAR.id]) {
+    storeGuitarOwned = true;
+    if (typeof _ownedByProfile !== 'undefined' && typeof activeProfileId !== 'undefined') {
+      _ownedByProfile[activeProfileId] = true;
+    }
+  }
+  if (typeof buildStoreGrid === 'function') buildStoreGrid();
+  if (typeof buildVaultGrid === 'function') buildVaultGrid();
 }
 
 // ── Topbar XP bar ────────────────────────────────────────────────────────
@@ -19743,13 +19752,12 @@ function closeItemPurchase(e) {
 
 function confirmItemPurchase() {
   if (storeGuitarOwned || (userPicks || 0) < STORE_GUITAR_PRICE) return;
-  setPicks(userPicks - STORE_GUITAR_PRICE);          // deduct Picks
-  storeGuitarOwned = true;
-  _ownedByProfile[activeProfileId] = true;           // ownership is per-profile
+  // Server-authoritative: do NOT deduct Picks or mark owned optimistically. Unity validates
+  // the purchase, atomically deducts Picks, and pushes back the real balance + owned items
+  // (updatePicks / updateOwnedItems) — the UI's balance and ownership update only from that.
+  // A purchase that fails server-side (e.g. insufficient Picks) therefore leaves the UI unchanged.
   sendToUnity('purchaseItem', { id: STORE_GUITAR.id, name: STORE_GUITAR.name, price: STORE_GUITAR_PRICE });
   closeItemPurchase();
-  buildStoreGrid();   // Items now reads "Owned"
-  buildVaultGrid();   // the guitar now appears in My Collection
 }
 
 // Shared glow palette (matches home-grid colors)
