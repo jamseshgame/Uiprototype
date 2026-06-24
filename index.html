@@ -12116,6 +12116,10 @@ function handleUnityMessage(msg) {
     case 'setInBandspace':
       inBandspace = !!msg.data;
       if (inBandspace) {
+        // The spaces grid keys "You Are Here" + the tap guard off inBandspace, but
+        // navigateTo doesn't rebuild it — refresh here so the badge clears off the
+        // public hub the moment we enter the bandspace.
+        buildSpacesGrid();
         // Reset instrument so nothing is pre-claimed
         selectedInstrument = '';
         lobbyPlayers = [];
@@ -12126,6 +12130,17 @@ function handleUnityMessage(msg) {
         setPlayMode('coop');
         navigateTo('play');
       } else {
+        // Back in the open lobby — Jamsesh Hub is the default public space again.
+        currentHub = 'Jamsesh Hub';
+        buildSpacesGrid();   // refresh so "You Are Here" returns to the hub
+        // Selecting a band entered its bandspace, so leaving it means we're no longer
+        // active in any band — clear the active group so it stops showing the "Active
+        // Group" badge back in the social hub. Membership is untouched: the band still
+        // lists in Bandmates ▸ Groups, just unbadged until re-selected.
+        window._activeGroupName = null;
+        var _grps = (typeof getBandGroups === 'function') ? getBandGroups() : [];
+        for (var _gi = 0; _gi < _grps.length; _gi++) _grps[_gi].active = false;
+        if (typeof buildSocialPage === 'function') buildSocialPage();
         // Returning to the open lobby — drop coop-only state, force the Play
         // tab back to Solo (so the Group panel doesn't keep rendering with a
         // stale roster), and route the user to Home so they land somewhere
@@ -12139,6 +12154,13 @@ function handleUnityMessage(msg) {
         }
         navigateTo('home');
       }
+      break;
+    case 'setCurrentSpace':
+      // Unity confirms the public hub it actually transitioned us into. This is the
+      // SOLE authority for the "You Are Here" marker — the web side no longer marks
+      // spaces current optimistically, so un-wired spaces can't strand a false badge.
+      currentHub = (typeof msg.data === 'string') ? msg.data : ((msg.data && msg.data.name) || currentHub);
+      buildSpacesGrid();
       break;
     case 'updateIsHost':
       if (typeof msg.data === 'object' && msg.data !== null) {
@@ -13564,7 +13586,10 @@ function closeSpaceSwitchConfirm(e) {
 
 function confirmSpaceSwitch() {
   if (_pendingSwitchHub) {
-    currentHub = _pendingSwitchHub.name;
+    // Don't mark this space "current" optimistically — Unity is the authority and
+    // confirms via setCurrentSpace ONLY for hubs it actually honors. Un-wired spaces
+    // (custom public spaces, band studios) would otherwise show a false "You Are
+    // Here" that never clears, since Unity silently ignores their joinHub.
     sendToUnity('joinHub', _pendingSwitchHub.name);
     buildSpacesGrid();
   }
@@ -13631,10 +13656,21 @@ function makeSpaceTile(sp) {
   tile.style.position = 'relative';
   tile.style.overflow = 'hidden';
   tile.style.cursor = 'pointer';
+  // A tile is a public hub (a real, Unity-honored open-lobby env) iff its name is
+  // in spaceHubs; private spaces (band studios, personal space) are not.
+  var isPublicHub = false;
+  for (var hi = 0; hi < spaceHubs.length; hi++) {
+    if (spaceHubs[hi].name === sp.name) { isPublicHub = true; break; }
+  }
   tile.onclick = (function(hub) {
-    return function() { if (hub.name === currentHub) return; openSpaceSwitchConfirm(hub); };
+    // Only no-op when we're actually parked on this public hub in the open lobby.
+    // While in a bandspace, tapping the hub must still fire (it's how you leave).
+    return function() { if (!inBandspace && hub.name === currentHub) return; openSpaceSwitchConfirm(hub); };
   })(sp);
-  var here = (sp.name === currentHub) ? '<div class="space-here-badge">You Are Here</div>' : '';
+  // "You Are Here" belongs only to the public hub we're parked in, and only when
+  // NOT in a bandspace (in a bandspace you're not in any listed space).
+  var here = (!inBandspace && isPublicHub && sp.name === currentHub)
+    ? '<div class="space-here-badge">You Are Here</div>' : '';
   var sub = sp.tagline ? sp.tagline : (sp.count + ' Jammers');
   tile.innerHTML = here +
     '<div class="quest-fade"></div>' +
