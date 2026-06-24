@@ -12098,7 +12098,18 @@ function handleUnityMessage(msg) {
         buildSpacesGrid();
         // Reset instrument so nothing is pre-claimed
         selectedInstrument = '';
-        lobbyPlayers = [];
+        // Carry over any optimistic PENDING invites made from the pre-room Group tab.
+        // When the FIRST invite is what spins up the adhoc room, the pending tile was
+        // pushed into mainStageRoster (inBandspace was still false); seed lobbyPlayers
+        // with it so the "Invited" tile survives the transition into the bandspace
+        // instead of vanishing. updateLobbyFromBackend then preserves it until the
+        // invitee actually joins.
+        var carriedPending = [];
+        for (var _cp = 0; _cp < mainStageRoster.length; _cp++) {
+          if (mainStageRoster[_cp] && mainStageRoster[_cp].pending) carriedPending.push(mainStageRoster[_cp]);
+        }
+        lobbyPlayers = carriedPending;
+        mainStageRoster = [];
         // Clients clear setlist — they'll receive the host's list via network.
         // Host keeps their setlist (3 random songs from buildPlayPanel).
         if (!isHost) setlist = [];
@@ -14225,8 +14236,49 @@ function addFriendToGroup(friend) {
   // to CG_MEMBERS_MAX (4) first-come-first-served as people accept — Unity enforces
   // the cap on accept and rejects/ignores latecomers once the band is full.
   if (createGroupInvited[friend.name]) return;
-  createGroupInvited[friend.name] = true;
-  sendToUnity('inviteToGroup', { name: friend.name });
+  // Store the platformId as the value (falls back to `true` when absent) so the createGroup
+  // payload can invite create-time friends by Meta id. All readers only check truthiness.
+  createGroupInvited[friend.name] = friend.platformId || true;
+
+  if (createGroupMode === 'invite') {
+    // Stage "Add Player" = invite to PLAY this session (a single targeted Meta
+    // invite, no system panel) — NOT a persistent band-membership invite. Unity
+    // fires GroupPresence.SendInvites to this one friend; we own the UI so we drop
+    // an optimistic PENDING tile into the live stage roster. It survives
+    // updateLobbyFromBackend rebuilds and converts to a real tile once they join.
+    console.log('[PLAYINVITE] web: addFriendToGroup(invite) → invitePlayer name=' + friend.name + ' platformId=' + (friend.platformId || '(none)'));
+    sendToUnity('invitePlayer', { name: friend.name, platformId: friend.platformId || '' });
+    var roster = getCoopRoster();
+    var dup = false;
+    for (var i = 0; i < roster.length; i++) {
+      if (roster[i] && (roster[i].name === friend.name ||
+          (friend.platformId && roster[i].platformId === friend.platformId))) { dup = true; break; }
+    }
+    if (!dup && roster.length < COOP_PLAYERS_MAX) {
+      roster.push({
+        name: friend.name,
+        platformId: friend.platformId || '',
+        avatar: friend.avatar || '',
+        instrument: '',
+        difficulty: '',
+        status: 'pending',
+        pending: true,
+        ready: false,
+        online: friend.online !== false
+      });
+    }
+    renderCreateGroupLists();
+    buildPlayGrid();
+    return;
+  }
+
+  // Persistent band-membership invite — only meaningful for an EXISTING band (manage mode).
+  // Unity resolves the active band by name and invites the friend (by platformId) immediately.
+  // In CREATE mode the band doesn't exist yet, so we do NOT invite here — those invitees ride the
+  // createGroup payload and get invited once the band is created.
+  if (createGroupMode === 'manage') {
+    sendToUnity('inviteToGroup', { name: friend.name, platformId: friend.platformId || '', groupName: getActiveGroupName() });
+  }
   renderCreateGroupLists();
 }
 
@@ -14287,12 +14339,17 @@ function confirmCreateGroup() {
   }
   var hadGroup = !!getActiveGroup();   // already in a group? → defer the switch to "Go there"
   var invited = [];
-  for (var k in createGroupInvited) { if (createGroupInvited[k]) invited.push(k); }
+  for (var k in createGroupInvited) {
+    if (createGroupInvited[k]) {
+      // Value is the platformId, or `true` if none was captured → send '' in that case.
+      invited.push({ name: k, platformId: (createGroupInvited[k] === true ? '' : createGroupInvited[k]) });
+    }
+  }
   sendToUnity('createGroup', {
     name: name,
     logo: createGroupLogo,
     members: createGroupMembers.map(function(f) { return { name: f.name, platformId: f.platformId || '' }; }),
-    invited: invited   // pending invites — they join as members once they accept
+    invited: invited   // [{name, platformId}] — pending invites; they join as members once they accept
   });
 
   // Create locally + set active so it shows on the Bandmates ▸ Groups tab.
@@ -17993,15 +18050,24 @@ function buildCoopMemberTile(p, idx) {
   var diffId = p.isSelf ? (selectedDifficulty || p.difficulty || 'easy') : (p.difficulty || 'easy');
   var diffColor = DIFF_ICON_COLORS[diffId] || '#888';
   var isTheHost = hostName && p.name === hostName;
-  // The local player is "Ready" only once a song is added AND instrument /
-  // difficulty / vibe are all set; otherwise "Choosing". Others use their roster status.
-  var statusReady = p.isSelf
+  // Invited-but-not-joined players show an "Invited" pill and no instrument/difficulty
+  // (they haven't picked yet). The local player is "Ready" only once a song is added
+  // AND instrument / difficulty / vibe are all set; otherwise "Choosing". Others use
+  // their roster status.
+  var statusPending = p.pending === true;
+  var statusReady = !statusPending && (p.isSelf
     ? coopSelfReady()
-    : (p.status === 'ready' || p.ready === true);
-  var statusClass = statusReady ? 'coop-player-status-pill--ready' : 'coop-player-status-pill--choosing';
-  var statusLabel = statusReady ? 'Ready' : 'Choosing';
+    : (p.status === 'ready' || p.ready === true));
+  var statusClass = statusPending ? 'coop-player-status-pill--pending'
+                  : (statusReady ? 'coop-player-status-pill--ready' : 'coop-player-status-pill--choosing');
+  var statusLabel = statusPending ? 'Invited' : (statusReady ? 'Ready' : 'Choosing');
   var canRemove = !p.isSelf && !isTheHost && (!inBandspace || isHost);
   var imgHtml = p.avatar ? '<img class="coop-member-img" src="' + p.avatar + '" alt="">' : '<div class="coop-member-img" style="background:#333"></div>';
+  var metaHtml = statusPending
+    ? '<span class="coop-player-status-pill ' + statusClass + '">' + statusLabel + '</span>'
+    : '<span class="player-icon player-icon--inst"><img src="' + (instId === 'guitar' ? 'instruments/skins/iridescent-guitar.png' : 'instruments/' + instId + '.png') + '" alt=""></span>' +
+      '<span class="player-icon player-icon--diff">' + diffBarsSvg(DIFF_BAR_LEVELS[diffId] || 1, diffColor) + '</span>' +
+      '<span class="coop-player-status-pill ' + statusClass + '">' + statusLabel + '</span>';
   tile.innerHTML =
     imgHtml +
     '<div class="coop-member-info">' +
@@ -18009,11 +18075,7 @@ function buildCoopMemberTile(p, idx) {
         (p.isSelf ? '<span class="you-badge">YOU</span>' : '') +
         (isTheHost ? '<span class="player-host-badge">HOST</span>' : '') +
       '</div>' +
-      '<div class="coop-member-meta">' +
-        '<span class="player-icon player-icon--inst"><img src="' + (instId === 'guitar' ? 'instruments/skins/iridescent-guitar.png' : 'instruments/' + instId + '.png') + '" alt=""></span>' +
-        '<span class="player-icon player-icon--diff">' + diffBarsSvg(DIFF_BAR_LEVELS[diffId] || 1, diffColor) + '</span>' +
-        '<span class="coop-player-status-pill ' + statusClass + '">' + statusLabel + '</span>' +
-      '</div>' +
+      '<div class="coop-member-meta">' + metaHtml + '</div>' +
     '</div>';
   // Tap a removable member → the shared member popup (with Remove Member). No X button.
   if (canRemove) {
@@ -18036,6 +18098,16 @@ function openGroupInvitePopup(band) {
   createGroupLogo = b.logo || b.photo || '';
   createGroupMembers = [];
   createGroupInvited = {};
+  // Persist dedup across reopens: pre-mark anyone already in the live stage roster
+  // (pending invites + joined players) so they show as "Invited" and can't be
+  // re-invited. Without this, reopening the popup wipes createGroupInvited and the
+  // same friend could be invited again.
+  var liveRoster = getCoopRoster();
+  for (var ri = 0; ri < liveRoster.length; ri++) {
+    if (liveRoster[ri] && liveRoster[ri].name && !liveRoster[ri].isSelf) {
+      createGroupInvited[liveRoster[ri].name] = true;
+    }
+  }
   if (b.members) {
     for (var i = 0; i < b.members.length && createGroupMembers.length < CG_MEMBERS_MAX - 1; i++) {
       var m = b.members[i];
@@ -18093,12 +18165,17 @@ function _allNonHostReady() {
 
 // Ready/total counts for the Start button label ("2/4 Ready"). The local player
 // (isSelf) counts as ready via coopSelfReady(); everyone else by their status.
+// Counts only LIVE members — pending invitees (not joined yet) and disconnected
+// players are excluded so they can't hold the count below N/N and ransom the
+// host's Start. Mirrors the exclusions in _allNonHostReady().
 function coopReadyCounts() {
   var roster = getCoopRoster() || [];
   var ready = 0, total = 0;
   for (var i = 0; i < roster.length; i++) {
     var p = roster[i];
     if (!p) continue;
+    if (p.pending) continue;       // invited but not joined — not a live member
+    if (p.disconnected) continue;  // can't ready up while gone
     total++;
     var r = p.isSelf ? coopSelfReady() : (p.status === 'ready' || p.ready === true);
     if (r) ready++;
