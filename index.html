@@ -2419,6 +2419,11 @@
     color: #34d399;
     border: 1px solid rgba(52, 211, 153, 0.4);
   }
+  .coop-player-status-pill--pending {
+    background: rgba(148, 163, 184, 0.12);
+    color: #94a3b8;
+    border: 1px solid rgba(148, 163, 184, 0.4);
+  }
   .coop-player-row .player-remove-btn {
     width: 36px;
     height: 36px;
@@ -12405,11 +12410,24 @@ function updateGroupMembers(index, count) {
 function updateLobbyFromBackend(data) {
   // data: [{name, avatar, disconnected, instrument, difficulty, ready, isSelf}, ...]
   if (!data) return;
+  // Preserve any optimistic PENDING invites before we clobber the roster — the
+  // network only knows about players who have actually joined, so a freshly
+  // invited friend isn't in `data` yet and would otherwise vanish on every push.
+  var pending = [];
+  for (var p = 0; p < lobbyPlayers.length; p++) {
+    if (lobbyPlayers[p] && lobbyPlayers[p].pending) pending.push(lobbyPlayers[p]);
+  }
   lobbyPlayers = [];
+  var joinedNames = {};
+  var joinedIds = {};
   for (var i = 0; i < data.length; i++) {
     var ready = data[i].ready !== undefined ? !!data[i].ready : false;
+    var pid = data[i].platformId || '';
+    if (data[i].name) joinedNames[data[i].name] = true;
+    if (pid) joinedIds[pid] = true;
     lobbyPlayers.push({
       name: data[i].name || 'Player ' + (i + 1),
+      platformId: pid,
       avatar: data[i].avatar || '',
       plate: null,
       plateClass: null,
@@ -12426,6 +12444,14 @@ function updateLobbyFromBackend(data) {
       // would early-return on getSelfRosterIdx() === -1 and never reach Unity.
       isSelf: !!data[i].isSelf
     });
+  }
+  // Re-append pending invites that haven't joined yet. Once the invitee shows up
+  // in the networked roster (matched by platformId, falling back to name) we drop
+  // the pending placeholder — the real tile replaces it.
+  for (var q = 0; q < pending.length; q++) {
+    var inv = pending[q];
+    var joined = (inv.platformId && joinedIds[inv.platformId]) || joinedNames[inv.name];
+    if (!joined && lobbyPlayers.length < COOP_PLAYERS_MAX) lobbyPlayers.push(inv);
   }
   if (playMode !== 'solo') buildPlayGrid();
 }
@@ -18058,6 +18084,7 @@ function _allNonHostReady() {
     if (p.isSelf) continue;                         // self readiness = coopSelfReady(), checked separately
     if (hostName && p.name === hostName) continue;  // host itself
     if (p.disconnected) continue;
+    if (p.pending) continue; // invited but not joined — can't gate Start on them
     var ready = p.status === 'ready' || p.ready === true;
     if (!ready) return false;
   }
@@ -18430,9 +18457,11 @@ function buildCoopPlayerRow(p, idx) {
   // status is authoritative when set, but fall back to the boolean `ready`
   // field so a roster pushed without status (older payload paths) still
   // renders the right pill / dot.
-  var statusReady = p.status === 'ready' || p.ready === true;
-  var statusClass = statusReady ? 'coop-player-status-pill--ready' : 'coop-player-status-pill--choosing';
-  var statusLabel = statusReady ? 'Ready' : 'Choosing';
+  var statusPending = p.pending === true;
+  var statusReady = !statusPending && (p.status === 'ready' || p.ready === true);
+  var statusClass = statusPending ? 'coop-player-status-pill--pending'
+                  : (statusReady ? 'coop-player-status-pill--ready' : 'coop-player-status-pill--choosing');
+  var statusLabel = statusPending ? 'Invited' : (statusReady ? 'Ready' : 'Choosing');
   var canRemove = !p.isSelf && !isTheHost && (!inBandspace || isHost);
 
   var avatarSrc = p.avatar || '';
@@ -18514,7 +18543,10 @@ function removeCoopPlayer(idx) {
   var p = roster[idx];
   if (!p || p.isSelf) return; // never let the user kick themselves
   if (hostName && p.name === hostName) return; // and never the host
-  sendToUnity('kickPlayer', { name: p.name });
+  // Pending invites aren't in the networked session yet, so there's nobody to
+  // kick — just drop the optimistic tile. (The Meta invite itself can't be
+  // recalled, but removing the tile lets the host re-invite if they want.)
+  if (!p.pending) sendToUnity('kickPlayer', { name: p.name });
   // roster IS the live array (lobbyPlayers in a bandspace, the active band's
   // members otherwise) — splice it directly so the removal actually sticks.
   roster.splice(idx, 1);
@@ -18563,11 +18595,14 @@ function openAddPlayerPicker() {
     { name: 'GrooveMonkey', online: false, avatar: '' }
   ];
 
-  // Exclude friends already in the roster
+  // Exclude friends already in the roster (including pending invites, which live
+  // in the roster as tiles). Match on platformId where available, name otherwise.
   var roster = getCoopRoster();
   var inRoster = {};
+  var inRosterById = {};
   for (var r = 0; r < roster.length; r++) {
     if (roster[r] && roster[r].name) inRoster[roster[r].name] = true;
+    if (roster[r] && roster[r].platformId) inRosterById[roster[r].platformId] = true;
   }
 
   var fgrid = document.createElement('div');
@@ -18576,6 +18611,7 @@ function openAddPlayerPicker() {
   for (var f = 0; f < pool.length; f++) {
     var fr = pool[f];
     if (inRoster[fr.name]) continue;
+    if (fr.platformId && inRosterById[fr.platformId]) continue;
     renderedAny = true;
     var cell = document.createElement('div');
     cell.style.cssText = 'position:relative;overflow:hidden;border-radius:var(--panel-radius);cursor:pointer;padding-top:100%;border:2px solid transparent;background:#1a1a1a;transition:border-color 0.15s, box-shadow 0.2s';
@@ -18604,16 +18640,22 @@ function openAddPlayerPicker() {
 
 function addCoopPlayer(friend) {
   if (inBandspace) {
-    sendToUnity('invitePlayer', { name: friend.name });
-    // Locally append so the prototype UI updates without Unity in the loop.
+    // Targeted invite: Unity sends a single Meta invite straight to this friend
+    // (no system panel). We own the UI, so append an optimistic PENDING tile and
+    // mark it so it survives updateLobbyFromBackend rebuilds until the invitee
+    // actually joins the networked session (or the host cancels it).
+    console.log('[PLAYINVITE] web: addCoopPlayer → sending invitePlayer name=' + friend.name + ' platformId=' + (friend.platformId || '(none)'));
+    sendToUnity('invitePlayer', { name: friend.name, platformId: friend.platformId || '' });
     lobbyPlayers.push({
       name: friend.name,
+      platformId: friend.platformId || '',
       avatar: friend.avatar,
       plate: null,
       plateClass: null,
       instrument: 'guitar',
       difficulty: 'medium',
-      status: 'choosing',
+      status: 'pending',
+      pending: true,
       ready: false
     });
     buildPlayGrid();
@@ -18633,7 +18675,7 @@ function addCoopPlayer(friend) {
     ready: false,
     online: friend.online !== false
   });
-  sendToUnity('invitePlayer', { name: friend.name });
+  sendToUnity('invitePlayer', { name: friend.name, platformId: friend.platformId || '' });
   buildPlayGrid();
 }
 
