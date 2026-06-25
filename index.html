@@ -12663,6 +12663,15 @@ function updateProfile(data) {
     if (data.name)           profile.name   = data.name;
   }
   if (data.coins != null) userCoins = data.coins;
+  // Keep the personal "<name>'s Private Space" tile in sync with the live name Unity
+  // just pushed (mirrors switchProfile). Without this the tile keeps the seeded mock
+  // name ("RAELJAMSESH's Private Space") on device. No-op until the tile is seeded.
+  if (data.name) {
+    for (var ps = 0; ps < privateSpaces.length; ps++) {
+      if (privateSpaces[ps].isDefault) { privateSpaces[ps].name = data.name + "'s Private Space"; break; }
+    }
+    buildSpacesGrid();
+  }
   rebuildStatTicker();
 }
 
@@ -13652,7 +13661,14 @@ function confirmSpaceSwitch() {
     // confirms via setCurrentSpace ONLY for hubs it actually honors. Un-wired spaces
     // (custom public spaces, band studios) would otherwise show a false "You Are
     // Here" that never clears, since Unity silently ignores their joinHub.
-    sendToUnity('joinHub', _pendingSwitchHub.name);
+    //
+    // The personal private space is a DISCONNECTED haven (OpenLobby env, no Fusion);
+    // everything else is a public hub Unity swaps/joins. Both routes echo setCurrentSpace.
+    if (_pendingSwitchHub.isDefault) {
+      sendToUnity('enterPrivateSpace', _pendingSwitchHub.name);
+    } else {
+      sendToUnity('joinHub', _pendingSwitchHub.name);
+    }
     buildSpacesGrid();
   }
   document.getElementById('space-switch-overlay').classList.remove('active');
@@ -13718,20 +13734,16 @@ function makeSpaceTile(sp) {
   tile.style.position = 'relative';
   tile.style.overflow = 'hidden';
   tile.style.cursor = 'pointer';
-  // A tile is a public hub (a real, Unity-honored open-lobby env) iff its name is
-  // in spaceHubs; private spaces (band studios, personal space) are not.
-  var isPublicHub = false;
-  for (var hi = 0; hi < spaceHubs.length; hi++) {
-    if (spaceHubs[hi].name === sp.name) { isPublicHub = true; break; }
-  }
   tile.onclick = (function(hub) {
-    // Only no-op when we're actually parked on this public hub in the open lobby.
+    // Only no-op when we're actually parked on this space in the open lobby.
     // While in a bandspace, tapping the hub must still fire (it's how you leave).
     return function() { if (!inBandspace && hub.name === currentHub) return; openSpaceSwitchConfirm(hub); };
   })(sp);
-  // "You Are Here" belongs only to the public hub we're parked in, and only when
-  // NOT in a bandspace (in a bandspace you're not in any listed space).
-  var here = (!inBandspace && isPublicHub && sp.name === currentHub)
+  // "You Are Here" belongs to whichever space Unity has confirmed as current via
+  // setCurrentSpace (a public hub OR the disconnected personal private space), and only
+  // when NOT in a bandspace (in a bandspace you're not in any listed space). currentHub
+  // is set solely by Unity, so an un-honored space can't strand a false badge.
+  var here = (!inBandspace && sp.name === currentHub)
     ? '<div class="space-here-badge">You Are Here</div>' : '';
   var sub = sp.tagline ? sp.tagline : (sp.count + ' Jammers');
   tile.innerHTML = here +
