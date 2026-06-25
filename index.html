@@ -20512,7 +20512,7 @@ function buildJamCreatorSection() {
           '<div class="jc-field-label">' + pf.label + '</div>' +
           '<div class="jc-input-wrap">' +
             '<span class="jc-at">@</span>' +
-            '<input type="text" class="jc-input" id="jc-input-' + pf.id + '" placeholder="yourhandle" value="' + safe + '" autocomplete="off" autocapitalize="off" spellcheck="false">' +
+            '<input type="text" class="jc-input" id="jc-input-' + pf.id + '" placeholder="yourhandle" value="' + safe + '" inputmode="none" onclick="requestKeyboardForInput(\'jc-input-' + pf.id + '\')" autocomplete="off" autocapitalize="off" spellcheck="false">' +
           '</div>' +
         '</div>' +
         '<button class="jc-confirm' + (s.handle ? ' confirmed' : '') + '" id="jc-confirm-' + pf.id + '" onclick="confirmCreatorSocial(\'' + pf.id + '\')">' + (s.handle ? 'Confirmed' : 'Confirm') + '</button>' +
