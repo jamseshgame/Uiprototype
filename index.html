@@ -5885,6 +5885,22 @@
 
 
 
+  /* Device / build details footer at the bottom of Settings ▸ Profile. Sits
+     below the (flex:1) settings-grid as a quiet, single-line meta string. */
+  .settings-device-info {
+    flex: 0 0 auto;
+    margin: 8px 8px 4px;
+    text-align: center;
+    font-size: 18px;
+    line-height: 1.3;
+    color: var(--text-muted);
+    letter-spacing: 0.04em;
+    font-style: italic;
+  }
+  .settings-device-info:empty {
+    display: none;
+  }
+
   .settings-tile .tile-info {
     position: absolute;
     top: 0; left: 0; right: 0; bottom: 0;
@@ -10996,6 +11012,9 @@ input, textarea, select {
             <div class="settings-tile" onclick="showPrivacy()"><div class="tile-info"><div class="tile-title">Privacy Policy</div></div></div>
           </div>
           <div id="settings-profile-pager"></div>
+          <!-- Device / build details, populated by updateClientInfo (Unity pushes
+               device + firmware + game version on web ready; UI version is local). -->
+          <div class="settings-device-info" id="settings-device-info"></div>
         </div>
         <div id="settings-tab-gameplay" class="spaces-tab-content" style="display:none">
           <!-- All Gameplay settings tiles removed for now (features not yet wired up). -->
@@ -12800,10 +12819,10 @@ function updateXpFromBackend(data) {
   renderXp();
 }
 
-// Populates the existing Device/Firmware/UI/Game tile on the Career page
-// with real client values. Static for the session — Unity sends this once
-// on web ready via updateClientInfo. UI version comes from the webview's
-// own UI_VERSION constant (the page knows its own bundle version).
+// Populates the Device/build details footer in Settings ▸ Profile with real
+// client values. Static for the session — Unity sends this once on web ready
+// via updateClientInfo. UI version comes from the webview's own UI_VERSION
+// constant (the page knows its own bundle version).
 function updateClientInfo(data) {
   if (!data) return;
   function setText(id, value) {
@@ -12814,6 +12833,17 @@ function updateClientInfo(data) {
   setText('client-info-firmware', data.firmware);
   setText('client-info-ui',       UI_VERSION);
   setText('client-info-game',     data.gameVersion);
+
+  // Single-line device/build string for the Settings ▸ Profile footer.
+  var infoEl = document.getElementById('settings-device-info');
+  if (infoEl) {
+    var parts = [];
+    if (data.device)      parts.push(data.device);
+    if (data.firmware)    parts.push('Firmware ' + data.firmware);
+    parts.push('UI ' + UI_VERSION);
+    if (data.gameVersion) parts.push('Game ' + data.gameVersion);
+    infoEl.textContent = parts.join('  ·  ');
+  }
 }
 
 // ── Navigation ─────────────────────────────────────────
