@@ -615,17 +615,17 @@
   <!-- ══════════════ RESULTS SCREEN 1 ══════════════ -->
   <div class="game-screen active" id="screen-results1">
     <div class="results-panel">
-      <div class="results-title">You crushed it, <span id="results-group-name">Jamsesh Hunters</span>!</div>
+      <div class="results-title" id="results-title">You crushed it!</div>
       <div class="results-body">
 
         <!-- Left column: album art + score stacked -->
         <div class="results-left-col">
           <div class="results-album-col">
             <img class="results-album-art" id="results-album-art" src="art/placeholder.jpg" alt="Album">
-            <div class="results-song-title" id="results-song-title">The Fate of Ophelia</div>
-            <div class="results-song-artist" id="results-song-artist">Taylor Swift</div>
-            <div class="results-song-diff">Expert</div>
-            <div class="results-instrument"><svg viewBox="0 0 24 24"><path d="M19.59 3.41c-.8-.8-2.1-.8-2.9 0L12 8.1 9.59 5.69c-.8-.8-2.1-.8-2.9 0-.8.8-.8 2.1 0 2.9L9.1 11 3.41 16.69c-.8.8-.8 2.1 0 2.9.4.4.93.59 1.45.59s1.05-.2 1.45-.59L12 13.9l2.41 2.41c.4.4.93.59 1.45.59s1.05-.2 1.45-.59c.8-.8.8-2.1 0-2.9L14.9 11l5.69-5.69c.8-.8.8-2.1 0-2.9z"/></svg>Guitar</div>
+            <div class="results-song-title" id="results-song-title"></div>
+            <div class="results-song-artist" id="results-song-artist"></div>
+            <div class="results-song-diff" id="results-song-diff"></div>
+            <div class="results-instrument" id="results-instrument"></div>
           </div>
           <div class="results-score-col">
             <div class="col-title">Score</div>
@@ -633,19 +633,19 @@
               <div class="results-tab active" onclick="switchResultsTab('group')">Group</div>
               <div class="results-tab" onclick="switchResultsTab('me')">Me</div>
             </div>
-            <div class="results-big-score" id="results-big-score">987,654</div>
+            <div class="results-big-score" id="results-big-score">—</div>
             <div class="results-stars" id="results-stars">
-              <div class="results-star">&#9733;</div>
-              <div class="results-star">&#9733;</div>
-              <div class="results-star">&#9733;</div>
-              <div class="results-star">&#9733;</div>
+              <div class="results-star empty">&#9734;</div>
+              <div class="results-star empty">&#9734;</div>
+              <div class="results-star empty">&#9734;</div>
+              <div class="results-star empty">&#9734;</div>
               <div class="results-star empty">&#9734;</div>
             </div>
             <div class="results-stats" id="results-stats">
-              <div class="results-stat accuracy"><div class="stat-label">Accuracy</div><div class="stat-value">98.5%</div></div>
-              <div class="results-stat combo"><div class="stat-label">Max Combo</div><div class="stat-value">342</div></div>
-              <div class="results-stat perfect"><div class="stat-label">Perfect Hits</div><div class="stat-value">98.5%</div></div>
-              <div class="results-stat notes"><div class="stat-label">Notes Hit</div><div class="stat-value">98.5%</div></div>
+              <div class="results-stat accuracy"><div class="stat-label">Accuracy</div><div class="stat-value">—</div></div>
+              <div class="results-stat combo"><div class="stat-label">Max Combo</div><div class="stat-value">—</div></div>
+              <div class="results-stat perfect"><div class="stat-label">Perfect Hits</div><div class="stat-value">—</div></div>
+              <div class="results-stat notes"><div class="stat-label">Notes Hit</div><div class="stat-value">—</div></div>
             </div>
           </div>
         </div>
@@ -657,91 +657,13 @@
             <div class="results-tab active" onclick="switchResultsTab('group')">Group</div>
             <div class="results-tab" onclick="switchResultsTab('me')">Me</div>
           </div>
-          <!-- Group leaderboard -->
+          <!-- Group leaderboard — populated by applyLeaderboard() from Unity. -->
           <div class="results-lb-list" id="lb-group">
-            <div class="results-lb-entry">
-              <div class="results-lb-rank">1</div>
-              <div class="results-lb-avatar"><img src="avatars/placeholder-12.png" alt=""></div>
-              <div class="results-lb-info"><div class="results-lb-name">Neon Phantoms</div><div class="results-lb-score-val">1,245,678</div></div>
-            </div>
-            <div class="results-lb-entry highlight">
-              <div class="results-lb-rank">2</div>
-              <div class="results-lb-avatar"><img src="avatars/placeholder-33.png" alt=""></div>
-              <div class="results-lb-info"><div class="results-lb-name">Jamsesh Hunters</div><div class="results-lb-score-val">1,123,456</div></div>
-            </div>
-            <div class="results-lb-entry">
-              <div class="results-lb-rank">3</div>
-              <div class="results-lb-avatar"><img src="avatars/placeholder-47.png" alt=""></div>
-              <div class="results-lb-info"><div class="results-lb-name">Electric Dreams</div><div class="results-lb-score-val">1,098,765</div></div>
-            </div>
-            <div class="results-lb-entry">
-              <div class="results-lb-rank">4</div>
-              <div class="results-lb-avatar"><img src="avatars/placeholder-5.png" alt=""></div>
-              <div class="results-lb-info"><div class="results-lb-name">Rhythm Rebels</div><div class="results-lb-score-val">987,654</div></div>
-            </div>
-            <div class="results-lb-entry">
-              <div class="results-lb-rank">5</div>
-              <div class="results-lb-avatar"><img src="avatars/placeholder-20.png" alt=""></div>
-              <div class="results-lb-info"><div class="results-lb-name">Sonic Wolves</div><div class="results-lb-score-val">945,210</div></div>
-            </div>
-            <div class="results-lb-entry">
-              <div class="results-lb-rank">6</div>
-              <div class="results-lb-avatar"><img src="avatars/placeholder-60.png" alt=""></div>
-              <div class="results-lb-info"><div class="results-lb-name">Bass Bandits</div><div class="results-lb-score-val">912,033</div></div>
-            </div>
-            <div class="results-lb-entry">
-              <div class="results-lb-rank">7</div>
-              <div class="results-lb-avatar"><img src="avatars/placeholder-31.png" alt=""></div>
-              <div class="results-lb-info"><div class="results-lb-name">Velvet Crush</div><div class="results-lb-score-val">889,441</div></div>
-            </div>
-            <div class="results-lb-entry">
-              <div class="results-lb-rank">8</div>
-              <div class="results-lb-avatar"><img src="avatars/placeholder-15.png" alt=""></div>
-              <div class="results-lb-info"><div class="results-lb-name">Star Strummers</div><div class="results-lb-score-val">854,112</div></div>
-            </div>
+            <div class="results-lb-entry"><div class="results-lb-info"><div class="results-lb-name">Loading…</div></div></div>
           </div>
-          <!-- Me leaderboard -->
+          <!-- Me leaderboard — populated by applyLeaderboard() from Unity. -->
           <div class="results-lb-list" id="lb-me" style="display:none">
-            <div class="results-lb-entry">
-              <div class="results-lb-rank">1</div>
-              <div class="results-lb-avatar"><img src="avatars/placeholder-9.png" alt=""></div>
-              <div class="results-lb-info"><div class="results-lb-name">xShadowPick</div><div class="results-lb-score-val">1,312,400</div></div>
-            </div>
-            <div class="results-lb-entry">
-              <div class="results-lb-rank">2</div>
-              <div class="results-lb-avatar"><img src="avatars/placeholder-25.png" alt=""></div>
-              <div class="results-lb-info"><div class="results-lb-name">MelodyQueen</div><div class="results-lb-score-val">1,198,320</div></div>
-            </div>
-            <div class="results-lb-entry">
-              <div class="results-lb-rank">3</div>
-              <div class="results-lb-avatar"><img src="avatars/placeholder-44.png" alt=""></div>
-              <div class="results-lb-info"><div class="results-lb-name">BeatDropper99</div><div class="results-lb-score-val">1,087,650</div></div>
-            </div>
-            <div class="results-lb-entry highlight">
-              <div class="results-lb-rank">4</div>
-              <div class="results-lb-avatar"><img src="avatars/rael_new.png" alt=""></div>
-              <div class="results-lb-info"><div class="results-lb-name">Rael</div><div class="results-lb-score-val">987,654</div></div>
-            </div>
-            <div class="results-lb-entry">
-              <div class="results-lb-rank">5</div>
-              <div class="results-lb-avatar"><img src="avatars/placeholder-52.png" alt=""></div>
-              <div class="results-lb-info"><div class="results-lb-name">FretNinja</div><div class="results-lb-score-val">965,880</div></div>
-            </div>
-            <div class="results-lb-entry">
-              <div class="results-lb-rank">6</div>
-              <div class="results-lb-avatar"><img src="avatars/placeholder-38.png" alt=""></div>
-              <div class="results-lb-info"><div class="results-lb-name">GrooveMonkey</div><div class="results-lb-score-val">943,210</div></div>
-            </div>
-            <div class="results-lb-entry">
-              <div class="results-lb-rank">7</div>
-              <div class="results-lb-avatar"><img src="avatars/placeholder-18.png" alt=""></div>
-              <div class="results-lb-info"><div class="results-lb-name">RiffLord420</div><div class="results-lb-score-val">921,550</div></div>
-            </div>
-            <div class="results-lb-entry">
-              <div class="results-lb-rank">8</div>
-              <div class="results-lb-avatar"><img src="avatars/placeholder-67.png" alt=""></div>
-              <div class="results-lb-info"><div class="results-lb-name">PickSlinger</div><div class="results-lb-score-val">898,770</div></div>
-            </div>
+            <div class="results-lb-entry"><div class="results-lb-info"><div class="results-lb-name">Loading…</div></div></div>
           </div>
         </div>
 
@@ -900,8 +822,8 @@ function applyProgression(data) {
 // ── Tab state (mirrors index.html switchResultsTab) ────────
 var resultsTab = 'group';
 
-// Group play also pushes a band name with the gameResults payload — null in solo.
-var _groupName = 'Jamsesh Hunters';
+// Band name from the gameResults payload (group play only); blank until it arrives.
+var _groupName = '';
 
 // Per-tab score data. groupScoreData starts with placeholder values; gets the
 // real combined total when the host's RPC_BroadcastBandScores arrives. The
@@ -911,13 +833,17 @@ var _groupName = 'Jamsesh Hunters';
 var groupScoreData = { score: '0', stars: 0, members: null };
 var meScoreData = { score: '0', stars: 0, accuracy: '0%', combo: '0', perfect: '0', notes: '0/0' };
 
-// Tracks the most-recent profile name pushed from Unity so the "Me" tab can
-// label the title correctly. Starts as the index.html default.
-var _profileName = 'Rael';
+// Player display name from the gameResults payload (or a later updateProfile);
+// labels the "Me" tab title. Blank until Unity sends it.
+var _profileName = '';
 
+// Sets the whole results title. Drops the name (and its comma) gracefully when
+// it hasn't arrived yet so the page never shows a hardcoded placeholder name.
 function _refreshTitle() {
-  document.getElementById('results-group-name').textContent =
-    resultsTab === 'group' ? _groupName : _profileName;
+  var el = document.getElementById('results-title');
+  if (!el) return;
+  var name = resultsTab === 'group' ? _groupName : _profileName;
+  el.innerHTML = name ? ('You crushed it, <span>' + name + '</span>!') : 'You crushed it!';
 }
 
 function _renderStats(tab) {
@@ -985,16 +911,35 @@ function switchResultsTab(tab) {
 // ── Apply Unity results payload ────────────────────────────
 function _fmtNum(n) { return (n == null) ? '0' : Number(n).toLocaleString(); }
 
+// Builds the instrument icon + label from the Unity-sent slug ('drums'|'guitar'
+// |'vocals'). Reuses the shared instrument PNGs; hides a broken icon rather than
+// showing the browser's placeholder glyph. Empty slug → no label at all.
+function _instrumentMarkup(slug) {
+  if (!slug) return '';
+  var label = slug.charAt(0).toUpperCase() + slug.slice(1);
+  return '<img src="instruments/' + slug + '.png" alt="" ' +
+         'style="width:28px;height:28px;object-fit:contain" ' +
+         'onerror="this.style.display=\'none\'">' + label;
+}
+
 function applyGameResults(data) {
   if (!data) return;
+
+  // Capture the player name first so the title (rendered below via
+  // switchResultsTab → _refreshTitle) shows the real name in solo.
+  if (data.playerName) _profileName = data.playerName;
 
   if (data.song) {
     var artEl = document.getElementById('results-album-art');
     var titleEl = document.getElementById('results-song-title');
     var artistEl = document.getElementById('results-song-artist');
+    var diffEl = document.getElementById('results-song-diff');
+    var instEl = document.getElementById('results-instrument');
     if (artEl && data.song.file) artEl.src = data.song.file;
     if (titleEl) titleEl.textContent = data.song.title || 'Unknown';
     if (artistEl) artistEl.textContent = data.song.artist || 'Unknown';
+    if (diffEl) diffEl.textContent = data.song.difficulty || '';
+    if (instEl) instEl.innerHTML = _instrumentMarkup(data.song.instrument);
   }
 
   meScoreData = {
