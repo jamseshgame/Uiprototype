@@ -5900,6 +5900,25 @@
   .settings-device-info:empty {
     display: none;
   }
+  /* Account identifiers (Meta id + Jamsesh/PlayFab id), each on its own line
+     under the device/build string. Quiet like the device-info string but with
+     a monospaced value so the long opaque ids stay legible when read aloud. */
+  .settings-account-id {
+    flex: 0 0 auto;
+    margin: 2px 8px;
+    text-align: center;
+    font-size: 16px;
+    line-height: 1.3;
+    color: var(--text-muted);
+    letter-spacing: 0.02em;
+  }
+  .settings-account-id:empty {
+    display: none;
+  }
+  .settings-account-id .settings-account-id-value {
+    font-family: monospace;
+    letter-spacing: 0.04em;
+  }
 
   .settings-tile .tile-info {
     position: absolute;
@@ -10990,8 +11009,8 @@ input, textarea, select {
     <div class="page" id="page-store">
       <div class="play-mode-tabs" id="store-tabs">
         <button class="play-mode-tab" onclick="switchStoreTab('songs')" style="display:none">Songs</button>
-        <button class="play-mode-tab" onclick="switchStoreTab('packs')" style="display:none">Packs</button>
         <button class="play-mode-tab active" onclick="switchStoreTab('items')">Items</button>
+        <button class="play-mode-tab" onclick="switchStoreTab('packs')">Picks</button>
         <button class="play-mode-tab" onclick="switchStoreTab('vault')">My Collection</button>
       </div>
       <div id="store-tab-songs" class="vault-tab-content" style="display:none"><div class="spaces-grid" id="store-songs-grid"></div><div id="store-songs-pager"></div></div>
@@ -11017,6 +11036,10 @@ input, textarea, select {
           <!-- Device / build details, populated by updateClientInfo (Unity pushes
                device + firmware + game version on web ready; UI version is local). -->
           <div class="settings-device-info" id="settings-device-info"></div>
+          <!-- Account identifiers, populated by updateClientInfo (Meta platform
+               id + Jamsesh/PlayFab id). Hidden until their values arrive. -->
+          <div class="settings-account-id" id="settings-meta-id"></div>
+          <div class="settings-account-id" id="settings-jamsesh-id"></div>
         </div>
         <div id="settings-tab-gameplay" class="spaces-tab-content" style="display:none">
           <!-- All Gameplay settings tiles removed for now (features not yet wired up). -->
@@ -12097,6 +12120,7 @@ function handleUnityMessage(msg) {
     case 'updatePicks': updatePicksFromBackend(msg.data); break;
     case 'updateOwnedItems': updateOwnedItemsFromBackend(msg.data); break;
     case 'updateStoreCatalog': updateStoreCatalogFromBackend(msg.data); break;
+    case 'updateIapPacks': updateIapPacksFromBackend(msg.data); break;
     case 'updateXp': updateXpFromBackend(msg.data); break;
     case 'updateProgression': updateProgression(msg.data); break;
     case 'updateChallenges': updateChallengesFromBackend(msg.data); break;
@@ -12877,6 +12901,22 @@ function updateClientInfo(data) {
     if (data.gameVersion) parts.push('Game ' + data.gameVersion);
     infoEl.textContent = parts.join('  ·  ');
   }
+
+  // Account identifiers (Meta platform id + Jamsesh/PlayFab id) shown on their
+  // own lines under the device/build string so they can be read out for support.
+  // Each row stays hidden (empty) until its value arrives.
+  function setAccountId(rowId, label, value) {
+    var row = document.getElementById(rowId);
+    if (!row) return;
+    if (value) {
+      row.innerHTML = label + ' <span class="settings-account-id-value"></span>';
+      row.querySelector('.settings-account-id-value').textContent = value;
+    } else {
+      row.textContent = '';
+    }
+  }
+  setAccountId('settings-meta-id',    'Meta ID:',    data.metaId);
+  setAccountId('settings-jamsesh-id', 'Jamsesh ID:', data.jamseshId);
 }
 
 // ── Navigation ─────────────────────────────────────────
@@ -19791,11 +19831,13 @@ function updateCreatorNameBtn() {
 
 function switchStoreTab(tab) {
   var tabs = document.getElementById('store-tabs').children;
-  var names = ['songs', 'packs', 'items', 'vault'];
+  var names = ['songs', 'items', 'packs', 'vault'];
   for (var i = 0; i < tabs.length; i++) {
     tabs[i].className = 'play-mode-tab' + (names[i] === tab ? ' active' : '');
     document.getElementById('store-tab-' + names[i]).style.display = names[i] === tab ? 'flex' : 'none';
   }
+  // Opening Packs → ask Unity for the latest real-money pick packs (sku/picks + localized price).
+  if (tab === 'packs') sendToUnity('requestIapPacks', {});
   updateDeeplinkUrl('store', tab);
 }
 
@@ -19946,6 +19988,16 @@ var storePacksPage = 0;
 var storeItemsPage = 0;
 var storeVaultPage = 0;
 
+// Real-money pick packs pushed by Unity (updateIapPacks). Each: { sku, picks, price, name }.
+// picks comes from PlayFab Title Data; price is the localized string from Meta (may be empty in
+// the editor / before the add-on is published). Empty → fall back to the mock packData below.
+var iapPacks = [];
+function updateIapPacksFromBackend(data) {
+  iapPacks = (data && data.packs) ? data.packs : [];
+  // Store DOM is static (always present, just hidden), so it's safe to rebuild whenever this lands.
+  if (document.getElementById('store-packs-grid')) buildStoreGrid();
+}
+
 function buildStoreGrid() {
   // ── Songs tab: paginate the full catalogue 12 (4x3) at a time ──
   var songsGrid = document.getElementById('store-songs-grid');
@@ -19973,18 +20025,35 @@ function buildStoreGrid() {
   renderPager(document.getElementById('store-songs-pager'), storeSongsPage, songTotal, function(dir) { storeSongsPage += dir; buildStoreGrid(); });
 
   // ── Packs tab ──
+  // Real-money pick packs from Unity (iapPacks) when available; otherwise the mock bundles below
+  // so the desktop demo still renders. Real packs send storeBuyPack {sku}; mock send {name}.
   var packsGrid = document.getElementById('store-packs-grid');
-  var packData = [
-    {name:'Starter Bundle', picks:500, items:['Neon Arena','Electric Guitar'], price:'$4.99', color:'#1a3a5c', locked:false},
-    {name:'Rock Legend Pack', picks:1200, items:['Fire Stage','Gold Mic'], price:'$9.99', color:'#4a1a1a', locked:false},
-    {name:'Party Pack', picks:800, items:['Beach Party','Drum Kit'], price:'$7.99', color:'#1a4a2a', locked:false},
-    {name:'Premium Bundle', picks:2500, items:['Diamond','Rainbow Road'], price:'$14.99', color:'#3a1a4a', locked:false},
-    {name:'Galaxy Pack', picks:1000, items:['Galaxy Skybox','Synthesizer'], price:'$8.99', color:'#1a2a4a', locked:false},
-    {name:'Progress Pass', picks:3000, items:['Northern Lights','Cloud Stage'], price:'$19.99', color:'#4a3a1a', locked:false},
-    {locked:true, unlock:'Unlocks on 9/28'},
-    {locked:true, unlock:'Unlocks on 10/15'},
-    {locked:true, unlock:'Unlocks on 11/1'}
-  ];
+  var packData;
+  if (iapPacks && iapPacks.length) {
+    var PICK_PACK_COLORS = ['#1a3a5c', '#4a1a1a', '#1a4a2a', '#3a1a4a', '#1a2a4a', '#4a3a1a'];
+    packData = [];
+    for (var ppi = 0; ppi < iapPacks.length; ppi++) {
+      var ip = iapPacks[ppi];
+      packData.push({
+        sku: ip.sku,
+        picks: ip.picks,
+        price: (ip.price && ip.price.length) ? ip.price : '—',
+        color: PICK_PACK_COLORS[ppi % PICK_PACK_COLORS.length],
+        locked: false,
+        isPickPack: true
+      });
+    }
+  } else {
+    // Desktop/editor fallback (no Unity push): mock the real pick-pack ladder so the Packs tab reads
+    // identically to production. No sku → buttons send {name} (harmless off-device). Prices here are
+    // placeholders; on device the real localized price comes from Meta via updateIapPacks.
+    packData = [
+      {picks:1000,  price:'$5',  color:'#1a3a5c', locked:false, isPickPack:true},
+      {picks:2300,  price:'$10', color:'#4a1a1a', locked:false, isPickPack:true},
+      {picks:5000,  price:'$20', color:'#1a4a2a', locked:false, isPickPack:true},
+      {picks:12500, price:'$40', color:'#3a1a4a', locked:false, isPickPack:true}
+    ];
+  }
   var packTotal = pageCount(packData.length);
   if (storePacksPage >= packTotal) storePacksPage = packTotal - 1;
   if (storePacksPage < 0) storePacksPage = 0;
@@ -20003,14 +20072,21 @@ function buildStoreGrid() {
       tile.style.cursor = 'pointer';
       tile.style.padding = '24px';
       tile.onclick = (function(pack) {
-        return function() { sendToUnity('storeBuyPack', {name: pack.name}); };
+        return function() { sendToUnity('storeBuyPack', pack.sku ? {sku: pack.sku} : {name: pack.name}); };
       })(p);
-      tile.innerHTML =
+      var packInner =
         '<div class="store-price">' + p.price + '</div>' +
-        '<div style="font-size:40px;line-height:1">&#127873;</div>' +
-        '<div class="tile-hero-title">' + p.name + '</div>' +
-        '<div class="tile-hero-sub">' + p.picks + ' Picks</div>' +
-        '<div class="tile-hero-sub" style="color:rgba(255,255,255,0.6)">' + p.items[0] + ' + ' + p.items[1] + '</div>';
+        '<div style="line-height:0"><img src="branding/JamPick_hires.png" alt="" style="width:44px;height:44px;object-fit:contain;display:block"></div>';
+      if (p.isPickPack) {
+        // Real pick pack: price + gift + "1,000 Picks" (no cosmetic items bundled).
+        packInner += '<div class="tile-hero-title">' + (p.picks ? p.picks.toLocaleString() : '') + ' Picks</div>';
+      } else {
+        packInner +=
+          '<div class="tile-hero-title">' + p.name + '</div>' +
+          '<div class="tile-hero-sub">' + p.picks + ' Picks</div>' +
+          '<div class="tile-hero-sub" style="color:rgba(255,255,255,0.6)">' + p.items[0] + ' + ' + p.items[1] + '</div>';
+      }
+      tile.innerHTML = packInner;
     } else {
       tile.style.background = 'var(--bg-surface)';
       tile.innerHTML =
