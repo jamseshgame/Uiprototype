@@ -18020,7 +18020,10 @@ function buildCoopSongsRow(grid) {
   var n = Math.min(setlist.length, coopMax);
   var shown = 0;
   for (var i = 0; i < n && shown < COOP_PLAYERS_MAX - 1; i++) { row.appendChild(makeSoloSongTile(i)); shown++; }
-  if (shown < COOP_PLAYERS_MAX - 1 && n < coopMax) row.appendChild(makeSoloAddTile());
+  // Only the host controls the setlist — non-host clients can't pick songs (showPlayPicker
+  // bails for them), so don't render the Add Song tile at all in a bandspace for clients.
+  var canAddSong = !inBandspace || isHost;
+  if (canAddSong && shown < COOP_PLAYERS_MAX - 1 && n < coopMax) row.appendChild(makeSoloAddTile());
   grid.appendChild(row);
 }
 
@@ -18127,8 +18130,13 @@ function buildCoopMembersRow(grid) {
 function buildCoopMemberTile(p, idx) {
   var tile = document.createElement('div');
   tile.className = 'coop-member-tile' + (p.isSelf ? ' coop-member-tile--self' : '');
-  var instId = p.isSelf ? (selectedInstrument || p.instrument || 'guitar') : (p.instrument || 'guitar');
-  var diffId = p.isSelf ? (selectedDifficulty || p.difficulty || 'easy') : (p.difficulty || 'easy');
+  // Trust the networked roster echo (p.instrument/p.difficulty) for EVERY row, including
+  // self — so the local player's pills match exactly what their bandmates see. Local
+  // selections are only a pre-replication fallback for self, used until Unity echoes the
+  // broadcast back. (Previously self read local state first, which could disagree with the
+  // network and made the self pills flicker / show the wrong instrument.)
+  var instId = p.instrument || (p.isSelf ? selectedInstrument : '') || 'guitar';
+  var diffId = p.difficulty || (p.isSelf ? selectedDifficulty : '') || 'easy';
   var diffColor = DIFF_ICON_COLORS[diffId] || '#888';
   var isTheHost = hostName && p.name === hostName;
   // Invited-but-not-joined players show an "Invited" pill and no instrument/difficulty
@@ -18136,9 +18144,13 @@ function buildCoopMemberTile(p, idx) {
   // AND instrument / difficulty / vibe are all set; otherwise "Choosing". Others use
   // their roster status.
   var statusPending = p.pending === true;
-  var statusReady = !statusPending && (p.isSelf
-    ? coopSelfReady()
-    : (p.status === 'ready' || p.ready === true));
+  // Non-host self uses the SAME authoritative ready state as every other row (the networked
+  // echo of what was actually broadcast via playerReady), not a local completeness guess — so
+  // the self pill can't claim "Ready" while peers still see "Choosing" (or vice versa). The
+  // host is the exception: they never broadcast a ready flag (their button is Start, gated on
+  // coopSelfReady), so the host's own pill stays tied to coopSelfReady to match that gate.
+  var echoReady = p.status === 'ready' || p.ready === true;
+  var statusReady = !statusPending && (p.isSelf && isHost ? coopSelfReady() : echoReady);
   var statusClass = statusPending ? 'coop-player-status-pill--pending'
                   : (statusReady ? 'coop-player-status-pill--ready' : 'coop-player-status-pill--choosing');
   var statusLabel = statusPending ? 'Invited' : (statusReady ? 'Ready' : 'Choosing');
@@ -18606,10 +18618,11 @@ function buildCoopPlayerRow(p, idx) {
   row.className = 'coop-player-row';
   if (p.isSelf) row.className += ' coop-player-row--self';
 
-  // For self, reflect the live picker selections so changing instrument /
-  // difficulty in the options row updates the row immediately, before Ready.
-  var instId = p.isSelf ? (selectedInstrument || p.instrument || 'guitar') : (p.instrument || 'guitar');
-  var diffId = p.isSelf ? (selectedDifficulty || p.difficulty || 'easy') : (p.difficulty || 'easy');
+  // Trust the networked roster echo for every row, including self, so the local player's
+  // instrument/difficulty match what bandmates see. Local picker selections are only a
+  // pre-replication fallback for self, used until Unity echoes the broadcast back.
+  var instId = p.instrument || (p.isSelf ? selectedInstrument : '') || 'guitar';
+  var diffId = p.difficulty || (p.isSelf ? selectedDifficulty : '') || 'easy';
   var diffColor = DIFF_ICON_COLORS[diffId] || '#888';
   var isTheHost = hostName && p.name === hostName;
   // status is authoritative when set, but fall back to the boolean `ready`
@@ -18670,6 +18683,21 @@ function getSelfRosterIdx() {
     if (roster[i] && roster[i].isSelf) return i;
   }
   return -1;
+}
+
+// Optimistically mirror the local player's instrument/difficulty picks onto their own
+// roster entry so the Group-tab pill updates instantly with the value we just broadcast
+// to Unity. The authoritative network echo (updateLobby) overwrites this a moment later
+// with the same value — or a host correction (e.g. bumped to Spectator when the band is
+// full) — so the pill always ends up matching what bandmates see.
+function coopSyncSelfPicks() {
+  if (!inBandspace) return;
+  var idx = getSelfRosterIdx();
+  if (idx < 0) return;
+  var self = getCoopRoster()[idx];
+  if (!self) return;
+  if (selectedInstrument) self.instrument = selectedInstrument;
+  if (selectedDifficulty) self.difficulty = selectedDifficulty;
 }
 
 function handleCoopReady() {
@@ -18920,6 +18948,7 @@ function openOptionPicker(type) {
             selectedInstrument = id;
             setSongInstrument(activeSongIdx, id);
             sendToUnity('instrument', { instrument: id, chartId: chartId });
+            coopSyncSelfPicks();
             closeOptionPicker();
             buildPlayGrid();
           };
@@ -18950,6 +18979,7 @@ function openOptionPicker(type) {
                 setSongInstrument(activeSongIdx, instId);
                 setSongChart(activeSongIdx, instId, chartId);
                 sendToUnity('instrument', { instrument: instId, chartId: chartId });
+                coopSyncSelfPicks();
                 closeOptionPicker();
                 buildPlayGrid();
               };
@@ -18995,6 +19025,7 @@ function openOptionPicker(type) {
           selectedDifficulty = id;
           setSongDifficulty(activeSongIdx, id);
           sendToUnity('selectDifficulty', id);
+          coopSyncSelfPicks();
           closeOptionPicker();
           buildPlayGrid();
         };
