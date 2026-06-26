@@ -7584,6 +7584,8 @@
     letter-spacing: 1px;
     color: var(--page-accent, #fff);
   }
+  /* Buyable item the player can't afford yet (matches the purchase popup's red). */
+  .store-item-price.insufficient { color: #dc2626; }
   /* !important beats the broader `.space-tile img { width:100% }` rule that was
      blowing this little price icon up to fill the whole tile. */
   .store-item-pick { width: 34px !important; height: 34px !important; object-fit: contain; flex: 0 0 auto; }
@@ -12094,6 +12096,7 @@ function handleUnityMessage(msg) {
     case 'updateCoins': updateCoinsFromBackend(msg.data); break;
     case 'updatePicks': updatePicksFromBackend(msg.data); break;
     case 'updateOwnedItems': updateOwnedItemsFromBackend(msg.data); break;
+    case 'updateStoreCatalog': updateStoreCatalogFromBackend(msg.data); break;
     case 'updateXp': updateXpFromBackend(msg.data); break;
     case 'updateProgression': updateProgression(msg.data); break;
     case 'updateChallenges': updateChallengesFromBackend(msg.data); break;
@@ -12757,6 +12760,9 @@ function setPicks(n) {
   var profile = getActiveProfile();
   if (profile) profile.picks = v;   // keep active profile in sync
   renderPicks();
+  // Refresh the store so buyable tiles re-evaluate affordability (grey-out) against
+  // the new balance — otherwise the dimming would go stale after a purchase.
+  if (typeof buildStoreGrid === 'function') buildStoreGrid();
 }
 
 // Bridge handler — tolerant of { picks: N }, { count: N }, or a bare number.
@@ -12777,15 +12783,42 @@ function updateOwnedItemsFromBackend(data) {
   for (var i = 0; i < items.length; i++) {
     if (items[i] != null) ownedItems['' + items[i]] = true;
   }
-  // Drive the store/vault "Owned" UI from server truth (replaces the old optimistic local flag).
-  if (typeof STORE_GUITAR !== 'undefined' && ownedItems[STORE_GUITAR.id]) {
-    storeGuitarOwned = true;
-    if (typeof _ownedByProfile !== 'undefined' && typeof activeProfileId !== 'undefined') {
-      _ownedByProfile[activeProfileId] = true;
-    }
-  }
+  // Ownership is server truth (owned_items / Economy v2 inventory) — rebuild store + collection.
   if (typeof buildStoreGrid === 'function') buildStoreGrid();
   if (typeof buildVaultGrid === 'function') buildVaultGrid();
+}
+
+// Unity pushes { type:'updateStoreCatalog', data:{ items:[ {id,name,kind,price,unlock,grantLabel,image,sortOrder} ] } }
+// — the server-authoritative Economy v2 catalog. It becomes the source of truth for the store
+// offerings + the Vibe equip picker; the hardcoded STORE_SKINS / VIBE_* arrays stay only as a
+// desktop-dev fallback (used until/unless this arrives). Empty payload = keep the fallback.
+function updateStoreCatalogFromBackend(data) {
+  var items = (data && data.items) ? data.items
+    : (Object.prototype.toString.call(data) === '[object Array]' ? data : []);
+  if (!items || !items.length) return;
+
+  items.sort(function(a, b) { return (a.sortOrder || 0) - (b.sortOrder || 0); });
+
+  var skins = [];
+  var guitars = [{ id: 'Original', label: 'Original', img: 'instruments/guitar.png' }];
+  var drums = [{ id: 'Original', label: 'Original', img: 'instruments/drums.png' }];
+  for (var i = 0; i < items.length; i++) {
+    var it = items[i];
+    if (!it || !it.id) continue;
+    var kind = it.kind || 'guitar';
+    var img = it.image || (kind === 'drums' ? 'instruments/drums.png' : 'instruments/guitar.png');
+    skins.push({
+      id: it.id, kind: kind, name: it.name || it.id, img: img,
+      unlock: it.unlock || 'buy', price: it.price || 0, grantLabel: it.grantLabel
+    });
+    var tile = { id: it.id, label: it.name || it.id, img: img };
+    if (kind === 'drums') drums.push(tile); else guitars.push(tile);
+  }
+
+  STORE_SKINS = skins;
+  VIBE_GUITAR_SKINS = guitars;
+  VIBE_DRUM_SKINS = drums;
+  if (typeof buildStoreGrid === 'function') buildStoreGrid();
 }
 
 // ── Topbar XP bar ────────────────────────────────────────────────────────
@@ -17702,17 +17735,14 @@ var VIBE_STAGES = [
   { id: 'Stadium',   label: 'Stadium',   img: 'spaces/003.jpg' },
   { id: 'Forest',    label: 'Forest',    img: 'spaces/004.jpg' }
 ];
+// Vibe-picker equip lists. Only the always-free 'Original' is hardcoded; every other skin is
+// appended from the PlayFab catalog by updateStoreCatalogFromBackend (by kind), and only shows
+// once owned (vibeAvailable + ownedItems). ids come straight from the catalog FriendlyIds.
 var VIBE_GUITAR_SKINS = [
-  { id: 'Original',      label: 'Original',      img: 'instruments/guitar.png' },
-  { id: 'Crystal',       label: 'Crystal',       img: 'instruments/skins/crystal.png' },
-  { id: 'Crystal Green', label: 'Crystal Green', img: 'instruments/skins/crystal.png' },
-  { id: 'iridescent-guitar', label: 'Iridescent', img: 'instruments/skins/iridescent-guitar.png' }
+  { id: 'Original', label: 'Original', img: 'instruments/guitar.png' }
 ];
 var VIBE_DRUM_SKINS = [
-  { id: 'Original',    label: 'Original',    img: 'instruments/drums.png' },
-  { id: 'Prehistoric', label: 'Prehistoric', img: 'instruments/drums.png' },
-  { id: 'Flower',      label: 'Flower',      img: 'instruments/drums.png' },
-  { id: 'Nautical',    label: 'Nautical',    img: 'instruments/drums.png' }
+  { id: 'Original', label: 'Original', img: 'instruments/drums.png' }
 ];
 var VIBE_HIGHWAYS = [
   { id: 'Neon',    label: 'Neon',    img: 'vault/018.jpg' },
@@ -19208,54 +19238,48 @@ var vaultItems = [
   {name:'Storm',           cat:'Skybox',      file:'vault/025.jpg'}
 ];
 
-// ── Store: the single Iridescent Classic Guitar listing ────────────────────
-// The only item for sale for now. It's the same asset shown on the Rate Us
-// reward tile (vault/iridescent-guitar.png).
-// UNITY VARIABLE: STORE_GUITAR_PRICE is the price in Picks. Unity can override
-// it with setStoreGuitarPrice(n) (or a future updateStoreItems message), and
-// push owned state with setStoreGuitarOwned(true).
-var STORE_GUITAR_PRICE = 1000;
-var storeGuitarOwned = false;
-var _ownedByProfile = {};   // profileId → owns the store guitar (per-profile, not global)
-var STORE_GUITAR = {
-  id: 'iridescent-guitar',
-  name: 'Iridescent Classic Guitar #1',
-  cat: 'Instrument',
-  file: 'vault/iridescent-guitar.png',
-  desc: 'A shimmering iridescent-finish electric guitar. Equip it to stand out on stage.'
-};
-function setStoreGuitarPrice(n) {
-  var v = parseInt(n, 10);
-  if (!isNaN(v) && v >= 0) STORE_GUITAR_PRICE = v;
-  if (typeof buildStoreGrid === 'function') buildStoreGrid();
+// ── Instrument-skin purchase set (Store "Items" tab + My Collection) ─────────
+// SERVER-AUTHORITATIVE: this is populated entirely from the PlayFab Economy v2 catalog,
+// pushed by Unity via `updateStoreCatalog` (see updateStoreCatalogFromBackend). There is no
+// hardcoded fallback — outside Unity (desktop dev) the store is empty until a catalog arrives.
+// Each entry: { id (FriendlyId), kind:'guitar'|'drums', name, img, unlock:'buy'|'grant',
+//   price (Picks), grantLabel }. The id→visual binding lives server-side (DisplayProperties).
+var STORE_SKINS = [];
+
+// Owned = server truth (owned_items_v1 / Economy v2 inventory, via updateOwnedItems).
+function skinOwned(item) {
+  return !!(item && ownedItems[item.id]);
 }
-function setStoreGuitarOwned(owned) {
-  storeGuitarOwned = !!owned;
-  if (typeof buildStoreGrid === 'function') buildStoreGrid();
-  if (typeof buildVaultGrid === 'function') buildVaultGrid();
+// The Picks price to display. The server-authoritative catalog (updateStoreCatalog) sets each
+// item's price; for the desktop-dev fallback the hardcoded STORE_SKINS prices are used.
+function skinPrice(item) {
+  return (item && item.price) || 0;
 }
 
 function buildVaultGrid() {
   var grid = document.getElementById('vault-grid');
-  // My Collection holds only the guitar, and only once it's been purchased.
-  var owned = storeGuitarOwned ? [STORE_GUITAR] : [];
+  // My Collection holds every owned instrument skin (server truth via owned_items_v1).
+  var owned = [];
+  for (var i = 0; i < STORE_SKINS.length; i++) {
+    if (skinOwned(STORE_SKINS[i])) owned.push(STORE_SKINS[i]);
+  }
   buildUniformGrid(grid, owned, function(v) {
     var tile = document.createElement('div');
     tile.className = 'space-tile';
-    tile.style.background = 'url(' + v.file + ') center center / cover no-repeat var(--bg-surface)';
+    tile.style.background = 'url(' + (v.img || v.file) + ') center center / cover no-repeat var(--bg-surface)';
     tile.style.position = 'relative';
     tile.style.overflow = 'hidden';
     tile.style.cursor = 'pointer';
     tile.onclick = (function(item) {
       return function() {
-        sendToUnity('selectVaultItem', {name: item.name, cat: item.cat});
-        openItemPurchase('equip');   // owned-item popup with "Equip Now" CTA
+        sendToUnity('selectVaultItem', {name: item.name, cat: item.kind || item.cat});
+        openItemPurchase(item, 'equip');   // owned-item popup with "Equip Now" CTA
       };
     })(v);
     tile.innerHTML =
       '<div style="position:absolute;bottom:0;left:0;right:0;padding:24px 20px 18px;background:linear-gradient(0deg,rgba(0,0,0,0.85) 0%,transparent 100%);">' +
         '<div class="tile-hero-title store-tile-title">' + v.name + '</div>' +
-        '<div class="tile-hero-sub">' + v.cat + '</div>' +
+        '<div class="tile-hero-sub">' + (v.kind === 'drums' ? 'Drum Skin' : 'Guitar Skin') + '</div>' +
       '</div>';
     return tile;
   });
@@ -19775,38 +19799,52 @@ function switchStoreTab(tab) {
   updateDeeplinkUrl('store', tab);
 }
 
-// ── Store item purchase popup (the Iridescent Guitar) ──────────────────────
+// ── Store item purchase popup (any instrument skin) ────────────────────────
+// item = a STORE_SKINS entry (populated from the PlayFab catalog).
 // mode 'equip' = opened from My Collection (owned item) → hides price, CTA = "Equip Now".
-function openItemPurchase(mode) {
-  document.getElementById('item-purchase-img').src = STORE_GUITAR.file;
-  document.getElementById('item-purchase-name').textContent = STORE_GUITAR.name;
-  document.getElementById('item-purchase-desc').textContent = STORE_GUITAR.desc;
-  document.getElementById('item-purchase-price').textContent = STORE_GUITAR_PRICE.toLocaleString();
+var currentPurchaseItem = null;
+function openItemPurchase(item, mode) {
+  if (!item) return;   // nothing to show without a catalog item
+  currentPurchaseItem = item;
+
+  var price = skinPrice(item);
+  var owned = skinOwned(item);
+  var isGrant = item.unlock === 'grant';
+
+  document.getElementById('item-purchase-img').src = item.img || item.file || '';
+  document.getElementById('item-purchase-name').textContent = item.name;
+  document.getElementById('item-purchase-desc').textContent = item.desc ||
+    (item.kind === 'drums' ? 'A custom drum-kit skin. Equip it to restyle your kit on stage.'
+                           : 'A custom guitar skin. Equip it to stand out on stage.');
+  document.getElementById('item-purchase-price').textContent = price.toLocaleString();
   var priceEl = document.querySelector('#item-purchase-overlay .item-purchase-price');
   var balEl = document.getElementById('item-purchase-balance');
   var btn = document.getElementById('item-purchase-btn');
   var title = document.querySelector('#item-purchase-overlay .std-popup-header h2');
-  if (mode === 'equip') {
+
+  if (mode === 'equip' || owned) {
+    // Owned (or explicit equip): no purchase path, just equip.
     if (title) title.textContent = 'Equip Item';
     if (priceEl) priceEl.style.display = 'none';
     balEl.style.display = 'none';
     btn.textContent = 'Equip Now';
     btn.disabled = false;
     btn.onclick = equipItem;
-  } else if (storeGuitarOwned) {
-    if (title) title.textContent = 'Purchase Item';
-    if (priceEl) priceEl.style.display = '';
+  } else if (isGrant) {
+    // Grant-only (5★ review / Founders / VIP): not purchasable with Picks.
+    if (title) title.textContent = 'Locked Item';
+    if (priceEl) priceEl.style.display = 'none';
     balEl.style.display = '';
     balEl.className = 'item-purchase-balance';
-    balEl.textContent = 'You already own this item.';
-    btn.textContent = 'Owned';
+    balEl.textContent = 'Unlock via: ' + (item.grantLabel || 'special offer');
+    btn.textContent = 'Locked';
     btn.disabled = true;
-    btn.onclick = confirmItemPurchase;
+    btn.onclick = null;
   } else {
     if (title) title.textContent = 'Purchase Item';
     if (priceEl) priceEl.style.display = '';
     balEl.style.display = '';
-    var afford = (userPicks || 0) >= STORE_GUITAR_PRICE;
+    var afford = (userPicks || 0) >= price;
     balEl.className = 'item-purchase-balance' + (afford ? '' : ' insufficient');
     balEl.textContent = 'Your balance: ' + (userPicks || 0).toLocaleString() + ' Picks';
     btn.textContent = 'Purchase';
@@ -19817,7 +19855,9 @@ function openItemPurchase(mode) {
 }
 
 function equipItem() {
-  sendToUnity('equipItem', { id: STORE_GUITAR.id, name: STORE_GUITAR.name });
+  var item = currentPurchaseItem;
+  if (!item) return;
+  sendToUnity('equipItem', { id: item.id, name: item.name });
   closeItemPurchase();
 }
 
@@ -19827,12 +19867,13 @@ function closeItemPurchase(e) {
 }
 
 function confirmItemPurchase() {
-  if (storeGuitarOwned || (userPicks || 0) < STORE_GUITAR_PRICE) return;
+  var item = currentPurchaseItem;
+  if (!item || item.unlock === 'grant' || skinOwned(item) || (userPicks || 0) < skinPrice(item)) return;
   // Server-authoritative: do NOT deduct Picks or mark owned optimistically. Unity validates
   // the purchase, atomically deducts Picks, and pushes back the real balance + owned items
   // (updatePicks / updateOwnedItems) — the UI's balance and ownership update only from that.
   // A purchase that fails server-side (e.g. insufficient Picks) therefore leaves the UI unchanged.
-  sendToUnity('purchaseItem', { id: STORE_GUITAR.id, name: STORE_GUITAR.name, price: STORE_GUITAR_PRICE });
+  sendToUnity('purchaseItem', { id: item.id, name: item.name, price: skinPrice(item) });
   closeItemPurchase();
 }
 
@@ -19980,32 +20021,47 @@ function buildStoreGrid() {
   });
   renderPager(document.getElementById('store-packs-pager'), storePacksPage, packTotal, function(dir) { storePacksPage += dir; buildStoreGrid(); });
 
-  // ── Items tab ──
+  // ── Items tab: the instrument-skin purchase set (paginated 12 at a time) ──
+  // Each tile shows the skin art + its state: a Picks price (buy), an "Owned" badge,
+  // or its grant requirement (5★ Review / Founders / VIP). Tapping opens the popup.
   var itemsGrid = document.getElementById('store-items-grid');
-  // Single listing: the Iridescent Classic Guitar. Tapping it opens the purchase
-  // popup; once owned it reads "Owned" and lives in My Collection.
-  buildUniformGrid(itemsGrid, [STORE_GUITAR], function(it) {
+  var itemTotal = pageCount(STORE_SKINS.length);
+  if (storeItemsPage >= itemTotal) storeItemsPage = itemTotal - 1;
+  if (storeItemsPage < 0) storeItemsPage = 0;
+  buildUniformGrid(itemsGrid, pageSlice(STORE_SKINS, storeItemsPage), function(it) {
     var tile = document.createElement('div');
     tile.className = 'space-tile';
     // Full-bleed product image (cover) + caption — matches the Challenges reward tiles.
-    tile.style.background = 'url(' + it.file + ') center center / cover no-repeat var(--bg-surface)';
+    tile.style.background = 'url(' + (it.img || it.file) + ') center center / cover no-repeat var(--bg-surface)';
     tile.style.position = 'relative';
     tile.style.overflow = 'hidden';
     tile.style.cursor = 'pointer';
-    // Owned → open the Equip popup (no purchase path); otherwise the purchase popup.
-    tile.onclick = function() { openItemPurchase(storeGuitarOwned ? 'equip' : undefined); };
-    var priceHtml = storeGuitarOwned
-      ? '<div class="store-item-owned">Owned</div>'
-      : '<div class="store-item-price"><img class="store-item-pick" src="branding/jamsesh-pick.png" alt="">' +
-          STORE_GUITAR_PRICE.toLocaleString() + ' Picks</div>';
+    var owned = skinOwned(it);
+    // A buyable item the player can't yet afford → dim the tile + flag the price.
+    var unaffordable = !owned && it.unlock === 'buy' && (userPicks || 0) < skinPrice(it);
+    if (unaffordable) tile.style.opacity = '0.5';
+    // Owned → Equip popup; otherwise the purchase/locked popup (which explains the shortfall).
+    tile.onclick = (function(item, isOwned) {
+      return function() { openItemPurchase(item, isOwned ? 'equip' : undefined); };
+    })(it, owned);
+    var stateHtml;
+    if (owned) {
+      stateHtml = '<div class="store-item-owned">Owned</div>';
+    } else if (it.unlock === 'grant') {
+      stateHtml = '<div class="store-item-price">&#128274; ' + (it.grantLabel || 'Locked') + '</div>';
+    } else {
+      stateHtml = '<div class="store-item-price' + (unaffordable ? ' insufficient' : '') + '">' +
+        '<img class="store-item-pick" src="branding/jamsesh-pick.png" alt="">' +
+        skinPrice(it).toLocaleString() + ' Picks</div>';
+    }
     tile.innerHTML =
       '<div style="position:absolute;bottom:0;left:0;right:0;padding:24px 20px 18px;background:linear-gradient(0deg,rgba(0,0,0,0.9) 0%,rgba(0,0,0,0.6) 50%,transparent 100%);">' +
         '<div class="tile-hero-title store-tile-title">' + it.name + '</div>' +
-        priceHtml +
+        stateHtml +
       '</div>';
     return tile;
   });
-  renderPager(document.getElementById('store-items-pager'), 0, 1, null);
+  renderPager(document.getElementById('store-items-pager'), storeItemsPage, itemTotal, function(dir) { storeItemsPage += dir; buildStoreGrid(); });
 }
 
 // ── Themes ──────────────────────────────────────────────
@@ -21561,8 +21617,7 @@ function switchProfile(profileId) {
   if (profile.xpMax != null) userXpMax = profile.xpMax;
   renderXp();
 
-  // Owned items are per-profile — don't leak the guitar across profiles.
-  storeGuitarOwned = !!_ownedByProfile[profileId];
+  // Ownership comes from the backend (owned_items / Economy v2 inventory) per logged-in account.
   // The personal "<name>'s Private Space" tile follows the active profile.
   for (var ps = 0; ps < privateSpaces.length; ps++) {
     if (privateSpaces[ps].isDefault) { privateSpaces[ps].name = profile.name + "'s Private Space"; break; }
