@@ -11013,6 +11013,7 @@ input, textarea, select {
         <button class="play-mode-tab" onclick="switchStoreTab('packs')">Picks</button>
         <button class="play-mode-tab" onclick="switchStoreTab('vault')">My Collection</button>
       </div>
+      <div id="promo-redeem-bar" style="display:flex;align-items:center;gap:12px;margin-bottom:var(--grid-gap);flex-wrap:wrap"><input id="promo-code-input" type="text" placeholder="Have a code? Enter it here" maxlength="32" autocomplete="off" style="flex:1;min-width:280px;height:64px;padding:0 20px;font-size:24px;border-radius:var(--panel-radius);border:2px solid var(--border-strong);background:var(--bg-surface);color:var(--text-primary)"><button onclick="redeemPromoCode()" class="jamsesh-signature" style="height:64px;padding:0 32px;font-size:24px;font-weight:700;border:none;border-radius:var(--panel-radius);color:#fff;cursor:pointer">Redeem</button><div id="promo-redeem-status" style="flex-basis:100%;font-size:18px;color:var(--text-secondary);min-height:22px"></div></div>
       <div id="store-tab-songs" class="vault-tab-content" style="display:none"><div class="spaces-grid" id="store-songs-grid"></div><div id="store-songs-pager"></div></div>
       <div id="store-tab-packs" class="vault-tab-content" style="display:none"><div class="spaces-grid" id="store-packs-grid"></div><div id="store-packs-pager"></div></div>
       <div id="store-tab-items" class="vault-tab-content"><div class="spaces-grid" id="store-items-grid"></div><div id="store-items-pager"></div></div>
@@ -12121,6 +12122,7 @@ function handleUnityMessage(msg) {
     case 'updateOwnedItems': updateOwnedItemsFromBackend(msg.data); break;
     case 'updateStoreCatalog': updateStoreCatalogFromBackend(msg.data); break;
     case 'updateIapPacks': updateIapPacksFromBackend(msg.data); break;
+    case 'promoRedeemResult': onPromoRedeemResult(msg.data); break;
     case 'updateXp': updateXpFromBackend(msg.data); break;
     case 'updateProgression': updateProgression(msg.data); break;
     case 'updateChallenges': updateChallengesFromBackend(msg.data); break;
@@ -19996,6 +19998,55 @@ function updateIapPacksFromBackend(data) {
   iapPacks = (data && data.packs) ? data.packs : [];
   // Store DOM is static (always present, just hidden), so it's safe to rebuild whenever this lands.
   if (document.getElementById('store-packs-grid')) buildStoreGrid();
+}
+
+// Promo codes (Founders/VIP early-signup drops + future campaigns). The redeem bar sits at the
+// top of the store page (all tabs); Unity (WebViewBridge.HandleRedeemPromoCode) grants the code's pack and replies with
+// promoRedeemResult. Owned items / picks refresh separately via updateOwnedItems / updatePicks.
+function redeemPromoCode() {
+  var input = document.getElementById('promo-code-input');
+  var status = document.getElementById('promo-redeem-status');
+  if (!input) return;
+  var code = (input.value || '').trim();
+  if (!code) {
+    if (status) { status.style.color = 'var(--text-secondary)'; status.textContent = 'Enter a code first.'; }
+    return;
+  }
+  if (status) { status.style.color = 'var(--text-secondary)'; status.textContent = 'Redeeming…'; }
+  sendToUnity('redeemPromoCode', { code: code });
+}
+
+function onPromoRedeemResult(data) {
+  var input = document.getElementById('promo-code-input');
+  var status = document.getElementById('promo-redeem-status');
+  if (!status) return;
+  data = data || {};
+  if (data.redeemed) {
+    var n = (data.itemsGranted && data.itemsGranted.length) ? data.itemsGranted.length : 0;
+    var picks = data.picksAwarded || 0;
+    var parts = [];
+    if (n) parts.push(n + (n === 1 ? ' item' : ' items'));
+    if (picks) parts.push(picks.toLocaleString() + ' Picks');
+    status.style.color = '#4caf50';
+    status.textContent = parts.length ? ('Redeemed! You got ' + parts.join(' + ') + '.') : 'Redeemed! Reward added.';
+    if (input) input.value = '';
+  } else {
+    status.style.color = '#e57373';
+    status.textContent = promoReasonText(data.reason);
+  }
+}
+
+function promoReasonText(reason) {
+  switch (reason) {
+    case 'invalid_code': return 'That code isn\'t valid.';
+    case 'expired': return 'That code has expired.';
+    case 'exhausted': return 'That code has already been fully claimed.';
+    case 'already_redeemed': return 'You\'ve already redeemed this code.';
+    case 'pack_unavailable': return 'This reward is temporarily unavailable. Try again later.';
+    case 'grant_failed': return 'Something went wrong granting the reward. Please try again.';
+    case 'not_logged_in': return 'Hang on — finishing sign-in. Try again in a moment.';
+    default: return 'Couldn\'t redeem that code. Please try again.';
+  }
 }
 
 function buildStoreGrid() {
