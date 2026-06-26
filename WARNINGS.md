@@ -130,6 +130,13 @@ The game pushes these to the UI; if the UI drops the matching `case`, the game's
 
 Changing these payload shapes breaks the feature even if the message name is unchanged:
 
+- **`instrument` (alias `selectInstrument`)** carries the chosen instrument id. Since the multichart
+  picker (`MULTICHART_HANDOVER.md`) the payload is an **object** `{ instrument, chartId }`, not a bare
+  string. The instrument id MUST live in `data.instrument` and be one of `"guitar"` / `"drums"` /
+  `"vocals"` (or `"spectator"`). The bridge now tolerates BOTH the object and a legacy bare string,
+  but it resolves the id ONLY from `data.instrument` when it's an object — rename that field (or send
+  the instrument under a different key) and every pick parses to `Unknown`, which silently drops the
+  player into **Spectator** at gameplay load. See cautionary tales.
 - **`invitePlayer` / `inviteToGroup`** must send `platformId` (Meta id), not just `name`. The game
   resolves people by `platformId`; name-only invites can't be sent. `inviteToGroup` also sends
   `groupName` (the active band) and is only emitted in **manage** mode.
@@ -185,6 +192,13 @@ are easy to break with a "polish" pass and the breakage only shows up in a live 
 - **Coop lobby skipped self.** A "coop lobby polish" reskin added `if (roster[i].isSelf) continue;`
   in `buildCoopMembersRow`, so in a live bandspace **every player saw everyone except themselves**.
   No error — it only showed up in a 3-player on-device playtest. (See the rendering invariants above.)
+- **`instrument` payload string → object → loaded as Spectator.** The multichart picker changed the
+  `instrument` message payload from a bare string (`"guitar"`) to an object (`{instrument, chartId}`),
+  but the bridge was still reading `data.ToString()` → it got JSON text, matched no instrument, fell
+  through to `Unknown`, and `GameplayManager` loads `SpectatorSystem` for `Unknown`. Players who
+  picked an instrument entered gameplay as **spectators** with no error. The bridge now accepts both
+  shapes; keep the id in `data.instrument`. This is the classic trap — the payload SHAPE changed, not
+  the message name, so the per-name audit above wouldn't have caught it.
 
 The pattern is always the same: **a rename on the UI side, no error, a dead feature.** This file
 exists so the next rename gets caught in review instead of in a playtest.
