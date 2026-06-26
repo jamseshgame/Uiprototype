@@ -11013,7 +11013,7 @@ input, textarea, select {
         <button class="play-mode-tab" onclick="switchStoreTab('packs')">Picks</button>
         <button class="play-mode-tab" onclick="switchStoreTab('vault')">My Collection</button>
       </div>
-      <div id="promo-redeem-bar" style="display:flex;align-items:center;gap:12px;margin-bottom:var(--grid-gap);flex-wrap:wrap"><input id="promo-code-input" type="text" placeholder="Have a code? Enter it here" maxlength="32" autocomplete="off" style="flex:1;min-width:280px;height:64px;padding:0 20px;font-size:24px;border-radius:var(--panel-radius);border:2px solid var(--border-strong);background:var(--bg-surface);color:var(--text-primary)"><button onclick="redeemPromoCode()" class="jamsesh-signature" style="height:64px;padding:0 32px;font-size:24px;font-weight:700;border:none;border-radius:var(--panel-radius);color:#fff;cursor:pointer">Redeem</button><div id="promo-redeem-status" style="flex-basis:100%;font-size:18px;color:var(--text-secondary);min-height:22px"></div></div>
+      <div id="promo-redeem-bar" style="display:flex;align-items:center;gap:12px;margin-bottom:var(--grid-gap);flex-wrap:wrap"><input id="promo-code-input" type="text" placeholder="Have a code? Enter it here" maxlength="32" autocomplete="off" inputmode="none" onclick="requestKeyboardForInput('promo-code-input')" style="flex:1;min-width:280px;height:64px;padding:0 20px;font-size:24px;border-radius:var(--panel-radius);border:2px solid var(--border-strong);background:var(--bg-surface);color:var(--text-primary)"><button onclick="redeemPromoCode()" class="jamsesh-signature" style="height:64px;padding:0 32px;font-size:24px;font-weight:700;border:none;border-radius:var(--panel-radius);color:#fff;cursor:pointer">Redeem</button><div id="promo-redeem-status" style="flex-basis:100%;font-size:18px;color:var(--text-secondary);min-height:22px"></div></div>
       <div id="store-tab-songs" class="vault-tab-content" style="display:none"><div class="spaces-grid" id="store-songs-grid"></div><div id="store-songs-pager"></div></div>
       <div id="store-tab-packs" class="vault-tab-content" style="display:none"><div class="spaces-grid" id="store-packs-grid"></div><div id="store-packs-pager"></div></div>
       <div id="store-tab-items" class="vault-tab-content"><div class="spaces-grid" id="store-items-grid"></div><div id="store-items-pager"></div></div>
@@ -11690,7 +11690,7 @@ input, textarea, select {
     <div class="std-popup-header"><h2>Enter Referral Code</h2></div>
     <div class="std-popup-body" style="justify-content:center">
       <div class="referral-code-popup-sub">Got a code from a friend? Enter it below &mdash; you <b>both</b> earn <b><span id="referral-code-popup-reward">500</span> Picks</b> when you finish your first jam.</div>
-      <input class="save-input" id="referral-code-input" type="text" maxlength="12" placeholder="e.g. J4M-53SH">
+      <input class="save-input" id="referral-code-input" type="text" maxlength="12" placeholder="e.g. J4M-53SH" inputmode="none" onclick="requestKeyboardForInput('referral-code-input')">
       <div class="referral-code-error" id="referral-code-error"></div>
     </div>
     <div class="std-popup-footer">
