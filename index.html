@@ -18012,6 +18012,26 @@ function buildCoopGrid(grid) {
     return;
   }
 
+  // Invite-first gate (open lobby only). When NOT in a live bandspace — i.e. the
+  // player is in the open lobby getting ready to invite people — the Group tab
+  // shows ONLY the members/invite row until at least one bandmate has been
+  // invited (pending) or joined. The song / instrument / Start portions stay
+  // hidden so the empty lobby reads as "invite someone first". Once an invitee
+  // is in the roster, the full layout below renders. In a live bandspace (the
+  // gameplay lobby / a joiner arriving via invite, both inBandspace===true) the
+  // whole layout always shows, unchanged.
+  if (!inBandspace) {
+    var coopRoster = getCoopRoster() || [];
+    var hasInvitee = false;
+    for (var ci = 0; ci < coopRoster.length; ci++) {
+      if (coopRoster[ci] && !coopRoster[ci].isSelf) { hasInvitee = true; break; }
+    }
+    if (!hasInvitee) {
+      buildCoopMembersRow(grid);
+      return;
+    }
+  }
+
   // Uniform 4×3 grid (no text headers).
   buildCoopMembersRow(grid);
   buildCoopSongsRow(grid);
