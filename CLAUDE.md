@@ -10,7 +10,7 @@ A second standalone page, `results.html`, ships the end-of-song results UI on it
 
 There is also `claudedesignui/` — a Babel-in-the-browser React design-exploration tool that is a **separate reference artifact**, **not** the primary working file, and does **not** follow the ES5 / single-file rules below (see "The claudedesignui/ Design Tool" section).
 
-Handover docs for the Unity integration live at the repo root: `HANDOVER.md` (Group Lobby / bandspace contract) and `MULTICHART_HANDOVER.md` (multichart / instrument picker contract).
+Handover docs for the Unity integration live at the repo root: `HANDOVER.md` (Group Lobby / bandspace contract), `MULTICHART_HANDOVER.md` (multichart / instrument picker contract), `MODIFIERS_HANDOVER.md` (miss-feedback modifiers + tuning tier), and `TUTORIAL_PROMPT_HANDOVER.md` (guitar tutorial prompt + completion flag).
 
 ## Development
 
@@ -129,6 +129,40 @@ There are no tests, no linter, and no build step for `index.html` / `results.htm
 - **Load Setlist — 3 tabs**: Personal / Jamsesh / Community. Jamsesh and Community show a large "Coming Soon..." placeholder; Personal lists user-saved setlists only (built-in lesson setlists are no longer shown in this view).
 - **Lesson setlists**: `lessonSetlists[]` (Basic, Advanced, Expert) are still used by the Tutorial Play onboarding step but no longer surface in the standard Load popup.
 
+### Difficulty & Modifiers Popup
+`openOptionPicker('difficulty')` renders a **full-screen** (`std-popup--full`, 1920×1920) tabbed popup holding the difficulty cards **plus** the miss-feedback modifiers. Picking a difficulty no longer closes the popup — it repaints the selected card in place, since the other tabs are part of the same decision.
+
+- **Six tabs** via `MODIFIER_TABS[]` / `switchModifierTab(id)` / `renderModifierTab()`. Each entry's `kind` picks the renderer: `'difficulty'` (the 3 per-song cards), `'mods'` (**Audio**, **Highway**, **Scoring**, **Failure** — each renders its `mods` list), `'presets'` (the preset browser). `modifierTab` is sticky for the session. Tab switching repaints only `#mod-tab-body`; the tab row reuses the existing `.option-picker-tabs` / `.option-picker-tab` styling. No tab overflows the body at either tier, so nothing scrolls.
+- **`checkModifierTabs()`** runs in `initModifiers()` and console-warns if a `MISS_MODIFIERS` entry is missing from every `kind: 'mods'` tab — without it a new modifier would silently never render.
+- **`MISS_MODIFIERS[]`** is the single declarative source: each entry is `{id, label, desc, def, sliders[]}`, and each slider is `{id, label, min, max, step, def, fmt}` where `fmt` is `'ms' | 'db' | 'pct' | 'x' | 'num'`. Adding a modifier means adding to this array **and** to a `MODIFIER_TABS` entry — the renderer, defaults, persistence, and Unity payload all derive from it. Modifiers model how Rock Band / Guitar Hero signal a miss: subtract the reward (stem, fret flame, streak) rather than draw a penalty, plus one asymmetric failure meter.
+- **Two tiers, one list.** `modifierTier` is `'player'` (a toggle per modifier) or `'team'` (the same toggles plus the numeric sliders behind each). Unity chooses per account via the `setModifierTier` message — pass `{tier:'team'}` directly, or `{accountId:'…'}` to resolve against the `MODIFIER_TEAM_ACCOUNTS` allowlist. `?modifiers=team` overrides it for browser testing.
+- **State is global, not per-song** — unlike difficulty, modifiers are not keyed by setlist index. `modifierEnabled{}` (id → bool), `modifierValues{}` (slider id → number) and `modifierTier` all persist to `localStorage` under `jamsesh_modifiers`. Saved values overlay defaults, so a newly added modifier still gets its default instead of `undefined`.
+- **The tier is sticky on purpose.** Onboarding rewrites the URL via `history.replaceState`, so `?modifiers=team` would be lost on the next refresh and silently drop the team back to the toggles-only view. `initModifiers()` restores the saved tier, `parseMode()` re-applies `?modifiers` if present, and Unity's `setModifierTier` overrides either way. Use `?modifiers=player` to go back.
+- **Bridge messages**: WebView → Unity sends `modifierChanged {modifier, slider?, value?, enabled}` on every toggle and slider release (throttled to ~60ms during a drag so the team can hear changes live without flooding the bridge), `modifiers {tier, enabled, values}` on reset, and the same `modifiers` payload is embedded in `startGame`.
+- **`buildModifierSlider()`** uses one shared drag session (`_modDrag`) with document listeners bound once — unlike `buildAvatarSliderRow()`, which attaches a fresh pair per row on every rebuild and leaks them.
+
+#### Modifier Presets
+The **Presets** tab is a browser over `modifierPresets[]` — `{id, name, enabled, values}` snapshots of **every** modifier across all tabs, so applying one is a single decision rather than fifteen.
+
+- Stored under its own key, `jamsesh_modifier_presets` (`{presets, active}`), **separate from the live modifier state** so `resetModifiers()` or clearing the live settings never destroys saved presets.
+- Per-card actions: **Apply** (`applyPreset`), **Update** (`updatePresetFromCurrent` — stamps current settings over the preset), **Rename** (`renamePreset`), **Delete** (`deletePreset`). `savePresetAsNew()` captures the current state as a new preset.
+- `applyPreset()` **rebases on `modifierDefaults()` first**, so a preset saved before a modifier existed leaves that modifier at its default rather than `undefined`.
+- `activePresetId` + `presetMatchesCurrent()` drive the **ACTIVE / MODIFIED** badge and disable Apply when the live state already equals the preset. `getModifierPayload().preset` carries the name (suffixed `" (modified)"` when dirty) to Unity.
+- **`openJamDialog(opts)`** is the shared modal primitive (also used by the tutorial prompt below), built on demand into `.viewport` at z-index 1000 — above the option picker's 999, same tier as the logo picker. Text mode when `opts.value` is a string, confirm mode otherwise. Options: `title`, `body`, `value`, `confirmLabel`, `cancelLabel`, `onConfirm`, `onCancel`, `excludeId`, `destructive`. Backdrop click and the cancel button both route through one `dismiss()` that fires `onCancel` exactly once — a prompt whose "no" has a side effect must not be escapable via the backdrop. The name input follows the repo's VR keyboard pattern: `class="save-input"` + `inputmode="none"` + `onclick="requestKeyboardForInput('jam-dialog-input')"`. Blank and duplicate names are rejected inline (`excludeId` lets a rename keep its own name).
+
+### Instrument Tutorial Prompt
+`startGame()` offers the Guitar tutorial **at the last moment before a song starts** — not when the instrument is picked. By then the user has committed to playing, so the recommendation is timely rather than interruptive. It is a recommendation, never a gate.
+
+- **`startGame()` is a gate; `_startGameConfirmed()` does the work.** `startGame()` runs the existing host/empty-setlist guards, then checks `pendingTutorialInstrument()`; if it returns an instrument it shows the prompt and returns. Both prompt outcomes are terminal — **Play Anyway** calls `_startGameConfirmed()` itself, so declining starts the song rather than making the user tap Start twice. Anything that needs to start a song without the prompt calls `_startGameConfirmed()` directly.
+- **Unity owns the completion flag.** `tutorialStatus` → `applyTutorialStatus()` accepts either a map (`{guitar:true}`) or a pair (`{instrument:'guitar', completed:true}`), filling `tutorialCompleted{}`. Nothing is inferred locally.
+- `shouldPromptTutorial(instId)` gates on three things: the instrument is in `TUTORIAL_PROMPT_INSTRUMENTS` (just `['guitar']` today), the tutorial is not already complete, and it was not declined this session. `pendingTutorialInstrument()` walks the **per-song** instruments, so a mixed setlist with a single guitar track still surfaces the recommendation.
+- **`isTutorialSetlist()`** short-circuits the whole thing when every track's artist is `'Jamsesh Tutorial'` — otherwise starting the tutorial would offer the tutorial as an alternative to itself, an infinite prompt.
+- **Declining is session-scoped** (`tutorialPromptSuppressed{}`, not persisted) — nagging before every song would be worse than useless, but the recommendation should return next launch while the tutorial is still outstanding. Permanent suppression is Unity's completion flag, not a local dismissal.
+- **Start Tutorial** → `startInstrumentTutorial()` loads the matching `lessonBasicSongs` entry as a 1-song setlist and **plays it immediately** via `_startGameConfirmed(instId)`, rather than returning the user to the Main Stage to press Start again. It deliberately does **not** call `startTutorialPlay()` — that is the onboarding lockdown, which greys the whole UI and loads the *mixed* lesson set. This path is opt-in, so the user keeps a normal UI.
+- **One launch message.** The tutorial goes out as an ordinary `startGame` carrying `tutorial: '<instrument>'` (`false` on every normal start), so Unity has a single launch code path and cannot double-launch. There is no separate `startTutorial` message.
+- **The instrument picker still shows the flag**: a cyan `TUTORIAL AVAILABLE` or green `TUTORIAL DONE` chip (`.instrument-picker__tut`) on instruments that have a tutorial, so the state is visible rather than only implied by whether the prompt fires. `applyTutorialStatus()` repaints the picker if it is open.
+- WebView → Unity: `tutorialPromptAccepted {instrument}`, `tutorialPromptDeclined {instrument}`, and the `tutorial` field on `startGame`.
+
 ### Group Lobby (Bandspace)
 When Unity flips `inBandspace=true`, the Group tab becomes available and `buildCoopGrid()` renders a vertical list of up to **4 players** (host + 3) — the group member limit (`COOP_PLAYERS_MAX`). Each row shows avatar, name, instrument icon, colour-coded difficulty bars, and a status pill — `CHOOSING` (amber) or `READY` (green). See `HANDOVER.md` for the full Unity contract.
 
@@ -193,6 +227,7 @@ When Unity flips `inBandspace=true`, the Group tab becomes available and `buildC
   | `?layoutPicker` | Reveals the layout-picker button (hidden by default). |
   | `?challengeLayout=N` | Sets the Challenges (Progress tab) 4x3 grid layout (0–3163). Persists via `sendToUnity('challengeLayoutChanged', N)`. |
   | `?challengeLayoutPicker` | Reveals the Challenges layout-picker button (hidden by default). |
+  | `?modifiers=team` | Forces the tuning tier of the Difficulty & Modifiers popup (toggles + sliders). `?modifiers=player` forces toggles only. In production Unity picks the tier per account. |
   | `?host` / `?client` | Open directly into the Group lobby with a populated roster — see Group Lobby section. |
 - **Combining**: flags combine with `&`, e.g. `?demo&onboard&step=tutorial`, `?host&skip`.
 - **`isDemoMode()`** / **`isOnboardMode()`** — helper functions checked throughout the flow.
