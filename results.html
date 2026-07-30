@@ -5,6 +5,22 @@
 <meta name="viewport" content="width=1920, height=1920, initial-scale=1.0, user-scalable=no">
 <title>Jamsesh — Results</title>
 <style>
+  @font-face {
+    font-family: 'Monda';
+    font-style: normal; font-weight: 400 700; font-display: swap;
+    src: url('fonts/monda-latin.woff2') format('woff2');
+  }
+  @font-face {
+    font-family: 'Bebas Neue';
+    font-style: normal; font-weight: 400; font-display: swap;
+    src: url('fonts/bebas-neue-latin.woff2') format('woff2');
+  }
+  @font-face {
+    font-family: 'Gasoek One';
+    font-style: normal; font-weight: 400; font-display: swap;
+    src: url('fonts/gasoek-one-latin.woff2') format('woff2');
+  }
+
   /*
     End-of-song results page. Mounted by LobbyWebView in place of index.html
     when the gameplay-end flag is set. Visually identical to index.html's
@@ -18,7 +34,7 @@
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
   :root {
-    --panel-radius: 28px;
+    --panel-radius: 22px;
     --grid-gap: 16px;
     /* Mirrors index.html: tile-h derived from page geometry, then nav-btn-h
        is half. Hardcoded here so we don't pull in the rest of the lobby grid
@@ -30,9 +46,9 @@
   html, body {
     width: 1920px;
     height: 1920px;
-    background: #0d0a16;
+    background: #100c1f;
     color: #f0ecf8;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Monda', sans-serif;
     font-weight: 400;
     -webkit-font-smoothing: antialiased;
     -webkit-user-select: none;
@@ -56,7 +72,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background: #111111;
+    background: #100c1f;
   }
   .game-screen.active { display: flex; }
 
@@ -77,7 +93,7 @@
   .results-panel {
     width: 1872px;
     height: 1776px;
-    background: #0a0a0a;
+    background: #1b1638;
     border-radius: var(--panel-radius);
     display: flex;
     flex-direction: column;
@@ -89,12 +105,14 @@
   /* ── Results Screen 1 ── */
   .results-title {
     font-size: 48px;
-    font-weight: 700;
-    color: #ffffff;
+    font-weight: 400;
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 0.03em;
+    color: #f0ecf8;
     margin-bottom: 36px;
     text-align: center;
   }
-  .results-title span { color: #ffffff; }
+  .results-title span { color: #ff2e92; }
 
   .results-body {
     display: flex;
@@ -115,7 +133,7 @@
   /* Score column */
   .results-score-col {
     flex: 1;
-    background: #1a1a1a;
+    background: #1a1628;
     border-radius: var(--panel-radius);
     padding: 32px;
     display: flex;
@@ -124,8 +142,10 @@
   }
   .results-score-col .col-title {
     font-size: 28px;
-    font-weight: 700;
-    color: #ffffff;
+    font-weight: 400;
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 0.03em;
+    color: #b0a6df;
     margin-bottom: 16px;
   }
   .results-tabs {
@@ -143,26 +163,29 @@
     border-radius: var(--panel-radius);
     border: 1px solid transparent;
     font-size: 30px;
-    font-weight: 700;
+    font-weight: 400;
     cursor: pointer;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 0.03em;
     transition: background 0.15s, color 0.15s;
     text-align: center;
   }
   .results-tab.active {
-    background: #ffffff;
-    color: #000000;
-    border-color: #ffffff;
-    box-shadow: 0 0 0 2px #ffffff;
+    background: #ff2e92;
+    color: #ffffff;
+    border-color: #ff2e92;
+    box-shadow: 0 0 0 2px #ff2e92;
   }
   .results-tab:not(.active) {
-    background: #333333;
-    color: #ffffff;
+    background: #282435;
+    color: rgba(255,255,255,0.65);
   }
   .results-big-score {
     font-size: 72px;
-    font-weight: 700;
-    color: #ffffff;
+    font-weight: 400;
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 0.02em;
+    color: #e8ff3a;
     margin-bottom: 12px;
   }
   .results-stars {
@@ -172,9 +195,9 @@
   }
   .results-star {
     font-size: 48px;
-    color: #ffffff;
+    color: #e8ff3a;
   }
-  .results-star.empty { color: #444444; }
+  .results-star.empty { color: #3d3850; }
 
   .results-stats {
     display: grid;
@@ -196,20 +219,23 @@
   }
   .results-stat .stat-label {
     font-size: 18px;
-    font-weight: 600;
-    color: #ffffff;
-    opacity: 0.7;
+    font-weight: 400;
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 0.04em;
+    color: rgba(255,255,255,0.65);
     margin-bottom: 8px;
   }
   .results-stat .stat-value {
     font-size: 44px;
-    font-weight: 700;
-    color: #ffffff;
+    font-weight: 400;
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 0.02em;
+    color: #e8ff3a;
   }
-  .results-stat.accuracy { background: #333333; }
-  .results-stat.combo { background: #333333; }
-  .results-stat.perfect { background: #333333; }
-  .results-stat.notes { background: #333333; }
+  .results-stat.accuracy { background: #1e1b2c; }
+  .results-stat.combo { background: #1e1b2c; }
+  .results-stat.perfect { background: #1e1b2c; }
+  .results-stat.notes { background: #1e1b2c; }
 
   /* Album art section (top of left column) */
   .results-album-col {
@@ -217,7 +243,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background: #1a1a1a;
+    background: #1a1628;
     border-radius: var(--panel-radius);
     padding: 32px;
   }
@@ -228,24 +254,27 @@
     object-fit: cover;
     margin-bottom: 24px;
     box-shadow: 0 8px 12px rgba(0,0,0,0.5);
-    background: #222222;
+    background: #1e1b2c;
   }
   .results-song-title {
     font-size: 32px;
     font-weight: 700;
-    color: #ffffff;
+    font-family: 'Monda', sans-serif;
+    color: #f0ecf8;
     text-align: center;
     margin-bottom: 8px;
   }
   .results-song-artist {
     font-size: 24px;
-    color: #aaaaaa;
+    color: rgba(255,255,255,0.65);
+    font-family: 'Monda', sans-serif;
     text-align: center;
     margin-bottom: 4px;
   }
   .results-song-diff {
     font-size: 20px;
-    color: #888888;
+    color: rgba(255,255,255,0.45);
+    font-family: 'Monda', sans-serif;
     text-align: center;
   }
   .results-instrument {
@@ -254,7 +283,8 @@
     gap: 8px;
     margin-top: 8px;
     font-size: 20px;
-    color: #888888;
+    font-family: 'Monda', sans-serif;
+    color: rgba(255,255,255,0.45);
   }
   .results-instrument svg {
     width: 28px;
@@ -265,7 +295,7 @@
   /* Leaderboard column */
   .results-lb-col {
     flex: 1;
-    background: #1a1a1a;
+    background: #1a1628;
     border-radius: var(--panel-radius);
     padding: 32px;
     display: flex;
@@ -273,8 +303,10 @@
   }
   .results-lb-col .col-title {
     font-size: 28px;
-    font-weight: 700;
-    color: #ffffff;
+    font-weight: 400;
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 0.03em;
+    color: #b0a6df;
     margin-bottom: 16px;
     text-align: center;
   }
@@ -291,18 +323,20 @@
     gap: 16px;
     padding: 20px 24px;
     border-radius: var(--panel-radius);
-    background: #2a2a2a;
+    background: #1e1b2c;
     flex: 1;
     min-height: 0;
   }
   .results-lb-entry.highlight {
-    background: #333333;
-    border: 2px solid #ffffff;
+    background: #282435;
+    border: 2px solid #ff2e92;
   }
   .results-lb-rank {
     font-size: 28px;
-    font-weight: 700;
-    color: #ffffff;
+    font-weight: 400;
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 0.02em;
+    color: #b0a6df;
     width: 40px;
     text-align: center;
     flex-shrink: 0;
@@ -311,12 +345,12 @@
     width: 72px;
     height: 72px;
     border-radius: 50%;
-    background: #444444;
+    background: #282435;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 28px;
-    color: #ffffff;
+    color: #f0ecf8;
     font-weight: 700;
     flex-shrink: 0;
     overflow: hidden;
@@ -330,11 +364,13 @@
   .results-lb-name {
     font-size: 24px;
     font-weight: 700;
-    color: #ffffff;
+    font-family: 'Monda', sans-serif;
+    color: #f0ecf8;
   }
   .results-lb-score-val {
     font-size: 20px;
-    color: #aaaaaa;
+    font-family: 'Monda', sans-serif;
+    color: rgba(255,255,255,0.65);
   }
 
   /* Bottom buttons */
@@ -350,9 +386,10 @@
     border-radius: var(--panel-radius);
     border: 1px solid transparent;
     font-size: 30px;
-    font-weight: 700;
+    font-weight: 400;
     cursor: pointer;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 0.04em;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -361,25 +398,42 @@
   .results-btn:hover { transform: scale(1.05); }
   .results-btn:active { transform: scale(0.97); }
   .results-btn.retry {
-    background: #333333;
-    color: #ffffff;
+    background: #282435;
+    color: rgba(255,255,255,0.65);
   }
   .results-btn.continue {
-    background: #ffffff;
-    color: #000000;
-    border-color: #ffffff;
-    box-shadow: 0 0 0 2px #ffffff;
+    background: #ff2e92;
+    color: #ffffff;
+    border-color: #ff2e92;
+    box-shadow: 0 0 0 2px #ff2e92;
+  }
+  /* Non-host waiting message — replaces the button row when isHost=false so
+     guests can't drive setlist progression / retry on their own. */
+  .results-await-host {
+    margin-top: 36px;
+    width: 100%;
+    height: var(--nav-btn-h);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    font-weight: 400;
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 0.03em;
+    color: rgba(255,255,255,0.45);
   }
 
   /* ── Results Screen 2 (Rewards) ── */
   .rewards-title {
     font-size: 48px;
-    font-weight: 700;
-    color: #ffffff;
+    font-weight: 400;
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 0.03em;
+    color: #f0ecf8;
     margin-bottom: 36px;
     text-align: center;
   }
-  .rewards-title span { color: #ffffff; }
+  .rewards-title span { color: #e8ff3a; }
 
   .rewards-body {
     display: grid;
@@ -391,7 +445,7 @@
     min-height: 0;
   }
   .rewards-cell {
-    background: #1a1a1a;
+    background: #1a1628;
     border-radius: var(--panel-radius);
     padding: 32px;
     display: flex;
@@ -403,14 +457,16 @@
   }
   .rewards-cell .col-title {
     font-size: 56px;
-    font-weight: 700;
-    color: #ffffff;
+    font-weight: 400;
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 0.03em;
+    color: #b0a6df;
   }
   .rewards-pick-icon {
     width: 320px;
     height: 320px;
     border-radius: 50%;
-    background: #333333;
+    background: #1e1b2c;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -424,12 +480,17 @@
   }
   .rewards-earned-label {
     font-size: 22px;
-    color: #aaaaaa;
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 0.04em;
+    font-weight: 400;
+    color: rgba(255,255,255,0.65);
   }
   .rewards-earned-value {
     font-size: 56px;
-    font-weight: 700;
-    color: #ffffff;
+    font-weight: 400;
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 0.02em;
+    color: #e8ff3a;
   }
 
   .rewards-badge-item {
@@ -437,8 +498,8 @@
     align-items: center;
     gap: 20px;
     padding: 20px 24px;
-    background: #2a2a2a;
-    border: 2px solid #444444;
+    background: #1e1b2c;
+    border: 2px solid #ff2e92;
     border-radius: var(--panel-radius);
     width: 100%;
     flex: 1;
@@ -448,7 +509,7 @@
     width: 72px;
     height: 72px;
     border-radius: 50%;
-    background: #444444;
+    background: #282435;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -459,10 +520,12 @@
   .rewards-badge-new {
     position: absolute;
     top: -6px; right: -6px;
-    background: #ffffff;
-    color: #000000;
-    font-size: 12px;
-    font-weight: 700;
+    background: #ff2e92;
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 400;
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 0.04em;
     padding: 3px 8px;
     border-radius: var(--panel-radius);
   }
@@ -470,18 +533,20 @@
   .rewards-badge-name {
     font-size: 24px;
     font-weight: 700;
-    color: #ffffff;
+    font-family: 'Monda', sans-serif;
+    color: #f0ecf8;
   }
   .rewards-badge-desc {
     font-size: 18px;
-    color: #888888;
+    font-family: 'Monda', sans-serif;
+    color: rgba(255,255,255,0.45);
   }
 
   .rewards-level-circle {
     width: 320px;
     height: 320px;
     border-radius: 50%;
-    border: 6px solid #ffffff;
+    border: 6px solid #c77dff;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -490,21 +555,31 @@
   }
   .rewards-level-label {
     font-size: 22px;
-    color: #aaaaaa;
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 0.04em;
+    font-weight: 400;
+    color: rgba(255,255,255,0.65);
   }
   .rewards-level-num {
     font-size: 96px;
-    font-weight: 700;
-    color: #ffffff;
+    font-weight: 400;
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 0.02em;
+    color: #c77dff;
   }
   .rewards-xp-earned-label {
     font-size: 22px;
-    color: #aaaaaa;
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 0.04em;
+    font-weight: 400;
+    color: rgba(255,255,255,0.65);
   }
   .rewards-xp-earned-value {
     font-size: 56px;
-    font-weight: 700;
-    color: #ffffff;
+    font-weight: 400;
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 0.02em;
+    color: #ffcb6b;
   }
   .rewards-xp-bar-wrap {
     width: 100%;
@@ -515,13 +590,13 @@
   .rewards-xp-bar {
     width: 100%;
     height: 16px;
-    background: #333333;
+    background: #282435;
     border-radius: var(--panel-radius);
     overflow: hidden;
   }
   .rewards-xp-bar-fill {
     height: 100%;
-    background: #ffffff;
+    background: #00e5c7;
     border-radius: var(--panel-radius);
     width: 67%;
   }
@@ -529,7 +604,8 @@
     display: flex;
     justify-content: space-between;
     font-size: 16px;
-    color: #aaaaaa;
+    font-family: 'Monda', sans-serif;
+    color: rgba(255,255,255,0.45);
   }
 </style>
 </head>
@@ -539,17 +615,17 @@
   <!-- ══════════════ RESULTS SCREEN 1 ══════════════ -->
   <div class="game-screen active" id="screen-results1">
     <div class="results-panel">
-      <div class="results-title">You crushed it, <span id="results-group-name">Jamsesh Hunters</span>!</div>
+      <div class="results-title" id="results-title">You crushed it!</div>
       <div class="results-body">
 
         <!-- Left column: album art + score stacked -->
         <div class="results-left-col">
           <div class="results-album-col">
             <img class="results-album-art" id="results-album-art" src="" alt="Album">
-            <div class="results-song-title" id="results-song-title">The Fate of Ophelia</div>
-            <div class="results-song-artist" id="results-song-artist">Taylor Swift</div>
-            <div class="results-song-diff">Expert</div>
-            <div class="results-instrument"><svg viewBox="0 0 24 24"><path d="M19.59 3.41c-.8-.8-2.1-.8-2.9 0L12 8.1 9.59 5.69c-.8-.8-2.1-.8-2.9 0-.8.8-.8 2.1 0 2.9L9.1 11 3.41 16.69c-.8.8-.8 2.1 0 2.9.4.4.93.59 1.45.59s1.05-.2 1.45-.59L12 13.9l2.41 2.41c.4.4.93.59 1.45.59s1.05-.2 1.45-.59c.8-.8.8-2.1 0-2.9L14.9 11l5.69-5.69c.8-.8.8-2.1 0-2.9z"/></svg>Guitar</div>
+            <div class="results-song-title" id="results-song-title"></div>
+            <div class="results-song-artist" id="results-song-artist"></div>
+            <div class="results-song-diff" id="results-song-diff"></div>
+            <div class="results-instrument" id="results-instrument"></div>
           </div>
           <div class="results-score-col">
             <div class="col-title">Score</div>
@@ -557,19 +633,19 @@
               <div class="results-tab active" onclick="switchResultsTab('group')">Group</div>
               <div class="results-tab" onclick="switchResultsTab('me')">Me</div>
             </div>
-            <div class="results-big-score" id="results-big-score">987,654</div>
+            <div class="results-big-score" id="results-big-score">—</div>
             <div class="results-stars" id="results-stars">
-              <div class="results-star">&#9733;</div>
-              <div class="results-star">&#9733;</div>
-              <div class="results-star">&#9733;</div>
-              <div class="results-star">&#9733;</div>
+              <div class="results-star empty">&#9734;</div>
+              <div class="results-star empty">&#9734;</div>
+              <div class="results-star empty">&#9734;</div>
+              <div class="results-star empty">&#9734;</div>
               <div class="results-star empty">&#9734;</div>
             </div>
             <div class="results-stats" id="results-stats">
-              <div class="results-stat accuracy"><div class="stat-label">Accuracy</div><div class="stat-value">98.5%</div></div>
-              <div class="results-stat combo"><div class="stat-label">Max Combo</div><div class="stat-value">342</div></div>
-              <div class="results-stat perfect"><div class="stat-label">Perfect Hits</div><div class="stat-value">98.5%</div></div>
-              <div class="results-stat notes"><div class="stat-label">Notes Hit</div><div class="stat-value">98.5%</div></div>
+              <div class="results-stat accuracy"><div class="stat-label">Accuracy</div><div class="stat-value">—</div></div>
+              <div class="results-stat combo"><div class="stat-label">Max Combo</div><div class="stat-value">—</div></div>
+              <div class="results-stat perfect"><div class="stat-label">Perfect Hits</div><div class="stat-value">—</div></div>
+              <div class="results-stat notes"><div class="stat-label">Notes Hit</div><div class="stat-value">—</div></div>
             </div>
           </div>
         </div>
@@ -581,99 +657,22 @@
             <div class="results-tab active" onclick="switchResultsTab('group')">Group</div>
             <div class="results-tab" onclick="switchResultsTab('me')">Me</div>
           </div>
-          <!-- Group leaderboard -->
+          <!-- Group leaderboard — populated by applyLeaderboard() from Unity. -->
           <div class="results-lb-list" id="lb-group">
-            <div class="results-lb-entry">
-              <div class="results-lb-rank">1</div>
-              <div class="results-lb-avatar"><img src="" alt=""></div>
-              <div class="results-lb-info"><div class="results-lb-name">Neon Phantoms</div><div class="results-lb-score-val">1,245,678</div></div>
-            </div>
-            <div class="results-lb-entry highlight">
-              <div class="results-lb-rank">2</div>
-              <div class="results-lb-avatar"><img src="" alt=""></div>
-              <div class="results-lb-info"><div class="results-lb-name">Jamsesh Hunters</div><div class="results-lb-score-val">1,123,456</div></div>
-            </div>
-            <div class="results-lb-entry">
-              <div class="results-lb-rank">3</div>
-              <div class="results-lb-avatar"><img src="" alt=""></div>
-              <div class="results-lb-info"><div class="results-lb-name">Electric Dreams</div><div class="results-lb-score-val">1,098,765</div></div>
-            </div>
-            <div class="results-lb-entry">
-              <div class="results-lb-rank">4</div>
-              <div class="results-lb-avatar"><img src="" alt=""></div>
-              <div class="results-lb-info"><div class="results-lb-name">Rhythm Rebels</div><div class="results-lb-score-val">987,654</div></div>
-            </div>
-            <div class="results-lb-entry">
-              <div class="results-lb-rank">5</div>
-              <div class="results-lb-avatar"><img src="" alt=""></div>
-              <div class="results-lb-info"><div class="results-lb-name">Sonic Wolves</div><div class="results-lb-score-val">945,210</div></div>
-            </div>
-            <div class="results-lb-entry">
-              <div class="results-lb-rank">6</div>
-              <div class="results-lb-avatar"><img src="" alt=""></div>
-              <div class="results-lb-info"><div class="results-lb-name">Bass Bandits</div><div class="results-lb-score-val">912,033</div></div>
-            </div>
-            <div class="results-lb-entry">
-              <div class="results-lb-rank">7</div>
-              <div class="results-lb-avatar"><img src="" alt=""></div>
-              <div class="results-lb-info"><div class="results-lb-name">Velvet Crush</div><div class="results-lb-score-val">889,441</div></div>
-            </div>
-            <div class="results-lb-entry">
-              <div class="results-lb-rank">8</div>
-              <div class="results-lb-avatar"><img src="" alt=""></div>
-              <div class="results-lb-info"><div class="results-lb-name">Star Strummers</div><div class="results-lb-score-val">854,112</div></div>
-            </div>
+            <div class="results-lb-entry"><div class="results-lb-info"><div class="results-lb-name">Loading…</div></div></div>
           </div>
-          <!-- Me leaderboard -->
+          <!-- Me leaderboard — populated by applyLeaderboard() from Unity. -->
           <div class="results-lb-list" id="lb-me" style="display:none">
-            <div class="results-lb-entry">
-              <div class="results-lb-rank">1</div>
-              <div class="results-lb-avatar"><img src="" alt=""></div>
-              <div class="results-lb-info"><div class="results-lb-name">xShadowPick</div><div class="results-lb-score-val">1,312,400</div></div>
-            </div>
-            <div class="results-lb-entry">
-              <div class="results-lb-rank">2</div>
-              <div class="results-lb-avatar"><img src="" alt=""></div>
-              <div class="results-lb-info"><div class="results-lb-name">MelodyQueen</div><div class="results-lb-score-val">1,198,320</div></div>
-            </div>
-            <div class="results-lb-entry">
-              <div class="results-lb-rank">3</div>
-              <div class="results-lb-avatar"><img src="" alt=""></div>
-              <div class="results-lb-info"><div class="results-lb-name">BeatDropper99</div><div class="results-lb-score-val">1,087,650</div></div>
-            </div>
-            <div class="results-lb-entry highlight">
-              <div class="results-lb-rank">4</div>
-              <div class="results-lb-avatar"><img src="" alt=""></div>
-              <div class="results-lb-info"><div class="results-lb-name">Rael</div><div class="results-lb-score-val">987,654</div></div>
-            </div>
-            <div class="results-lb-entry">
-              <div class="results-lb-rank">5</div>
-              <div class="results-lb-avatar"><img src="" alt=""></div>
-              <div class="results-lb-info"><div class="results-lb-name">FretNinja</div><div class="results-lb-score-val">965,880</div></div>
-            </div>
-            <div class="results-lb-entry">
-              <div class="results-lb-rank">6</div>
-              <div class="results-lb-avatar"><img src="" alt=""></div>
-              <div class="results-lb-info"><div class="results-lb-name">GrooveMonkey</div><div class="results-lb-score-val">943,210</div></div>
-            </div>
-            <div class="results-lb-entry">
-              <div class="results-lb-rank">7</div>
-              <div class="results-lb-avatar"><img src="" alt=""></div>
-              <div class="results-lb-info"><div class="results-lb-name">RiffLord420</div><div class="results-lb-score-val">921,550</div></div>
-            </div>
-            <div class="results-lb-entry">
-              <div class="results-lb-rank">8</div>
-              <div class="results-lb-avatar"><img src="" alt=""></div>
-              <div class="results-lb-info"><div class="results-lb-name">PickSlinger</div><div class="results-lb-score-val">898,770</div></div>
-            </div>
+            <div class="results-lb-entry"><div class="results-lb-info"><div class="results-lb-name">Loading…</div></div></div>
           </div>
         </div>
 
       </div>
-      <div class="results-buttons">
+      <div class="results-buttons" id="results1-buttons">
         <button class="results-btn retry" onclick="retryGame()">Retry</button>
         <button class="results-btn continue" onclick="showResults2()">Continue</button>
       </div>
+      <div class="results-await-host" id="results1-await" style="display:none">Awaiting host…</div>
     </div>
   </div>
 
@@ -688,7 +687,7 @@
           <div class="col-title">Jamsesh Picks</div>
           <div class="rewards-pick-icon"><img src="branding/JamPick.png" alt="Pick"></div>
           <div class="rewards-earned-label">Earned</div>
-          <div class="rewards-earned-value">+1,250</div>
+          <div class="rewards-earned-value" id="rewards-picks-earned">+0</div>
         </div>
 
         <!-- Top-right: Badges -->
@@ -710,16 +709,16 @@
 
         <!-- Bottom-left: XP -->
         <div class="rewards-cell">
-          <div class="col-title">XP</div>
+          <div class="col-title" id="rewards-xp-title">XP</div>
           <div class="rewards-level-circle">
             <div class="rewards-level-label">Level</div>
-            <div class="rewards-level-num">42</div>
+            <div class="rewards-level-num" id="rewards-xp-level">0</div>
           </div>
           <div class="rewards-xp-earned-label">Earned</div>
-          <div class="rewards-xp-earned-value">+3,500</div>
+          <div class="rewards-xp-earned-value" id="rewards-xp-earned">+0</div>
           <div class="rewards-xp-bar-wrap">
-            <div class="rewards-xp-bar"><div class="rewards-xp-bar-fill"></div></div>
-            <div class="rewards-xp-labels"><span>6,700 XP</span><span>10,000 XP</span></div>
+            <div class="rewards-xp-bar"><div class="rewards-xp-bar-fill" id="rewards-xp-fill" style="width:0%"></div></div>
+            <div class="rewards-xp-labels"><span id="rewards-xp-current">0 XP</span><span id="rewards-xp-max">— XP</span></div>
           </div>
         </div>
 
@@ -739,10 +738,11 @@
         </div>
 
       </div>
-      <div class="results-buttons">
+      <div class="results-buttons" id="results2-buttons">
         <button class="results-btn retry" onclick="backToResults1()">Back</button>
         <button class="results-btn continue" onclick="exitResults()">Continue</button>
       </div>
+      <div class="results-await-host" id="results2-await" style="display:none">Awaiting host…</div>
     </div>
   </div>
 
@@ -768,31 +768,120 @@ else window.addEventListener('vuplexready', attachVuplex);
 
 function handleUnityMessage(msg) {
   if (!msg || !msg.type) return;
-  // The lighter page only consumes gameResults — every other Push from
-  // WebViewBridge is silently dropped, since the lobby's index.html will
+  // The lighter page only consumes the gameResults family — every other Push
+  // from WebViewBridge is silently dropped, since the lobby's index.html will
   // re-receive them when the user returns.
   if (msg.type === 'gameResults') applyGameResults(msg.data);
-  else if (msg.type === 'updateProfile' && msg.data && msg.data.name) _profileName = msg.data.name;
+  else if (msg.type === 'gameResultsGroupScore') applyGroupScore(msg.data);
+  else if (msg.type === 'gameResultsLeaderboard') applyLeaderboard(msg.data);
+  else if (msg.type === 'gameResultsProgression') applyProgression(msg.data);
+  else if (msg.type === 'updateProfile' && msg.data && msg.data.name) {
+    _profileName = msg.data.name;
+    if (resultsTab === 'me') _refreshTitle();
+  }
+}
+
+// Renders the per-song progression award on the rewards-screen 2x2:
+//   • Picks "+N" earned
+//   • XP cell: instrument label, new level, "+N" earned, bar fill %, labels
+// Carryover model: newUserXp is XP within the new level (not cumulative), so
+// the bar denominator is xpForNextLevel computed off the new level. Server
+// already did the carryover math; we just render.
+function applyProgression(data) {
+  if (!data) return;
+
+  var picksEl = document.getElementById('rewards-picks-earned');
+  if (picksEl && data.currencyAwarded != null) {
+    picksEl.textContent = '+' + Number(data.currencyAwarded).toLocaleString();
+  }
+
+  var titleEl = document.getElementById('rewards-xp-title');
+  if (titleEl && data.instrument) titleEl.textContent = data.instrument + ' XP';
+
+  var levelEl = document.getElementById('rewards-xp-level');
+  if (levelEl && data.newUserLevel != null) levelEl.textContent = String(data.newUserLevel);
+
+  var earnedEl = document.getElementById('rewards-xp-earned');
+  if (earnedEl && data.userXpAwarded != null) {
+    earnedEl.textContent = '+' + Number(data.userXpAwarded).toLocaleString();
+  }
+
+  var fillEl = document.getElementById('rewards-xp-fill');
+  var curEl = document.getElementById('rewards-xp-current');
+  var maxEl = document.getElementById('rewards-xp-max');
+  var newXp = data.newUserXp != null ? Number(data.newUserXp) : 0;
+  var nextXp = data.xpForNextLevel != null ? Number(data.xpForNextLevel) : 0;
+  if (curEl) curEl.textContent = newXp.toLocaleString() + ' XP';
+  if (maxEl) maxEl.textContent = (nextXp > 0 ? nextXp.toLocaleString() : '—') + ' XP';
+  if (fillEl) {
+    var pct = (nextXp > 0) ? Math.max(0, Math.min(100, Math.round((newXp / nextXp) * 100))) : 0;
+    fillEl.style.width = pct + '%';
+  }
 }
 
 // ── Tab state (mirrors index.html switchResultsTab) ────────
 var resultsTab = 'group';
 
-// Mock per-tab data — the lighter page doesn't have access to live group/me
-// stats so we mirror the placeholder values used by index.html until the
-// payload from Unity overwrites them.
-var groupScoreData = { score: '987,654', stars: 4, accuracy: '98.5%', combo: '342', perfect: '98.5%', notes: '98.5%' };
-var meScoreData = { score: '245,890', stars: 3, accuracy: '92.1%', combo: '187', perfect: '88.3%', notes: '94.7%' };
+// Band name from the gameResults payload (group play only); blank until it arrives.
+var _groupName = '';
 
-// Tracks the most-recent profile name pushed from Unity so the "Me" tab can
-// label the title correctly. Starts as the index.html default.
-var _profileName = 'Rael';
+// Per-tab score data. groupScoreData starts with placeholder values; gets the
+// real combined total when the host's RPC_BroadcastBandScores arrives. The
+// per-member breakdown (one row per player, with their instrument) replaces the
+// 4-stat grid (accuracy/combo/etc) on the group tab, since the network only
+// collects per-player scores, not per-player accuracy/combo.
+var groupScoreData = { score: '0', stars: 0, members: null };
+var meScoreData = { score: '0', stars: 0, accuracy: '0%', combo: '0', perfect: '0', notes: '0/0' };
+
+// Player display name from the gameResults payload (or a later updateProfile);
+// labels the "Me" tab title. Blank until Unity sends it.
+var _profileName = '';
+
+// Sets the whole results title. Drops the name (and its comma) gracefully when
+// it hasn't arrived yet so the page never shows a hardcoded placeholder name.
+function _refreshTitle() {
+  var el = document.getElementById('results-title');
+  if (!el) return;
+  var name = resultsTab === 'group' ? _groupName : _profileName;
+  el.innerHTML = name ? ('You crushed it, <span>' + name + '</span>!') : 'You crushed it!';
+}
+
+function _renderStats(tab) {
+  var statsEl = document.getElementById('results-stats');
+  if (tab === 'group') {
+    // Per-member breakdown (one row per player). Falls back to a placeholder
+    // until the host's RPC_BroadcastBandScores arrives. Supports any band size
+    // and duplicate instruments — a 3-drummer band shows three rows.
+    var members = groupScoreData.members;
+    if (!members || !members.length) {
+      statsEl.innerHTML = '<div class="results-stat" style="grid-column:span 2"><div class="stat-label">Band breakdown</div><div class="stat-value">Pending…</div></div>';
+      return;
+    }
+    var html = '';
+    for (var i = 0; i < members.length; i++) {
+      var m = members[i];
+      var inst = m.instrument || '';
+      var instLabel = inst ? (inst.charAt(0).toUpperCase() + inst.slice(1)) : '';
+      var name = m.name || 'Player';
+      var label = instLabel ? (name + ' · ' + instLabel) : name;
+      html += '<div class="results-stat"><div class="stat-label">' + label +
+              '</div><div class="stat-value">' + Number(m.score || 0).toLocaleString() + '</div></div>';
+    }
+    statsEl.innerHTML = html;
+  }
+  else {
+    var d = meScoreData;
+    statsEl.innerHTML =
+      '<div class="results-stat accuracy"><div class="stat-label">Accuracy</div><div class="stat-value">' + d.accuracy + '</div></div>' +
+      '<div class="results-stat combo"><div class="stat-label">Max Combo</div><div class="stat-value">' + d.combo + '</div></div>' +
+      '<div class="results-stat perfect"><div class="stat-label">Perfect Hits</div><div class="stat-value">' + d.perfect + '</div></div>' +
+      '<div class="results-stat notes"><div class="stat-label">Notes Hit</div><div class="stat-value">' + d.notes + '</div></div>';
+  }
+}
 
 function switchResultsTab(tab) {
   resultsTab = tab;
-
-  document.getElementById('results-group-name').textContent =
-    tab === 'group' ? 'Jamsesh Hunters' : _profileName;
+  _refreshTitle();
 
   var scoreTabs = document.getElementById('score-tabs').children;
   for (var i = 0; i < scoreTabs.length; i++) scoreTabs[i].className = 'results-tab';
@@ -809,12 +898,7 @@ function switchResultsTab(tab) {
   }
   starsEl.innerHTML = starsHtml;
 
-  var statsEl = document.getElementById('results-stats');
-  statsEl.innerHTML =
-    '<div class="results-stat accuracy"><div class="stat-label">Accuracy</div><div class="stat-value">' + data.accuracy + '</div></div>' +
-    '<div class="results-stat combo"><div class="stat-label">Max Combo</div><div class="stat-value">' + data.combo + '</div></div>' +
-    '<div class="results-stat perfect"><div class="stat-label">Perfect Hits</div><div class="stat-value">' + data.perfect + '</div></div>' +
-    '<div class="results-stat notes"><div class="stat-label">Notes Hit</div><div class="stat-value">' + data.notes + '</div></div>';
+  _renderStats(tab);
 
   var lbTabs = document.getElementById('lb-tabs').children;
   for (var j = 0; j < lbTabs.length; j++) lbTabs[j].className = 'results-tab';
@@ -827,16 +911,35 @@ function switchResultsTab(tab) {
 // ── Apply Unity results payload ────────────────────────────
 function _fmtNum(n) { return (n == null) ? '0' : Number(n).toLocaleString(); }
 
+// Builds the instrument icon + label from the Unity-sent slug ('drums'|'guitar'
+// |'vocals'). Reuses the shared instrument PNGs; hides a broken icon rather than
+// showing the browser's placeholder glyph. Empty slug → no label at all.
+function _instrumentMarkup(slug) {
+  if (!slug) return '';
+  var label = slug.charAt(0).toUpperCase() + slug.slice(1);
+  return '<img src="instruments/' + slug + '.png" alt="" ' +
+         'style="width:28px;height:28px;object-fit:contain" ' +
+         'onerror="this.style.display=\'none\'">' + label;
+}
+
 function applyGameResults(data) {
   if (!data) return;
+
+  // Capture the player name first so the title (rendered below via
+  // switchResultsTab → _refreshTitle) shows the real name in solo.
+  if (data.playerName) _profileName = data.playerName;
 
   if (data.song) {
     var artEl = document.getElementById('results-album-art');
     var titleEl = document.getElementById('results-song-title');
     var artistEl = document.getElementById('results-song-artist');
+    var diffEl = document.getElementById('results-song-diff');
+    var instEl = document.getElementById('results-instrument');
     if (artEl && data.song.file) artEl.src = data.song.file;
     if (titleEl) titleEl.textContent = data.song.title || 'Unknown';
     if (artistEl) artistEl.textContent = data.song.artist || 'Unknown';
+    if (diffEl) diffEl.textContent = data.song.difficulty || '';
+    if (instEl) instEl.innerHTML = _instrumentMarkup(data.song.instrument);
   }
 
   meScoreData = {
@@ -848,15 +951,94 @@ function applyGameResults(data) {
     notes: (data.notes != null) ? String(data.notes) : '0/0'
   };
 
-  // Hide the Group/Me tabs in solo — there's no group context, the placeholder
-  // group scores would just be misleading. Mirrors the index.html behaviour.
+  // Group score arrives later via gameResultsGroupScore (host has to collect
+  // every peer's score over the network first). Until then the Group tab shows
+  // "Pending…" so users see a clear loading state instead of stale mock data.
+  groupScoreData = {
+    score: 'Pending…',
+    stars: data.stars || 0,
+    members: null
+  };
+
+  if (data.bandName) _groupName = data.bandName;
+
+  // Hide the Group/Me tabs in solo — there's no group context, so a "Group" tab
+  // would be confusing. Mirrors the index.html behaviour.
   var isGroupPlay = !!data.isGroupPlay;
   var scoreTabsEl = document.getElementById('score-tabs');
   var lbTabsEl = document.getElementById('lb-tabs');
   if (scoreTabsEl) scoreTabsEl.style.display = isGroupPlay ? '' : 'none';
   if (lbTabsEl) lbTabsEl.style.display = isGroupPlay ? '' : 'none';
 
+  // Solo: collapse the leaderboard to just the personal list. Group: show
+  // both, but default-active is "group" so the user sees the band-wide score.
+  if (!isGroupPlay) {
+    document.getElementById('lb-group').style.display = 'none';
+  }
+
+  // Only the host drives setlist progression (Retry / Continue). Guests get
+  // an "Awaiting host…" placeholder so they can't accidentally desync the
+  // band by hitting buttons that only do something host-side. Solo always
+  // counts as host. Defaults to true if the flag is missing for any reason.
+  var canHost = (data.isHost !== false);
+  _applyHostControls(canHost);
+
   switchResultsTab(isGroupPlay ? 'group' : 'me');
+}
+
+function _applyHostControls(canHost) {
+  var b1 = document.getElementById('results1-buttons');
+  var a1 = document.getElementById('results1-await');
+  var b2 = document.getElementById('results2-buttons');
+  var a2 = document.getElementById('results2-await');
+  if (b1) b1.style.display = canHost ? '' : 'none';
+  if (a1) a1.style.display = canHost ? 'none' : 'flex';
+  if (b2) b2.style.display = canHost ? '' : 'none';
+  if (a2) a2.style.display = canHost ? 'none' : 'flex';
+}
+
+function applyGroupScore(data) {
+  if (!data) return;
+  groupScoreData.score = _fmtNum(data.score);
+  groupScoreData.members = data.members || null;
+  // Re-render only if the group tab is currently visible — switching to it later
+  // will pick up the new state via switchResultsTab.
+  if (resultsTab === 'group') {
+    document.getElementById('results-big-score').textContent = groupScoreData.score;
+    _renderStats('group');
+  }
+}
+
+function _renderLeaderboardList(containerId, entries, fallbackName) {
+  var el = document.getElementById(containerId);
+  if (!el) return;
+  if (!entries || !entries.length) {
+    el.innerHTML = '<div class="results-lb-entry"><div class="results-lb-info"><div class="results-lb-name">No entries yet</div></div></div>';
+    return;
+  }
+  var html = '';
+  for (var i = 0; i < entries.length; i++) {
+    var e = entries[i];
+    var name = e.name || fallbackName || 'Unknown';
+    var rank = (e.rank != null) ? e.rank : (i + 1);
+    var avatar = e.avatarUrl ? '<img src="' + e.avatarUrl + '" alt="">' : '';
+    var cls = 'results-lb-entry' + (e.isCurrentPlayer ? ' highlight' : '');
+    html += '<div class="' + cls + '">' +
+              '<div class="results-lb-rank">' + rank + '</div>' +
+              '<div class="results-lb-avatar">' + avatar + '</div>' +
+              '<div class="results-lb-info">' +
+                '<div class="results-lb-name">' + name + '</div>' +
+                '<div class="results-lb-score-val">' + Number(e.score || 0).toLocaleString() + '</div>' +
+              '</div>' +
+            '</div>';
+  }
+  el.innerHTML = html;
+}
+
+function applyLeaderboard(data) {
+  if (!data || !data.entries) return;
+  if (data.tab === 'group') _renderLeaderboardList('lb-group', data.entries, _groupName);
+  else _renderLeaderboardList('lb-me', data.entries, _profileName);
 }
 
 // ── Screen transitions (mirror index.html with local fade) ─

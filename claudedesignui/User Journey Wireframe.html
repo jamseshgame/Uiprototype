@@ -1,0 +1,1499 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Jamsesh — User Journey Wireframe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Patrick+Hand&family=Kalam:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f6f2e7;
+    --paper-2: #efe9d6;
+    --ink: #1a1a1a;
+    --ink-2: #3a3a3a;
+    --ink-3: #6b6b6b;
+    --accent: #e85a2a;
+    --accent-2: #2e7dd1;
+    --hi: #ffe45c;
+    --note: #fef3b8;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body { margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Patrick Hand', cursive;
+    background:
+      radial-gradient(1200px 600px at 10% -10%, rgba(232,90,42,0.08), transparent 60%),
+      radial-gradient(1000px 500px at 110% 110%, rgba(46,125,209,0.08), transparent 60%),
+      var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+    padding: 36px 48px 64px;
+    /* paper texture via overlapping noise gradients */
+    background-attachment: fixed;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+      radial-gradient(rgba(0,0,0,0.025) 1px, transparent 1px),
+      radial-gradient(rgba(0,0,0,0.02) 1px, transparent 1px);
+    background-size: 24px 24px, 80px 80px;
+    background-position: 0 0, 12px 12px;
+    z-index: 0;
+  }
+
+  .wrap { position: relative; z-index: 1; max-width: 1800px; margin: 0 auto; }
+
+  /* ───────── Header ───────── */
+  .hdr {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    gap: 32px;
+    margin-bottom: 40px;
+    border-bottom: 2px dashed var(--ink-2);
+    padding-bottom: 18px;
+  }
+  .hdr-title {
+    font-family: 'Caveat', cursive;
+    font-weight: 700;
+    font-size: 64px;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .hdr-title small {
+    display: block;
+    font-family: 'Patrick Hand', cursive;
+    font-size: 22px;
+    color: var(--ink-3);
+    letter-spacing: 0.05em;
+    margin-top: 6px;
+    text-transform: uppercase;
+  }
+  .hdr-meta {
+    text-align: right;
+    font-size: 18px;
+    color: var(--ink-3);
+    line-height: 1.5;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+  }
+  .hdr-meta strong { color: var(--ink); }
+  .hdr-stamp {
+    display: inline-block;
+    margin-top: 18px;
+    padding: 6px 14px;
+    border: 2px solid var(--accent);
+    color: var(--accent);
+    font-family: 'Kalam', cursive;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-size: 16px;
+    transform: rotate(-2deg);
+  }
+
+  /* ───────── Flow grid ───────── */
+  .flow {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    grid-auto-rows: min-content;
+    gap: 28px;
+    align-items: start;
+  }
+
+  /* Step labels */
+  .step-label {
+    grid-column: span 12;
+    display: flex; align-items: center; gap: 14px;
+    flex-wrap: wrap;
+    margin-top: 18px;
+  }
+  .step-num {
+    width: 48px; height: 48px;
+    border: 2.5px solid var(--ink);
+    border-radius: 50%;
+    display: grid; place-items: center;
+    font-family: 'Caveat', cursive;
+    font-weight: 700;
+    font-size: 30px;
+    background: var(--paper);
+    box-shadow: 3px 3px 0 var(--ink);
+  }
+  .step-title {
+    font-family: 'Caveat', cursive;
+    font-weight: 700;
+    font-size: 36px;
+    line-height: 1;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .step-sub {
+    margin-left: 8px;
+    color: var(--ink-3);
+    font-size: 20px;
+  }
+
+  /* ───────── Screen frame ───────── */
+  .frame {
+    position: relative;
+    background: var(--paper-2);
+    border: 2.5px solid var(--ink);
+    border-radius: 14px;
+    padding: 14px;
+    box-shadow: 4px 6px 0 var(--ink);
+    aspect-ratio: 16 / 10;
+    display: flex; flex-direction: column;
+  }
+  .frame-title {
+    position: absolute;
+    top: -16px; left: 14px;
+    background: var(--hi);
+    border: 2px solid var(--ink);
+    padding: 1px 12px 3px;
+    font-family: 'Caveat', cursive;
+    font-weight: 700;
+    font-size: 24px;
+    border-radius: 6px;
+    transform: rotate(-1.5deg);
+    white-space: nowrap;
+  }
+  .frame-tag {
+    position: absolute;
+    top: -14px; right: 14px;
+    font-family: 'Kalam', cursive;
+    font-size: 14px;
+    letter-spacing: 0.08em;
+    background: var(--paper);
+    border: 1.5px solid var(--ink-2);
+    padding: 2px 10px;
+    border-radius: 99px;
+    color: var(--ink-2);
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .canvas {
+    flex: 1;
+    border: 2px dashed var(--ink-3);
+    border-radius: 8px;
+    background:
+      repeating-linear-gradient(
+        0deg,
+        transparent 0 26px,
+        rgba(0,0,0,0.04) 26px 27px
+      ),
+      var(--paper);
+    padding: 14px;
+    display: flex; flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* Generic wireframe primitives */
+  .box {
+    border: 2px solid var(--ink);
+    border-radius: 6px;
+    padding: 6px 10px;
+    background: var(--paper);
+    font-size: 18px;
+  }
+  .ghost {
+    border: 2px dashed var(--ink-3);
+    border-radius: 6px;
+    background: rgba(255,255,255,0.4);
+    color: var(--ink-3);
+    padding: 6px 10px;
+    font-size: 16px;
+  }
+  .pill {
+    display: inline-block;
+    border: 2px solid var(--ink);
+    border-radius: 99px;
+    padding: 2px 12px 4px;
+    background: var(--paper);
+    font-size: 16px;
+    white-space: nowrap;
+  }
+  .pill.solid { background: var(--ink); color: var(--paper); }
+  .pill.accent { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .pill.hi { background: var(--hi); }
+
+  .line {
+    height: 2px;
+    background: var(--ink-3);
+    border-radius: 2px;
+    margin: 6px 0;
+  }
+  .line.short { width: 40%; }
+  .line.med   { width: 65%; }
+  .line.long  { width: 90%; }
+
+  .row { display: flex; align-items: center; gap: 10px; }
+  .col { display: flex; flex-direction: column; gap: 8px; }
+  .grow { flex: 1; }
+
+  /* Avatar bubble */
+  .av {
+    width: 36px; height: 36px;
+    border: 2px solid var(--ink);
+    border-radius: 50%;
+    background: var(--paper);
+    position: relative;
+  }
+  .av::after {
+    content: ""; position: absolute;
+    left: 50%; top: 50%;
+    width: 14px; height: 14px;
+    border: 2px solid var(--ink);
+    border-radius: 50%;
+    transform: translate(-50%, -85%);
+    background: var(--paper);
+  }
+  .av::before {
+    content: ""; position: absolute;
+    left: 50%; bottom: 4px;
+    width: 22px; height: 10px;
+    border: 2px solid var(--ink);
+    border-bottom: none;
+    border-radius: 22px 22px 0 0;
+    transform: translateX(-50%);
+    background: var(--paper);
+  }
+
+  /* CTA emphasis */
+  .cta-big {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 14px 28px;
+    border: 3px solid var(--ink);
+    background: var(--accent);
+    color: #fff;
+    border-radius: 14px;
+    font-family: 'Caveat', cursive;
+    font-weight: 700;
+    font-size: 36px;
+    box-shadow: 4px 4px 0 var(--ink);
+    transform: rotate(-1deg);
+  }
+  .cta-big.alt { background: var(--accent-2); }
+
+  /* Highlight ring */
+  .ring {
+    position: relative;
+  }
+  .ring::after {
+    content: "";
+    position: absolute;
+    inset: -10px;
+    border: 3px dashed var(--accent);
+    border-radius: 18px;
+    pointer-events: none;
+    animation: pulse 2.4s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.85; }
+    50%      { transform: scale(1.04); opacity: 0.45; }
+  }
+
+  /* ───────── Sticky notes ───────── */
+  .note {
+    background: var(--note);
+    border: 2px solid var(--ink);
+    padding: 12px 14px;
+    font-family: 'Caveat', cursive;
+    font-size: 22px;
+    line-height: 1.2;
+    box-shadow: 3px 3px 0 var(--ink);
+    border-radius: 4px;
+    align-self: start;
+    max-width: 100%;
+  }
+  .note b { font-weight: 700; }
+  .note small {
+    display: block;
+    font-family: 'Patrick Hand', cursive;
+    font-size: 14px;
+    color: var(--ink-3);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+  .note.tilt-l { transform: rotate(-1.4deg); }
+  .note.tilt-r { transform: rotate(1.6deg); }
+  .note.todo {
+    background: #ffd6d6;
+  }
+  .note.todo::before {
+    content: "TBD";
+    display: inline-block;
+    background: var(--ink);
+    color: var(--paper);
+    padding: 1px 8px 2px;
+    border-radius: 4px;
+    font-family: 'Kalam', cursive;
+    letter-spacing: 0.1em;
+    font-size: 13px;
+    margin-right: 8px;
+    transform: translateY(-2px);
+  }
+
+  /* ───────── Connector arrows ───────── */
+  .arrow-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 80px;
+  }
+  .arrow-label {
+    position: absolute;
+    top: -10px;
+    background: var(--paper);
+    padding: 0 8px;
+    font-family: 'Caveat', cursive;
+    font-size: 22px;
+    color: var(--ink);
+  }
+  .arrow {
+    width: 100%;
+    height: 4px;
+    background: var(--ink);
+    border-radius: 2px;
+    position: relative;
+  }
+  .arrow::after {
+    content: "";
+    position: absolute;
+    right: -2px; top: 50%;
+    width: 0; height: 0;
+    border-left: 18px solid var(--ink);
+    border-top: 12px solid transparent;
+    border-bottom: 12px solid transparent;
+    transform: translateY(-50%);
+  }
+
+  .arrow.dashed { background: transparent; background-image: linear-gradient(to right, var(--ink) 60%, transparent 0); background-size: 14px 4px; background-repeat: repeat-x; }
+
+  /* Down arrow for branching */
+  .branch {
+    grid-column: span 12;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+    align-items: start;
+    position: relative;
+    margin-top: 8px;
+  }
+  .branch-arrow {
+    display: flex; flex-direction: column; align-items: center;
+    min-height: 90px;
+    position: relative;
+  }
+  .branch-arrow .arrow-label {
+    position: relative;
+    top: 0;
+    background: var(--hi);
+    border: 2px solid var(--ink);
+    padding: 1px 14px 3px;
+    border-radius: 6px;
+    font-weight: 700;
+    transform: rotate(-1deg);
+    z-index: 1;
+  }
+  .branch-arrow.alt .arrow-label { background: var(--paper-2); }
+  .branch-down {
+    margin-top: 6px;
+    width: 4px;
+    flex: 1;
+    background: var(--ink);
+    position: relative;
+  }
+  .branch-down::after {
+    content: "";
+    position: absolute;
+    left: 50%; bottom: -2px;
+    width: 0; height: 0;
+    border-top: 18px solid var(--ink);
+    border-left: 12px solid transparent;
+    border-right: 12px solid transparent;
+    transform: translateX(-50%);
+  }
+
+  /* ───────── Lobby content ───────── */
+  .lobby-fullscreen {
+    position: absolute;
+    inset: 0;
+    border-radius: 8px;
+    overflow: hidden;
+    background:
+      repeating-linear-gradient(135deg, rgba(0,0,0,0.04) 0 8px, transparent 8px 18px),
+      var(--paper-2);
+  }
+  .lobby-stage-bg {
+    position: absolute;
+    inset: 0;
+    display: flex; flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding: 36px 24px;
+  }
+  .lobby-stage-label {
+    font-family: 'Caveat', cursive;
+    font-size: 26px;
+    color: var(--ink-3);
+    text-align: center;
+    border: 2px dashed var(--ink-3);
+    padding: 6px 14px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.5);
+  }
+  .lobby-people-cluster {
+    display: flex; gap: 10px; flex-wrap: wrap;
+    justify-content: center;
+  }
+  .lobby-cta-wrap {
+    display: flex; justify-content: center;
+  }
+
+  /* Floating overlays for "who's here" and "live now" */
+  .lobby-overlay {
+    position: absolute;
+    top: 14px;
+    width: 200px;
+    border: 2px solid var(--ink);
+    border-radius: 10px;
+    background: rgba(246, 242, 231, 0.92);
+    backdrop-filter: blur(4px);
+    box-shadow: 3px 3px 0 var(--ink);
+    padding: 10px 12px;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .lobby-overlay-left  { left: 14px; transform: rotate(-1deg); }
+  .lobby-overlay-right { right: 14px; transform: rotate(1deg); }
+  .overlay-head {
+    display: flex; align-items: center; justify-content: space-between;
+    font-family: 'Caveat', cursive;
+    font-size: 22px;
+    border-bottom: 2px dashed var(--ink-3);
+    padding-bottom: 4px;
+  }
+  .overlay-count {
+    font-family: 'Kalam', cursive;
+    font-size: 13px;
+    border: 1.5px solid var(--ink);
+    border-radius: 99px;
+    padding: 0 8px 1px;
+    background: var(--hi);
+  }
+  .overlay-row {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 16px;
+  }
+  .live-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent);
+    flex-shrink: 0;
+  }
+
+  /* ───────── Menu modal ───────── */
+  .menu-modal {
+    background: rgba(0,0,0,0.55);
+    border-radius: 8px;
+    flex: 1;
+    display: grid;
+    place-items: center;
+    padding: 22px;
+  }
+  .menu-card {
+    background: var(--paper);
+    border: 2.5px solid var(--ink);
+    border-radius: 12px;
+    box-shadow: 5px 5px 0 rgba(0,0,0,0.45);
+    padding: 18px;
+    width: 100%;
+    max-width: 360px;
+  }
+  .menu-card-title {
+    font-family: 'Caveat', cursive;
+    font-weight: 700;
+    font-size: 30px;
+    text-align: center;
+    margin: 0 0 8px;
+  }
+  .menu-card-sub {
+    text-align: center;
+    color: var(--ink-3);
+    font-size: 18px;
+    margin-bottom: 14px;
+  }
+  .menu-options {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;
+  }
+  .menu-opt {
+    border: 2.5px solid var(--ink);
+    border-radius: 10px;
+    padding: 14px 10px;
+    text-align: center;
+    background: var(--paper-2);
+    box-shadow: 3px 3px 0 var(--ink);
+    font-family: 'Caveat', cursive;
+    font-size: 24px;
+    font-weight: 700;
+  }
+  .menu-opt small {
+    display: block;
+    font-family: 'Patrick Hand', cursive;
+    font-weight: 400;
+    font-size: 14px;
+    color: var(--ink-3);
+    margin-top: 2px;
+    letter-spacing: 0.05em;
+  }
+  .menu-opt.solo  { background: #d2efe1; }
+  .menu-opt.multi { background: #fde2c8; }
+
+  /* Multiplayer sub-menu (2 options) */
+  .mp-options {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+  }
+  .mp-opt.mp-friend { background: #d6ecff; }
+  .mp-opt.mp-band   { background: #fde2c8; }
+
+  /* Picker sub-heads (used in Friend / Band / Space pickers) */
+  .sub-head {
+    font-family: 'Caveat', cursive;
+    font-weight: 700;
+    font-size: 22px;
+    margin: 10px 0 4px;
+    border-bottom: 2px dashed var(--ink-3);
+    padding-bottom: 2px;
+  }
+  .sub-head.muted { color: var(--ink-3); }
+
+  .picker-row {
+    display: flex; align-items: center; gap: 10px;
+    border: 2px solid var(--ink);
+    border-radius: 8px;
+    background: var(--paper);
+    padding: 8px 10px;
+    margin-bottom: 8px;
+  }
+  .status {
+    font-family: 'Kalam', cursive;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    padding: 1px 8px 2px;
+    border-radius: 99px;
+    border: 1.5px solid var(--ink);
+  }
+  .status-jam { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .status-on  { background: #c8efd6; }
+
+  /* Band tile grid */
+  .band-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .band-tile {
+    border: 2px solid var(--ink);
+    border-radius: 8px;
+    background: var(--paper);
+    padding: 8px;
+    display: flex; flex-direction: column; gap: 4px;
+    position: relative;
+  }
+  .band-art {
+    aspect-ratio: 1 / 1;
+    border: 2px solid var(--ink);
+    border-radius: 6px;
+    background:
+      repeating-linear-gradient(45deg, rgba(0,0,0,0.06) 0 4px, transparent 4px 10px),
+      var(--paper-2);
+  }
+  .band-name {
+    font-family: 'Caveat', cursive;
+    font-weight: 700;
+    font-size: 22px;
+    line-height: 1;
+  }
+  .band-meta {
+    font-size: 14px;
+    color: var(--ink-3);
+  }
+  .band-cta {
+    align-self: flex-start;
+    font-size: 14px;
+    padding: 1px 10px 2px;
+  }
+
+  /* Space tile list */
+  .space-grid {
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .space-tile {
+    display: grid;
+    grid-template-columns: 60px 1fr auto;
+    gap: 10px;
+    align-items: center;
+    border: 2px solid var(--ink);
+    border-radius: 8px;
+    background: var(--paper);
+    padding: 8px 10px;
+  }
+  .space-art {
+    width: 60px; height: 44px;
+    border: 2px solid var(--ink);
+    border-radius: 6px;
+    background:
+      repeating-linear-gradient(-45deg, rgba(0,0,0,0.08) 0 4px, transparent 4px 10px),
+      var(--paper-2);
+  }
+  .space-name {
+    font-family: 'Caveat', cursive;
+    font-weight: 700;
+    font-size: 22px;
+    line-height: 1;
+  }
+  .space-meta {
+    font-size: 14px;
+    color: var(--ink-3);
+    letter-spacing: 0.06em;
+  }
+  .menu-opt.battle {
+    background: #e2e2e2;
+    color: var(--ink-3);
+    border-color: var(--ink-3);
+    box-shadow: 3px 3px 0 var(--ink-3);
+    position: relative;
+    cursor: not-allowed;
+  }
+  .menu-opt.battle small { color: var(--ink-3); }
+  .menu-opt-soon {
+    display: inline-block;
+    margin-top: 4px;
+    font-family: 'Kalam', cursive;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    background: var(--ink-3);
+    color: var(--paper);
+    padding: 1px 8px 2px;
+    border-radius: 4px;
+  }
+
+  /* ───────── Perform mini-mock ───────── */
+  .perform-tabs {
+    display: flex; gap: 10px;
+  }
+  .perform-tab {
+    border: 2px solid var(--ink);
+    border-radius: 99px;
+    padding: 1px 12px 3px;
+    font-size: 16px;
+    background: var(--paper);
+  }
+  .perform-tab.on { background: var(--ink); color: var(--paper); }
+  .perform-now {
+    border: 2px solid var(--ink);
+    border-radius: 10px;
+    padding: 10px;
+    margin-top: 10px;
+    background: rgba(255,255,255,0.6);
+    display: flex; gap: 10px;
+  }
+  .perform-now-img {
+    width: 56px; height: 56px;
+    border: 2px solid var(--ink);
+    border-radius: 6px;
+    background: var(--ink-3);
+  }
+  .perform-setlist {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .perform-song {
+    aspect-ratio: 1 / 1;
+    min-width: 0;
+    border: 2px solid var(--ink);
+    border-radius: 8px;
+    background:
+      repeating-linear-gradient(45deg, rgba(0,0,0,0.06) 0 4px, transparent 4px 10px),
+      var(--paper);
+    position: relative;
+  }
+  .perform-song::after {
+    content: attr(data-n);
+    position: absolute;
+    top: 4px; left: 6px;
+    font-family: 'Caveat', cursive;
+    font-weight: 700;
+    font-size: 18px;
+  }
+  .perform-foot {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 10px;
+  }
+  .perform-start {
+    background: var(--accent);
+    color: #fff;
+    border: 2.5px solid var(--ink);
+    padding: 4px 14px 6px;
+    border-radius: 10px;
+    font-family: 'Caveat', cursive;
+    font-weight: 700;
+    font-size: 22px;
+    box-shadow: 3px 3px 0 var(--ink);
+  }
+
+  /* ───────── TBD pane ───────── */
+  .tbd {
+    flex: 1;
+    border: 3px dashed var(--ink-2);
+    border-radius: 10px;
+    background:
+      repeating-linear-gradient(-45deg, rgba(0,0,0,0.04) 0 10px, transparent 10px 22px),
+      rgba(255,255,255,0.4);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 22px;
+    text-align: center;
+    gap: 10px;
+  }
+  .tbd-stamp {
+    font-family: 'Kalam', cursive;
+    font-weight: 700;
+    font-size: 36px;
+    letter-spacing: 0.15em;
+    color: var(--ink);
+    border: 4px solid var(--ink);
+    padding: 6px 18px 10px;
+    transform: rotate(-3deg);
+    background: var(--paper);
+    box-shadow: 4px 4px 0 var(--ink);
+  }
+  .tbd-line {
+    font-family: 'Caveat', cursive;
+    font-size: 26px;
+    color: var(--ink-2);
+    max-width: 360px;
+  }
+  .tbd-hints {
+    display: flex; flex-wrap: wrap; gap: 6px; justify-content: center;
+    margin-top: 8px;
+  }
+  .tbd-hint {
+    border: 2px dashed var(--ink-3);
+    border-radius: 99px;
+    padding: 2px 12px 4px;
+    font-size: 16px;
+    color: var(--ink-3);
+    background: var(--paper-2);
+  }
+
+  /* ───────── Legend strip ───────── */
+  .legend {
+    grid-column: span 12;
+    display: flex; gap: 18px; flex-wrap: wrap;
+    align-items: center;
+    padding: 14px 18px;
+    border: 2px dashed var(--ink-3);
+    border-radius: 10px;
+    background: rgba(255,255,255,0.4);
+    font-size: 18px;
+    color: var(--ink-2);
+    margin-top: 6px;
+  }
+  .legend strong { font-family: 'Caveat', cursive; font-size: 24px; color: var(--ink); margin-right: 6px; }
+  .legend-item { display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+  .legend-swatch {
+    width: 22px; height: 22px;
+    border: 2px solid var(--ink);
+    border-radius: 4px;
+  }
+  .legend-swatch.note { background: var(--note); }
+  .legend-swatch.tbd  { background: repeating-linear-gradient(-45deg, rgba(0,0,0,0.18) 0 6px, transparent 6px 12px), var(--paper); }
+  .legend-swatch.hi   { background: var(--hi); }
+  .legend-swatch.acc  { background: var(--accent); border-color: var(--accent); }
+
+  /* ── Private space (Step 6) ── */
+  .space-room {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 10px;
+    min-height: 0;
+  }
+  .room-art {
+    border: 2px dashed var(--ink-3);
+    border-radius: 10px;
+    background:
+      repeating-linear-gradient(135deg, rgba(0,0,0,0.05) 0 6px, transparent 6px 14px),
+      var(--paper-2);
+    padding: 14px;
+    display: flex; flex-direction: column; justify-content: space-between;
+    position: relative;
+    min-height: 180px;
+  }
+  .room-label {
+    font-family: 'Caveat', cursive;
+    font-size: 22px;
+    color: var(--ink-3);
+    text-align: center;
+  }
+  .room-avatars {
+    display: flex; gap: 10px; justify-content: center;
+    flex-wrap: wrap;
+  }
+  .room-side {
+    border: 2px solid var(--ink);
+    border-radius: 10px;
+    background: var(--paper);
+    padding: 10px;
+    display: flex; flex-direction: column; gap: 6px;
+    min-height: 0;
+    overflow: hidden;
+  }
+  .chat-msg {
+    display: flex; align-items: flex-start; gap: 8px;
+    font-size: 16px;
+    line-height: 1.2;
+  }
+  .av.small { width: 26px; height: 26px; flex-shrink: 0; }
+  .av.small::after { width: 10px; height: 10px; }
+  .av.small::before { width: 16px; height: 7px; bottom: 3px; border-radius: 16px 16px 0 0; }
+
+  /* ── Perform Multiplayer roster (Step 7) ── */
+  .mp-roster {
+    display: flex; flex-direction: column; gap: 8px;
+    margin-top: 10px;
+  }
+  .mp-row {
+    display: grid;
+    grid-template-columns: 44px 1fr 1.2fr 0.8fr 1fr;
+    align-items: center;
+    gap: 10px;
+    border: 2px solid var(--ink);
+    border-radius: 8px;
+    background: var(--paper);
+    padding: 6px 10px;
+  }
+  .mp-row-name {
+    font-family: 'Caveat', cursive;
+    font-weight: 700;
+    font-size: 22px;
+    line-height: 1;
+  }
+  .mp-cell {
+    font-size: 16px;
+    color: var(--ink);
+  }
+  .mp-cell.ghost-cell {
+    color: var(--ink-3);
+    font-style: italic;
+  }
+
+  /* Column spans */
+  .sp4 { grid-column: span 4; }
+  .sp3 { grid-column: span 3; }
+  .sp1 { grid-column: span 1; }
+  .sp2 { grid-column: span 2; }
+  .sp5 { grid-column: span 5; }
+  .sp6 { grid-column: span 6; }
+  .sp7 { grid-column: span 7; }
+
+  /* Arrow column helpers */
+  .arrow-col { display: flex; align-items: center; justify-content: center; height: 100%; }
+
+</style>
+</head>
+<body>
+  <div class="wrap">
+
+    <header class="hdr">
+      <div>
+        <div class="hdr-title">
+          Jamsesh — User Journey
+          <small>Wireframe · v1 · lobby → play menu → solo / multiplayer</small>
+        </div>
+      </div>
+      <div class="hdr-meta">
+        <div><strong>Scope:</strong> entry flow only</div>
+        <div><strong>Status:</strong> solo path defined · multiplayer pending</div>
+        <div class="hdr-stamp">Low-fi · for review</div>
+      </div>
+    </header>
+
+    <div class="flow">
+
+      <!-- ─────────── STEP 1 ─────────── -->
+      <div class="step-label">
+        <div class="step-num">1</div>
+        <div class="step-title">Social Lobby</div>
+        <div class="step-sub">— entry point · friends drop in, hang out, see what's live</div>
+      </div>
+
+      <!-- Lobby screen -->
+      <div class="sp5">
+        <div class="frame">
+          <div class="frame-title">SOCIAL LOBBY</div>
+          <div class="frame-tag">Screen 1 · /lobby</div>
+          <div class="canvas" style="padding: 0; position: relative; overflow: hidden;">
+            <!-- Full-bleed lobby stage -->
+            <div class="lobby-fullscreen">
+              <div class="lobby-stage-bg">
+                <div class="lobby-stage-label">[ lobby stage / full-screen room render ]</div>
+                <div class="lobby-people-cluster">
+                  <div class="av"></div><div class="av"></div><div class="av"></div>
+                  <div class="av"></div><div class="av"></div><div class="av"></div>
+                </div>
+                <div class="lobby-cta-wrap">
+                  <div class="ring">
+                    <div class="cta-big">▶ PLAY</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Overlay: who's here -->
+              <div class="lobby-overlay lobby-overlay-left">
+                <div class="overlay-head">
+                  <b>Who's here</b>
+                  <span class="overlay-count">12</span>
+                </div>
+                <div class="overlay-row"><div class="av small"></div><div class="line med"></div></div>
+                <div class="overlay-row"><div class="av small"></div><div class="line med"></div></div>
+                <div class="overlay-row"><div class="av small"></div><div class="line med"></div></div>
+                <div class="overlay-row"><div class="av small"></div><div class="line med"></div></div>
+              </div>
+
+              <!-- Overlay: live now -->
+              <div class="lobby-overlay lobby-overlay-right">
+                <div class="overlay-head">
+                  <b>Live now</b>
+                  <span class="overlay-count">5</span>
+                </div>
+                <div class="overlay-row"><span class="live-dot"></span>Velocity</div>
+                <div class="overlay-row"><span class="live-dot"></span>Iron Eclipse</div>
+                <div class="overlay-row"><div class="line short"></div></div>
+                <div class="overlay-row"><div class="line short"></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- notes for step 1 -->
+      <div class="sp4">
+        <div class="col" style="gap: 16px;">
+          <div class="note tilt-l">
+            <b>Default landing.</b> Every session opens here — feels alive before you commit to playing.
+            <small>Lobby = home base</small>
+          </div>
+          <div class="note tilt-r">
+            <b>Single PLAY button</b> is the only path forward. Friends list + live bands are passive context.
+            <small>No accidental routing</small>
+          </div>
+          <div class="note tilt-l" style="background: #d6ecff;">
+            <b>Resolved:</b> players <i>always</i> start in the social lobby — no skip path to a recent setlist. The lobby is the gate, every session.
+            <small>Locked · ship it</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- arrow column on the right (steers eye down) -->
+      <div class="sp3">
+        <div style="height: 100%; display: flex; flex-direction: column; gap: 14px; padding-top: 24px;">
+          <div class="note" style="background: #fff4d6; transform: rotate(1.5deg);">
+            <b>Tap PLAY →</b>
+            <small>opens menu modal, lobby stays in background</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- branch down arrow to step 2 -->
+      <div class="step-label" style="margin-top: 28px;">
+        <div class="step-num">2</div>
+        <div class="step-title">Perform page</div>
+        <div class="step-sub">— pick mode · build setlist · configure · start</div>
+      </div>
+
+      <!-- Perform page screen -->
+      <div class="sp5">
+        <div class="frame" style="aspect-ratio: 16 / 10;">
+          <div class="frame-title">PERFORM PAGE</div>
+          <div class="frame-tag">Screen 2 · /perform</div>
+          <div class="canvas" style="gap: 8px;">
+
+            <!-- top chrome: nav + user -->
+            <div class="row" style="justify-content: space-between;">
+              <div class="row" style="gap: 6px;">
+                <div class="pill solid">JAMSESH</div>
+                <div class="pill">Home</div>
+                <div class="pill hi">Perform</div>
+                <div class="pill">Bandmates</div>
+                <div class="pill">Spaces</div>
+                <div class="pill">Store</div>
+              </div>
+              <div class="row" style="gap: 6px;">
+                <div class="pill" style="font-size: 14px;">¢3,180</div>
+                <div class="av small"></div>
+              </div>
+            </div>
+
+            <!-- mode tabs -->
+            <div class="row" style="gap: 18px; border-bottom: 2px dashed var(--ink-3); padding-bottom: 4px;">
+              <div style="font-family: 'Caveat', cursive; font-weight: 700; font-size: 22px; color: var(--accent); border-bottom: 3px solid var(--accent); padding-bottom: 2px;">Solo</div>
+              <div style="font-family: 'Caveat', cursive; font-weight: 700; font-size: 22px; color: var(--ink-3);">Multiplayer</div>
+              <div style="font-family: 'Caveat', cursive; font-weight: 700; font-size: 22px; color: var(--ink-3); opacity: 0.5;">Battle <span style="font-size: 12px; background: var(--ink); color: var(--paper); padding: 1px 6px; border-radius: 99px; font-family: 'Kalam', cursive; letter-spacing: 0.08em; margin-left: 4px;">SOON</span></div>
+            </div>
+
+            <!-- setlist panel header -->
+            <div class="row" style="justify-content: space-between; align-items: flex-end;">
+              <div>
+                <div style="font-family: 'Kalam', cursive; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-3);">Now Up</div>
+                <div style="font-family: 'Caveat', cursive; font-weight: 700; font-size: 24px; line-height: 1;">Velocity Theme</div>
+                <div style="font-size: 13px; color: var(--ink-3);">Iron Eclipse · 3:42 · 124 BPM</div>
+              </div>
+              <div style="text-align: right;">
+                <div style="font-family: 'Kalam', cursive; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-3);">Setlist</div>
+                <div style="font-family: 'Caveat', cursive; font-weight: 700; font-size: 18px; line-height: 1;">3 tracks · 11:24</div>
+                <div class="row" style="gap: 4px; justify-content: flex-end; margin-top: 4px;">
+                  <div style="width: 8px; height: 8px; border: 1.5px solid var(--ink); border-radius: 50%; background: var(--accent);"></div>
+                  <div style="width: 8px; height: 8px; border: 1.5px solid var(--ink); border-radius: 50%; background: var(--paper);"></div>
+                  <div style="width: 8px; height: 8px; border: 1.5px solid var(--ink); border-radius: 50%; background: var(--paper);"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- setlist row (song cards) -->
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;">
+              <div style="border: 2.5px solid var(--accent); border-radius: 8px; background: var(--paper); padding: 6px; aspect-ratio: 1/1; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 2px 2px 0 var(--ink); position: relative;">
+                <div style="position: absolute; top: 4px; left: 4px; font-family: 'Kalam', cursive; font-size: 10px; background: var(--ink); color: var(--paper); padding: 1px 4px; border-radius: 3px;">01</div>
+                <div style="flex: 1; background: repeating-linear-gradient(45deg, rgba(0,0,0,0.08) 0 4px, transparent 4px 10px), var(--paper-2); border-radius: 4px; margin: 12px 0 4px;"></div>
+                <div>
+                  <div style="font-family: 'Caveat', cursive; font-weight: 700; font-size: 13px; line-height: 1;">Velocity</div>
+                  <div style="font-size: 9px; color: var(--ink-3);">Iron Eclipse</div>
+                </div>
+              </div>
+              <div style="border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); padding: 6px; aspect-ratio: 1/1; display: flex; flex-direction: column; justify-content: space-between; position: relative;">
+                <div style="position: absolute; top: 4px; left: 4px; font-family: 'Kalam', cursive; font-size: 10px; background: var(--ink); color: var(--paper); padding: 1px 4px; border-radius: 3px;">02</div>
+                <div style="flex: 1; background: repeating-linear-gradient(45deg, rgba(0,0,0,0.08) 0 4px, transparent 4px 10px), var(--paper-2); border-radius: 4px; margin: 12px 0 4px;"></div>
+                <div>
+                  <div style="font-family: 'Caveat', cursive; font-weight: 700; font-size: 13px; line-height: 1;">Glass Hwy</div>
+                  <div style="font-size: 9px; color: var(--ink-3);">Lunaris</div>
+                </div>
+              </div>
+              <div style="border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); padding: 6px; aspect-ratio: 1/1; display: flex; flex-direction: column; justify-content: space-between; position: relative;">
+                <div style="position: absolute; top: 4px; left: 4px; font-family: 'Kalam', cursive; font-size: 10px; background: var(--ink); color: var(--paper); padding: 1px 4px; border-radius: 3px;">03</div>
+                <div style="flex: 1; background: repeating-linear-gradient(45deg, rgba(0,0,0,0.08) 0 4px, transparent 4px 10px), var(--paper-2); border-radius: 4px; margin: 12px 0 4px;"></div>
+                <div>
+                  <div style="font-family: 'Caveat', cursive; font-weight: 700; font-size: 13px; line-height: 1;">Triple Dare</div>
+                  <div style="font-size: 9px; color: var(--ink-3);">FRACTUR</div>
+                </div>
+              </div>
+              <div style="border: 2px dashed var(--ink-3); border-radius: 8px; background: rgba(255,255,255,0.4); padding: 6px; aspect-ratio: 1/1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;">
+                <div style="width: 24px; height: 24px; border: 2px solid var(--ink-3); border-radius: 50%; display: grid; place-items: center; font-family: 'Caveat', cursive; font-weight: 700; font-size: 18px; color: var(--ink-3); line-height: 1;">+</div>
+                <div style="font-family: 'Caveat', cursive; font-weight: 700; font-size: 13px; color: var(--ink-3); line-height: 1;">Add Track</div>
+              </div>
+            </div>
+
+            <!-- configure row -->
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;">
+              <div class="box" style="padding: 4px 6px; font-size: 12px;">
+                <div style="font-family: 'Kalam', cursive; font-size: 9px; letter-spacing: 0.14em; color: var(--ink-3); text-transform: uppercase;">Instrument</div>
+                <div style="font-family: 'Caveat', cursive; font-weight: 700; font-size: 17px; color: var(--accent); line-height: 1;">🎸 Guitar</div>
+              </div>
+              <div class="box" style="padding: 4px 6px; font-size: 12px;">
+                <div style="font-family: 'Kalam', cursive; font-size: 9px; letter-spacing: 0.14em; color: var(--ink-3); text-transform: uppercase;">Difficulty</div>
+                <div style="font-family: 'Caveat', cursive; font-weight: 700; font-size: 17px; line-height: 1;">Hard</div>
+              </div>
+              <div class="box" style="padding: 4px 6px; font-size: 12px;">
+                <div style="font-family: 'Kalam', cursive; font-size: 9px; letter-spacing: 0.14em; color: var(--ink-3); text-transform: uppercase;">Vibe</div>
+                <div style="font-family: 'Caveat', cursive; font-weight: 700; font-size: 17px; line-height: 1;">Neon Coliseum</div>
+              </div>
+              <div class="box" style="padding: 4px 6px; font-size: 12px;">
+                <div style="font-family: 'Kalam', cursive; font-size: 9px; letter-spacing: 0.14em; color: var(--ink-3); text-transform: uppercase;">Setlist</div>
+                <div style="font-family: 'Caveat', cursive; font-weight: 700; font-size: 17px; line-height: 1;">Save / Load</div>
+              </div>
+            </div>
+
+            <!-- start button -->
+            <div style="display: flex; justify-content: flex-end; margin-top: auto;">
+              <div class="cta-big" style="font-size: 26px; padding: 8px 22px; transform: rotate(-1deg);">▶ START</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- notes for step 2 -->
+      <div class="sp4">
+        <div class="col" style="gap: 16px;">
+          <div class="note tilt-r">
+            <b>Mode tabs at the top</b> — Solo / Multiplayer / Battle. Switching tabs swaps in the relevant crew picker but keeps the setlist and configure rows on screen.
+            <small>Fork lives inline</small>
+          </div>
+          <div class="note tilt-l">
+            <b>Setlist of up to 4 tracks.</b> First card is "Now Up" (orange highlight); the rest queue after it. An "+ Add Track" slot stays present until full.
+            <small>Stack a session in one screen</small>
+          </div>
+          <div class="note tilt-r" style="background: #d6ecff;" data-om-id="b84433e1:136">
+            <b>Battle</b> sits as a 3rd tab, greyed out + "SOON" chip — visible but non-interactive until ready.
+            <small>Reserved slot</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="sp3">
+        <div class="col" style="gap: 16px;">
+          <div class="note" style="background: #fff4d6; transform: rotate(1.5deg);">
+            <b>Configure row</b> applies to the <i>active</i> (Now Up) track only — each track in the setlist can have its own instrument + difficulty.
+            <small>Per-track config</small>
+          </div>
+          <div class="note tilt-l" style="background: #d6ecff;">
+            <b>Resolved:</b> page remembers the <i>last mode</i> between sessions and lands you back on it. Setlist resets to default — pick fresh each time.
+            <small>Locked · ship it</small>
+          </div>
+          <div class="note" style="background: #ffe5d6; transform: rotate(1deg);">
+            <b>START</b> kicks off the active track. Subsequent tracks auto-queue — no return trip to this page.
+            <small>One tap to play</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─────────── BRANCH ─────────── -->
+      <div class="branch">
+        <div class="branch-arrow">
+          <div class="arrow-label">SOLO →</div>
+          <div class="branch-down"></div>
+        </div>
+        <div class="branch-arrow alt">
+          <div class="arrow-label">MULTIPLAYER →</div>
+          <div class="branch-down"></div>
+        </div>
+      </div>
+
+      <!-- ─────────── STEP 3 ─────────── -->
+      <div class="step-label" style="margin-top: 8px;">
+        <div class="step-num">3</div>
+        <div class="step-title">Mode destinations</div>
+        <div class="step-sub">— two parallel paths from the menu</div>
+      </div>
+
+      <!-- Solo destination -->
+      <div class="sp5">
+        <div class="frame" style="aspect-ratio: 16 / 11;">
+          <div class="frame-title" style="background: #d2efe1;">SOLO → PERFORM PAGE</div>
+          <div class="frame-tag">Screen 3a · /perform (existing UI)</div>
+          <div class="canvas">
+            <!-- mode tabs row -->
+            <div class="perform-tabs">
+              <div class="perform-tab on">Solo</div>
+              <div class="perform-tab">Multiplayer</div>
+              <div class="perform-tab">Battle</div>
+            </div>
+
+            <div class="perform-now">
+              <div class="perform-now-img"></div>
+              <div class="grow">
+                <div style="font-family: 'Caveat', cursive; font-size: 22px; font-weight: 700;">Now up · [song title]</div>
+                <div class="line med"></div>
+                <div class="line short"></div>
+              </div>
+              <div class="pill">setlist · 4 tracks</div>
+            </div>
+
+            <div class="perform-setlist">
+              <div class="perform-song" data-n="01"></div>
+              <div class="perform-song" data-n="02"></div>
+              <div class="perform-song" data-n="03"></div>
+              <div class="perform-song" data-n="04"></div>
+            </div>
+
+            <div class="perform-foot">
+              <div class="row" style="gap: 8px;">
+                <div class="ghost">Instrument</div>
+                <div class="ghost">Difficulty</div>
+                <div class="ghost">Vibe</div>
+              </div>
+              <div class="perform-start">START ▶</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Multiplayer destination — Perform page · Multiplayer tab -->
+      <div class="sp5">
+        <div class="frame" style="aspect-ratio: 16 / 11;">
+          <div class="frame-title" style="background: #fde2c8;">MULTIPLAYER → PERFORM PAGE</div>
+          <div class="frame-tag">Screen 3b · /perform · "Multiplayer" tab</div>
+          <div class="canvas" style="gap: 6px;">
+
+            <!-- mode tabs row -->
+            <div class="perform-tabs">
+              <div class="perform-tab">Solo</div>
+              <div class="perform-tab on">Multiplayer</div>
+              <div class="perform-tab">Battle</div>
+            </div>
+
+            <!-- Multiplayer panel header -->
+            <div class="row" style="justify-content: space-between; align-items: flex-end; padding: 4px 2px; border-bottom: 1.5px dashed var(--ink-3);">
+              <div>
+                <div style="font-family: 'Kalam', cursive; font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent);">Multiplayer · Your Crew</div>
+                <div style="font-family: 'Caveat', cursive; font-weight: 700; font-size: 20px; line-height: 1;">Who are you jamming with?</div>
+              </div>
+              <div class="row" style="gap: 4px;">
+                <div class="pill" style="font-size: 11px; padding: 1px 8px;"><b>4</b> friends online</div>
+                <div class="pill" style="font-size: 11px; padding: 1px 8px;"><b>7</b> bandmates</div>
+              </div>
+            </div>
+
+            <!-- Two-column Multiplayer body: Friends (left) + Bands (right) -->
+            <div style="display: grid; grid-template-columns: 1fr 1.35fr; gap: 8px; flex: 1; min-height: 0;">
+
+              <!-- Friends Online column -->
+              <div style="display: flex; flex-direction: column; gap: 4px; min-width: 0;">
+                <div style="font-family: 'Kalam', cursive; font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-2);">Friends Online · 4</div>
+
+                <div class="box" style="padding: 4px 6px; display: grid; grid-template-columns: 18px 1fr auto; gap: 6px; align-items: center;">
+                  <div class="av small" style="width:18px; height:18px;"></div>
+                  <div style="min-width: 0;">
+                    <div style="font-family: 'Caveat', cursive; font-weight: 700; font-size: 14px; line-height: 1;">Jooleeno</div>
+                    <div style="font-size: 8px; color: var(--ink-3);">JAMMING · Vocals</div>
+                  </div>
+                  <div class="pill" style="font-size: 9px; padding: 1px 6px; background: var(--paper-2);">Spectate</div>
+                </div>
+
+                <div class="box" style="padding: 4px 6px; display: grid; grid-template-columns: 18px 1fr auto; gap: 6px; align-items: center;">
+                  <div class="av small" style="width:18px; height:18px;"></div>
+                  <div style="min-width: 0;">
+                    <div style="font-family: 'Caveat', cursive; font-weight: 700; font-size: 14px; line-height: 1;">Abbie</div>
+                    <div style="font-size: 8px; color: var(--ink-3);">JAMMING · Drums</div>
+                  </div>
+                  <div class="pill" style="font-size: 9px; padding: 1px 6px; background: var(--paper-2);">Spectate</div>
+                </div>
+
+                <div class="box" style="padding: 4px 6px; display: grid; grid-template-columns: 18px 1fr auto; gap: 6px; align-items: center;">
+                  <div class="av small" style="width:18px; height:18px;"></div>
+                  <div style="min-width: 0;">
+                    <div style="font-family: 'Caveat', cursive; font-weight: 700; font-size: 14px; line-height: 1;">Ted</div>
+                    <div style="font-size: 8px; color: var(--ink-3);">ONLINE · Velvet Club lobby</div>
+                  </div>
+                  <div class="pill accent" style="font-size: 9px; padding: 1px 6px;">Invite</div>
+                </div>
+
+                <div class="box" style="padding: 4px 6px; display: grid; grid-template-columns: 18px 1fr auto; gap: 6px; align-items: center;">
+                  <div class="av small" style="width:18px; height:18px;"></div>
+                  <div style="min-width: 0;">
+                    <div style="font-family: 'Caveat', cursive; font-weight: 700; font-size: 14px; line-height: 1;">Arthen</div>
+                    <div style="font-size: 8px; color: var(--ink-3);">ONLINE · in Store</div>
+                  </div>
+                  <div class="pill accent" style="font-size: 9px; padding: 1px 6px;">Invite</div>
+                </div>
+              </div>
+
+              <!-- Your Bands column -->
+              <div style="display: flex; flex-direction: column; gap: 4px; min-width: 0;">
+                <div style="font-family: 'Kalam', cursive; font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-2);">Your Bands · 3</div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px; flex: 1;">
+                  <div style="border: 2px solid var(--ink); border-radius: 6px; background: var(--paper); padding: 4px; display: flex; flex-direction: column; gap: 2px; box-shadow: 1.5px 1.5px 0 var(--ink); position: relative;">
+                    <div style="height: 32px; background: repeating-linear-gradient(45deg, rgba(0,0,0,0.08) 0 4px, transparent 4px 10px), var(--paper-2); border-radius: 3px; position: relative;">
+                      <span style="position: absolute; top: 2px; left: 2px; font-family: 'Kalam', cursive; font-size: 8px; background: var(--accent); color:#fff; padding: 0 4px; border-radius: 2px; letter-spacing: 0.06em;">LIVE</span>
+                    </div>
+                    <div style="font-family: 'Caveat', cursive; font-weight: 700; font-size: 14px; line-height: 1;">Velocity</div>
+                    <div style="font-size: 8px; color: var(--ink-3); line-height: 1;">Lead Guitar · <b>4/8</b> online</div>
+                    <div style="font-family: 'Caveat', cursive; font-weight: 700; font-size: 11px; color: var(--accent); line-height: 1;">Jam →</div>
+                  </div>
+
+                  <div style="border: 2px solid var(--ink); border-radius: 6px; background: var(--paper); padding: 4px; display: flex; flex-direction: column; gap: 2px; box-shadow: 1.5px 1.5px 0 var(--ink);">
+                    <div style="height: 32px; background: repeating-linear-gradient(45deg, rgba(0,0,0,0.08) 0 4px, transparent 4px 10px), var(--paper-2); border-radius: 3px;"></div>
+                    <div style="font-family: 'Caveat', cursive; font-weight: 700; font-size: 14px; line-height: 1;">Iron Eclipse</div>
+                    <div style="font-size: 8px; color: var(--ink-3); line-height: 1;">Rhythm Gtr · <b>2/6</b> online</div>
+                    <div style="font-family: 'Caveat', cursive; font-weight: 700; font-size: 11px; color: var(--accent); line-height: 1;">Jam →</div>
+                  </div>
+
+                  <div style="border: 2px solid var(--ink); border-radius: 6px; background: var(--paper); padding: 4px; display: flex; flex-direction: column; gap: 2px; box-shadow: 1.5px 1.5px 0 var(--ink);">
+                    <div style="height: 32px; background: repeating-linear-gradient(45deg, rgba(0,0,0,0.08) 0 4px, transparent 4px 10px), var(--paper-2); border-radius: 3px;"></div>
+                    <div style="font-family: 'Caveat', cursive; font-weight: 700; font-size: 14px; line-height: 1;">Velvet Crush</div>
+                    <div style="font-size: 8px; color: var(--ink-3); line-height: 1;">Bass · <b>1/10</b> online</div>
+                    <div style="font-family: 'Caveat', cursive; font-weight: 700; font-size: 11px; color: var(--accent); line-height: 1;">Jam →</div>
+                  </div>
+
+                  <div style="border: 1.5px dashed var(--ink-3); border-radius: 6px; background: rgba(255,255,255,0.4); padding: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: var(--ink-3);">
+                    <div style="width: 18px; height: 18px; border: 1.5px solid var(--ink-3); border-radius: 50%; display: grid; place-items: center; font-family: 'Caveat', cursive; font-weight: 700; font-size: 14px; line-height: 1;">+</div>
+                    <div style="font-family: 'Caveat', cursive; font-weight: 700; font-size: 11px; line-height: 1;">Start a Band</div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Setlist + Start (still present below) -->
+            <div class="row" style="gap: 6px; padding-top: 4px; border-top: 1.5px dashed var(--ink-3);">
+              <div class="ghost" style="flex: 1; font-size: 11px; padding: 3px 6px;">Setlist · 3 tracks · 11:24</div>
+              <div class="ghost" style="font-size: 11px; padding: 3px 6px;">Instrument · Difficulty · Vibe</div>
+              <div style="font-family: 'Caveat', cursive; font-weight: 700; font-size: 16px; color: #fff; background: var(--accent); border: 2px solid var(--ink); padding: 2px 10px; border-radius: 6px; box-shadow: 2px 2px 0 var(--ink); transform: rotate(-1deg);">START ▶</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- side-by-side notes under the two branches -->
+      <div class="sp5">
+        <div class="note tilt-l" style="background: #e6f6ec;">
+          <b>Solo path is one screen deep.</b> The menu hands the user straight to Perform — they configure + start from there. The "Solo" tab in Perform is already pre-selected.
+          <small>No intermediate solo lobby</small>
+        </div>
+      </div>
+      <div class="sp5">
+        <div class="note tilt-r" style="background: #fff0e0;">
+          <b>Multiplayer lives inline on Perform.</b> Switching to the Multiplayer tab reveals Friends Online (left) + Your Bands (right) above the setlist — no modal, no second page. Invite a friend or tap a band, then build the setlist and start.
+          <small>Same page, deeper context</small>
+        </div>
+      </div>
+
+      <!-- ─────────── STEP 4 — Personal Studio (auto-spawn after invite-accept) ─────────── -->
+      <div class="step-label" style="margin-top: 28px;">
+        <div class="step-num">4</div>
+        <div class="step-title">Auto-spawn · Personal Studio / Default Band Space</div>
+        <div class="step-sub">— invitees accept · everyone lands here · each player picks instrument + difficulty</div>
+      </div>
+
+      <div class="sp7">
+        <div class="frame" style="aspect-ratio: 16 / 10;">
+          <div class="frame-title">PERSONAL STUDIO / DEFAULT BAND SPACE</div>
+          <div class="frame-tag">Screen 4 · auto-spawn after invite-accept</div>
+          <div class="canvas">
+            <div class="row" style="justify-content: space-between; margin-bottom: 6px;">
+              <div class="row" style="gap: 8px;">
+                <div class="pill">← Leave</div>
+                <div class="pill solid">Personal Studio</div>
+                <div class="pill hi">HOST: YOU</div>
+              </div>
+              <div class="row" style="gap: 6px;">
+                <div class="av small"></div><div class="av small"></div><div class="av small"></div><div class="av small"></div>
+                <div class="pill" style="font-size: 13px;">4/4 in space</div>
+              </div>
+            </div>
+
+            <div style="position: relative; flex: 1; min-height: 0;">
+
+              <!-- room render — full-bleed -->
+              <div class="space-room" style="position: absolute; inset: 0; height: 100%;">
+                <div class="room-art" style="min-height: 0; height: 100%; justify-content: space-between;">
+                  <div class="room-label">[ 3D room render · full-screen · avatars hanging out ]</div>
+                  <div class="room-avatars">
+                    <div class="av"></div>
+                    <div class="av"></div>
+                    <div class="av"></div>
+                    <div class="av"></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Per-player instrument + difficulty roster — OVERLAID HUD -->
+              <div style="position: absolute; top: 10px; right: 10px; width: 46%; max-width: 320px; display: flex; flex-direction: column; gap: 4px; min-width: 0; background: rgba(253, 248, 235, 0.94); border: 2px solid var(--ink-2); border-radius: 10px; padding: 8px 10px; box-shadow: 4px 4px 0 rgba(0,0,0,0.12); backdrop-filter: blur(2px);">
+                <div style="font-family: 'Kalam', cursive; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent);">Pick Your Loadout · overlay</div>
+                <div style="font-family: 'Caveat', cursive; font-weight: 700; font-size: 18px; line-height: 1; margin-bottom: 4px;">Each player picks instrument + difficulty</div>
+
+                <div class="box" style="padding: 4px 8px; display: grid; grid-template-columns: 22px 1fr auto auto auto; gap: 6px; align-items: center; background: #fff7d6;">
+                  <div class="av small" style="width:22px; height:22px;"></div>
+                  <div style="font-family: 'Caveat', cursive; font-weight: 700; font-size: 16px; line-height: 1;">You <span style="font-size: 11px; color: var(--ink-3); font-weight: 400;">(host)</span></div>
+                  <div class="pill" style="font-size: 11px; padding: 1px 6px;">🎸 Guitar ▾</div>
+                  <div class="pill" style="font-size: 11px; padding: 1px 6px;">Hard ▾</div>
+                  <div class="pill green" style="font-size: 10px; padding: 1px 6px;">✓ READY</div>
+                </div>
+
+                <div class="box" style="padding: 4px 8px; display: grid; grid-template-columns: 22px 1fr auto auto auto; gap: 6px; align-items: center;">
+                  <div class="av small" style="width:22px; height:22px;"></div>
+                  <div style="font-family: 'Caveat', cursive; font-weight: 700; font-size: 16px; line-height: 1;">Ted</div>
+                  <div class="pill" style="font-size: 11px; padding: 1px 6px;">🥁 Drums ▾</div>
+                  <div class="pill" style="font-size: 11px; padding: 1px 6px;">Normal ▾</div>
+                  <div class="pill green" style="font-size: 10px; padding: 1px 6px;">✓ READY</div>
+                </div>
+
+                <div class="box" style="padding: 4px 8px; display: grid; grid-template-columns: 22px 1fr auto auto auto; gap: 6px; align-items: center;">
+                  <div class="av small" style="width:22px; height:22px;"></div>
+                  <div style="font-family: 'Caveat', cursive; font-weight: 700; font-size: 16px; line-height: 1;">Jooleeno</div>
+                  <div class="pill" style="font-size: 11px; padding: 1px 6px;">🎤 Vocals ▾</div>
+                  <div class="pill" style="font-size: 11px; padding: 1px 6px;">Expert ▾</div>
+                  <div class="pill green" style="font-size: 10px; padding: 1px 6px;">✓ READY</div>
+                </div>
+
+                <div class="box" style="padding: 4px 8px; display: grid; grid-template-columns: 22px 1fr auto auto auto; gap: 6px; align-items: center; border-style: dashed; background: rgba(255,255,255,0.4);">
+                  <div class="av small" style="width:22px; height:22px;"></div>
+                  <div style="font-family: 'Caveat', cursive; font-weight: 700; font-size: 16px; line-height: 1;">Abbie</div>
+                  <div class="pill" style="font-size: 11px; padding: 1px 6px; background: var(--paper-2); color: var(--ink-3);">pick ▾</div>
+                  <div class="pill" style="font-size: 11px; padding: 1px 6px; background: var(--paper-2); color: var(--ink-3);">— ▾</div>
+                  <div class="pill" style="font-size: 10px; padding: 1px 6px; color: var(--ink-3);">choosing…</div>
+                </div>
+
+                <div style="display: flex; gap: 4px; margin-top: 2px; flex-wrap: wrap;">
+                  <div class="ghost" style="font-size: 11px; padding: 2px 6px;">🎤 mic</div>
+                  <div class="ghost" style="font-size: 11px; padding: 2px 6px;">💬 chat</div>
+                  <div class="ghost" style="font-size: 11px; padding: 2px 6px;">📣 emote</div>
+                  <div class="ghost" style="font-size: 11px; padding: 2px 6px;">⚙ settings</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="perform-foot" style="margin-top: 8px;">
+              <div class="ghost" style="font-size: 13px;">Ready: <b>3/4</b> · waiting on Abbie</div>
+              <div class="ring">
+                <div class="perform-start" style="opacity: 0.6;">PLAY ▶ (3/4)</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sp5">
+        <div class="col" style="gap: 14px;">
+          <div class="note tilt-l" style="background: #ecdcff;">
+            <b>Auto-spawn, no venue picker.</b> Once invitees accept, the whole group materializes inside the host's Personal Studio (or the band's Default Band Space if invited via a band). No lobby in between.
+            <small>One predictable destination</small>
+          </div>
+          <div class="note tilt-r" style="background: #d6ecff;">
+            <b>3D room is the stage</b> — full-screen render, avatars in the space. The loadout picker is a translucent HUD overlay anchored top-right, not a side panel. Room reads first; config sits on top of it.
+            <small>Room-first, UI-overlay</small>
+          </div>
+          <div class="note tilt-r" style="background: #fde2c8;">
+            <b>Instrument + difficulty are picked here</b> — each player chooses for themselves, visible to everyone in the roster. Personal choice, public state.
+            <small>Per-player loadout, in-room</small>
+          </div>
+          <div class="note tilt-l">
+            <b>Voice + chat are live in the space.</b> Players hang out, mess around in the room while configuring — no rush to start.
+            <small>Pre-game social time</small>
+          </div>
+          <div class="note tilt-r" style="background: #fff4d6;">
+            <b>START is gated on readiness.</b> The host fires once every player has locked in instrument + difficulty — then the session begins from inside the studio.
+            <small>Ready check terminates the flow</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─────────── LEGEND ─────────── -->
+      <div class="legend">
+        <strong>Legend</strong>
+        <div class="legend-item"><div class="legend-swatch hi"></div> screen label</div>
+        <div class="legend-item"><div class="legend-swatch acc"></div> primary action</div>
+        <div class="legend-item"><div class="legend-swatch note"></div> design note</div>
+        <div class="legend-item"><div class="legend-swatch tbd"></div> undefined / TBD</div>
+        <div class="legend-item"><span style="border: 2px dashed var(--accent); padding: 2px 10px; border-radius: 6px; color: var(--accent);">dashed ring</span> = highlighted element on screen</div>
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>
