@@ -3467,6 +3467,11 @@
     max-height: 1920px !important;
     border-radius: 0;
   }
+  /* Modifier tab row only (.mod-tabs) — leave the shared picker tabs alone. */
+  .mod-tabs .option-picker-tab {
+    font-size: 32px;
+    height: 88px;
+  }
   .std-popup--full .std-popup-btn {
     font-family: 'Bebas Neue', sans-serif !important;
     font-size: 42px;
@@ -3486,12 +3491,12 @@
     padding: 0 10px;
   }
   .mod-section-note {
-    font-size: 18px;
+    font-size: 22px;
     color: var(--text-muted);
   }
   .mod-reset-btn {
     margin-left: auto;
-    font-size: 18px;
+    font-size: 24px;
     font-weight: 700;
     padding: 10px 22px;
     border-radius: 999px;
@@ -3525,12 +3530,12 @@
   .mod-row:active { transform: scale(0.995); }
   .mod-row__text { flex: 1; min-width: 0; }
   .mod-row__label {
-    font-size: 26px;
+    font-size: 34px;
     font-weight: 700;
     color: #ffffff;
   }
   .mod-row__desc {
-    font-size: 18px;
+    font-size: 24px;
     line-height: 1.35;
     color: var(--text-secondary);
     margin-top: 6px;
@@ -3587,8 +3592,8 @@
     border-radius: var(--radius-bar);
   }
   .mod-slider-label {
-    flex: 0 0 260px;
-    font-size: 20px;
+    flex: 0 0 320px;
+    font-size: 28px;
     font-weight: 700;
     color: #ffffff;
   }
@@ -3619,8 +3624,8 @@
     box-shadow: 0 0 0 3px rgba(34,211,238,0.55), 0 0 14px rgba(34,211,238,0.5);
   }
   .mod-slider-value {
-    flex: 0 0 150px;
-    font-size: 20px;
+    flex: 0 0 200px;
+    font-size: 28px;
     font-weight: 700;
     color: #ffffff;
     text-align: right;
@@ -3646,7 +3651,7 @@
     display: flex;
     align-items: center;
     gap: 14px;
-    font-size: 26px;
+    font-size: 32px;
     font-weight: 700;
     color: #ffffff;
   }
@@ -3666,7 +3671,7 @@
     color: #fde047;
   }
   .preset-card__meta {
-    font-size: 18px;
+    font-size: 22px;
     color: var(--text-secondary);
     margin-top: 6px;
     font-variant-numeric: tabular-nums;
