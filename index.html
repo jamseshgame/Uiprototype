@@ -3489,16 +3489,6 @@
     font-size: 18px;
     color: var(--text-muted);
   }
-  .mod-tier-badge {
-    font-size: 16px;
-    font-weight: 700;
-    letter-spacing: 2px;
-    padding: 6px 14px;
-    border-radius: 999px;
-    background: rgba(34,211,238,0.18);
-    border: 1px solid rgba(34,211,238,0.5);
-    color: #67e8f9;
-  }
   .mod-reset-btn {
     margin-left: auto;
     font-size: 18px;
@@ -3590,7 +3580,8 @@
     display: flex;
     align-items: center;
     gap: 20px;
-    padding: 12px 22px;
+    /* Tall rows: hand-tracking needs a fat touch target, not a thin strip. */
+    padding: 24px 22px;
     background: rgba(0,0,0,0.25);
     border: 1px solid var(--btn-tab-border);
     border-radius: var(--radius-bar);
@@ -3603,7 +3594,7 @@
   }
   .mod-slider-track {
     flex: 1;
-    height: 14px;
+    height: 28px;
     background: rgba(0,0,0,0.5);
     border-radius: 999px;
     position: relative;
@@ -3620,8 +3611,8 @@
   .mod-slider-handle {
     position: absolute;
     top: 50%;
-    width: 34px;
-    height: 34px;
+    width: 68px;
+    height: 68px;
     background: #ffffff;
     border-radius: 50%;
     transform: translate(-50%, -50%);
@@ -19911,16 +19902,6 @@ function buildModifierList(host, ids) {
 
   var head = document.createElement('div');
   head.className = 'mod-section-head';
-  var note = document.createElement('div');
-  note.className = 'mod-section-note';
-  note.textContent = 'Applies to every song in the setlist';
-  head.appendChild(note);
-  if (showSliders) {
-    var badge = document.createElement('div');
-    badge.className = 'mod-tier-badge';
-    badge.textContent = 'TUNING';
-    head.appendChild(badge);
-  }
   var resetBtn = document.createElement('button');
   resetBtn.className = 'mod-reset-btn';
   resetBtn.textContent = 'Reset Defaults';
@@ -25451,6 +25432,33 @@ function getJourneyTickerStats() {
     out.push(track.label + ' · Level ' + level);
   }
   return out;
+}
+
+/* ── Desktop preview auto-fit ──────────────────────────────
+   The app is a fixed 1920x1920 canvas for the Quest WebView; desktop windows
+   narrower than that crop it and force scrolling. Outside Vuplex, scale the
+   whole body down so the full panel always fits the window. Never runs
+   on-device (window.vuplex present). */
+function fitDesktopPreview() {
+  if (window.vuplex) return;
+  var s = Math.min(window.innerWidth / 1920, window.innerHeight / 1920, 1);
+  var b = document.body;
+  if (s >= 1) {
+    b.style.transform = '';
+    b.style.transformOrigin = '';
+    b.style.width = '';
+    b.style.height = '';
+  } else {
+    b.style.transform = 'scale(' + s + ')';
+    b.style.transformOrigin = 'top left';
+    b.style.width = '1920px';
+    b.style.height = '1920px';
+    document.documentElement.style.background = '#0a0612';
+  }
+}
+if (!window.vuplex) {
+  window.addEventListener('resize', fitDesktopPreview);
+  fitDesktopPreview();
 }
 
 </script>
