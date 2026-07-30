@@ -172,7 +172,7 @@ When Unity flips `inBandspace=true`, the Group tab becomes available and `buildC
 - Songs side max = 9 (featured 2×2 + small tiles, transitioning to 3×3 at 7+). Players side max = 4 (the group member limit, `COOP_PLAYERS_MAX`).
 - Unity → WebView messages: `setInBandspace`, `updateIsHost`, `lobbyRoster` (canonical roster, max 4 — the group member limit), `sessionInProgress` (toggles late-join Spectate), `updateInstrumentAvailability`.
 - WebView → Unity messages: `playerReady {ready}`, `startGame {instrument, difficulty, setlist[]}`, `invitePlayer {name}`, `kickPlayer {name}`, `playMode "solo"|"coop"`.
-- Mock lobby data exists on the `main` branch for in-browser demos; the `production` branch strips placeholder media and mock arrays.
+- All work happens on the `production` branch (the old `main` branch was merged in and deleted 2026-07-30). Production strips placeholder media and mock arrays: media paths in mock data are blank strings, and roster/friend fallbacks are empty stubs — real data always arrives from Unity over the bridge.
 
 ### Song Picker Grid
 - **3×3 grid, 9 songs per page**, discrete (non-overlapping) paging. Driven by `GRID_COLUMNS = 3` and `GRID_DEFAULT_ROWS = 3`. `getGridPagingMetrics()` returns `pageRows === stepRows`, so each down/up arrow click advances by a full page.
