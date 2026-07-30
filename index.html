@@ -25434,33 +25434,6 @@ function getJourneyTickerStats() {
   return out;
 }
 
-/* ── Desktop preview auto-fit ──────────────────────────────
-   The app is a fixed 1920x1920 canvas for the Quest WebView; desktop windows
-   narrower than that crop it and force scrolling. Outside Vuplex, scale the
-   whole body down so the full panel always fits the window. Never runs
-   on-device (window.vuplex present). */
-function fitDesktopPreview() {
-  if (window.vuplex) return;
-  var s = Math.min(window.innerWidth / 1920, window.innerHeight / 1920, 1);
-  var b = document.body;
-  if (s >= 1) {
-    b.style.transform = '';
-    b.style.transformOrigin = '';
-    b.style.width = '';
-    b.style.height = '';
-  } else {
-    b.style.transform = 'scale(' + s + ')';
-    b.style.transformOrigin = 'top left';
-    b.style.width = '1920px';
-    b.style.height = '1920px';
-    document.documentElement.style.background = '#0a0612';
-  }
-}
-if (!window.vuplex) {
-  window.addEventListener('resize', fitDesktopPreview);
-  fitDesktopPreview();
-}
-
 </script>
 <script>
 
