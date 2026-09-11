@@ -15112,6 +15112,9 @@ function buildSongColumn() {
 function buildRightPanel() {
   var panel = document.getElementById('play-right-panel');
   var songCol = document.getElementById('play-song-col');
+  // The current play layout has no legacy right panel. Backend song updates
+  // still call this helper, so only render it when that layout is present.
+  if (!panel || !songCol) return;
   panel.innerHTML = '';
   if (playMode === 'solo') {
     songCol.style.display = 'none';
@@ -19354,6 +19357,37 @@ function buildVaultGrid() {
 
 // ── Creator ──────────────────────────────────────────────
 
+var vinylArtSlot = null;
+function openVinylArtPicker(slot) {
+  vinylArtSlot = slot;
+  navigateTo('creator');
+  switchCreatorTab('art');
+  var banner = document.getElementById('vinyl-art-picker');
+  if (!banner) {
+    banner = document.createElement('div');
+    banner.id = 'vinyl-art-picker';
+    banner.style.cssText = 'padding:12px;display:flex;gap:12px;align-items:center;flex-shrink:0';
+    var label = document.createElement('span'); label.id = 'vinyl-art-status'; banner.appendChild(label);
+    var close = document.createElement('button'); close.textContent = 'Done';
+    close.onclick = closeVinylArtPicker;
+    banner.appendChild(close);
+    var tab = document.getElementById('creator-tab-art'); tab.insertBefore(banner, tab.firstChild);
+  }
+  banner.style.display = 'flex';
+  document.getElementById('vinyl-art-status').textContent = 'Choose artwork for cover ' + (slot + 1);
+  sendToUnity('creatorPageOpened', {});
+}
+function closeVinylArtPicker() {
+  vinylArtSlot = null;
+  var banner = document.getElementById('vinyl-art-picker');
+  if (banner) banner.style.display = 'none';
+  sendToUnity('vinylArtPickerClosed', {});
+}
+function vinylArtStatus(data) {
+  var label = document.getElementById('vinyl-art-status');
+  if (label) label.textContent = data.message;
+}
+
 var creatorPhotosPage = 0;
 var creatorArtPage = 0;
 var CREATOR_PER_PAGE = 12;   // 4x3
@@ -19470,7 +19504,7 @@ function buildCreatorArtGrid() {
     tile.style.background = 'url(' + creatorArtLogos[i] + ') center center / cover no-repeat var(--bg-surface)';
     tile.style.cursor = 'pointer';
     tile.onclick = (function(src) {
-      return function() { openArtPreview(src); };
+      return function() { if (vinylArtSlot !== null) sendToUnity('vinylArtSelected', {path:src}); else openArtPreview(src); };
     })(creatorArtLogos[i]);
     grid.appendChild(tile);
   }
