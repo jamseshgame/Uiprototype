@@ -12929,6 +12929,7 @@ function updateClientInfo(data) {
 var _navTransitioning = false;
 
 function navigateTo(pageName) {
+  closePanelKeyboard();
   var target = document.getElementById('page-' + pageName);
   if (!target) return;
   if (_navTransitioning) return;
@@ -14069,6 +14070,7 @@ function startFreshOwnBand() {
 function closeCreateGroup(e) {
   if (e && e.target !== document.getElementById('create-group-overlay')) return;
   document.getElementById('create-group-overlay').className = 'create-group-overlay';
+  closePanelKeyboard();
   sendToUnity('closeKeyboard', {});
 }
 
@@ -14569,13 +14571,45 @@ function goToNewGroup() {
 }
 
 // ── Keyboard Bridge ─────────────────────────────────────
+var panelKeyboard = null;
+var panelKeyboardInputId = null;
+
+function closePanelKeyboard() {
+  if (panelKeyboard) panelKeyboard.remove();
+  panelKeyboard = null;
+  panelKeyboardInputId = null;
+}
+
+window.addEventListener('message', function(event) {
+  if (!panelKeyboard || event.source !== panelKeyboard.contentWindow ||
+      !event.data || event.data.source !== 'jamsesh-keyboard') return;
+  var el = document.getElementById(panelKeyboardInputId);
+  if (event.data.type === 'ready') {
+    panelKeyboard.contentWindow.postMessage({source:'jamsesh-keyboard-host', type:'initialize', value:el ? el.value : ''}, '*');
+  } else if (event.data.type === 'change' && el) {
+    var text = typeof event.data.value === 'string' ? event.data.value : '';
+    el.value = el.maxLength >= 0 ? text.slice(0, el.maxLength) : text;
+    el.dispatchEvent(new Event('input', {bubbles:true}));
+  } else if (event.data.type === 'submit' || event.data.type === 'dismiss') {
+    closePanelKeyboard();
+  }
+});
+
 function requestKeyboardForInput(inputId) {
   var el = document.getElementById(inputId);
-  // On Quest/Vuplex, Unity supplies the keyboard, so blur to avoid the WebView's
-  // own IME. On desktop (no bridge) keep focus so the field can be typed natively.
+  // Keep Quest text entry on the menu's visible surface rather than a separate
+  // compositor layer. Desktop users retain normal native text entry.
   if (window.vuplex) {
     if (el) el.blur();
-    sendToUnity('requestKeyboard', { inputId: inputId, value: (el ? el.value : '') });
+    closePanelKeyboard();
+    sendToUnity('closeKeyboard', {});
+    panelKeyboardInputId = inputId;
+    panelKeyboard = document.createElement('iframe');
+    panelKeyboard.title = 'Text keyboard';
+    panelKeyboard.id = 'panel-keyboard';
+    panelKeyboard.style.cssText = 'position:fixed;left:50%;transform:translateX(-50%);bottom:240px;width:calc(100% - 80px);max-width:1400px;height:560px;max-height:42vh;border:3px solid #a38aff;border-radius:18px;background:#161225;z-index:2147483647;box-shadow:0 12px 40px #0009';
+    panelKeyboard.src = '../Keyboard/keyboard.html';
+    document.body.appendChild(panelKeyboard);
   }
 }
 
@@ -21227,6 +21261,7 @@ function showAvatarSection() {
 }
 
 function hideAvatarSection() {
+  closePanelKeyboard();
   document.getElementById('avatar-section').style.display = 'none';
   document.getElementById('career-main').style.display = '';   // restore the career grid for next visit
   sendToUnity('avatarEditorClosed', {});
@@ -21282,6 +21317,7 @@ var avatarAuthMode = 'email'; // 'email' | 'otp'
 var avatarOtpEmail = '';
 
 function avatarSetAuthMode(mode) {
+  closePanelKeyboard();
   avatarAuthMode = mode;
   var showEmail = mode === 'email';
   var showOtp   = mode === 'otp';
@@ -21318,7 +21354,7 @@ function avatarOpenSignUp() {
 function avatarSubmitSignin() {
   var emailEl = document.getElementById('avatar-email-signin');
   var email = emailEl ? (emailEl.value || '').trim() : '';
-  if (!email) { emailEl.focus(); return; }
+  if (!email) { emailEl.focus(); requestKeyboardForInput('avatar-email-signin'); return; }
   avatarOtpEmail = email;
   sendToUnity('avatarEmailSignin', { email: email });
 }
@@ -21326,7 +21362,7 @@ function avatarSubmitSignin() {
 function avatarSubmitOtp() {
   var codeEl = document.getElementById('avatar-otp-code');
   var code = codeEl ? (codeEl.value || '').trim() : '';
-  if (!code) { codeEl.focus(); return; }
+  if (!code) { codeEl.focus(); requestKeyboardForInput('avatar-otp-code'); return; }
   sendToUnity('avatarOtpSubmit', { code: code });
 }
 
