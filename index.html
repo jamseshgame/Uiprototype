@@ -3434,6 +3434,338 @@
     letter-spacing: 4px;
   }
 
+  /* ── Difficulty & Modifiers popup ──────────────────────
+     Two tiers of the same list (see MISS_MODIFIERS in the main script):
+       player — a row + on/off toggle per modifier
+       team   — the same rows plus the numeric sliders that parameterise them
+     Tier is chosen by Unity from the account ID, so both must share styling. */
+
+  /* Full-screen popup — fills the 1920x1920 panel exactly. Used by the
+     Difficulty & Modifiers picker, which is too tall for --large once its
+     categories are tabbed. Declared after --large so the !important wins. */
+  .std-popup--full {
+    width: 1920px !important;
+    height: 1920px !important;
+    max-width: 1920px !important;
+    max-height: 1920px !important;
+    border-radius: 0;
+  }
+  .mod-tabs { flex-wrap: wrap; }
+  .mod-tabs .option-picker-tab { min-width: 110px; }
+
+  /* Modifier tab row only (.mod-tabs) — leave the shared picker tabs alone. */
+  .mod-tabs .option-picker-tab {
+    font-size: 32px;
+    height: 88px;
+  }
+  .std-popup--full .std-popup-btn {
+    font-family: 'Bebas Neue', sans-serif !important;
+    font-size: 42px;
+    font-weight: 400;
+    letter-spacing: 4px;
+  }
+
+  .mod-tabs { margin-top: 4px; }
+
+  .mod-section-head {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-shrink: 0;
+    /* Inset so the note text lines up with the row labels and never clips
+       against the popup padding edge. */
+    padding: 0 10px;
+  }
+  .mod-section-note {
+    font-size: 22px;
+    color: var(--text-muted);
+  }
+  .mod-reset-btn {
+    margin-left: auto;
+    font-size: 24px;
+    font-weight: 700;
+    padding: 10px 22px;
+    border-radius: 999px;
+    background: var(--btn-panel);
+    border: 1px solid var(--btn-tab-border);
+    color: #ffffff;
+    cursor: pointer;
+  }
+  .mod-reset-btn:active { transform: scale(0.96); }
+
+  .mod-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .mod-item {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .mod-row {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding: 20px 26px;
+    background: var(--btn-panel);
+    border: 1px solid var(--btn-tab-border);
+    border-radius: var(--radius-bar);
+    cursor: pointer;
+  }
+  .mod-row:active { transform: scale(0.995); }
+  .mod-row__text { flex: 1; min-width: 0; }
+  .mod-row__label {
+    font-size: 34px;
+    font-weight: 700;
+    color: #ffffff;
+  }
+  .mod-row__desc {
+    font-size: 24px;
+    line-height: 1.35;
+    color: var(--text-secondary);
+    margin-top: 6px;
+  }
+  .mod-toggle {
+    flex: 0 0 96px;
+    width: 96px;
+    height: 52px;
+    border-radius: 999px;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid var(--btn-tab-border);
+    position: relative;
+    transition: background 0.15s;
+  }
+  .mod-toggle__knob {
+    position: absolute;
+    top: 50%;
+    left: 6px;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.5);
+    transform: translateY(-50%);
+    transition: left 0.15s, background 0.15s;
+  }
+  .mod-toggle.on { background: var(--btn-primary); }
+  .mod-toggle.on .mod-toggle__knob {
+    left: 52px;
+    background: #ffffff;
+    box-shadow: 0 0 12px rgba(255,255,255,0.6);
+  }
+
+  /* Slider stack — team tier only. Indented under its parent modifier. */
+  .mod-sliders {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-left: 40px;
+    padding-left: 24px;
+    border-left: 3px solid var(--btn-tab-border);
+  }
+  .mod-item.off .mod-sliders {
+    opacity: 0.3;
+    pointer-events: none;
+  }
+  .mod-slider-row {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    /* Tall rows: hand-tracking needs a fat touch target, not a thin strip. */
+    padding: 24px 22px;
+    background: rgba(0,0,0,0.25);
+    border: 1px solid var(--btn-tab-border);
+    border-radius: var(--radius-bar);
+  }
+  .mod-slider-label {
+    flex: 0 0 320px;
+    font-size: 28px;
+    font-weight: 700;
+    color: #ffffff;
+  }
+  .mod-slider-track {
+    flex: 1;
+    height: 28px;
+    background: rgba(0,0,0,0.5);
+    border-radius: 999px;
+    position: relative;
+    cursor: pointer;
+  }
+  .mod-slider-fill {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    background: linear-gradient(90deg, rgba(34,211,238,0.65), rgba(168,85,247,0.95));
+    border-radius: 999px;
+  }
+  .mod-slider-handle {
+    position: absolute;
+    top: 50%;
+    width: 68px;
+    height: 68px;
+    background: #ffffff;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 0 3px rgba(34,211,238,0.55), 0 0 14px rgba(34,211,238,0.5);
+  }
+  .mod-slider-value {
+    flex: 0 0 200px;
+    font-size: 28px;
+    font-weight: 700;
+    color: #ffffff;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ── Preset browser (Presets tab) ────────────────────── */
+  .preset-card {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding: 20px 26px;
+    background: var(--btn-panel);
+    border: 1px solid var(--btn-tab-border);
+    border-radius: var(--radius-bar);
+  }
+  .preset-card.active {
+    border-color: var(--page-accent);
+    box-shadow: 0 0 0 2px var(--page-accent);
+  }
+  .preset-card__text { flex: 1; min-width: 0; }
+  .preset-card__name {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: 32px;
+    font-weight: 700;
+    color: #ffffff;
+  }
+  .preset-card__badge {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    padding: 4px 12px;
+    border-radius: 999px;
+    background: rgba(34,211,238,0.18);
+    border: 1px solid rgba(34,211,238,0.5);
+    color: #67e8f9;
+  }
+  .preset-card__badge.modified {
+    background: rgba(250,204,21,0.16);
+    border-color: rgba(250,204,21,0.5);
+    color: #fde047;
+  }
+  .preset-card__meta {
+    font-size: 22px;
+    color: var(--text-secondary);
+    margin-top: 6px;
+    font-variant-numeric: tabular-nums;
+  }
+  .preset-card__actions {
+    display: flex;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+  .jam-btn {
+    height: 64px;
+    padding: 0 26px;
+    font-size: 20px;
+    font-weight: 700;
+    border-radius: var(--radius-bar);
+    border: 1px solid var(--btn-tab-border);
+    background: var(--btn-panel);
+    color: #ffffff;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.15s;
+  }
+  .jam-btn:hover { background: var(--btn-panel-hover); }
+  .jam-btn:active { transform: scale(0.96); }
+  .jam-btn--primary {
+    background: var(--btn-primary);
+    border-color: var(--btn-primary-border);
+  }
+  .jam-btn--danger {
+    background: rgba(220,38,38,0.22);
+    border-color: rgba(248,113,113,0.55);
+    color: #fca5a5;
+  }
+  .jam-btn:disabled {
+    background: var(--btn-panel);
+    border-color: var(--btn-panel-border);
+    color: rgba(255,255,255,0.4);
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .preset-empty {
+    margin: auto 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    text-align: center;
+    padding: 0 200px;
+  }
+  .preset-empty__title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 52px;
+    letter-spacing: 3px;
+    color: #ffffff;
+  }
+  .preset-empty__sub {
+    font-size: 22px;
+    line-height: 1.45;
+    color: var(--text-secondary);
+  }
+
+  /* Name / confirm dialog — sits above the option picker (999), same tier as
+     the logo picker sub-overlay. */
+  .jam-dialog-overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.6);
+  }
+  .jam-dialog {
+    width: 900px;
+    box-sizing: border-box;
+    padding: 48px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    border-radius: var(--radius-outer);
+    background: var(--bg-panel);
+    border: 1px solid var(--border-subtle);
+  }
+  .jam-dialog-title {
+    font-size: 34px;
+    font-weight: 800;
+    color: #ffffff;
+    text-align: center;
+  }
+  .jam-dialog-body {
+    font-size: 21px;
+    line-height: 1.45;
+    color: var(--text-secondary);
+    text-align: center;
+  }
+  .jam-dialog-error {
+    font-size: 18px;
+    color: #fca5a5;
+    text-align: center;
+    min-height: 22px;
+  }
+  .jam-dialog-actions {
+    display: flex;
+    gap: 18px;
+    justify-content: center;
+  }
+  .jam-dialog-actions .jam-btn { flex: 1; justify-content: center; }
+
   /* ── Vibe picker sections (Stage / Guitar Skin / Drum Skin / Highway) ──
      Each section is a label + a single row of 4 cover tiles. */
   .vibe-section-label {
@@ -12100,6 +12432,8 @@ function initVuplexListener() {
 
 function handleUnityMessage(msg) {
   switch(msg.type) {
+    case 'setModifierTier': setModifierTier(msg.data); break;
+    case 'battleStartRejected': showConfirmPopup(String(msg.data), { title: 'Battle Setup', confirmLabel: 'OK' }); break;
     case 'updateProfile': updateProfile(msg.data); break;
     case 'updateClientInfo': updateClientInfo(msg.data); break;
     case 'navigate': navigateTo(msg.data); break;
@@ -15925,7 +16259,7 @@ function startGame() {
   for (var i = 0; i < setlist.length; i++) {
     titles.push(setlist[i].title);
   }
-  sendToUnity('startGame', {instrument: selectedInstrument, difficulty: selectedDifficulty, setlist: titles});
+  sendToUnity('startGame', {instrument: selectedInstrument, difficulty: selectedDifficulty, setlist: titles, playMode: playMode, modifiers: getModifierPayload()});
   showResults1();
 }
 
@@ -19005,6 +19339,1222 @@ function openExperiencePicker() {
   experiencePendingSnapshot = true;
   openOptionPicker('experience');
 }
+// ── Miss-feedback modifiers ────────────────────────────────────────────────
+// Modelled on how Rock Band / Guitar Hero communicate a missed note: the miss
+// is signalled by SUBTRACTING rewards (your stem, the fret flame, the streak)
+// rather than by drawing a penalty on the highway, plus one meter that trends
+// toward failure with a deliberately asymmetric hit/miss cost.
+//
+// Two tiers of the same list:
+//   'player' — one on/off toggle per modifier
+//   'team'   — the same toggles plus the numeric sliders behind each one
+// Unity picks the tier per account (see setModifierTier / MODIFIER_TEAM_ACCOUNTS)
+// so the tuning knobs never reach players.
+//
+// Modifier state is GLOBAL for the session — unlike difficulty, it is not
+// stored per setlist slot.
+
+var MODIFIER_TIERS = ['player', 'team'];
+var modifierTier = 'player';
+
+// Unity engineer: add PlayFab account IDs here (or push 'setModifierTier')
+// to unlock the slider tier for specific users.
+var MODIFIER_TEAM_ACCOUNTS = [];
+
+var MISS_MODIFIERS = [
+  {
+    "id": "battleSections",
+    "label": "Battle Note Sections",
+    "desc": "Two guitar players share the host’s chart and difficulty. Hit every glowing gem in a section to send one attack. Chord gems count individually; short songs use fewer complete sections.",
+    "sliders": [
+      {
+        "id": "battleSectionCount",
+        "label": "Sections Per Song",
+        "min": 0,
+        "max": 20,
+        "step": 1,
+        "def": 3,
+        "fmt": "int"
+      },
+      {
+        "id": "battleNoteCount",
+        "label": "Notes Per Section",
+        "min": 1,
+        "max": 100,
+        "step": 1,
+        "def": 10,
+        "fmt": "int"
+      },
+      {
+        "id": "battleGlow",
+        "label": "Note Glow",
+        "min": 0.5,
+        "max": 5,
+        "step": 0.1,
+        "def": 2,
+        "fmt": "x"
+      },
+      {
+        "id": "battleCooldown",
+        "label": "Attack Cooldown (seconds)",
+        "min": 0,
+        "max": 30,
+        "step": 1,
+        "def": 2,
+        "fmt": "int"
+      }
+    ],
+    "def": true
+  },
+  {
+    "id": "battleStack",
+    "label": "Allow Overlapping Debuffs",
+    "desc": "Off: a new attack replaces the current effect. On: different effects overlap; repeating an effect refreshes its duration.",
+    "sliders": [],
+    "def": false
+  },
+  {
+    "id": "battleInk",
+    "label": "Ink Splatter",
+    "desc": "Ink blots obscure your view for a short time.",
+    "sliders": [
+      {
+        "id": "battleInkDuration",
+        "label": "Duration (seconds)",
+        "min": 1,
+        "max": 30,
+        "step": 1,
+        "def": 5,
+        "fmt": "int"
+      },
+      {
+        "id": "battleInkCoverage",
+        "label": "Blot Size",
+        "min": 10,
+        "max": 90,
+        "step": 5,
+        "def": 45,
+        "fmt": "pct"
+      },
+      {
+        "id": "battleInkOpacity",
+        "label": "Opacity",
+        "min": 10,
+        "max": 100,
+        "step": 5,
+        "def": 90,
+        "fmt": "pct"
+      },
+      {
+        "id": "battleInkBlots",
+        "label": "Blots",
+        "min": 1,
+        "max": 12,
+        "step": 1,
+        "def": 6,
+        "fmt": "int"
+      }
+    ],
+    "def": true
+  },
+  {
+    "id": "battleReverse",
+    "label": "Reverse Highway",
+    "desc": "Gems travel from the frets toward the horizon. Play at the original musical time.",
+    "sliders": [
+      {
+        "id": "battleReverseDuration",
+        "label": "Duration (seconds)",
+        "min": 1,
+        "max": 30,
+        "step": 1,
+        "def": 5,
+        "fmt": "int"
+      }
+    ],
+    "def": true
+  },
+  {
+    "id": "battleFlip",
+    "label": "Left / Right Flip",
+    "desc": "Mirror the displayed lanes. Gem colours still identify the required frets.",
+    "sliders": [
+      {
+        "id": "battleFlipDuration",
+        "label": "Duration (seconds)",
+        "min": 1,
+        "max": 30,
+        "step": 1,
+        "def": 5,
+        "fmt": "int"
+      }
+    ],
+    "def": true
+  },
+  {
+    "id": "battleSpeed",
+    "label": "Fast Gems / Bigger Gaps",
+    "desc": "Faster travel and larger spacing, with the same musical hit times.",
+    "sliders": [
+      {
+        "id": "battleSpeedDuration",
+        "label": "Duration (seconds)",
+        "min": 1,
+        "max": 30,
+        "step": 1,
+        "def": 5,
+        "fmt": "int"
+      },
+      {
+        "id": "battleSpeedFactor",
+        "label": "Travel Speed",
+        "min": 1.1,
+        "max": 3,
+        "step": 0.05,
+        "def": 1.75,
+        "fmt": "x"
+      }
+    ],
+    "def": true
+  },
+  {
+    "id": "battleTiny",
+    "label": "Tiny Gems",
+    "desc": "Shrink gems while keeping the original input and timing windows.",
+    "sliders": [
+      {
+        "id": "battleTinyDuration",
+        "label": "Duration (seconds)",
+        "min": 1,
+        "max": 30,
+        "step": 1,
+        "def": 5,
+        "fmt": "int"
+      },
+      {
+        "id": "battleTinyScale",
+        "label": "Gem Scale",
+        "min": 0.1,
+        "max": 0.9,
+        "step": 0.05,
+        "def": 0.4,
+        "fmt": "x"
+      }
+    ],
+    "def": true
+  },
+  {
+    "id": "battleSpawn",
+    "label": "Shift Spawn Direction",
+    "desc": "Move the incoming highway path left or right around the strike point.",
+    "sliders": [
+      {
+        "id": "battleSpawnDuration",
+        "label": "Duration (seconds)",
+        "min": 1,
+        "max": 30,
+        "step": 1,
+        "def": 5,
+        "fmt": "int"
+      },
+      {
+        "id": "battleSpawnAngle",
+        "label": "Angle (degrees; negative = left)",
+        "min": -60,
+        "max": 60,
+        "step": 5,
+        "def": 45,
+        "fmt": "int"
+      }
+    ],
+    "def": true
+  },
+  {
+    "id": "battleSwap",
+    "label": "Instrument Swap: Guitar to Drums",
+    "desc": "Switch to the real drum kit and drumsticks, then return to guitar. The same note sequence is mapped across usable drum pads; sustained notes ring after a strike. Layout numbers start at 0; unavailable numbers use the last built-in layout.",
+    "sliders": [
+      {
+        "id": "battleSwapDuration",
+        "label": "Duration (seconds)",
+        "min": 1,
+        "max": 30,
+        "step": 1,
+        "def": 5,
+        "fmt": "int"
+      },
+      {
+        "id": "battleSwapLayout",
+        "label": "Drum Layout Index",
+        "min": 0,
+        "max": 10,
+        "step": 1,
+        "def": 0,
+        "fmt": "int"
+      }
+    ],
+    "def": true
+  },
+  {
+    "id": "battleDebug",
+    "label": "Solo Debuff Test",
+    "desc": "Play a solo guitar song to receive attacks automatically. Effect: 0 cycles enabled effects; 1 ink, 2 reverse, 3 flip, 4 speed, 5 tiny, 6 spawn shift, 7 instrument swap. Completing a battle section also attacks you. Disabled effects are skipped.",
+    "sliders": [
+      {
+        "id": "battleDebugStart",
+        "label": "First Attack (seconds)",
+        "min": 0,
+        "max": 120,
+        "step": 1,
+        "def": 15,
+        "fmt": "int"
+      },
+      {
+        "id": "battleDebugInterval",
+        "label": "Attack Interval (seconds)",
+        "min": 1,
+        "max": 120,
+        "step": 1,
+        "def": 20,
+        "fmt": "int"
+      },
+      {
+        "id": "battleDebugCount",
+        "label": "Automatic Attacks Per Song",
+        "min": 1,
+        "max": 100,
+        "step": 1,
+        "def": 10,
+        "fmt": "int"
+      },
+      {
+        "id": "battleDebugEffect",
+        "label": "Effect (0 = cycle)",
+        "min": 0,
+        "max": 7,
+        "step": 1,
+        "def": 0,
+        "fmt": "int"
+      }
+    ],
+    "def": false
+  },
+  {
+    id: 'stemDuck',
+    label: 'Duck Your Stem On Miss',
+    desc: 'Your instrument drops out of the mix the moment you miss. The single strongest miss signal — it reads as "I played it wrong", not "the game penalised me".',
+    def: true,
+    // Envelope, in order: fade down over Fade Out, sit at Dip Depth for Dip
+    // Duration, come back over Fade In. Total silence ~= the three ms values
+    // summed, so Dip Duration is the time held at FULL depth, not end-to-end.
+    sliders: [
+      {id: 'duckDb',         label: 'Dip Depth',    min: -60, max: 0,    step: 1,  def: -24, fmt: 'db'},
+      {id: 'duckDurationMs', label: 'Dip Duration', min: 0,   max: 1500, step: 10, def: 250, fmt: 'ms'},
+      {id: 'duckAttackMs',   label: 'Dip Fade Out', min: 0,   max: 300,  step: 5,  def: 15,  fmt: 'ms'},
+      {id: 'duckReleaseMs',  label: 'Dip Fade In',  min: 0,   max: 1000, step: 10, def: 120, fmt: 'ms'}
+    ]
+  },
+  {
+    id: 'stemBoost',
+    label: 'Boost Your Stem',
+    desc: 'Lifts the instrument you are playing above the rest of the mix so both hits and dropouts read clearly. Above +12 dB a normalised stem will clip.',
+    def: true,
+    sliders: [
+      {id: 'boostDb', label: 'Boost', min: 0, max: 12, step: 0.5, def: 3, fmt: 'db'}
+    ]
+  },
+  {
+    id: 'missSfx',
+    label: 'Miss Sound Effect',
+    desc: 'Broken-string screech layered over the dip, so a miss stays audible on drums and vocals where the stem dropout is harder to hear.',
+    def: true,
+    sliders: [
+      {id: 'missSfxDb', label: 'SFX Level', min: -40, max: 0, step: 1, def: -6, fmt: 'db'}
+    ]
+  },
+  {
+    id: 'hitFlames',
+    label: 'Fret Flames On Hit',
+    desc: 'Reward burst at the strike line. With this on, a miss reads as the absence of the flame — no extra graphic needed.',
+    def: true,
+    sliders: [
+      {id: 'flameScale',  label: 'Flame Size',   min: 0.5, max: 2,   step: 0.05, def: 1,   fmt: 'x'},
+      {id: 'flameHoldMs', label: 'Flame Length', min: 60,  max: 600, step: 10,   def: 180, fmt: 'ms'}
+    ]
+  },
+  {
+    id: 'ghostMissedNote',
+    label: 'Missed Notes Ghost Through',
+    desc: 'A missed gem slides past the strike line unlit instead of vanishing, so you can see what you dropped.',
+    def: true,
+    sliders: [
+      {id: 'ghostOpacity', label: 'Ghost Opacity', min: 0, max: 100, step: 5, def: 35, fmt: 'pct'}
+    ]
+  },
+  {
+    id: 'streakBreak',
+    label: 'Miss Breaks Streak',
+    desc: 'Note streak resets to zero on a miss. Forgiveness above zero is a streak-protection assist.',
+    def: true,
+    sliders: [
+      {id: 'streakForgiveness', label: 'Misses Forgiven', min: 0, max: 3, step: 1, def: 0, fmt: 'num'}
+    ]
+  },
+  {
+    id: 'streakCounter',
+    label: 'Streak Counter',
+    desc: 'Counter fades in once the streak is long enough and disappears on a miss — a HUD element vanishing is very legible in peripheral vision.',
+    def: true,
+    sliders: [
+      {id: 'streakCounterAt', label: 'Show After', min: 5, max: 60, step: 5, def: 30, fmt: 'num'}
+    ]
+  },
+  {
+    id: 'multiplierDrop',
+    label: 'Miss Drops Multiplier',
+    desc: 'How far the score multiplier falls on a miss. Four steps is a full Guitar Hero style reset to 1x.',
+    def: true,
+    sliders: [
+      {id: 'multiplierSteps',  label: 'Steps Lost',     min: 1, max: 4,  step: 1, def: 4,  fmt: 'num'},
+      {id: 'multiplierEveryN', label: 'Notes Per Step', min: 5, max: 30, step: 1, def: 10, fmt: 'num'}
+    ]
+  },
+  {
+    id: 'overdriveVoid',
+    label: 'Miss Voids Overdrive Phrase',
+    desc: 'Missing inside a glowing phrase reverts the rest of it to ordinary notes — you watch the reward de-power in front of you.',
+    def: true,
+    sliders: []
+  },
+  {
+    id: 'rockMeter',
+    label: 'Rock Meter',
+    desc: 'The crowd / failure meter. Misses costing roughly three times what hits earn is the core tuning decision — it makes danger arrive fast but stay recoverable.',
+    def: true,
+    sliders: [
+      {id: 'meterStart',    label: 'Starts At',     min: 0,    max: 100, step: 5,    def: 50, fmt: 'pct'},
+      {id: 'meterHitGain',  label: 'Gain Per Hit',  min: 0.25, max: 3,   step: 0.25, def: 1,  fmt: 'num'},
+      {id: 'meterMissCost', label: 'Cost Per Miss', min: 0.5,  max: 8,   step: 0.5,  def: 3,  fmt: 'num'}
+    ]
+  },
+  {
+    id: 'failSong',
+    label: 'Fail On Empty Meter',
+    desc: 'Turn off for No Fail practice. Scores are still tracked but flagged as assisted.',
+    def: true,
+    sliders: []
+  },
+  {
+    id: 'dangerVignette',
+    label: 'Danger Screen Edges',
+    desc: 'Red vignette pulses at the edge of vision as the meter nears empty. Stronger in VR than on a TV — it sits in genuine peripheral vision.',
+    def: true,
+    sliders: [
+      {id: 'vignetteAt',      label: 'Kicks In Below', min: 5,   max: 50,   step: 5,  def: 25,  fmt: 'pct'},
+      {id: 'vignetteOpacity', label: 'Peak Opacity',   min: 10,  max: 100,  step: 5,  def: 60,  fmt: 'pct'},
+      {id: 'vignettePulseMs', label: 'Pulse Period',   min: 200, max: 2000, step: 50, def: 700, fmt: 'ms'}
+    ]
+  },
+  {
+    id: 'highwayDesat',
+    label: 'Highway Drains In Danger',
+    desc: 'The note highway loses colour as the meter falls. Off by default — it competes with the vignette for the same signal.',
+    def: false,
+    sliders: [
+      {id: 'desatAmount', label: 'Max Drain', min: 0, max: 100, step: 5, def: 70, fmt: 'pct'}
+    ]
+  },
+  {
+    id: 'crowdReacts',
+    label: 'Crowd Reacts To Misses',
+    desc: 'Cheering sours into booing as the meter drops, escalating the failure out of the HUD and into the world.',
+    def: true,
+    sliders: [
+      {id: 'crowdBooAt', label: 'Boos Below', min: 5,   max: 60, step: 5, def: 35,  fmt: 'pct'},
+      {id: 'crowdBooDb', label: 'Boo Level',  min: -40, max: 0,  step: 1, def: -12, fmt: 'db'}
+    ]
+  },
+  {
+    id: 'bandRevive',
+    label: 'Bandmate Revive',
+    desc: 'Group only. A player who fails out goes silent and can be revived by a bandmate spending Overdrive.',
+    def: true,
+    sliders: [
+      {id: 'reviveCostPct', label: 'Overdrive Cost', min: 25, max: 100, step: 25, def: 50, fmt: 'pct'}
+    ]
+  }
+];
+
+// Category tabs for the popup. The kind field picks the renderer: 'difficulty'
+// is the per-song difficulty cards, 'presets' is the preset browser, and 'mods'
+// tabs render their mods list. Every MISS_MODIFIERS id must appear in exactly one
+// 'mods' tab — checkModifierTabs() warns at init if one is unassigned.
+var MODIFIER_TABS = [
+  {id: 'difficulty', label: 'Difficulty', kind: 'difficulty'},
+  {id: 'audio',   kind: 'mods', label: 'Audio',   mods: ['stemDuck', 'stemBoost', 'missSfx']},
+  {id: 'highway', kind: 'mods', label: 'Highway', mods: ['hitFlames', 'ghostMissedNote', 'streakCounter']},
+  {id: 'scoring', kind: 'mods', label: 'Scoring', mods: ['streakBreak', 'multiplierDrop', 'overdriveVoid']},
+  {id: 'failure', kind: 'mods', label: 'Failure', mods: ['rockMeter', 'failSong', 'dangerVignette',
+                                                         'highwayDesat', 'crowdReacts', 'bandRevive']},
+  {id: 'battle', label: 'Battle', kind: 'mods', mods: ["battleSections", "battleStack", "battleInk", "battleReverse", "battleFlip", "battleSpeed", "battleTiny", "battleSpawn", "battleSwap", "battleDebug"]},
+  {id: 'presets', label: 'Presets', kind: 'presets'}
+];
+var modifierTab = 'difficulty';
+
+var modifierEnabled = {};   // modifier id -> bool
+var modifierValues = {};    // slider id   -> number
+
+// Guard against a modifier being added to MISS_MODIFIERS but not to a tab —
+// it would silently never render.
+function checkModifierTabs() {
+  var assigned = {};
+  for (var t = 0; t < MODIFIER_TABS.length; t++) {
+    if (MODIFIER_TABS[t].kind !== 'mods') continue;
+    var ids = MODIFIER_TABS[t].mods;
+    for (var i = 0; i < ids.length; i++) assigned[ids[i]] = true;
+  }
+  for (var m = 0; m < MISS_MODIFIERS.length; m++) {
+    if (!assigned[MISS_MODIFIERS[m].id]) {
+      console.warn('[Modifiers] "' + MISS_MODIFIERS[m].id + '" is in MISS_MODIFIERS but not in any MODIFIER_TABS entry — it will never render.');
+    }
+  }
+}
+
+function modifierDefaults() {
+  var en = {}, vals = {};
+  for (var i = 0; i < MISS_MODIFIERS.length; i++) {
+    var m = MISS_MODIFIERS[i];
+    en[m.id] = !!m.def;
+    for (var s = 0; s < m.sliders.length; s++) {
+      vals[m.sliders[s].id] = m.sliders[s].def;
+    }
+  }
+  return {enabled: en, values: vals};
+}
+
+function initModifiers() {
+  checkModifierTabs();
+  _loadPresets();
+  var d = modifierDefaults();
+  modifierEnabled = d.enabled;
+  modifierValues = d.values;
+  // Saved values overlay the defaults so a newly added modifier still gets its
+  // default rather than coming back undefined.
+  try {
+    var raw = localStorage.getItem('jamsesh_modifiers');
+    if (raw) {
+      var saved = JSON.parse(raw);
+      // Tier is sticky: the onboarding flow rewrites the URL via
+      // history.replaceState, so ?modifiers=team would otherwise be lost on the
+      // next refresh and silently drop the team back to the toggles-only view.
+      // parseMode runs after this and re-applies ?modifiers if present; in
+      // production Unity's setModifierTier overrides either way.
+      if (saved && MODIFIER_TIERS.indexOf(saved.tier) >= 0) modifierTier = saved.tier;
+      if (saved && saved.enabled) {
+        for (var k in saved.enabled) {
+          if (modifierEnabled.hasOwnProperty(k)) modifierEnabled[k] = !!saved.enabled[k];
+        }
+      }
+      if (saved && saved.values) {
+        for (var v in saved.values) {
+          if (modifierValues.hasOwnProperty(v) && typeof saved.values[v] === 'number') {
+            modifierValues[v] = saved.values[v];
+          }
+        }
+      }
+    }
+  } catch (e) {}
+}
+
+function _saveModifiers() {
+  try {
+    localStorage.setItem('jamsesh_modifiers', JSON.stringify({
+      tier: modifierTier,
+      enabled: modifierEnabled,
+      values: modifierValues
+    }));
+  } catch (e) {}
+}
+
+// Payload shape shared by the 'modifiers' message and the startGame payload.
+function getModifierPayload() {
+  return {tier: modifierTier, enabled: modifierEnabled, values: modifierValues,
+          preset: activePresetName()};
+}
+
+// ── Presets ────────────────────────────────────────────────────────────────
+// A preset is a snapshot of EVERY modifier across all tabs — enabled flags and
+// slider values together — so applying one is a single decision rather than 15.
+// Stored separately from the live state (jamsesh_modifier_presets) so clearing
+// or resetting the live modifiers never destroys saved presets.
+
+var modifierPresets = [];    // [{id, name, enabled, values}]
+var activePresetId = '';     // last applied/saved preset; may be "dirty"
+
+function _presetUid() {
+  return 'p' + Date.now().toString(36) + Math.floor(Math.random() * 1e6).toString(36);
+}
+
+function _loadPresets() {
+  try {
+    var raw = localStorage.getItem('jamsesh_modifier_presets');
+    if (!raw) return;
+    var o = JSON.parse(raw);
+    if (o && o.presets && o.presets.length) modifierPresets = o.presets;
+    if (o && o.active) activePresetId = o.active;
+  } catch (e) {}
+}
+
+function _savePresets() {
+  try {
+    localStorage.setItem('jamsesh_modifier_presets',
+      JSON.stringify({presets: modifierPresets, active: activePresetId}));
+  } catch (e) {}
+}
+
+function findPreset(id) {
+  for (var i = 0; i < modifierPresets.length; i++) {
+    if (modifierPresets[i].id === id) return modifierPresets[i];
+  }
+  return null;
+}
+
+function activePresetName() {
+  var p = findPreset(activePresetId);
+  if (!p) return '';
+  return presetMatchesCurrent(p) ? p.name : p.name + ' (modified)';
+}
+
+// Copy rather than reference — otherwise every preset would alias the live
+// state object and they'd all change together.
+function snapshotModifiers() {
+  var en = {}, vals = {}, k;
+  for (k in modifierEnabled) if (modifierEnabled.hasOwnProperty(k)) en[k] = !!modifierEnabled[k];
+  for (k in modifierValues) if (modifierValues.hasOwnProperty(k)) vals[k] = modifierValues[k];
+  return {enabled: en, values: vals};
+}
+
+function presetMatchesCurrent(p) {
+  var k;
+  for (k in modifierEnabled) {
+    if (modifierEnabled.hasOwnProperty(k) && !!modifierEnabled[k] !== !!p.enabled[k]) return false;
+  }
+  for (k in modifierValues) {
+    if (modifierValues.hasOwnProperty(k) && modifierValues[k] !== p.values[k]) return false;
+  }
+  return true;
+}
+
+// "12 on · 3 tuned" — how far this preset sits from the shipped defaults.
+function presetSummary(p) {
+  var defs = modifierDefaults(), on = 0, tuned = 0, k;
+  for (k in p.enabled) if (p.enabled.hasOwnProperty(k) && p.enabled[k]) on++;
+  for (k in p.values) {
+    if (p.values.hasOwnProperty(k) && defs.values.hasOwnProperty(k) &&
+        p.values[k] !== defs.values[k]) tuned++;
+  }
+  return on + ' of ' + MISS_MODIFIERS.length + ' on' + (tuned ? '  ·  ' + tuned + ' tuned' : '');
+}
+
+function applyPreset(id) {
+  var p = findPreset(id);
+  if (!p) return;
+  // Rebase on defaults first so a preset saved before a new modifier existed
+  // leaves that modifier at its default instead of undefined.
+  var d = modifierDefaults();
+  modifierEnabled = d.enabled;
+  modifierValues = d.values;
+  var k;
+  for (k in p.enabled) {
+    if (modifierEnabled.hasOwnProperty(k)) modifierEnabled[k] = !!p.enabled[k];
+  }
+  for (k in p.values) {
+    if (modifierValues.hasOwnProperty(k) && typeof p.values[k] === 'number') {
+      modifierValues[k] = p.values[k];
+    }
+  }
+  activePresetId = id;
+  _saveModifiers();
+  _savePresets();
+  sendToUnity('modifiers', getModifierPayload());
+  renderModifierTab();
+}
+
+function savePresetAsNew() {
+  openJamDialog({
+    title: 'Name This Preset',
+    value: 'Preset ' + (modifierPresets.length + 1),
+    confirmLabel: 'Save',
+    onConfirm: function(name) {
+      var snap = snapshotModifiers();
+      var p = {id: _presetUid(), name: name, enabled: snap.enabled, values: snap.values};
+      modifierPresets.push(p);
+      activePresetId = p.id;
+      _savePresets();
+      sendToUnity('modifierPresetSaved', {id: p.id, name: p.name});
+      renderModifierTab();
+    }
+  });
+}
+
+// "Edit" in the sense the user asked for: stamp the current settings over an
+// existing preset, so you can tweak sliders and re-save without renaming.
+function updatePresetFromCurrent(id) {
+  var p = findPreset(id);
+  if (!p) return;
+  openJamDialog({
+    title: 'Overwrite "' + p.name + '"?',
+    body: 'Replaces the saved settings with everything currently set across all tabs. This cannot be undone.',
+    confirmLabel: 'Overwrite',
+    onConfirm: function() {
+      var snap = snapshotModifiers();
+      p.enabled = snap.enabled;
+      p.values = snap.values;
+      activePresetId = p.id;
+      _savePresets();
+      renderModifierTab();
+    }
+  });
+}
+
+function renamePreset(id) {
+  var p = findPreset(id);
+  if (!p) return;
+  openJamDialog({
+    title: 'Rename Preset',
+    value: p.name,
+    confirmLabel: 'Rename',
+    excludeId: p.id,   // its own name must not count as a clash
+    onConfirm: function(name) { p.name = name; _savePresets(); renderModifierTab(); }
+  });
+}
+
+function deletePreset(id) {
+  var p = findPreset(id);
+  if (!p) return;
+  openJamDialog({
+    title: 'Delete "' + p.name + '"?',
+    body: 'The preset is removed for good. Your current modifier settings are not changed.',
+    confirmLabel: 'Delete',
+    destructive: true,
+    onConfirm: function() {
+      for (var i = 0; i < modifierPresets.length; i++) {
+        if (modifierPresets[i].id === id) { modifierPresets.splice(i, 1); break; }
+      }
+      if (activePresetId === id) activePresetId = '';
+      _savePresets();
+      renderModifierTab();
+    }
+  });
+}
+
+// Unity -> WebView. Accepts a plain tier string, {tier:'team'}, or
+// {accountId:'...'} to resolve against MODIFIER_TEAM_ACCOUNTS.
+function setModifierTier(data) {
+  var tier = '';
+  if (typeof data === 'string') {
+    tier = data;
+  } else if (data) {
+    if (data.tier) tier = data.tier;
+    else if (data.accountId) {
+      tier = MODIFIER_TEAM_ACCOUNTS.indexOf(data.accountId) >= 0 ? 'team' : 'player';
+    }
+  }
+  if (MODIFIER_TIERS.indexOf(tier) < 0) tier = 'player';
+  modifierTier = tier;
+  _saveModifiers();
+  // Sliders appear/disappear, so repaint the body if the popup is open.
+  var overlay = document.getElementById('option-picker-overlay');
+  if (overlay && overlay.style.display === 'flex' && currentPickerType === 'difficulty') {
+    renderModifierTab();
+  }
+}
+
+function _modFormat(slider, v) {
+  if (slider.fmt === 'ms')  return Math.round(v) + ' ms';
+  if (slider.fmt === 'db')  return (v > 0 ? '+' : '') + v.toFixed(1) + ' dB';
+  if (slider.fmt === 'pct') return Math.round(v) + '%';
+  if (slider.fmt === 'x')   return v.toFixed(2) + 'x';
+  return slider.step < 1 ? v.toFixed(2) : String(Math.round(v));
+}
+
+// One shared drag session + one set of document listeners for every slider —
+// the per-row listeners used by buildAvatarSliderRow leak on every rebuild.
+var _modDrag = null;
+var _modDragBound = false;
+function _modBindDrag() {
+  if (_modDragBound) return;
+  _modDragBound = true;
+  function onMove(e) {
+    if (!_modDrag) return;
+    var x = (e.touches && e.touches[0]) ? e.touches[0].clientX : e.clientX;
+    _modDrag.move(x);
+  }
+  function onUp() {
+    if (!_modDrag) return;
+    _modDrag.end();
+    _modDrag = null;
+  }
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', onUp);
+  document.addEventListener('touchmove', onMove);
+  document.addEventListener('touchend', onUp);
+}
+
+function buildModifierSlider(mod, slider) {
+  var row = document.createElement('div');
+  row.className = 'mod-slider-row';
+
+  var labelEl = document.createElement('div');
+  labelEl.className = 'mod-slider-label';
+  labelEl.textContent = slider.label;
+
+  var track = document.createElement('div');
+  track.className = 'mod-slider-track';
+  var fill = document.createElement('div');
+  fill.className = 'mod-slider-fill';
+  track.appendChild(fill);
+  var handle = document.createElement('div');
+  handle.className = 'mod-slider-handle';
+  track.appendChild(handle);
+
+  var valueEl = document.createElement('div');
+  valueEl.className = 'mod-slider-value';
+
+  var span = slider.max - slider.min;
+
+  function paint(v) {
+    var pct = span === 0 ? 0 : ((v - slider.min) / span) * 100;
+    fill.style.width = pct + '%';
+    handle.style.left = pct + '%';
+    valueEl.textContent = _modFormat(slider, v);
+  }
+
+  function snap(v) {
+    v = Math.max(slider.min, Math.min(slider.max, v));
+    var steps = Math.round((v - slider.min) / slider.step);
+    v = slider.min + steps * slider.step;
+    // Kill float drift from the step arithmetic (0.30000000000000004).
+    v = Math.round(v * 1000) / 1000;
+    return Math.max(slider.min, Math.min(slider.max, v));
+  }
+
+  function pointerToValue(clientX) {
+    var rect = track.getBoundingClientRect();
+    if (!rect.width) return modifierValues[slider.id];
+    var t = (clientX - rect.left) / rect.width;
+    return snap(slider.min + t * span);
+  }
+
+  // Live updates while dragging so the team can hear the change, throttled so a
+  // drag does not flood the Vuplex bridge. The final value always gets through.
+  var lastSent = 0;
+  function commit(v, force) {
+    if (modifierValues[slider.id] === v && !force) return;
+    modifierValues[slider.id] = v;
+    paint(v);
+    var now = Date.now();
+    if (force || now - lastSent > 60) {
+      lastSent = now;
+      sendToUnity('modifierChanged', {
+        modifier: mod.id, slider: slider.id, value: v, enabled: !!modifierEnabled[mod.id]
+      });
+    }
+  }
+
+  function startDrag(clientX) {
+    _modBindDrag();
+    commit(pointerToValue(clientX), false);
+    _modDrag = {
+      move: function(x) { commit(pointerToValue(x), false); },
+      end: function() {
+        commit(modifierValues[slider.id], true);
+        _saveModifiers();
+      }
+    };
+  }
+
+  track.onmousedown = function(e) { startDrag(e.clientX); };
+  track.ontouchstart = function(e) {
+    if (e.touches && e.touches[0]) startDrag(e.touches[0].clientX);
+  };
+
+  paint(modifierValues[slider.id]);
+
+  row.appendChild(labelEl);
+  row.appendChild(track);
+  row.appendChild(valueEl);
+  return row;
+}
+
+function toggleModifier(id) {
+  modifierEnabled[id] = !modifierEnabled[id];
+  _saveModifiers();
+  sendToUnity('modifierChanged', {modifier: id, enabled: !!modifierEnabled[id]});
+  var item = document.getElementById('mod-item-' + id);
+  var toggle = document.getElementById('mod-toggle-' + id);
+  if (toggle) toggle.className = 'mod-toggle' + (modifierEnabled[id] ? ' on' : '');
+  if (item) item.className = 'mod-item' + (modifierEnabled[id] ? '' : ' off');
+}
+
+function resetModifiers() {
+  var d = modifierDefaults();
+  modifierEnabled = d.enabled;
+  modifierValues = d.values;
+  _saveModifiers();
+  sendToUnity('modifiers', getModifierPayload());
+  if (currentPickerType === 'difficulty') renderModifierTab();
+}
+
+// Renders one category's modifiers into the given host element, where ids is
+// the tab's mods list. Slider rows are only emitted on the team tier; the player
+// tier gets the toggles alone.
+function buildModifierList(host, ids) {
+  var showSliders = modifierTier === 'team' || ids.indexOf('battleSections') >= 0;
+
+  var head = document.createElement('div');
+  head.className = 'mod-section-head';
+  var resetBtn = document.createElement('button');
+  resetBtn.className = 'mod-reset-btn';
+  resetBtn.textContent = 'Reset Defaults';
+  resetBtn.onclick = function() { resetModifiers(); };
+  head.appendChild(resetBtn);
+  host.appendChild(head);
+
+  var list = document.createElement('div');
+  list.className = 'mod-list';
+
+  // Walk MISS_MODIFIERS (not ids) so the declaration order is the display order.
+  for (var i = 0; i < MISS_MODIFIERS.length; i++) {
+    var mod = MISS_MODIFIERS[i];
+    if (ids.indexOf(mod.id) < 0) continue;
+    var on = !!modifierEnabled[mod.id];
+
+    var item = document.createElement('div');
+    item.className = 'mod-item' + (on ? '' : ' off');
+    item.id = 'mod-item-' + mod.id;
+
+    var row = document.createElement('div');
+    row.className = 'mod-row';
+    var text = document.createElement('div');
+    text.className = 'mod-row__text';
+    var lbl = document.createElement('div');
+    lbl.className = 'mod-row__label';
+    lbl.textContent = mod.label;
+    text.appendChild(lbl);
+    var desc = document.createElement('div');
+    desc.className = 'mod-row__desc';
+    desc.textContent = mod.desc;
+    text.appendChild(desc);
+    row.appendChild(text);
+
+    var toggle = document.createElement('div');
+    toggle.className = 'mod-toggle' + (on ? ' on' : '');
+    toggle.id = 'mod-toggle-' + mod.id;
+    toggle.innerHTML = '<div class="mod-toggle__knob"></div>';
+    row.appendChild(toggle);
+
+    row.onclick = (function(id) {
+      return function() { toggleModifier(id); };
+    })(mod.id);
+    item.appendChild(row);
+
+    if (showSliders && mod.sliders.length) {
+      var sliderWrap = document.createElement('div');
+      sliderWrap.className = 'mod-sliders';
+      for (var s = 0; s < mod.sliders.length; s++) {
+        sliderWrap.appendChild(buildModifierSlider(mod, mod.sliders[s]));
+      }
+      item.appendChild(sliderWrap);
+    }
+
+    list.appendChild(item);
+  }
+
+  host.appendChild(list);
+}
+
+// 3-in-a-row difficulty cards, same card layout as the instrument picker.
+// Expert dropped. Imagery (shared with the options-row tile): gradient + bars.
+function buildDifficultyCards(host) {
+  var diffItems = [
+    {id: 'easy',   label: 'Easy'},
+    {id: 'medium', label: 'Medium'},
+    {id: 'hard',   label: 'Hard'}
+  ];
+  var diffGrid = document.createElement('div');
+  diffGrid.className = 'instrument-picker--single';
+  diffGrid.style.margin = 'auto 0';   // centre the row in the now-taller body
+  for (var di = 0; di < diffItems.length; di++) {
+    var d = diffItems[di];
+    var dMeta = DIFFICULTY_IMAGERY[d.id];
+    var dCol = document.createElement('div');
+    dCol.className = 'instrument-picker__column' + (d.id === selectedDifficulty ? ' selected' : '');
+    dCol.setAttribute('data-diff', d.id);
+    var dHeader = document.createElement('div');
+    dHeader.className = 'instrument-picker__header';
+    dHeader.innerHTML =
+      '<div class="instrument-picker__img" style="background:' + dMeta.grad + '"></div>' +
+      '<div class="diff-picker__icon">' + diffBarsSvg(dMeta.level) + '</div>' +
+      '<div class="instrument-picker__shade"></div>' +
+      '<div class="instrument-picker__label">' + d.label + '</div>';
+    // Unlike the old difficulty-only popup, picking does NOT close — the other
+    // tabs are part of the same decision. Repaint the selected card in place.
+    dHeader.onclick = (function (id) {
+      return function () {
+        selectedDifficulty = id;
+        setSongDifficulty(activeSongIdx, id);
+        sendToUnity('selectDifficulty', id);
+        coopSyncSelfPicks();
+        var cols = diffGrid.children;
+        for (var ci = 0; ci < cols.length; ci++) {
+          cols[ci].className = 'instrument-picker__column' +
+            (cols[ci].getAttribute('data-diff') === id ? ' selected' : '');
+        }
+        buildPlayGrid();
+      };
+    })(d.id);
+    dCol.appendChild(dHeader);
+    diffGrid.appendChild(dCol);
+  }
+  host.appendChild(diffGrid);
+}
+
+// Shared name-entry / confirm dialog for the preset actions. Sits above the
+// option picker (z-index 1000, same tier as the logo picker) and is built on
+// demand rather than living in the static HTML.
+function _presetNameTaken(name, excludeId) {
+  for (var i = 0; i < modifierPresets.length; i++) {
+    if (modifierPresets[i].id !== excludeId &&
+        modifierPresets[i].name.toLowerCase() === name.toLowerCase()) return true;
+  }
+  return false;
+}
+
+function closeJamDialog() {
+  var overlay = document.getElementById('jam-dialog-overlay');
+  if (overlay) overlay.style.display = 'none';
+}
+
+function openJamDialog(opts) {
+  var host = document.querySelector('.viewport') || document.body;
+  var overlay = document.getElementById('jam-dialog-overlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'jam-dialog-overlay';
+    overlay.className = 'jam-dialog-overlay';
+    host.appendChild(overlay);
+  }
+  overlay.innerHTML = '';
+  overlay.style.display = 'flex';
+
+  // Dismissing via the backdrop must be identical to pressing the cancel
+  // button — otherwise a prompt whose "no" has a side effect (e.g. the tutorial
+  // prompt suppressing itself for the session) would silently re-fire.
+  var dismissed = false;
+  function dismiss() {
+    if (dismissed) return;
+    dismissed = true;
+    closeJamDialog();
+    if (opts.onCancel) opts.onCancel();
+  }
+  overlay.onclick = dismiss;
+
+  var panel = document.createElement('div');
+  panel.className = 'jam-dialog';
+  panel.onclick = function(e) { e.stopPropagation(); };
+
+  var titleEl = document.createElement('div');
+  titleEl.className = 'jam-dialog-title';
+  titleEl.textContent = opts.title;
+  panel.appendChild(titleEl);
+
+  // Text mode when a starting value is supplied, confirm mode otherwise.
+  var isText = typeof opts.value === 'string';
+  var input = null;
+  if (isText) {
+    input = document.createElement('input');
+    input.type = 'text';
+    input.id = 'jam-dialog-input';
+    input.className = 'save-input';
+    input.maxLength = 32;
+    input.value = opts.value;
+    // Matches the promo/referral inputs: native VR keyboard on tap.
+    input.setAttribute('inputmode', 'none');
+    input.setAttribute('onclick', "requestKeyboardForInput('jam-dialog-input')");
+    panel.appendChild(input);
+  } else if (opts.body) {
+    var bodyEl = document.createElement('div');
+    bodyEl.className = 'jam-dialog-body';
+    bodyEl.textContent = opts.body;
+    panel.appendChild(bodyEl);
+  }
+
+  var errEl = document.createElement('div');
+  errEl.className = 'jam-dialog-error';
+  panel.appendChild(errEl);
+
+  var actions = document.createElement('div');
+  actions.className = 'jam-dialog-actions';
+  var cancelBtn = document.createElement('button');
+  cancelBtn.className = 'jam-btn';
+  cancelBtn.textContent = opts.cancelLabel || 'Cancel';
+  cancelBtn.onclick = dismiss;
+  var okBtn = document.createElement('button');
+  okBtn.className = 'jam-btn jam-btn--primary' + (opts.destructive ? ' jam-btn--danger' : '');
+  okBtn.textContent = opts.confirmLabel || 'OK';
+  okBtn.onclick = function() {
+    if (isText) {
+      var v = (input.value || '').replace(/^\s+|\s+$/g, '');
+      if (!v) { errEl.textContent = 'Give it a name first.'; return; }
+      if (_presetNameTaken(v, opts.excludeId)) {
+        errEl.textContent = 'There is already a preset called "' + v + '".';
+        return;
+      }
+      dismissed = true;          // confirm path must not also fire onCancel
+      closeJamDialog();
+      opts.onConfirm(v);
+    } else {
+      dismissed = true;
+      closeJamDialog();
+      opts.onConfirm();
+    }
+  };
+  actions.appendChild(cancelBtn);
+  actions.appendChild(okBtn);
+  panel.appendChild(actions);
+
+  overlay.appendChild(panel);
+  if (input) { try { input.focus(); input.select(); } catch (e) {} }
+}
+
+function buildPresetBrowser(host) {
+  var head = document.createElement('div');
+  head.className = 'mod-section-head';
+  var note = document.createElement('div');
+  note.className = 'mod-section-note';
+  note.textContent = 'A preset captures every modifier across all tabs';
+  head.appendChild(note);
+  var saveBtn = document.createElement('button');
+  saveBtn.className = 'mod-reset-btn';
+  saveBtn.textContent = '+ Save Current Settings';
+  saveBtn.onclick = function() { savePresetAsNew(); };
+  head.appendChild(saveBtn);
+  host.appendChild(head);
+
+  if (!modifierPresets.length) {
+    var empty = document.createElement('div');
+    empty.className = 'preset-empty';
+    empty.innerHTML =
+      '<div class="preset-empty__title">No presets yet</div>' +
+      '<div class="preset-empty__sub">Set the modifiers how you want them on the other tabs, ' +
+      'then save them here as a named preset you can jump back to.</div>';
+    var emptyBtn = document.createElement('button');
+    emptyBtn.className = 'jam-btn jam-btn--primary';
+    emptyBtn.textContent = '+ Save Current Settings';
+    emptyBtn.onclick = function() { savePresetAsNew(); };
+    empty.appendChild(emptyBtn);
+    host.appendChild(empty);
+    return;
+  }
+
+  var list = document.createElement('div');
+  list.className = 'mod-list';
+
+  for (var i = 0; i < modifierPresets.length; i++) {
+    var p = modifierPresets[i];
+    var isActive = p.id === activePresetId;
+    var clean = isActive && presetMatchesCurrent(p);
+
+    var card = document.createElement('div');
+    card.className = 'preset-card' + (isActive ? ' active' : '');
+
+    var text = document.createElement('div');
+    text.className = 'preset-card__text';
+    var nameRow = document.createElement('div');
+    nameRow.className = 'preset-card__name';
+    nameRow.textContent = p.name;
+    if (isActive) {
+      var badge = document.createElement('span');
+      badge.className = 'preset-card__badge' + (clean ? '' : ' modified');
+      badge.textContent = clean ? 'ACTIVE' : 'MODIFIED';
+      nameRow.appendChild(badge);
+    }
+    text.appendChild(nameRow);
+    var meta = document.createElement('div');
+    meta.className = 'preset-card__meta';
+    meta.textContent = presetSummary(p);
+    text.appendChild(meta);
+    card.appendChild(text);
+
+    var acts = document.createElement('div');
+    acts.className = 'preset-card__actions';
+
+    // Apply is pointless when the live state already equals this preset.
+    var applyBtn = document.createElement('button');
+    applyBtn.className = 'jam-btn jam-btn--primary';
+    applyBtn.textContent = clean ? 'Applied' : 'Apply';
+    applyBtn.disabled = clean;
+    applyBtn.onclick = (function(id) { return function() { applyPreset(id); }; })(p.id);
+    acts.appendChild(applyBtn);
+
+    var updBtn = document.createElement('button');
+    updBtn.className = 'jam-btn';
+    updBtn.textContent = 'Update';
+    updBtn.onclick = (function(id) { return function() { updatePresetFromCurrent(id); }; })(p.id);
+    acts.appendChild(updBtn);
+
+    var renBtn = document.createElement('button');
+    renBtn.className = 'jam-btn';
+    renBtn.textContent = 'Rename';
+    renBtn.onclick = (function(id) { return function() { renamePreset(id); }; })(p.id);
+    acts.appendChild(renBtn);
+
+    var delBtn = document.createElement('button');
+    delBtn.className = 'jam-btn jam-btn--danger';
+    delBtn.textContent = 'Delete';
+    delBtn.onclick = (function(id) { return function() { deletePreset(id); }; })(p.id);
+    acts.appendChild(delBtn);
+
+    card.appendChild(acts);
+    list.appendChild(card);
+  }
+
+  host.appendChild(list);
+}
+
+// Repaints just the popup body for the active tab. Cheap enough to rebuild
+// wholesale — the lists are at most 6 rows.
+function renderModifierTab() {
+  var body = document.getElementById('mod-tab-body');
+  if (!body) return;
+  body.innerHTML = '';
+  body.scrollTop = 0;
+
+  var def = null;
+  for (var i = 0; i < MODIFIER_TABS.length; i++) {
+    if (MODIFIER_TABS[i].id === modifierTab) { def = MODIFIER_TABS[i]; break; }
+  }
+  if (!def) def = MODIFIER_TABS[0];
+
+  if (def.kind === 'presets') buildPresetBrowser(body);
+  else if (def.kind === 'mods') buildModifierList(body, def.mods);
+  else buildDifficultyCards(body);
+}
+
+function switchModifierTab(tab) {
+  modifierTab = tab;
+  var tabs = document.getElementById('mod-tabs');
+  if (tabs) {
+    for (var i = 0; i < tabs.children.length; i++) {
+      var el = tabs.children[i];
+      el.className = 'option-picker-tab' +
+        (el.getAttribute('data-mod-tab') === tab ? ' active' : '');
+    }
+  }
+  renderModifierTab();
+}
+
 function openOptionPicker(type) {
   currentPickerType = type;
   var overlay = document.getElementById('option-picker-overlay');
@@ -19055,7 +20605,7 @@ function openOptionPicker(type) {
       // In coop/battle mode, check if this instrument is taken by another player.
       var isTaken = false;
       if (inBandspace && playMode !== 'solo') {
-        if (instrumentAvailability[inst.id] === false) isTaken = true;
+        if (playMode !== 'battle' && instrumentAvailability[inst.id] === false) isTaken = true;
       }
       var isSelected = inst.id === selectedInstrument && !isTaken;
 
@@ -19123,46 +20673,33 @@ function openOptionPicker(type) {
     }
     stdBody.appendChild(instGrid);
   } else if (type === 'difficulty') {
-    title.textContent = 'Select Difficulty';
+    // Per-song difficulty cards + the global miss-feedback modifiers, split
+    // into category tabs. Full-screen frame — the modifier lists are long and
+    // VR touch targets are big.
+    panel.className += ' std-popup--full';
+    title.textContent = 'Difficulty & Modifiers';
     stdHeader.appendChild(title);
     panel.appendChild(stdHeader);
-    panel.appendChild(stdBody);
-    // 3-in-a-row, same card layout as the instrument picker. Expert dropped.
-    // Imagery (shared with the options-row tile): gradient + signal bars.
-    var diffItems = [
-      {id: 'easy',   label: 'Easy'},
-      {id: 'medium', label: 'Medium'},
-      {id: 'hard',   label: 'Hard'}
-    ];
-    var diffGrid = document.createElement('div');
-    diffGrid.className = 'instrument-picker--single';
-    diffGrid.style.margin = 'auto 0';   // centre the row vertically in the popup body
-    for (var di = 0; di < diffItems.length; di++) {
-      var d = diffItems[di];
-      var dMeta = DIFFICULTY_IMAGERY[d.id];
-      var dCol = document.createElement('div');
-      dCol.className = 'instrument-picker__column' + (d.id === selectedDifficulty ? ' selected' : '');
-      var dHeader = document.createElement('div');
-      dHeader.className = 'instrument-picker__header';
-      dHeader.innerHTML =
-        '<div class="instrument-picker__img" style="background:' + dMeta.grad + '"></div>' +
-        '<div class="diff-picker__icon">' + diffBarsSvg(dMeta.level) + '</div>' +
-        '<div class="instrument-picker__shade"></div>' +
-        '<div class="instrument-picker__label">' + d.label + '</div>';
-      dHeader.onclick = (function (id) {
-        return function () {
-          selectedDifficulty = id;
-          setSongDifficulty(activeSongIdx, id);
-          sendToUnity('selectDifficulty', id);
-          coopSyncSelfPicks();
-          closeOptionPicker();
-          buildPlayGrid();
-        };
-      })(d.id);
-      dCol.appendChild(dHeader);
-      diffGrid.appendChild(dCol);
+
+    var modTabs = document.createElement('div');
+    modTabs.className = 'option-picker-tabs mod-tabs';
+    modTabs.id = 'mod-tabs';
+    for (var mt = 0; mt < MODIFIER_TABS.length; mt++) {
+      var tabDef = MODIFIER_TABS[mt];
+      var tabEl = document.createElement('div');
+      tabEl.className = 'option-picker-tab' + (tabDef.id === modifierTab ? ' active' : '');
+      tabEl.setAttribute('data-mod-tab', tabDef.id);
+      tabEl.textContent = tabDef.label;
+      tabEl.onclick = (function(id) {
+        return function() { switchModifierTab(id); };
+      })(tabDef.id);
+      modTabs.appendChild(tabEl);
     }
-    stdBody.appendChild(diffGrid);
+    panel.appendChild(modTabs);
+
+    stdBody.id = 'mod-tab-body';
+    panel.appendChild(stdBody);
+    renderModifierTab();
   } else if (type === 'experience') {
     panel.className += ' std-popup--large';   // bigger frame for the 4×4 grid
     title.textContent = 'Vibe';
@@ -19236,7 +20773,7 @@ function buildSimplePickerChoices(panel, type, items, currentVal) {
 
     // In coop/battle mode, check instrument availability from network state
     var isTaken = false;
-    if (type === 'instrument' && inBandspace && playMode !== 'solo') {
+    if (type === 'instrument' && inBandspace && playMode === 'coop') {
       var avail = instrumentAvailability[item.id];
       // undefined means no tracking for this instrument (e.g. bass) — treat as available
       if (avail === false) {
@@ -23763,6 +25300,7 @@ function dismissEarlyAccess() {
 }
 
 function init() {
+  initModifiers();
   // Parse URL mode and load onboarding flags
   parseMode();
 
