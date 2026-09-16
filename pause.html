@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1920, height=1920, initial-scale=1.0, user-scalable=no">
+<title>Jamsesh — Pause</title>
+<style>
+@font-face{font-family:Monda;src:url('fonts/monda-latin.woff2') format('woff2');font-display:swap}
+@font-face{font-family:'Gasoek One';src:url('fonts/gasoek-one-latin.woff2') format('woff2');font-display:swap}
+@font-face{font-family:'Bebas Neue';src:url('fonts/bebas-neue-latin.woff2') format('woff2');font-display:swap}
+*{box-sizing:border-box}html,body{margin:0;width:1920px;height:1920px;overflow:hidden;background:#100c1f;color:#f0ecf8;font-family:Monda,sans-serif;-webkit-user-select:none;user-select:none}
+body{background:radial-gradient(ellipse at 5% 0%,#283263 0,transparent 52%),radial-gradient(ellipse at 100% 100%,#432360 0,transparent 56%),#100c1f}
+main{margin:90px;width:1740px;height:1740px;border:2px solid #ffffff20;border-radius:56px;padding:72px;background:#100c1f99;position:relative}
+header{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #ffffff18;padding-bottom:38px}
+.brand{font-family:'Gasoek One',sans-serif;font-size:46px;letter-spacing:2px}.tag{font-size:26px;color:#66f4ef;letter-spacing:4px}
+h1{font-family:'Gasoek One',sans-serif;font-size:116px;font-weight:400;margin:58px 0 16px;letter-spacing:-3px}#song{font-size:32px;color:#b8afd0;margin:0 0 54px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+button{font-family:Monda,sans-serif;font-size:32px;color:inherit;cursor:pointer;border:2px solid #ffffff24;border-radius:24px;background:#332548;min-height:116px;padding:24px 36px;text-align:left}button:hover,button:focus-visible{border-color:#70fff4;background:#3b3459;outline:4px solid #70fff433}button:disabled{opacity:.4;cursor:default}.primary{width:100%;background:linear-gradient(105deg,#40e5d5,#88f4ad);color:#101828;font-size:40px;font-weight:bold;display:flex;justify-content:space-between;align-items:center}.primary:hover{background:#8af4d6;color:#101828}
+.section{background:#201831;border:2px solid #ffffff16;border-radius:28px;padding:36px;margin-top:30px}h2{font-family:'Bebas Neue',sans-serif;font-size:43px;font-weight:400;letter-spacing:2px;margin:0 0 12px}.hint{font-size:25px;color:#b8afd0;margin:0 0 24px;line-height:1.5}
+.picker{position:relative}#effectButton{width:100%;display:flex;justify-content:space-between;align-items:center;background:#322448;border-color:#ad7fea66}#effectMenu{display:none;position:absolute;top:126px;left:0;right:0;background:#20172f;border:2px solid #b689f7;border-radius:24px;z-index:4;padding:10px;box-shadow:0 24px 60px #000a;max-height:590px;overflow:auto}#effectMenu.open{display:block}#effectMenu button{display:block;width:100%;min-height:68px;padding:12px 24px;border:0;background:transparent;font-size:29px;border-radius:16px}#effectMenu button[aria-selected=true]{background:#674092}#effectMenu button:hover,#effectMenu button:focus{background:#4e3769}#status{margin:20px 0 0;font-size:25px;color:#79eee2;min-height:38px}
+.controls{display:flex;margin-top:20px}.controls button{flex:1}.controls button+button{margin-left:18px}.toggle{display:flex;justify-content:space-between;align-items:center;width:100%;margin-top:14px;font-size:27px;min-height:80px;padding:15px 25px}.toggle span{color:#78efe0}.actions{display:flex;position:absolute;bottom:68px;left:72px;right:72px}.actions button{flex:1}.actions button+button{margin-left:24px}.exit{background:#41283f}#confirmation{display:none;position:absolute;inset:0;background:#100c1fee;border-radius:56px;z-index:6;padding:470px 100px 100px}#confirmation h2{font-size:80px}#confirmation p{font-size:32px;color:#b8afd0}.hidden{display:none!important}
+</style>
+</head>
+<body>
+<main>
+ <header><span class="brand">JAMSESH</span><span class="tag">TAKE A BREATHER</span></header>
+ <h1>PAUSED</h1><p id="song">Current song</p>
+ <button class="primary" id="resume">Back to the music <span aria-hidden="true">▶</span></button>
+ <section class="section"><h2>BATTLE DEBUFF</h2><p class="hint">Choose an effect to keep active while you play. Change it here whenever you want.</p>
+  <div class="picker"><button id="effectButton" aria-haspopup="listbox" aria-expanded="false" aria-controls="effectMenu"><span id="effectLabel">None</span><span aria-hidden="true">⌄</span></button><div id="effectMenu" role="listbox" aria-label="Battle debuff"></div></div>
+  <p id="status" role="status">No debuff selected.</p>
+ </section>
+ <section class="section hidden" id="instrumentControls"><h2>INSTRUMENT SETTINGS</h2>
+  <div id="guitarControls"><button class="toggle" id="anchored" aria-pressed="false">Anchored spawns <span>Off</span></button><button class="toggle" id="rotation" aria-pressed="false">Free guitar rotation <span>Off</span></button><div class="controls"><button id="controller">Connect guitar controller</button></div></div>
+  <div id="drumControls" class="controls hidden"><button id="layout">Edit drum layout</button></div>
+ </section>
+ <div class="actions"><button id="restart">Restart song</button><button class="exit" id="home">Exit to lobby</button></div>
+ <div id="confirmation" role="dialog" aria-modal="true" aria-labelledby="confirmTitle"><h2 id="confirmTitle">RESTART SONG?</h2><p id="confirmCopy">Your current run will start again.</p><div class="controls"><button id="cancel">Keep playing</button><button id="confirm" class="primary">Restart</button></div></div>
+</main>
+<script>
+(function(){
+ 'use strict';
+ var labels=['Ink splatter','Reverse highway','Left / right flip','Fast gems','Tiny gems','Spawn shift','PLAY DRUMS'];
+ var state={selectedEffect:-1,canDebuff:true,canRestart:true,instrument:'Guitarist',anchored:false,freeRotation:false};
+ var connected=false, pendingAction=null;
+ function el(id){return document.getElementById(id);}
+ function send(action,extra){var m={type:'pauseAction',action:action};var k;for(k in extra){if(Object.prototype.hasOwnProperty.call(extra,k))m[k]=extra[k];}if(connected){window.vuplex.postMessage(m);}else if(action==='debuff'){state.selectedEffect=extra.effect;render();}else if(action==='anchored'){state.anchored=extra.value;render();}else if(action==='rotation'){state.freeRotation=extra.value;render();}else if(action!=='ready'){el('status').textContent='Preview: '+action;}}
+ function closeMenu(){el('effectMenu').classList.remove('open');el('effectButton').setAttribute('aria-expanded','false');}
+ function render(){
+  if(state.effects)labels=state.effects;
+  if(state.song)el('song').textContent=state.song;
+  var selected=state.selectedEffect;
+  el('effectLabel').textContent=selected>=0&&selected<labels.length?labels[selected]:'None';
+  el('status').textContent=!state.canDebuff?'Battle effects are available when playing guitar.':selected>=0?'Active until changed: '+labels[selected]:'No debuff selected. Normal battle rules apply.';
+  el('effectButton').disabled=!state.canDebuff;
+  el('restart').classList.toggle('hidden',!state.canRestart);
+  el('instrumentControls').classList.toggle('hidden',state.instrument!=='Guitarist'&&state.instrument!=='Drummer');
+  el('guitarControls').classList.toggle('hidden',state.instrument!=='Guitarist');el('drumControls').classList.toggle('hidden',state.instrument!=='Drummer');
+  toggle('anchored',state.anchored);toggle('rotation',state.freeRotation);
+  var menu=el('effectMenu');menu.textContent='';
+  for(var i=-1;i<labels.length;i++){var b=document.createElement('button');b.type='button';b.setAttribute('role','option');b.setAttribute('aria-selected',String(selected===i));b.textContent=i<0?'None':labels[i];b.onclick=(function(index){return function(){closeMenu();send('debuff',{effect:index});el('effectButton').focus();};})(i);menu.appendChild(b);}
+ }
+ function toggle(id,value){el(id).setAttribute('aria-pressed',String(!!value));el(id).querySelector('span').textContent=value?'On':'Off';}
+ el('effectButton').onclick=function(){var open=el('effectMenu').classList.toggle('open');this.setAttribute('aria-expanded',String(open));if(open)el('effectMenu').querySelector('[aria-selected=true]').focus();};
+ el('effectMenu').onkeydown=function(e){var options=this.querySelectorAll('button');var at=Array.prototype.indexOf.call(options,document.activeElement);if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();options[(at+(e.key==='ArrowDown'?1:options.length-1))%options.length].focus();}};
+ document.addEventListener('click',function(e){if(!el('effectButton').contains(e.target)&&!el('effectMenu').contains(e.target))closeMenu();});
+ document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeMenu();el('confirmation').style.display='none';pendingAction=null;}});
+ el('resume').onclick=function(){send('resume',{});};
+ el('anchored').onclick=function(){send('anchored',{value:!state.anchored});};el('rotation').onclick=function(){send('rotation',{value:!state.freeRotation});};
+ el('controller').onclick=function(){send('controller',{});};el('layout').onclick=function(){send('layout',{});};
+ function confirmAction(action){pendingAction=action;el('confirmTitle').textContent=action==='restart'?'RESTART SONG?':'LEAVE THE STAGE?';el('confirmCopy').textContent=action==='restart'?'Start again with your selected debuff.':'Exit this run and return to the lobby.';el('confirm').textContent=action==='restart'?'Restart':'Exit to lobby';el('confirmation').style.display='block';el('cancel').focus();}
+ el('restart').onclick=function(){confirmAction('restart');};el('home').onclick=function(){confirmAction('home');};el('cancel').onclick=function(){el('confirmation').style.display='none';pendingAction=null;};el('confirm').onclick=function(){var action=pendingAction;pendingAction=null;el('confirmation').style.display='none';if(action)send(action,{});};
+ function connect(){if(connected||!window.vuplex)return;connected=true;window.vuplex.addEventListener('message',function(event){var m=event.data;try{if(typeof m==='string')m=JSON.parse(m);}catch(e){return;}if(m&&m.type==='pauseState'){state=m;render();}});send('ready',{});}
+ render();if(window.vuplex)connect();else window.addEventListener('vuplexready',connect);
+})();
+</script>
+</body>
+</html>
