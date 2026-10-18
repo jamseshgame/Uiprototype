@@ -22,7 +22,19 @@
     font-style: normal; font-weight: 400; font-display: swap;
     src: url('fonts/gasoek-one-latin.woff2') format('woff2');
   }
-  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  *, *::before, *::after {
+    margin: 0; padding: 0; box-sizing: border-box;
+    /* Disable text highlighting / selection everywhere — this is a VR WebView
+       driven by a laser pointer, so accidental drag-selection just leaves ugly
+       highlighted text. Inputs re-enable selection below so they stay editable. */
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    user-select: none;
+  }
+  input, textarea {
+    -webkit-user-select: text;
+    user-select: text;
+  }
 
   button, a, input, select, .nav-item, .topbar-main, .xp-bar-full,
   .play-layout, .play-picker, .content > *, .page > *,
@@ -3467,6 +3479,9 @@
     max-height: 1920px !important;
     border-radius: 0;
   }
+  .mod-tabs { flex-wrap: wrap; }
+  .mod-tabs .option-picker-tab { min-width: 110px; }
+
   /* Modifier tab row only (.mod-tabs) — leave the shared picker tabs alone. */
   .mod-tabs .option-picker-tab {
     font-size: 32px;
@@ -12446,6 +12461,8 @@ function initVuplexListener() {
 
 function handleUnityMessage(msg) {
   switch(msg.type) {
+    case 'setModifierTier': setModifierTier(msg.data); break;
+    case 'battleStartRejected': showConfirmPopup(String(msg.data), { title: 'Battle Setup', confirmLabel: 'OK' }); break;
     case 'updateProfile': updateProfile(msg.data); break;
     case 'updateClientInfo': updateClientInfo(msg.data); break;
     case 'navigate': navigateTo(msg.data); break;
@@ -13277,6 +13294,7 @@ function updateClientInfo(data) {
 var _navTransitioning = false;
 
 function navigateTo(pageName) {
+  closePanelKeyboard();
   var target = document.getElementById('page-' + pageName);
   if (!target) return;
   if (_navTransitioning) return;
@@ -14398,6 +14416,7 @@ function startFreshOwnBand() {
 function closeCreateGroup(e) {
   if (e && e.target !== document.getElementById('create-group-overlay')) return;
   document.getElementById('create-group-overlay').className = 'create-group-overlay';
+  closePanelKeyboard();
   sendToUnity('closeKeyboard', {});
 }
 
@@ -14898,13 +14917,45 @@ function goToNewGroup() {
 }
 
 // ── Keyboard Bridge ─────────────────────────────────────
+var panelKeyboard = null;
+var panelKeyboardInputId = null;
+
+function closePanelKeyboard() {
+  if (panelKeyboard) panelKeyboard.remove();
+  panelKeyboard = null;
+  panelKeyboardInputId = null;
+}
+
+window.addEventListener('message', function(event) {
+  if (!panelKeyboard || event.source !== panelKeyboard.contentWindow ||
+      !event.data || event.data.source !== 'jamsesh-keyboard') return;
+  var el = document.getElementById(panelKeyboardInputId);
+  if (event.data.type === 'ready') {
+    panelKeyboard.contentWindow.postMessage({source:'jamsesh-keyboard-host', type:'initialize', value:el ? el.value : ''}, '*');
+  } else if (event.data.type === 'change' && el) {
+    var text = typeof event.data.value === 'string' ? event.data.value : '';
+    el.value = el.maxLength >= 0 ? text.slice(0, el.maxLength) : text;
+    el.dispatchEvent(new Event('input', {bubbles:true}));
+  } else if (event.data.type === 'submit' || event.data.type === 'dismiss') {
+    closePanelKeyboard();
+  }
+});
+
 function requestKeyboardForInput(inputId) {
   var el = document.getElementById(inputId);
-  // On Quest/Vuplex, Unity supplies the keyboard, so blur to avoid the WebView's
-  // own IME. On desktop (no bridge) keep focus so the field can be typed natively.
+  // Keep Quest text entry on the menu's visible surface rather than a separate
+  // compositor layer. Desktop users retain normal native text entry.
   if (window.vuplex) {
     if (el) el.blur();
-    sendToUnity('requestKeyboard', { inputId: inputId, value: (el ? el.value : '') });
+    closePanelKeyboard();
+    sendToUnity('closeKeyboard', {});
+    panelKeyboardInputId = inputId;
+    panelKeyboard = document.createElement('iframe');
+    panelKeyboard.title = 'Text keyboard';
+    panelKeyboard.id = 'panel-keyboard';
+    panelKeyboard.style.cssText = 'position:fixed;left:50%;transform:translateX(-50%);bottom:240px;width:calc(100% - 80px);max-width:1400px;height:560px;max-height:42vh;border:3px solid #a38aff;border-radius:18px;background:#161225;z-index:2147483647;box-shadow:0 12px 40px #0009';
+    panelKeyboard.src = '../Keyboard/keyboard.html';
+    document.body.appendChild(panelKeyboard);
   }
 }
 
@@ -15441,6 +15492,9 @@ function buildSongColumn() {
 function buildRightPanel() {
   var panel = document.getElementById('play-right-panel');
   var songCol = document.getElementById('play-song-col');
+  // The current play layout has no legacy right panel. Backend song updates
+  // still call this helper, so only render it when that layout is present.
+  if (!panel || !songCol) return;
   panel.innerHTML = '';
   if (playMode === 'solo') {
     songCol.style.display = 'none';
@@ -16234,6 +16288,7 @@ function _startGameConfirmed(tutorialInst) {
     instrument: selectedInstrument,
     difficulty: selectedDifficulty,
     setlist: titles,
+    playMode: playMode,
     modifiers: getModifierPayload(),
     tutorial: tutorialInst || false
   });
@@ -19334,6 +19389,283 @@ var MODIFIER_TEAM_ACCOUNTS = [];
 
 var MISS_MODIFIERS = [
   {
+    "id": "battleSections",
+    "label": "Battle Note Sections",
+    "desc": "Two guitar players share the host’s chart and difficulty. Hit every glowing gem in a section to send one attack. Chord gems count individually; short songs use fewer complete sections.",
+    "sliders": [
+      {
+        "id": "battleSectionCount",
+        "label": "Sections Per Song",
+        "min": 0,
+        "max": 20,
+        "step": 1,
+        "def": 3,
+        "fmt": "int"
+      },
+      {
+        "id": "battleNoteCount",
+        "label": "Notes Per Section",
+        "min": 1,
+        "max": 100,
+        "step": 1,
+        "def": 10,
+        "fmt": "int"
+      },
+      {
+        "id": "battleGlow",
+        "label": "Note Glow",
+        "min": 0.5,
+        "max": 5,
+        "step": 0.1,
+        "def": 2,
+        "fmt": "x"
+      },
+      {
+        "id": "battleCooldown",
+        "label": "Attack Cooldown (seconds)",
+        "min": 0,
+        "max": 30,
+        "step": 1,
+        "def": 2,
+        "fmt": "int"
+      }
+    ],
+    "def": true
+  },
+  {
+    "id": "battleStack",
+    "label": "Allow Overlapping Debuffs",
+    "desc": "Off: a new attack replaces the current effect. On: different effects overlap; repeating an effect refreshes its duration.",
+    "sliders": [],
+    "def": false
+  },
+  {
+    "id": "battleInk",
+    "label": "Ink Splatter",
+    "desc": "Ink blots obscure your view for a short time.",
+    "sliders": [
+      {
+        "id": "battleInkDuration",
+        "label": "Duration (seconds)",
+        "min": 1,
+        "max": 30,
+        "step": 1,
+        "def": 5,
+        "fmt": "int"
+      },
+      {
+        "id": "battleInkCoverage",
+        "label": "Blot Size",
+        "min": 10,
+        "max": 90,
+        "step": 5,
+        "def": 45,
+        "fmt": "pct"
+      },
+      {
+        "id": "battleInkOpacity",
+        "label": "Opacity",
+        "min": 10,
+        "max": 100,
+        "step": 5,
+        "def": 90,
+        "fmt": "pct"
+      },
+      {
+        "id": "battleInkBlots",
+        "label": "Blots",
+        "min": 1,
+        "max": 12,
+        "step": 1,
+        "def": 6,
+        "fmt": "int"
+      }
+    ],
+    "def": true
+  },
+  {
+    "id": "battleReverse",
+    "label": "Reverse Highway",
+    "desc": "Gems travel from the frets toward the horizon. Play at the original musical time.",
+    "sliders": [
+      {
+        "id": "battleReverseDuration",
+        "label": "Duration (seconds)",
+        "min": 1,
+        "max": 30,
+        "step": 1,
+        "def": 5,
+        "fmt": "int"
+      }
+    ],
+    "def": true
+  },
+  {
+    "id": "battleFlip",
+    "label": "Left / Right Flip",
+    "desc": "Mirror the displayed lanes. Gem colours still identify the required frets.",
+    "sliders": [
+      {
+        "id": "battleFlipDuration",
+        "label": "Duration (seconds)",
+        "min": 1,
+        "max": 30,
+        "step": 1,
+        "def": 5,
+        "fmt": "int"
+      }
+    ],
+    "def": true
+  },
+  {
+    "id": "battleSpeed",
+    "label": "Fast Gems / Bigger Gaps",
+    "desc": "Faster travel and larger spacing, with the same musical hit times.",
+    "sliders": [
+      {
+        "id": "battleSpeedDuration",
+        "label": "Duration (seconds)",
+        "min": 1,
+        "max": 30,
+        "step": 1,
+        "def": 5,
+        "fmt": "int"
+      },
+      {
+        "id": "battleSpeedFactor",
+        "label": "Travel Speed",
+        "min": 1.1,
+        "max": 3,
+        "step": 0.05,
+        "def": 1.75,
+        "fmt": "x"
+      }
+    ],
+    "def": true
+  },
+  {
+    "id": "battleTiny",
+    "label": "Tiny Gems",
+    "desc": "Shrink gems while keeping the original input and timing windows.",
+    "sliders": [
+      {
+        "id": "battleTinyDuration",
+        "label": "Duration (seconds)",
+        "min": 1,
+        "max": 30,
+        "step": 1,
+        "def": 5,
+        "fmt": "int"
+      },
+      {
+        "id": "battleTinyScale",
+        "label": "Gem Scale",
+        "min": 0.1,
+        "max": 0.9,
+        "step": 0.05,
+        "def": 0.4,
+        "fmt": "x"
+      }
+    ],
+    "def": true
+  },
+  {
+    "id": "battleSpawn",
+    "label": "Shift Spawn Direction",
+    "desc": "Move the incoming highway path left or right around the strike point.",
+    "sliders": [
+      {
+        "id": "battleSpawnDuration",
+        "label": "Duration (seconds)",
+        "min": 1,
+        "max": 30,
+        "step": 1,
+        "def": 5,
+        "fmt": "int"
+      },
+      {
+        "id": "battleSpawnAngle",
+        "label": "Angle (degrees; negative = left)",
+        "min": -60,
+        "max": 60,
+        "step": 5,
+        "def": 45,
+        "fmt": "int"
+      }
+    ],
+    "def": true
+  },
+  {
+    "id": "battleSwap",
+    "label": "Instrument Swap: Guitar to Drums",
+    "desc": "Switch to the real drum kit and drumsticks, then return to guitar. The same note sequence is mapped across usable drum pads; sustained notes ring after a strike. Layout numbers start at 0; unavailable numbers use the last built-in layout.",
+    "sliders": [
+      {
+        "id": "battleSwapDuration",
+        "label": "Duration (seconds)",
+        "min": 1,
+        "max": 30,
+        "step": 1,
+        "def": 5,
+        "fmt": "int"
+      },
+      {
+        "id": "battleSwapLayout",
+        "label": "Drum Layout Index",
+        "min": 0,
+        "max": 10,
+        "step": 1,
+        "def": 0,
+        "fmt": "int"
+      }
+    ],
+    "def": true
+  },
+  {
+    "id": "battleDebug",
+    "label": "Solo Debuff Test",
+    "desc": "Play a solo guitar song to receive attacks automatically. Effect: 0 cycles enabled effects; 1 ink, 2 reverse, 3 flip, 4 speed, 5 tiny, 6 spawn shift, 7 instrument swap. Completing a battle section also attacks you. Disabled effects are skipped.",
+    "sliders": [
+      {
+        "id": "battleDebugStart",
+        "label": "First Attack (seconds)",
+        "min": 0,
+        "max": 120,
+        "step": 1,
+        "def": 15,
+        "fmt": "int"
+      },
+      {
+        "id": "battleDebugInterval",
+        "label": "Attack Interval (seconds)",
+        "min": 1,
+        "max": 120,
+        "step": 1,
+        "def": 20,
+        "fmt": "int"
+      },
+      {
+        "id": "battleDebugCount",
+        "label": "Automatic Attacks Per Song",
+        "min": 1,
+        "max": 100,
+        "step": 1,
+        "def": 10,
+        "fmt": "int"
+      },
+      {
+        "id": "battleDebugEffect",
+        "label": "Effect (0 = cycle)",
+        "min": 0,
+        "max": 7,
+        "step": 1,
+        "def": 0,
+        "fmt": "int"
+      }
+    ],
+    "def": false
+  },
+  {
     id: 'stemDuck',
     label: 'Duck Your Stem On Miss',
     desc: 'Your instrument drops out of the mix the moment you miss. The single strongest miss signal — it reads as "I played it wrong", not "the game penalised me".',
@@ -19490,6 +19822,7 @@ var MODIFIER_TABS = [
   {id: 'scoring', kind: 'mods', label: 'Scoring', mods: ['streakBreak', 'multiplierDrop', 'overdriveVoid']},
   {id: 'failure', kind: 'mods', label: 'Failure', mods: ['rockMeter', 'failSong', 'dangerVignette',
                                                          'highwayDesat', 'crowdReacts', 'bandRevive']},
+  {id: 'battle', label: 'Battle', kind: 'mods', mods: ["battleSections", "battleStack", "battleInk", "battleReverse", "battleFlip", "battleSpeed", "battleTiny", "battleSpawn", "battleSwap", "battleDebug"]},
   {id: 'presets', label: 'Presets', kind: 'presets'}
 ];
 var modifierTab = 'difficulty';
@@ -19903,7 +20236,7 @@ function resetModifiers() {
 // the tab's mods list. Slider rows are only emitted on the team tier; the player
 // tier gets the toggles alone.
 function buildModifierList(host, ids) {
-  var showSliders = modifierTier === 'team';
+  var showSliders = modifierTier === 'team' || ids.indexOf('battleSections') >= 0;
 
   var head = document.createElement('div');
   head.className = 'mod-section-head';
@@ -20414,7 +20747,7 @@ function openOptionPicker(type) {
       // In coop/battle mode, check if this instrument is taken by another player.
       var isTaken = false;
       if (inBandspace && playMode !== 'solo') {
-        if (instrumentAvailability[inst.id] === false) isTaken = true;
+        if (playMode !== 'battle' && instrumentAvailability[inst.id] === false) isTaken = true;
       }
       var isSelected = inst.id === selectedInstrument && !isTaken;
 
@@ -20591,7 +20924,7 @@ function buildSimplePickerChoices(panel, type, items, currentVal) {
 
     // In coop/battle mode, check instrument availability from network state
     var isTaken = false;
-    if (type === 'instrument' && inBandspace && playMode !== 'solo') {
+    if (type === 'instrument' && inBandspace && playMode === 'coop') {
       var avail = instrumentAvailability[item.id];
       // undefined means no tracking for this instrument (e.g. bass) — treat as available
       if (avail === false) {
@@ -20746,6 +21079,37 @@ function buildVaultGrid() {
 
 // ── Creator ──────────────────────────────────────────────
 
+var vinylArtSlot = null;
+function openVinylArtPicker(slot) {
+  vinylArtSlot = slot;
+  navigateTo('creator');
+  switchCreatorTab('art');
+  var banner = document.getElementById('vinyl-art-picker');
+  if (!banner) {
+    banner = document.createElement('div');
+    banner.id = 'vinyl-art-picker';
+    banner.style.cssText = 'padding:12px;display:flex;gap:12px;align-items:center;flex-shrink:0';
+    var label = document.createElement('span'); label.id = 'vinyl-art-status'; banner.appendChild(label);
+    var close = document.createElement('button'); close.textContent = 'Done';
+    close.onclick = closeVinylArtPicker;
+    banner.appendChild(close);
+    var tab = document.getElementById('creator-tab-art'); tab.insertBefore(banner, tab.firstChild);
+  }
+  banner.style.display = 'flex';
+  document.getElementById('vinyl-art-status').textContent = 'Choose artwork for cover ' + (slot + 1);
+  sendToUnity('creatorPageOpened', {});
+}
+function closeVinylArtPicker() {
+  vinylArtSlot = null;
+  var banner = document.getElementById('vinyl-art-picker');
+  if (banner) banner.style.display = 'none';
+  sendToUnity('vinylArtPickerClosed', {});
+}
+function vinylArtStatus(data) {
+  var label = document.getElementById('vinyl-art-status');
+  if (label) label.textContent = data.message;
+}
+
 var creatorPhotosPage = 0;
 var creatorArtPage = 0;
 var CREATOR_PER_PAGE = 12;   // 4x3
@@ -20862,7 +21226,7 @@ function buildCreatorArtGrid() {
     tile.style.background = 'url(' + creatorArtLogos[i] + ') center center / cover no-repeat var(--bg-surface)';
     tile.style.cursor = 'pointer';
     tile.onclick = (function(src) {
-      return function() { openArtPreview(src); };
+      return function() { if (vinylArtSlot !== null) sendToUnity('vinylArtSelected', {path:src}); else openArtPreview(src); };
     })(creatorArtLogos[i]);
     grid.appendChild(tile);
   }
@@ -22579,6 +22943,7 @@ function showAvatarSection() {
 }
 
 function hideAvatarSection() {
+  closePanelKeyboard();
   document.getElementById('avatar-section').style.display = 'none';
   document.getElementById('career-main').style.display = '';   // restore the career grid for next visit
   sendToUnity('avatarEditorClosed', {});
@@ -22634,6 +22999,7 @@ var avatarAuthMode = 'email'; // 'email' | 'otp'
 var avatarOtpEmail = '';
 
 function avatarSetAuthMode(mode) {
+  closePanelKeyboard();
   avatarAuthMode = mode;
   var showEmail = mode === 'email';
   var showOtp   = mode === 'otp';
@@ -22670,7 +23036,7 @@ function avatarOpenSignUp() {
 function avatarSubmitSignin() {
   var emailEl = document.getElementById('avatar-email-signin');
   var email = emailEl ? (emailEl.value || '').trim() : '';
-  if (!email) { emailEl.focus(); return; }
+  if (!email) { emailEl.focus(); requestKeyboardForInput('avatar-email-signin'); return; }
   avatarOtpEmail = email;
   sendToUnity('avatarEmailSignin', { email: email });
 }
@@ -22678,7 +23044,7 @@ function avatarSubmitSignin() {
 function avatarSubmitOtp() {
   var codeEl = document.getElementById('avatar-otp-code');
   var code = codeEl ? (codeEl.value || '').trim() : '';
-  if (!code) { codeEl.focus(); return; }
+  if (!code) { codeEl.focus(); requestKeyboardForInput('avatar-otp-code'); return; }
   sendToUnity('avatarOtpSubmit', { code: code });
 }
 
