@@ -12462,6 +12462,7 @@ function initVuplexListener() {
 function handleUnityMessage(msg) {
   switch(msg.type) {
     case 'setModifierTier': setModifierTier(msg.data); break;
+    case 'setInternalUser': setInternalUser(msg.data); break;
     case 'battleStartRejected': showConfirmPopup(String(msg.data), { title: 'Battle Setup', confirmLabel: 'OK' }); break;
     case 'updateProfile': updateProfile(msg.data); break;
     case 'updateClientInfo': updateClientInfo(msg.data); break;
@@ -15356,7 +15357,7 @@ function disbandActiveGroup() {
   }
   var social = document.getElementById('page-social');
   if (social && social.classList.contains('active')) buildSocialPage();
-  if (typeof playMode !== 'undefined' && playMode === 'coop') buildPlayGrid();
+  if (typeof playMode !== 'undefined' && playMode !== 'solo') buildPlayGrid();
 }
 
 // Switch the active band (by name or id) and refresh the Bandmates tiles + the
@@ -15370,7 +15371,7 @@ function applyActiveGroup(nameOrId) {
   }
   var social = document.getElementById('page-social');
   if (social && social.classList.contains('active')) buildSocialPage();
-  if (typeof playMode !== 'undefined' && playMode === 'coop') buildPlayGrid();
+  if (typeof playMode !== 'undefined' && playMode !== 'solo') buildPlayGrid();
 }
 
 var difficulties = [
@@ -15411,9 +15412,10 @@ var modeTabImages = {};
 function buildModeTabs() {
   var container = document.getElementById('play-mode-tabs');
   container.innerHTML = '';
-  // Battle mode hidden for now — re-add 'Battle' / 'battle' to restore it.
+  // Battle is internal-only for now (see setInternalUser).
   var modes = ['Solo', 'Group'];
   var modeIds = ['solo', 'coop'];
+  if (isInternalUser) { modes.push('Battle'); modeIds.push('battle'); }
   for (var i = 0; i < modes.length; i++) {
     var btn = document.createElement('button');
     btn.className = 'play-mode-tab' + (modeIds[i] === playMode ? ' active' : '');
@@ -15433,11 +15435,17 @@ function buildModeTabs() {
 }
 
 function setPlayMode(mode) {
+  if (mode === 'battle' && !isInternalUser) mode = 'coop';
   playMode = mode;
+  // Battle is guitar vs guitar; move a drummer/vocalist onto guitar on entry.
+  if (mode === 'battle' && selectedInstrument !== 'guitar') {
+    selectedInstrument = 'guitar';
+    sendToUnity('selectInstrument', 'guitar');
+  }
   buildModeTabs();
   buildPlayGrid();
   sendToUnity('playMode', mode);
-  updateDeeplinkUrl('play', mode === 'coop' ? 'group' : 'solo');
+  updateDeeplinkUrl('play', mode === 'solo' ? 'solo' : 'group');
 }
 
 // ── Song Column ────────────────────────────────────────
@@ -16452,7 +16460,7 @@ function showResults1() {
 function showResults2() {
   // Single CTA label depends on mode: solo → Social Hub, group → Lobby.
   var cta = document.getElementById('rewards-cta');
-  if (cta) cta.textContent = (playMode === 'coop') ? 'BACK TO LOBBY' : 'BACK TO SOCIAL HUB';
+  if (cta) cta.textContent = (playMode !== 'solo') ? 'BACK TO LOBBY' : 'BACK TO SOCIAL HUB';
   var black = document.getElementById('onboard-black');
   black.className = 'visible';
   setTimeout(function() {
@@ -17614,8 +17622,9 @@ function buildPlayGrid() {
     grid.className = 'play-grid play-grid--solo';
     buildSoloGrid(grid);
   } else if (playMode === 'battle') {
+    // Same lobby as Group; the instrument picker restricts battle to guitar.
     grid.className = 'play-grid play-grid--coop';
-    grid.innerHTML = '<div style="flex:1;display:flex;align-items:center;justify-content:center;font-size:64px;font-weight:800;text-align:center">Coming Soon...</div>';
+    buildCoopGrid(grid);
   } else {
     grid.className = 'play-grid play-grid--coop';
     buildCoopGrid(grid);
@@ -19383,6 +19392,11 @@ function openExperiencePicker() {
 var MODIFIER_TIERS = ['player', 'team'];
 var modifierTier = 'player';
 
+// Internal (staff/tester) accounts, from the PlayFab Title Data InternalUsers list.
+// Unity pushes 'setInternalUser'. Gates the Battle play mode and the Battle
+// modifier tab (incl. Solo Debuff Test) while battle is internal-only.
+var isInternalUser = false;
+
 // Unity engineer: add PlayFab account IDs here (or push 'setModifierTier')
 // to unlock the slider tier for specific users.
 var MODIFIER_TEAM_ACCOUNTS = [];
@@ -19478,23 +19492,6 @@ var MISS_MODIFIERS = [
         "max": 12,
         "step": 1,
         "def": 6,
-        "fmt": "int"
-      }
-    ],
-    "def": true
-  },
-  {
-    "id": "battleReverse",
-    "label": "Reverse Highway",
-    "desc": "Gems travel from the frets toward the horizon. Play at the original musical time.",
-    "sliders": [
-      {
-        "id": "battleReverseDuration",
-        "label": "Duration (seconds)",
-        "min": 1,
-        "max": 30,
-        "step": 1,
-        "def": 5,
         "fmt": "int"
       }
     ],
@@ -19624,7 +19621,7 @@ var MISS_MODIFIERS = [
   {
     "id": "battleDebug",
     "label": "Solo Debuff Test",
-    "desc": "Play a solo guitar song to receive attacks automatically. Effect: 0 cycles enabled effects; 1 ink, 2 reverse, 3 flip, 4 speed, 5 tiny, 6 spawn shift, 7 instrument swap. Completing a battle section also attacks you. Disabled effects are skipped.",
+    "desc": "Play a solo guitar song to receive attacks automatically. Effect: 0 cycles enabled effects; 1 ink, 2 flip, 3 speed, 4 tiny, 5 spawn shift, 6 instrument swap. Completing a battle section also attacks you. Disabled effects are skipped.",
     "sliders": [
       {
         "id": "battleDebugStart",
@@ -19657,7 +19654,7 @@ var MISS_MODIFIERS = [
         "id": "battleDebugEffect",
         "label": "Effect (0 = cycle)",
         "min": 0,
-        "max": 7,
+        "max": 6,
         "step": 1,
         "def": 0,
         "fmt": "int"
@@ -19822,7 +19819,7 @@ var MODIFIER_TABS = [
   {id: 'scoring', kind: 'mods', label: 'Scoring', mods: ['streakBreak', 'multiplierDrop', 'overdriveVoid']},
   {id: 'failure', kind: 'mods', label: 'Failure', mods: ['rockMeter', 'failSong', 'dangerVignette',
                                                          'highwayDesat', 'crowdReacts', 'bandRevive']},
-  {id: 'battle', label: 'Battle', kind: 'mods', mods: ["battleSections", "battleStack", "battleInk", "battleReverse", "battleFlip", "battleSpeed", "battleTiny", "battleSpawn", "battleSwap", "battleDebug"]},
+  {id: 'battle', label: 'Battle', kind: 'mods', mods: ["battleSections", "battleStack", "battleInk", "battleFlip", "battleSpeed", "battleTiny", "battleSpawn", "battleSwap", "battleDebug"]},
   {id: 'presets', label: 'Presets', kind: 'presets'}
 ];
 var modifierTab = 'difficulty';
@@ -20072,6 +20069,21 @@ function deletePreset(id) {
       renderModifierTab();
     }
   });
+}
+
+// Unity -> WebView. true/false. Losing internal status drops the player out of
+// Battle and off the Battle modifier tab.
+function setInternalUser(data) {
+  var next = data === true || data === 'true' || (data && data.internal === true);
+  if (next === isInternalUser) return;
+  isInternalUser = next;
+  if (!isInternalUser && playMode === 'battle') setPlayMode('coop');
+  else if (typeof buildModeTabs === 'function' && document.getElementById('play-mode-tabs')) buildModeTabs();
+  if (!isInternalUser && modifierTab === 'battle') modifierTab = 'difficulty';
+  var overlay = document.getElementById('option-picker-overlay');
+  if (overlay && overlay.style.display === 'flex' && currentPickerType === 'difficulty') {
+    openOptionPicker('difficulty');
+  }
 }
 
 // Unity -> WebView. Accepts a plain tier string, {tier:'team'}, or
@@ -20677,7 +20689,7 @@ function renderModifierTab() {
   for (var i = 0; i < MODIFIER_TABS.length; i++) {
     if (MODIFIER_TABS[i].id === modifierTab) { def = MODIFIER_TABS[i]; break; }
   }
-  if (!def) def = MODIFIER_TABS[0];
+  if (!def || (def.id === 'battle' && !isInternalUser)) def = MODIFIER_TABS[0];
 
   if (def.kind === 'presets') buildPresetBrowser(body);
   else if (def.kind === 'mods') buildModifierList(body, def.mods);
@@ -20746,6 +20758,9 @@ function openOptionPicker(type) {
 
       // In coop/battle mode, check if this instrument is taken by another player.
       var isTaken = false;
+      // Battle is guitar vs guitar, so both players may hold Guitar at once.
+      var battleLocked = playMode === 'battle' && inst.id !== 'guitar';
+      if (battleLocked) isTaken = true;
       if (inBandspace && playMode !== 'solo') {
         if (playMode !== 'battle' && instrumentAvailability[inst.id] === false) isTaken = true;
       }
@@ -20757,7 +20772,7 @@ function openOptionPicker(type) {
       // Header tile (image + label) — always rendered, identical role in both layouts.
       var header = document.createElement('div');
       header.className = 'instrument-picker__header';
-      var labelText = isTaken ? inst.label + ' (Taken)' : inst.label;
+      var labelText = isTaken ? inst.label + (battleLocked ? ' (Guitar Only)' : ' (Taken)') : inst.label;
       // Surface the Unity-owned tutorial flag on the tile so the state is
       // visible, not just implied by whether the prompt appears.
       var tutHint = '';
@@ -20837,6 +20852,7 @@ function openOptionPicker(type) {
     modTabs.id = 'mod-tabs';
     for (var mt = 0; mt < MODIFIER_TABS.length; mt++) {
       var tabDef = MODIFIER_TABS[mt];
+      if (tabDef.id === 'battle' && !isInternalUser) continue;
       var tabEl = document.createElement('div');
       tabEl.className = 'option-picker-tab' + (tabDef.id === modifierTab ? ' active' : '');
       tabEl.setAttribute('data-mod-tab', tabDef.id);
@@ -20924,6 +20940,8 @@ function buildSimplePickerChoices(panel, type, items, currentVal) {
 
     // In coop/battle mode, check instrument availability from network state
     var isTaken = false;
+    var battleLocked = type === 'instrument' && playMode === 'battle' && item.id !== 'guitar';
+    if (battleLocked) isTaken = true;
     if (type === 'instrument' && inBandspace && playMode === 'coop') {
       var avail = instrumentAvailability[item.id];
       // undefined means no tracking for this instrument (e.g. bass) — treat as available
@@ -20940,7 +20958,7 @@ function buildSimplePickerChoices(panel, type, items, currentVal) {
     }
 
     var descText = item.desc;
-    if (isTaken) descText = 'Taken by another player';
+    if (isTaken) descText = battleLocked ? 'Battle is guitar only' : 'Taken by another player';
 
     choice.innerHTML =
       '<div style="flex:1">' +

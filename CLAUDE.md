@@ -110,7 +110,8 @@ There are no tests, no linter, and no build step for `index.html` / `results.htm
 - The Play tab was rebranded to **Main Stage** (proscenium stage icon, cyan→purple attract glow). Internally most code still uses `play*` / `solo`/`coop` identifiers — only the user-facing label changed.
 - Modes are switched via `setPlayMode(mode)` which calls `buildPlayGrid()`:
   - **Solo** — always available (single player setlist). `playMode = 'solo'`.
-  - **Group** — only visible when `inBandspace === true`. `playMode = 'coop'` internally. There is no Battle mode anymore. Inside a bandspace, Solo is rendered greyed-out (still visible but disabled).
+  - **Battle** — internal users only (`isInternalUser`, pushed by Unity as `setInternalUser` from the PlayFab InternalUsers list). `playMode = 'battle'`; reuses `buildCoopGrid()` and locks the instrument picker to Guitar. The Battle tab of the Difficulty & Modifiers popup (incl. Solo Debuff Test) is hidden for non-internal users too.
+  - **Group** — only visible when `inBandspace === true`. `playMode = 'coop'` internally. Inside a bandspace, Solo is rendered greyed-out (still visible but disabled).
 - `buildPlayGrid()` dispatches to `buildSoloGrid()` (solo) or `buildCoopGrid()` (group lobby — see Group Lobby section below).
 - **Solo mode layout** (top to bottom): State-aware songs panel → unified 5-tile options row (Save/Load Setlist, Instrument, Difficulty, Experience, Apply to All) → Half-height Start button with `jamsesh-signature` texture and `playNudge` attract animation.
 - **Default setlist is empty** — `init()` calls `buildPlayPanel([])`. `generateDefaultSetlists()` exists but is no longer called automatically; preset Rock Classics / Chill Vibes / Party Mix / Throwbacks / Hot Hits entries are gone.
@@ -171,7 +172,7 @@ When Unity flips `inBandspace=true`, the Group tab becomes available and `buildC
 - Bottom button is **Ready** (not Start). Host tapping Ready fires `startGame`; client tapping Ready toggles their own pill via `playerReady`.
 - Songs side max = 9 (featured 2×2 + small tiles, transitioning to 3×3 at 7+). Players side max = 4 (the group member limit, `COOP_PLAYERS_MAX`).
 - Unity → WebView messages: `setInBandspace`, `updateIsHost`, `lobbyRoster` (canonical roster, max 4 — the group member limit), `sessionInProgress` (toggles late-join Spectate), `updateInstrumentAvailability`.
-- WebView → Unity messages: `playerReady {ready}`, `startGame {instrument, difficulty, setlist[]}`, `invitePlayer {name}`, `kickPlayer {name}`, `playMode "solo"|"coop"`.
+- WebView → Unity messages: `playerReady {ready}`, `startGame {instrument, difficulty, setlist[]}`, `invitePlayer {name}`, `kickPlayer {name}`, `playMode "solo"|"coop"|"battle"`.
 - All work happens on the `production` branch (the old `main` branch was merged in and deleted 2026-07-30). Production strips placeholder media and mock arrays: media paths in mock data are blank strings, and roster/friend fallbacks are empty stubs — real data always arrives from Unity over the bridge.
 
 ### Song Picker Grid
@@ -378,7 +379,7 @@ Frame variables: `--frame-color-1`, `--frame-color-2`.
 - **Canvas z-index**: The particle canvas is at `z-index: 0` with `pointer-events: none`. UI elements must remain above it.
 - **Null guard on removed elements**: If you remove an HTML element (e.g., `#season-grid`), any JS function that accesses it must add a null check (`if (!container) return;`), otherwise it crashes and blocks all subsequent JS execution in `init()`.
 - **Store grid needs songs loaded**: `buildStoreGrid()` must be called inside the XHR callback after `allSongs` is populated, not in the synchronous init block.
-- **Play grid mode switching**: `buildPlayGrid()` dynamically changes the `#play-grid` className between `play-grid--solo` and `play-grid--coop`. Solo mode hides static `.play-go-bar` and renders Start button dynamically. Group mode renders the lobby roster (see Group Lobby section). There is no Battle mode anymore.
+- **Play grid mode switching**: `buildPlayGrid()` dynamically changes the `#play-grid` className between `play-grid--solo` and `play-grid--coop`. Solo mode hides static `.play-go-bar` and renders Start button dynamically. Group and Battle modes render the lobby roster (see Group Lobby section); Battle is internal-only.
 - **`aspect-ratio` CSS not supported**: Chromium 91 does not support `aspect-ratio`. Use `padding-top: 100%` trick for 1:1 squares instead.
 - **Early access hides main UI**: `init()` hides topbar/navbar/pages on startup. `_showMainUI()` restores them after onboarding completes. If adding new init-time UI, ensure it handles the hidden state.
 - **Create popups use native keyboard**: Group name, space name, and save setlist inputs are standard `<input type="text">` — no on-screen keyboard. Don't add `readonly` to these inputs.
