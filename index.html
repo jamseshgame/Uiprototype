@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Jamsesh Guitar HUD VR</title>
+<meta name="robots" content="noindex">
+<style>
+  @font-face { font-family: "Gasoek One"; src: url(gasoek-one-latin.woff2) format("woff2"); }
+  @font-face { font-family: "Bebas Neue"; src: url(bebas-neue-latin.woff2) format("woff2"); }
+  @font-face { font-family: "Monda"; src: url(monda-latin.woff2) format("woff2"); font-weight: 400 700; }
+  :root {
+    --bg: #0A0816; --ink: #100C1F; --surf2: #261F49; --acid: #E8FF3A; --acid-lip: #9fb21f;
+    --magenta: #FF2E92; --lav: #B0A6DF; --text: #F4F1FF; --muted: #A79FCB; --line: rgba(255,255,255,.1);
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.55 "Monda", system-ui, sans-serif; }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 32px max(16px, env(safe-area-inset-right)) 48px max(16px, env(safe-area-inset-left)); display: grid; gap: 18px; }
+  .brand { font: 22px "Gasoek One", sans-serif; background: linear-gradient(90deg, var(--acid), var(--magenta)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  h1 { font: 400 clamp(44px, 8vw, 80px)/.95 "Bebas Neue", Impact, sans-serif; letter-spacing: .02em; margin: 0; }
+  p { margin: 0; color: var(--muted); max-width: 64ch; }
+  .row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; }
+  .seg { display: inline-flex; gap: 4px; padding: 4px; border-radius: 12px; background: var(--ink); border: 1px solid var(--line); }
+  .seg button { appearance: none; border: 0; cursor: pointer; padding: 9px 14px; border-radius: 9px; background: transparent; color: var(--muted); font: 700 14px "Monda", sans-serif; }
+  .seg button[aria-pressed="true"] { background: var(--surf2); color: var(--text); box-shadow: inset 0 0 0 1px rgba(255,255,255,.14); }
+  .vr { appearance: none; border: 0; cursor: pointer; border-radius: 14px; padding: 14px 26px 12px; font: 400 30px/1 "Bebas Neue", sans-serif; letter-spacing: .04em; color: var(--ink);
+    background: linear-gradient(180deg, rgba(255,255,255,.35), rgba(255,255,255,0) 50%), var(--acid);
+    box-shadow: inset 0 0 0 2px rgba(255,255,255,.4), inset 0 2px 0 rgba(255,255,255,.6), 0 6px 0 var(--acid-lip), 0 12px 22px rgba(0,0,0,.45); }
+  .vr:active { transform: translateY(5px); box-shadow: inset 0 0 0 2px rgba(255,255,255,.4), 0 1px 0 var(--acid-lip); }
+  .vr[disabled] { filter: grayscale(1); opacity: .5; cursor: default; }
+  button:focus-visible { outline: 3px solid #00E5C7; outline-offset: 3px; }
+  .stage { position: relative; aspect-ratio: 4 / 3; max-width: 100%; border-radius: 16px; overflow: hidden; background: #09070f; border: 1px solid var(--line); }
+  .stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .status { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 24px; color: var(--muted); }
+  .note { font-size: 14px; }
+  ul.how { margin: 0; padding-left: 20px; color: var(--muted); display: grid; gap: 4px; }
+  b { color: var(--text); }
+</style>
+<script type="importmap">{ "imports": { "three": "./three/build/three.module.js", "three/addons/": "./three/examples/jsm/" } }</script>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">JAMSESH</div>
+  <h1>Guitar HUD in VR</h1>
+  <p>The current in-song guitar HUD and two redesign options, at real size around you. Notes play on a loop and the frets press as each note lands, so you can judge the strike zone and press feedback in the headset.</p>
+  <div class="row">
+    <div class="seg" role="group" aria-label="Version" id="variants">
+      <button type="button" data-v="before" aria-pressed="true">Today</button>
+      <button type="button" data-v="polish" aria-pressed="false">Polish pass</button>
+      <button type="button" data-v="chunky" aria-pressed="false">Chunky 3D</button>
+    </div>
+    <button class="vr" id="enter" type="button" disabled>Enter VR</button>
+  </div>
+  <div class="stage" id="stage">
+    <canvas id="c" aria-label="Guitar HUD preview"></canvas>
+    <div class="status" id="status">Loading…</div>
+  </div>
+  <p class="note" id="xr-note">Checking for VR support…</p>
+  <ul class="how">
+    <li><b>Trigger</b> (either hand): next version — Today, Polish pass, Chunky 3D.</li>
+    <li><b>Grip</b>: re-centre, so the guitar sits at your hip and the highway runs ahead of you.</li>
+    <li>Stand up and face forward before pressing Enter VR. The guitar stays put rather than following your hands.</li>
+  </ul>
+</div>
+<script type="module">
+import * as THREE from 'three';
+import { createHudViewer } from './hud-scene.js';
+
+const VARIANTS = ['before', 'polish', 'chunky'];
+const NAMES = { before: 'Today', polish: 'Polish pass', chunky: 'Chunky 3D' };
+const canvas = document.getElementById('c');
+const stage = document.getElementById('stage');
+const status = document.getElementById('status');
+const enterBtn = document.getElementById('enter');
+const xrNote = document.getElementById('xr-note');
+
+await Promise.all([
+  document.fonts.load('120px "Gasoek One"'), document.fonts.load('italic 120px "Gasoek One"'),
+  document.fonts.load('100px "Bebas Neue"'), document.fonts.load('700 40px Monda'), document.fonts.load('400 40px Monda'),
+]).catch(() => {});
+const highway = await new THREE.TextureLoader().loadAsync('space1.jpg');
+highway.colorSpace = THREE.SRGBColorSpace;
+
+const viewer = createHudViewer(canvas, { highway }, { width: 960, height: 720, animate: true, xr: true });
+const renderer = viewer.renderer;
+renderer.xr.enabled = true;
+renderer.xr.setReferenceSpaceType('local-floor');
+renderer.xr.setFoveation(1);
+viewer.prepare(VARIANTS);
+
+// ---- in-VR label: current version + controls
+const panelCanvas = document.createElement('canvas');
+panelCanvas.width = 1000; panelCanvas.height = 420;
+const panelTex = new THREE.CanvasTexture(panelCanvas);
+panelTex.colorSpace = THREE.SRGBColorSpace;
+const panel = new THREE.Mesh(new THREE.PlaneGeometry(0.5, 0.21), new THREE.MeshBasicMaterial({ map: panelTex, transparent: true, toneMapped: false }));
+function drawPanel(v) {
+  const ctx = panelCanvas.getContext('2d'), w = panelCanvas.width, h = panelCanvas.height;
+  ctx.clearRect(0, 0, w, h);
+  ctx.beginPath(); ctx.roundRect(4, 4, w - 8, h - 8, 48); ctx.fillStyle = 'rgba(16,12,31,0.88)'; ctx.fill();
+  ctx.lineWidth = 5; ctx.strokeStyle = 'rgba(176,166,223,0.6)'; ctx.stroke();
+  ctx.fillStyle = 'rgba(248,248,252,0.6)'; ctx.font = '700 40px Monda'; ctx.fillText('GUITAR HUD  ·  ' + (VARIANTS.indexOf(v) + 1) + ' / ' + VARIANTS.length, 56, 88);
+  ctx.fillStyle = v === 'before' ? '#F4F1FF' : '#E8FF3A'; ctx.font = '170px "Bebas Neue"'; ctx.fillText(NAMES[v].toUpperCase(), 52, 250);
+  ctx.fillStyle = 'rgba(248,248,252,0.75)'; ctx.font = '700 36px Monda'; ctx.fillText('Trigger: next version     Grip: re-centre', 56, 350);
+  panelTex.needsUpdate = true;
+}
+
+// ---- controllers: short rays, trigger = next version, grip = re-centre
+const controllers = [0, 1].map((i) => {
+  const c = renderer.xr.getController(i);
+  const ray = new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, -0.25)]),
+    new THREE.LineBasicMaterial({ color: '#E8FF3A' }));
+  c.add(ray);
+  c.addEventListener('selectstart', () => setVariant(VARIANTS[(VARIANTS.indexOf(viewer.variant) + 1) % VARIANTS.length]));
+  c.addEventListener('squeezestart', () => recenter());
+  return c;
+});
+
+// ---- rig pose shared by all versions so switching keeps everything in place
+const rigPose = { pos: new THREE.Vector3(), rotY: 0 };
+function applyRig() {
+  for (const v of VARIANTS) {
+    const rig = viewer.sceneFor(v).userData.rig;
+    rig.position.copy(rigPose.pos); rig.rotation.set(0, rigPose.rotY, 0);
+  }
+}
+function resetRig() { rigPose.pos.set(0, 0, 0); rigPose.rotY = 0; applyRig(); }
+function recenter() {
+  const cam = renderer.xr.getCamera();
+  const p = new THREE.Vector3().setFromMatrixPosition(cam.matrixWorld);
+  const fwd = new THREE.Vector3(0, 0, -1).applyQuaternion(new THREE.Quaternion().setFromRotationMatrix(cam.matrixWorld));
+  fwd.y = 0;
+  if (fwd.lengthSq() < 1e-6) return;
+  fwd.normalize();
+  // authored with the player's head at (0, 1.62, 0) looking down +Z
+  rigPose.rotY = Math.atan2(fwd.x, fwd.z);
+  rigPose.pos.set(p.x, p.y - 1.62, p.z);
+  applyRig();
+}
+
+function setVariant(v) {
+  viewer.setVariant(v);
+  const scene = viewer.sceneFor(v);
+  controllers.forEach((c) => scene.add(c));
+  // label floats up and to the left of the highway, facing the player
+  scene.userData.rig.add(panel);
+  scene.userData.rig.updateMatrixWorld(true);
+  panel.position.set(0.72, 1.62, 1.45);
+  panel.lookAt(scene.userData.rig.localToWorld(new THREE.Vector3(0, 1.62, 0)));
+  drawPanel(v);
+  document.querySelectorAll('#variants button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.v === v)));
+}
+document.querySelectorAll('#variants button').forEach((b) => b.addEventListener('click', () => setVariant(b.dataset.v)));
+setVariant('before');
+
+// ---- sizing + loop
+function fit() { const r = stage.getBoundingClientRect(); if (!renderer.xr.isPresenting) viewer.setSize(Math.max(1, Math.round(r.width)), Math.max(1, Math.round(r.height))); }
+new ResizeObserver(fit).observe(stage); fit();
+const clock = new THREE.Clock();
+let framesInSession = -1;
+renderer.setAnimationLoop(() => {
+  const dt = Math.min(clock.getDelta(), 0.05);
+  viewer.update(dt);
+  if (renderer.xr.isPresenting && framesInSession >= 0 && ++framesInSession === 6) recenter();
+  viewer.render();
+});
+status.hidden = true;
+
+// ---- WebXR session
+let session = null;
+async function enterVR() {
+  if (session) { await session.end(); return; }
+  try {
+    session = await navigator.xr.requestSession('immersive-vr', { optionalFeatures: ['local-floor', 'bounded-floor'] });
+    session.addEventListener('end', () => { session = null; framesInSession = -1; resetRig(); enterBtn.textContent = 'Enter VR'; fit(); });
+    await renderer.xr.setSession(session);
+    framesInSession = 0;
+    enterBtn.textContent = 'Exit VR';
+  } catch (e) {
+    console.error(e);
+    xrNote.textContent = 'Couldn’t start VR: ' + e.message;
+    session = null;
+  }
+}
+enterBtn.addEventListener('click', enterVR);
+if (navigator.xr && await navigator.xr.isSessionSupported('immersive-vr').catch(() => false)) {
+  enterBtn.disabled = false;
+  xrNote.textContent = 'VR is available. Press Enter VR, then use the trigger to switch versions.';
+} else {
+  xrNote.textContent = 'Open this page in the Meta Quest Browser to view it in VR. Here you get the animated preview.';
+}
+</script>
+</body>
+</html>
