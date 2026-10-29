@@ -59,11 +59,11 @@ const CROSS_T = 0.10;         // crossLinePercent 0.9 => 10% of the lane before 
 const GEM_LIFT = 0.05;        // hitPointLocalY / spawnPointLocalY
 const GHOST_RAISE = 0.04;     // ghostGemDepressDistance
 
-function laneFrame(S, H) {
+function laneFrame(S, H, fretRight = FRET_RIGHT) {
   const along = S.clone().sub(H);                // hit -> spawn
   const len = along.length();
   const d = along.clone().divideScalar(len);
-  const right = FRET_RIGHT.clone().projectOnPlane(d).normalize();
+  const right = fretRight.clone().projectOnPlane(d).normalize();
   const normal = new THREE.Vector3().crossVectors(d, right).normalize();
   if (normal.y < 0) normal.negate();
   return {
@@ -336,7 +336,7 @@ function buildGuitar(scene) {
     const pu = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.07, 0.01), new THREE.MeshStandardMaterial({ color: '#111', roughness: 0.4 }));
     pu.position.set(x, 0, 0.03); g.add(pu);
   }
-  return g;
+  return outer;
 }
 
 // ---------------------------------------------------------------- gems
@@ -1268,11 +1268,97 @@ function stageScreen(scene) {
 }
 
 
+
+// ---------------------------------------------------------------- hand-held guitar (VR preview)
+// Like the game's anchored mode: spawn points stay fixed on the stage, the hit points ride on the
+// guitar frets. Every HUD mesh is bent in the vertex shader: a point at fraction t along the
+// highway (0 = neck, 1 = spawn) moves by (1 - t) of the neck's displacement at its position across
+// the highway (linear between the left and right neck edges, so StarLane/PowerLane follow too).
+const N_L0 = LANES[4].at(0, -LANE_W / 2, 0), N_R0 = LANES[0].at(0, LANE_W / 2, 0);
+const F_L0 = LANES[4].at(1, -LANE_W / 2, 0), F_R0 = LANES[0].at(1, LANE_W / 2, 0);
+const WARP = (() => {
+  const n0 = N_L0.clone().add(N_R0).multiplyScalar(0.5);
+  const a = F_L0.clone().add(F_R0).multiplyScalar(0.5).sub(n0);
+  const w = N_R0.clone().sub(N_L0);
+  return {
+    uRig: { value: new THREE.Matrix4() }, uRigInv: { value: new THREE.Matrix4() },
+    uN0: { value: n0 }, uA: { value: a }, uAinv: { value: 1 / a.lengthSq() }, uW: { value: w }, uWinv: { value: 1 / w.lengthSq() },
+    uDL: { value: new THREE.Vector3() }, uDR: { value: new THREE.Vector3() },
+  };
+})();
+const WARP_GLSL = `
+uniform mat4 uRig; uniform mat4 uRigInv; uniform vec3 uN0; uniform vec3 uA; uniform float uAinv;
+uniform vec3 uW; uniform float uWinv; uniform vec3 uDL; uniform vec3 uDR;
+vec3 hudWarp(vec3 wp) {
+  vec3 p = (uRigInv * vec4(wp, 1.0)).xyz;
+  vec3 r = p - uN0;
+  float tt = clamp(dot(r, uA) * uAinv, 0.0, 1.0);
+  float ss = dot(r, uW) * uWinv + 0.5;
+  p += (1.0 - tt) * mix(uDL, uDR, ss);
+  return (uRig * vec4(p, 1.0)).xyz;
+}
+`;
+const PROJECT_WARP = `
+vec4 mvPosition = vec4( transformed, 1.0 );
+vec4 hudWp = modelMatrix * mvPosition;
+hudWp.xyz = hudWarp( hudWp.xyz );
+mvPosition = viewMatrix * hudWp;
+gl_Position = projectionMatrix * mvPosition;
+`;
+function patchWarp(mat) {
+  if (!mat || mat.userData.hudWarp || mat.isLineMaterial) return;
+  mat.userData.hudWarp = true;
+  if (mat.isShaderMaterial) {
+    Object.assign(mat.uniforms, WARP);
+    mat.vertexShader = WARP_GLSL + mat.vertexShader.replace(
+      'gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);',
+      'vec4 hudWp = modelMatrix * vec4(position, 1.0); hudWp.xyz = hudWarp(hudWp.xyz); gl_Position = projectionMatrix * viewMatrix * hudWp;');
+  } else {
+    mat.onBeforeCompile = (shader) => {
+      Object.assign(shader.uniforms, WARP);
+      shader.vertexShader = WARP_GLSL + shader.vertexShader.replace('#include <project_vertex>', PROJECT_WARP);
+    };
+    mat.customProgramCacheKey = () => 'hudwarp';
+  }
+  mat.needsUpdate = true;
+}
+const REST_GZ_SIGN = Math.sign(new THREE.Vector3().crossVectors(FRET_RIGHT, GUP).dot(FACE)) || 1;
+// pose: null for the authored rest pose, or { pivot, neck, away } in rig space
+export function applyGuitarPose(scene, pose) {
+  let pivot = P0, neck = NECK, face = FACE, up = GUP;
+  if (pose) {
+    pivot = pose.pivot; neck = pose.neck.clone().normalize();
+    const vv = UPW.clone().projectOnPlane(neck);
+    if (vv.lengthSq() < 1e-6) vv.set(0, 0, 1).projectOnPlane(neck);
+    vv.normalize();
+    const f0 = new THREE.Vector3().crossVectors(neck, vv).normalize();
+    if (pose.away && f0.dot(pose.away) < 0) f0.negate();
+    face = f0.clone().multiplyScalar(Math.cos(TILT)).addScaledVector(vv, Math.sin(TILT)).normalize();
+    up = vv.clone().multiplyScalar(Math.cos(TILT)).addScaledVector(f0, -Math.sin(TILT)).normalize();
+  }
+  const right = neck.clone().negate();
+  const gz = new THREE.Vector3().crossVectors(right, up).normalize();
+  const outer = scene.userData.guitar;
+  if (outer) {
+    outer.position.copy(pivot);
+    outer.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(right, up, gz));
+    const inner = outer.children[0];
+    if (inner) inner.scale.z = gz.dot(face) < 0 ? -1 : 1;
+  }
+  const frames = FRET_D.map((d, i) => laneFrame(SPAWN[i], pivot.clone().addScaledVector(neck, d).addScaledVector(face, 0.035), right));
+  if (scene.userData.anim) scene.userData.anim.frames = pose ? frames : null;
+  WARP.uDL.value.copy(frames[4].at(0, -LANE_W / 2, 0)).sub(N_L0);
+  WARP.uDR.value.copy(frames[0].at(0, LANE_W / 2, 0)).sub(N_R0);
+  const rig = scene.userData.rig;
+  if (rig) { rig.updateMatrixWorld(true); WARP.uRig.value.copy(rig.matrixWorld); WARP.uRigInv.value.copy(rig.matrixWorld).invert(); }
+}
+
 // ---------------------------------------------------------------- animation step (VR preview)
 const NOTE_SPEED = 0.42;   // lane fraction per second: about 2.1 s from spawn to the strike point
 const HOLD_TIME = 0.22;    // how long a fret reads as held after a note is hit
 export function updateHud(anim, dt) {
   if (!anim) return;
+  const frames = anim.frames || LANES;
   const held = anim.held || (anim.held = [0, 0, 0, 0, 0]);
   for (let f = 0; f < 5; f++) held[f] = Math.max(0, held[f] - dt);
   for (const n of anim.notes) {
@@ -1282,14 +1368,14 @@ export function updateHud(anim, dt) {
     if (n.t < CROSS_T) n.t += 1.65;                              // recycle behind the spawn
     const vis = n.t <= 1.0;
     n.obj.visible = vis;
-    if (vis) { n.obj.position.copy(LANES[n.f].at(n.t, 0, GEM_LIFT)); n.obj.rotation.y += dt * 1.4; }
+    if (vis) { n.obj.position.copy(frames[n.f].at(n.t, 0, GEM_LIFT)); n.obj.rotation.y += dt * 1.4; }
   }
   for (const g of anim.ghosts) {
     const h = GEM_LIFT + (held[g.f] > 0 ? 0 : GHOST_RAISE);
-    const target = LANES[g.f].at(CROSS_T, 0, h);
+    const target = frames[g.f].at(CROSS_T, 0, h);
     g.obj.position.lerp(target, Math.min(1, dt * 20));
   }
-  for (const h of anim.halos) h.obj.visible = held[h.f] > 0;
+  for (const h of anim.halos) { h.obj.visible = held[h.f] > 0; if (h.obj.visible) placeOnLane(h.obj, frames[h.f], CROSS_T, 0.005); }
   for (const l of anim.lanes) {
     const u = l.mat.uniforms;
     u.uvOffset.value.y = (u.uvOffset.value.y - dt * 0.9) % 9;
@@ -1324,11 +1410,20 @@ export function createHudViewer(canvas, assets, opts = {}) {
     const key = new THREE.DirectionalLight('#ffffff', 1.1); key.position.set(1.5, 4, -1.5); scene.add(key);
     const rim = new THREE.DirectionalLight('#ff4fa8', 0.3); rim.position.set(-3, 2, 5); scene.add(rim);
     buildEnvironment(scene);
-    buildGuitar(scene);
+    scene.userData.guitar = buildGuitar(scene);
+    const hudStart = scene.children.length;
     if (variant === 'before') buildBefore(scene, assets, res);
     else if (variant === 'polish') buildPolish(scene, assets, res);
     else if (variant === 'air') buildAir(scene, assets, res);
     else buildChunky(scene, assets, res, variant);
+    if (opts.handTrack && CUR) {
+      // everything the variant built bends with the guitar, except the pieces updateHud places itself
+      const placed = new Set([...CUR.notes, ...CUR.ghosts, ...CUR.halos].map((e) => e.obj));
+      scene.children.slice(hudStart).forEach((o) => {
+        if (placed.has(o)) return;
+        o.traverse((m) => { if (m.isMesh && m.material) (Array.isArray(m.material) ? m.material : [m.material]).forEach(patchWarp); });
+      });
+    }
     scene.traverse((o) => { if (o.material && o.material.isLineMaterial) lineMats.push(o.material); });
     scene.userData.anim = CUR; CUR = null;
     if (opts.xr) {
@@ -1385,6 +1480,7 @@ export function createHudViewer(canvas, assets, opts = {}) {
     sceneFor,
     get variant() { return state.variant; },
     update(dt) { updateHud(sceneFor(state.variant).userData.anim, dt); },
+    setGuitarPose(pose) { applyGuitarPose(sceneFor(state.variant), pose); },
   };
   api.setSize(res.x, res.y);
   return api;

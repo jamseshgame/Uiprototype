@@ -60,8 +60,9 @@
   <p class="note" id="xr-note">Checking for VR support…</p>
   <ul class="how">
     <li><b>Trigger</b> (either hand): next version — Today, Polish pass, Chunky 3D.</li>
-    <li><b>Grip</b>: re-centre, so the guitar sits at your hip and the highway runs ahead of you.</li>
-    <li>Stand up and face forward before pressing Enter VR. The guitar stays put rather than following your hands.</li>
+    <li><b>Hold the controllers like a guitar</b>: right hand at the body, left hand up the neck. The guitar and the near end of the highway follow your hands, while the far end stays fixed on the stage, as in the game.</li>
+    <li><b>Grip</b>: re-centre the stage so the highway runs straight ahead of you.</li>
+    <li>Stand up and face forward before pressing Enter VR.</li>
   </ul>
 </div>
 <script type="module">
@@ -83,7 +84,7 @@ await Promise.all([
 const highway = await new THREE.TextureLoader().loadAsync('space1.jpg');
 highway.colorSpace = THREE.SRGBColorSpace;
 
-const viewer = createHudViewer(canvas, { highway }, { width: 960, height: 720, animate: true, xr: true });
+const viewer = createHudViewer(canvas, { highway }, { width: 960, height: 720, animate: true, xr: true, handTrack: true });
 const renderer = viewer.renderer;
 renderer.xr.enabled = true;
 renderer.xr.setReferenceSpaceType('local-floor');
@@ -117,6 +118,42 @@ const controllers = [0, 1].map((i) => {
   c.addEventListener('squeezestart', () => recenter());
   return c;
 });
+
+// ---- hand-held guitar: right grip = body, neck aimed at the left grip
+const grips = [0, 1].map((i) => {
+  const g = renderer.xr.getControllerGrip(i);
+  g.userData.hand = null;
+  g.addEventListener('connected', (e) => { g.userData.hand = e.data && e.data.handedness; });
+  g.addEventListener('disconnected', () => { g.userData.hand = null; });
+  return g;
+});
+const held = { pivot: null, neck: null };
+let lastPose = null;
+function updateGuitarPose(dt) {
+  if (!renderer.xr.isPresenting) { lastPose = null; held.pivot = null; viewer.setGuitarPose(null); return; }
+  let L = null, R = null;
+  for (const g of grips) {
+    if (!g.visible) continue;
+    if (g.userData.hand === 'left') L = g.position; else if (g.userData.hand === 'right') R = g.position;
+  }
+  if (L && R) {
+    const rig = viewer.sceneFor(viewer.variant).userData.rig;
+    rig.updateMatrixWorld(true);
+    const Rl = rig.worldToLocal(R.clone()), Ll = rig.worldToLocal(L.clone());
+    const neck = Ll.clone().sub(Rl);
+    if (neck.length() > 0.12) {
+      neck.normalize();
+      const pivot = Rl.clone().addScaledVector(neck, 0.08); // strumming hand sits just behind the neck joint
+      const k = 1 - Math.exp(-dt * 22);
+      if (!held.pivot) { held.pivot = pivot; held.neck = neck; }
+      else { held.pivot.lerp(pivot, k); held.neck.lerp(neck, k).normalize(); }
+      const head = rig.worldToLocal(new THREE.Vector3().setFromMatrixPosition(renderer.xr.getCamera().matrixWorld));
+      const away = held.pivot.clone().sub(head); away.y = 0;
+      lastPose = { pivot: held.pivot, neck: held.neck, away: away.lengthSq() > 1e-6 ? away.normalize() : new THREE.Vector3(0, 0, 1) };
+    }
+  }
+  viewer.setGuitarPose(lastPose); // keeps the last pose if tracking drops for a moment
+}
 
 // ---- rig pose shared by all versions so switching keeps everything in place
 const rigPose = { pos: new THREE.Vector3(), rotY: 0 };
@@ -162,8 +199,9 @@ const clock = new THREE.Clock();
 let framesInSession = -1;
 renderer.setAnimationLoop(() => {
   const dt = Math.min(clock.getDelta(), 0.05);
-  viewer.update(dt);
   if (renderer.xr.isPresenting && framesInSession >= 0 && ++framesInSession === 6) recenter();
+  updateGuitarPose(dt);
+  viewer.update(dt);
   viewer.render();
 });
 status.hidden = true;
