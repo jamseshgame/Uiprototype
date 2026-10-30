@@ -48,7 +48,11 @@ pushes it via the Vuplex bridge.
 | `updateInstrumentAvailability` | `{ guitar, drums, vocals }` | Greys out instruments already claimed in the bandspace picker. Unchanged. |
 | `updateGroups` | `Array<group>` | The player's bands (shown on Bandmates ▸ Groups). The **active** band's roster auto-populates the Perform ▸ Group lobby (logo + name header + member list). |
 | `setActiveGroup` | `string` (group `id` or `name`) | Switch the active band. The web side repaints the Bandmates tiles + the Perform group lobby immediately. |
-| `updateFriends` | `Array<{ name, avatar, online, accepted?, meta?, playing?, requested? }>` | The player's friends + Meta-graph contacts (Bandmates ▸ Friends list). The web side derives a status from the flags, **sorts by status priority**, and renders a coloured pill per friend — see *Friends list — statuses, ordering & pills* below. |
+| `updateFriends` | `Array<{ name, oculusId, platformId, avatar, online, playing, accepted:true }>` | Meta friends who **own Jamsesh** (Bandmates ▸ Friends, left column; also the Create Group / Create Space invite pickers). Sent once Meta has answered — `[]` means "none", not "loading". See *Friends page* below. |
+| `updateInvitableFriends` | `Array<{ name, oculusId, platformId, avatar, online }>` | People the player can **invite to download Jamsesh** (Bandmates ▸ Friends, right column). |
+| `appInviteResult` | `{ platformId, ok, error }` | Reply to `inviteFriendToApp`. `ok:false` resets the row and shows an "Invite Not Sent" popup. |
+| `appInvitePanelResult` | `{ ok:false, error }` | Sent only when Quest's invite panel (`openAppInvitePanel`) couldn't open; the web side shows an "Invite List Unavailable" popup. |
+| `friendRequestResult` | `{ platformId, sent }` | Reply to `sendFriendRequest` (Meta follow-request dialog). `sent:false` = cancelled/failed; the button resets. |
 
 **Group shape** (`updateGroups`):
 ```
@@ -61,41 +65,35 @@ member = { name, avatar, instrument, difficulty, ready, online }
 
 Outside a live `setInBandspace` session, the **Perform ▸ Group** lobby is driven by the player's **active band** (not `lobbyPlayers`): `getCoopRoster()` returns the active band's `members`, the web side injects the local player at the top (YOU badge), and renders the band logo + name as a header above the list. Switching the active band — via a Bandmates tile tap (`joinGroup` → local `applyActiveGroup`) or `setActiveGroup` — repopulates the lobby. Inside a live bandspace (`setInBandspace:true`), `lobbyRoster`/`lobbyPlayers` still take over as before.
 
-### Friends list — statuses, ordering & pills (`updateFriends`)
+### Friends page (Bandmates ▸ Friends)
 
-Bandmates has two people tabs fed by the **same** `updateFriends` array, split by `accepted`:
-- **Friends** — `accepted === true` (your added friends).
-- **Add Friends** — everyone else (Meta-graph contacts not yet added, pending requests, non-Meta players). Tapping one opens the Add-Friend popup → **Send Friend Invite**. (In the popup, an already-accepted friend shows a disabled `Friends` button instead.)
+Two side-by-side columns, both pushed by Unity from Meta. **No mock people on the headset**: until
+Unity answers, each column shows "Loading…"; an empty push shows an empty state.
 
-Each is sorted by status priority and paginated 10/page (2×5) independently.
+**Left — On Jamsesh** (`updateFriends`): Meta mutual followers who own Jamsesh
+(`Users.GetLoggedInUserFriends`). Every entry is `accepted:true`. Sorted by status, 5 per page:
 
-Each friend object carries four booleans the web side uses to derive a **status**:
+| Status | Pill |
+|---|---|
+| `online` + `playing` (their Meta presence is in Jamsesh) | `Playing Jamsesh` (teal) |
+| `online` | `Online` (green) |
+| otherwise | `Offline` (grey) |
 
-```
-friend = { name, avatar, online, accepted?, meta?, playing?, requested? }
-```
-- `accepted` — an added/confirmed friend (vs. a Meta-graph suggestion).
-- `meta` — a Meta/Quest social-graph friend.
-- `online` — currently online.
-- `playing` — currently in a Jamsesh session (alias `playingJamsesh`).
-- `requested` — the player has a **pending** outgoing friend request to them. (The web side also sets this locally after the in-app **Send Friend Invite** → `sendFriendRequest { name }`.)
+Tapping a friend opens an info popup (no Remove — Meta gives apps no unfollow API).
 
-The list is **sorted by the web side** (`friendStatus()` in `buildSocialPage`) by this priority, then paginated 10 per page (2×5). Each status renders a coloured **pill** next to the presence dot:
+**Right — Invite to Jamsesh** (`updateInvitableFriends`): Meta's invitable users
+(`GroupPresence.GetInvitableUsers` — mutual followers + recently met) minus the left column. 4 per
+page plus a last row **+ Invite more from Quest** → `openAppInvitePanel {}` (Meta's own invite
+panel). Tapping a person → popup → **Send Invite** → `inviteFriendToApp { platformId, name }`; the
+row shows `Sending…` then `Invited` on `appInviteResult { ok:true }`. Unity also records a pending
+referral for each invitee, so the inviter is credited if they install.
 
-| # | Status condition | Pill label | Pill colour |
-|---|---|---|---|
-| 1 | accepted + online + **playing Jamsesh** | `Playing Jamsesh` | teal `#00E5C7` |
-| 2 | accepted + online (not playing) | `Online` | green `#00FF78` |
-| 3 | friend **requested** (pending) | `Request Sent` | amber `#FACC15` |
-| 4 | Meta friend (not added) + online + **playing** | `Meta · Playing` | cyan `#5BE0FF` |
-| 5 | Meta friend (not added) + online (not playing) | `Meta Friend` | blue `#6AA0FF` |
-| 6 | non-Meta + online + **playing** | `Playing Now` | lavender `#B0A6DF` |
-| — | anything else (offline / other) | `Offline` (or `Meta Friend` if a Meta contact) | grey / blue |
+> Unconfirmed on device: whether Meta's invitable list includes friends who **don't** own Jamsesh.
+> Unity logs both lists at launch under `[FRIENDS-DIAG]`.
 
-Notes:
-- Ties within a tier keep a **stable** order (push pre-sorted secondary — alphabetical/recency — so the list doesn't reshuffle each refresh).
-- `online` still drives the green/grey presence dot; the pill is the richer status.
-- Tapping a friend opens the Add-Friend popup (avatar + online status + **Send Friend Invite** → `sendFriendRequest { name }`), after which their row shows the `Request Sent` pill.
+**Member popup ▸ Add Friend**: for a lobby member with a `platformId` who isn't in `updateFriends`
+(and isn't you), the Group Member popup shows **Add Friend** → `sendFriendRequest { platformId, name }`,
+which opens Meta's follow-request dialog; `friendRequestResult { sent }` flips it to `Request Sent`.
 
 > On a fresh start the player is in **no group** — `bandGroups` is empty, the
 > Groups tab shows only "Create New Group", `getActiveBand()` returns `null`, and

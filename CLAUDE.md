@@ -256,7 +256,7 @@ When Unity flips `inBandspace=true`, the Group tab becomes available and `buildC
 - **Tutorial Gameplay** (`#screen-tutorial-1`, `#screen-tutorial-2`): Screenshot walkthrough with caption overlays
 
 ### Social & Spaces Builders
-- `buildSocialPage()` renders the Groups tab (3x3 grid with "Create New" tile + 7 sample groups) and Friends tab (list with online/offline status + "Add Friend" button)
+- `buildSocialPage()` renders the Groups tab (grid with "Create New" tile + the player's bands) and the Friends tab: two columns — **On Jamsesh** (`getFriendsData()`, Unity `updateFriends`) and **Invite to Jamsesh** (`getInvitableData()`, Unity `updateInvitableFriends`, + "Invite more from Quest" row). On the headset (`window.vuplex`) there is no mock fallback; the mock rosters are desktop-preview only. Contract: `HANDOVER.md` ▸ *Friends page*.
 - `buildSpacesGrid()` renders Public tab (3x3 grid with "Create New" tile + 8 sample hubs) and Private tab ("Create New" tile + 3 preset spaces)
 - Both "Create New" tiles use dashed borders and `+` icons styled with `.create-new-tile`
 

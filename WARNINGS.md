@@ -50,7 +50,8 @@ Renaming or removing any of these **breaks the matching feature**. Grouped by ar
 
 **Bands / social:** `enterBandspace` · `joinGroup` · `joinHub` · `viewGroup` · `createGroup` ·
 `inviteToGroup` · `acceptGroupInvite` · `declineGroupInvite` · `renameGroup` · `invitePlayer` ·
-`referFriend`
+`referFriend` · `inviteFriendToApp {platformId,name}` · `openAppInvitePanel` ·
+`sendFriendRequest {platformId,name}`
 
 **Store / economy:** `purchaseItem` · `equipItem` · `storeBuyPack`
 
@@ -92,7 +93,6 @@ skin tabs `guitarSkin`/`drumSkin` (these were silently dropped by a reskin — s
 Each is parked pending the backend/feature in *italics*. The payload shown is what the future handler
 will be written against:
 
-- `sendFriendRequest {name}` · `removeFriend {name}` — *no in-app friend graph exists (friends are Meta-only).*
 - `inviteToSpace {name}` · `createSpace {name,type,env,forGroup}` · `deleteSpace {name,forGroup}` — *no "spaces" backend exists.*
 - `songSpace songIdx:catId:optId` · `loadout idx:catId:optId` — per-song env / loadout. *No per-song apply system (per-song settings currently collapse to session-level).*
 - `themeChanged` · `themePurchased` · `bannerChanged` · `bannerPurchased` · `frameChanged` · `framePurchased` `<id>` — *cosmetic persistence + economy; uses a MOCK "Coins" currency (NOT the real Picks/JC), hardcoded unlocks, no persistence.*
@@ -116,7 +116,8 @@ will be written against:
 The game pushes these to the UI; if the UI drops the matching `case`, the game's update is ignored:
 
 `updateProfile` · `updateProgression` · `updateXp` · `updatePicks` · `updateOwnedItems` ·
-`updateFriends` · `updateGroups` · `updateLobby` · `updateIsHost` · `setInBandspace` ·
+`updateFriends` · `updateInvitableFriends` · `appInviteResult` · `appInvitePanelResult` · `friendRequestResult` ·
+`updateGroups` · `updateLobby` · `updateIsHost` · `setInBandspace` ·
 `sessionInProgress` · `setCurrentSpace` · `groupInvite` · `updateSongs` · `hostSetlistUpdated` ·
 `updateClientInfo` · `updateChallenges` · `updateReferralCode` · `updateReferralCount` ·
 `updateReferralList` · `gameResults` · `gameResultsGroupScore` · `gameResultsLeaderboard` ·
