@@ -12883,10 +12883,26 @@ function updateLobbyFromBackend(data) {
 }
 
 function updateHubsFromBackend(data) {
-  // data: [{name,count,img}, ...]
-  if (!data) return;
+  // data: [{name, count:"N/8"|null, img}, ...] — live open-lobby occupancy from Unity.
+  // Backend hubs win: matching spaceHubs entries take the backend count/img (count null →
+  // "—"), unknown hubs are added. Local entries (e.g. a demo-created public space) stay.
+  if (!data || !data.length) return;
   window._backendHubs = data;
+  for (var i = 0; i < data.length; i++) {
+    var bh = data[i];
+    if (!bh || !bh.name) continue;
+    var found = null;
+    for (var j = 0; j < spaceHubs.length; j++) { if (spaceHubs[j].name === bh.name) { found = spaceHubs[j]; break; } }
+    if (!found) { found = { name: bh.name }; spaceHubs.push(found); }
+    found.count = bh.count || null;
+    if (bh.img) found.img = bh.img;
+  }
   buildSpacesGrid();
+}
+
+// "N/8 Jammers" caption for a hub; "— Jammers" until Unity's updateHubs supplies a count.
+function hubCountText(hub) {
+  return (hub && hub.count) ? hub.count : '\u2014';
 }
 
 function updateCoinsFromBackend(data) {
@@ -14112,10 +14128,10 @@ function openSpaceSwitchConfirm(hub) {
   var joinPersonal = !!(hub.isDefault || hub.tagline);
   document.getElementById('space-swap-row').innerHTML =
     groupSwapTile('Current', 'var(--text-muted)', curImg, currentHub,
-      curPersonal ? 'You only' : (current ? current.count : ''), curPersonal ? '' : 'Jammers') +
+      curPersonal ? 'You only' : (current ? hubCountText(current) : ''), curPersonal ? '' : 'Jammers') +
     '<svg viewBox="0 0 24 24" style="width:72px;height:72px;flex:0 0 auto;fill:var(--mint);margin-top:240px" aria-hidden="true"><path d="M4 11h12.17l-5.59-5.59L12 4l8 8-8 8-1.41-1.41L16.17 13H4z"/></svg>' +
     groupSwapTile('Joining', 'var(--mint)', hub.img, hub.name,
-      joinPersonal ? 'You only' : hub.count, joinPersonal ? '' : 'Jammers');
+      joinPersonal ? 'You only' : hubCountText(hub), joinPersonal ? '' : 'Jammers');
   document.getElementById('space-switch-msg').textContent = '';
   document.getElementById('space-switch-confirm-btn').textContent = 'Switch';
   document.getElementById('space-switch-overlay').classList.add('active');
@@ -14163,8 +14179,10 @@ function ensureDefaultPrivateSpace() {
   privateSpaces.push({ name: (me && me.name ? me.name : 'My') + "'s Private Space", img: hubImg, tagline: 'A space just for you', isDefault: true });
 }
 var _pendingSwitchHub = null;
+// count comes from Unity (updateHubs, the live open-lobby shard). The desktop demo gets a
+// sample value; the headset shows "—" until real data arrives.
 var spaceHubs = [
-  { name: 'Jamsesh Hub', count: '8/25', img: 'spaces/social.png' }
+  { name: 'Jamsesh Hub', count: window.vuplex ? null : '3/8', img: 'spaces/social.png' }
 ];
 
 function buildSpacesGrid() {
@@ -14217,7 +14235,7 @@ function makeSpaceTile(sp) {
   // is set solely by Unity, so an un-honored space can't strand a false badge.
   var here = (!inBandspace && sp.name === currentHub)
     ? '<div class="space-here-badge">You Are Here</div>' : '';
-  var sub = sp.tagline ? sp.tagline : (sp.count + ' Jammers');
+  var sub = sp.tagline ? sp.tagline : (hubCountText(sp) + ' Jammers');
   tile.innerHTML = here +
     '<div class="quest-fade"></div>' +
     '<div class="quest-caption">' +
