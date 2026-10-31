@@ -7499,6 +7499,19 @@
     line-height: 1;
     color: #ffffff;
   }
+  /* Shown in place of the code when Unity reports the share code couldn't be fetched. */
+  .referral-code-retry {
+    display: none;
+    font-size: 22px;
+    font-weight: 700;
+    padding: 8px 22px;
+    border: 2px solid rgba(255,255,255,0.6);
+    border-radius: 999px;
+    background: transparent;
+    color: #ffffff;
+    cursor: pointer;
+  }
+  .referral-code-retry.active { display: inline-block; }
   /* Reward summary line: pick asset + Send/Join amounts + help button.
      The full explainer lives in the referral help popup. */
   .referral-rewards-line {
@@ -11431,7 +11444,8 @@ input, textarea, select {
         <div class="referral-head">
           <div class="referral-code-chip">
             <span class="referral-code-tag">Your Code</span>
-            <span class="referral-code" id="referral-code">J4M-53SH</span>
+            <span class="referral-code" id="referral-code">&mdash;</span>
+            <button class="referral-code-retry" id="referral-code-retry" onclick="retryReferralCode()">Retry</button>
           </div>
           <button class="referral-enter-code-btn" id="referral-enter-code-btn" onclick="openReferralCodePopup()">Enter a Friend's Code</button>
           <div class="referral-rewards-line">
@@ -12051,7 +12065,7 @@ input, textarea, select {
     <div class="std-popup-header"><h2>Enter Referral Code</h2></div>
     <div class="std-popup-body" style="justify-content:center">
       <div class="referral-code-popup-sub">Got a code from a friend? Enter it below &mdash; you <b>both</b> earn <b><span id="referral-code-popup-reward">500</span> Picks</b> when you finish your first jam.</div>
-      <input class="save-input" id="referral-code-input" type="text" maxlength="12" placeholder="e.g. J4M-53SH" inputmode="none" onclick="requestKeyboardForInput('referral-code-input')">
+      <input class="save-input" id="referral-code-input" type="text" maxlength="12" placeholder="e.g. ABC123" inputmode="none" onclick="requestKeyboardForInput('referral-code-input')">
       <div class="referral-code-error" id="referral-code-error"></div>
     </div>
     <div class="std-popup-footer">
@@ -22627,16 +22641,26 @@ function showReferralsSection() {
 // track referral counts, not the badge's own unlock condition.
 // Every tier carries a progress object so all tiles share the same layout: a
 // bottom-pinned bar + status label (Completed / X of Y referrals / Not started).
+// earned/progress are derived from myReferralCount (pushed by Unity as updateReferralCount)
+// against each tier's threshold — see deriveReferralTiers().
 var REFERRAL_BADGES = [
-  { name: 'Recruiter',     hint: 'Refer 1 friend who plays Jamsesh',   earned: true,
-    progress: { pct: 100, label: 'Completed' } },
-  { name: 'Band Together', hint: 'Refer 2 friends who play Jamsesh',   earned: false,
-    progress: { pct: 50,  label: '1 of 2 referrals' } },
-  { name: 'Full Lineup',   hint: 'Refer 5 friends who play Jamsesh',   earned: false,
-    progress: { pct: 0,   label: 'Not started' } },
-  { name: 'Top Promoter',  hint: 'Refer 10 friends who play Jamsesh',  earned: false,
-    progress: { pct: 0,   label: 'Not started' } }
+  { name: 'Recruiter',     hint: 'Refer 1 friend who plays Jamsesh',   threshold: 1 },
+  { name: 'Band Together', hint: 'Refer 2 friends who play Jamsesh',   threshold: 2 },
+  { name: 'Full Lineup',   hint: 'Refer 5 friends who play Jamsesh',   threshold: 5 },
+  { name: 'Top Promoter',  hint: 'Refer 10 friends who play Jamsesh',  threshold: 10 }
 ];
+
+function deriveReferralTiers() {
+  var n = myReferralCount || 0;
+  for (var i = 0; i < REFERRAL_BADGES.length; i++) {
+    var tier = REFERRAL_BADGES[i];
+    var have = Math.min(n, tier.threshold);
+    tier.earned = n >= tier.threshold;
+    tier.progress = tier.earned ? { pct: 100, label: 'Completed' }
+      : have > 0 ? { pct: Math.round(have * 100 / tier.threshold), label: have + ' of ' + tier.threshold + ' referrals' }
+      : { pct: 0, label: 'Not started' };
+  }
+}
 
 // ── Referral reward amounts ──
 // Display defaults for desktop testing. PlayFab-tunable: Unity pushes
@@ -22653,15 +22677,37 @@ function updateReferralRewards(data) {
   renderReferralRewards();
 }
 
-// Unity pushes the player's real 6-char share code ({type:'updateReferralCode', data:{code}}),
-// replacing the mock. We store it and stamp the displayed code element if it's on screen.
+// Unity pushes the player's real 6-char share code ({type:'updateReferralCode', data:{code, canRedeem}}).
+// Until it arrives the chip shows "—". If the fetch fails Unity sends {code:null, error} and the
+// chip offers a Retry, which re-sends referralsOpened (Unity re-fetches the code).
 function updateReferralCodeFromBackend(data) {
-  if (!data || !data.code) return;
-  referralCode = data.code;
-  var el = document.getElementById('referral-code');
-  if (el) el.textContent = referralCode;
+  if (!data) return;
+  if (data.code) {
+    referralCode = data.code;
+    referralCodeError = null;
+  } else if (data.error) {
+    referralCodeError = data.error;
+  }
   if (typeof data.canRedeem === 'boolean') myCanRedeemCode = data.canRedeem;
+  renderReferralCode();
   updateReferralCodeBtn();
+}
+
+function renderReferralCode() {
+  var el = document.getElementById('referral-code');
+  var retry = document.getElementById('referral-code-retry');
+  var failed = !referralCode && !!referralCodeError;
+  if (el) {
+    el.textContent = referralCode || '\u2014';
+    el.style.display = failed ? 'none' : '';
+  }
+  if (retry) retry.className = 'referral-code-retry' + (failed ? ' active' : '');
+}
+
+function retryReferralCode() {
+  referralCodeError = null;
+  renderReferralCode();
+  sendToUnity('referralsOpened', {});
 }
 
 // Unity pushes the player's confirmed referral count ({type:'updateReferralCount', data:{count}}).
@@ -22671,6 +22717,7 @@ function updateReferralCountFromBackend(data) {
   myReferralCount = data.count;
   var el = document.getElementById('referral-count');
   if (el) el.textContent = myReferralCount.toLocaleString();
+  buildReferralTiers();
 }
 
 // Unity pushes the list of people who used the player's code / they referred (real referrals).
@@ -22717,7 +22764,8 @@ function closeReferralHelpPopup(e) {
 // 'complete'/'sent' pills — state is driven by the real refer action (and later by backend
 // per-friend status, if/when that's added). Tapping a friend fires referFriend → CreatePendingReferral.
 var referralStates = {};
-var referralCode = 'J4M-53SH';   // mock fallback; Unity pushes the player's real code via updateReferralCode
+var referralCode = '';           // empty ("—") until Unity pushes the player's real code via updateReferralCode
+var referralCodeError = null;    // set when Unity reports the code fetch failed ({code:null, error})
 var myReferralCount = 0;         // confirmed referrals; Unity pushes via updateReferralCount
 var myCanRedeemCode = true;      // Unity pushes this on updateReferralCode: account <=1 day old OR internal user
 var enteredReferralCode = '';    // friend's code this player redeemed (Unity validates for real)
@@ -22740,7 +22788,7 @@ function confirmReferralCode() {
   var code = document.getElementById('referral-code-input').value.replace(/\s+/g, '').toUpperCase();
   var errEl = document.getElementById('referral-code-error');
   if (!code) { errEl.textContent = 'Please enter a code.'; return; }
-  if (code === referralCode.toUpperCase()) { errEl.textContent = 'That\'s your own code — ask a friend for theirs!'; return; }
+  if (referralCode && code === referralCode.toUpperCase()) { errEl.textContent = 'That\'s your own code — ask a friend for theirs!'; return; }
   enteredReferralCode = code;
   sendToUnity('referralCodeEntered', { code: code });
   document.getElementById('referral-code-overlay').className = 'referral-code-overlay';
@@ -22768,10 +22816,11 @@ var referralFriendsPage = 0;
 var REFERRAL_FRIENDS_PER_PAGE = 10;
 
 function buildReferralsSection() {
-  var codeEl = document.getElementById('referral-code');
-  if (codeEl) codeEl.textContent = referralCode;
+  renderReferralCode();
   updateReferralCodeBtn();
   renderReferralRewards();
+  // Tier band first: the empty-list branch below returns early.
+  buildReferralTiers();
 
   // ── Your referrals: people who used your code / you referred (paginated, read-only) ──
   // Populated by Unity via updateReferralList (window._myReferrals). The reward is granted
@@ -22816,9 +22865,13 @@ function buildReferralsSection() {
     referralFriendsPage += dir;
     buildReferralsSection();
   });
+}
 
-  // ── Badge band (Badges screen entries with referral-tier hints) ──
+// ── Badge band (Badges screen entries with referral-tier hints) ──
+function buildReferralTiers() {
   var band = document.getElementById('referral-tiers');
+  if (!band) return;
+  deriveReferralTiers();
   band.innerHTML = '';
   for (var t = 0; t < REFERRAL_BADGES.length; t++) {
     for (var j = 0; j < badgeData.length; j++) {
@@ -25111,10 +25164,7 @@ function parseMode() {
   // unlocks all cosmetics so locked themes/banners/frames preview as owned.
   if ('unlockAll' in map) {
     for (var _ua = 0; _ua < badgeData.length; _ua++) badgeData[_ua].earned = true;
-    for (var _ur = 0; _ur < REFERRAL_BADGES.length; _ur++) {
-      REFERRAL_BADGES[_ur].earned = true;
-      delete REFERRAL_BADGES[_ur].progress;
-    }
+    myReferralCount = REFERRAL_BADGES[REFERRAL_BADGES.length - 1].threshold;
     for (var _ut = 0; _ut < themes.length; _ut++) unlockedThemes.push(themes[_ut].id);
     for (var _ub = 0; _ub < banners.length; _ub++) unlockedBanners.push(banners[_ub].id);
     for (var _uf = 0; _uf < frames.length; _uf++) unlockedFrames.push(frames[_uf].id);

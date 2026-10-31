@@ -144,6 +144,10 @@ Changing these payload shapes breaks the feature even if the message name is unc
   `invited` entries need `platformId` or those create-time invites are silently dropped.
 - **`renameGroup`** must send `{ id, name }` — the band's real PlayFab `id` (from `updateGroups`),
   not just the new name. Without the id the rename can't be targeted.
+- **`updateReferralCode`** is `{ code, canRedeem }`, or `{ code:null, error }` when the share code
+  can't be fetched. The page shows "—" until a code arrives, and a Retry button (re-sends
+  `referralsOpened`) after an error. Referral badge tiers are derived from `updateReferralCount
+  {count}` against thresholds 1/2/5/10; there is no tier payload.
 - **`acceptGroupInvite` / `declineGroupInvite`** send the band **name** string shown in the popup.
 - **`experience`** skin tabs are `'guitarSkin'` / `'drumSkin'` (and `'environment'`). The game
   matches these exact tab strings — a renamed tab = the selection does nothing.
