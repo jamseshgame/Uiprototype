@@ -11178,7 +11178,7 @@ input, textarea, select {
       </div>
       <div class="profile-info">
         <div class="profile-topline">
-          <div class="profile-name">RAELJAMSESH</div>
+          <div class="profile-name">&mdash;</div>
           <span class="topbar-xp-level" id="topbar-xp-level">LVL 1</span>
         </div>
         <!-- XP bar spans the full width under the name + level; fill driven by Unity via 'updateXp'. -->
@@ -16333,7 +16333,7 @@ function buildResultsLeaderboard() {
   if (!lbEl) return;
   // Group tab → a band leaderboard instead of the per-player one.
   if (resultsLbTab === 'group') { buildResultsBandLeaderboard(lbEl); return; }
-  var meName = 'RAEL';
+  var meName = 'YOU';
   var meEl = document.querySelector('.profile-name');
   if (meEl && meEl.textContent && /[A-Za-z]/.test(meEl.textContent)) meName = meEl.textContent.toUpperCase();
   var myScore = parseInt((_resultsMeData().score || '0').replace(/[^0-9]/g, ''), 10) || 0;
@@ -21506,7 +21506,7 @@ function deleteCreatorArt() {
   }
 }
 
-var creatorSelectedName = 'Rael';
+var creatorSelectedName = 'You';   // replaced by the real name on updateProfile
 var creatorNameType = 'solo';
 
 function openCreatorNamePicker() {
@@ -21543,9 +21543,9 @@ function openCreatorNamePicker() {
   grid.style.flex = '1';
   grid.style.minHeight = '0';
 
-  var profileName = 'Rael';
+  var profileName = 'You';
   var profileEl = document.querySelector('.profile-name');
-  if (profileEl) profileName = profileEl.textContent;
+  if (profileEl && /[A-Za-z0-9]/.test(profileEl.textContent)) profileName = profileEl.textContent;
   var profileAvatar = '';
   var profileImg = document.querySelector('.profile-avatar img');
   if (profileImg) profileAvatar = profileImg.src;
@@ -25507,6 +25507,13 @@ function init() {
   buildPlayPanel([]);
   buildStoreGrid();
   showPlayLoading(true);
+
+  // Topbar name is "—" in the HTML until Unity's updateProfile lands. The desktop demo
+  // (no Unity bridge) seeds it from the mock active profile instead.
+  if (!window.vuplex) {
+    var demoNameEl = document.querySelector('.profile-name');
+    if (demoNameEl) demoNameEl.textContent = getActiveProfile().name;
+  }
 
   // Fallback: load songs.json when running outside Vuplex (standalone browser)
   if (!window.vuplex) {
