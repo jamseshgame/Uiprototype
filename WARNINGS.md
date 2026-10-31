@@ -144,6 +144,10 @@ Changing these payload shapes breaks the feature even if the message name is unc
   `invited` entries need `platformId` or those create-time invites are silently dropped.
 - **`renameGroup`** must send `{ id, name }` — the band's real PlayFab `id` (from `updateGroups`),
   not just the new name. Without the id the rename can't be targeted.
+- **`leaveGroup` / `disbandGroup`** send `{ id, name }`, where `id` is the band's PlayFab group id from
+  `updateGroups`. Unity resolves by id, and falls back to the name only for an older page that sent a
+  bare name string. The page picks `disbandGroup` when the band has `isAdmin` (from `updateGroups`) or
+  is a local `isOwn` band. Disband is admin-only on the server.
 - **`acceptGroupInvite` / `declineGroupInvite`** send the band **name** string shown in the popup.
 - **`experience`** skin tabs are `'guitarSkin'` / `'drumSkin'` (and `'environment'`). The game
   matches these exact tab strings — a renamed tab = the selection does nothing.
