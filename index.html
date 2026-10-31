@@ -12577,23 +12577,6 @@ function handleUnityMessage(msg) {
       joinedDuringActiveSong = !!msg.data;
       if (inBandspace && playMode !== 'solo') buildPlayGrid();
       break;
-    case 'updateInstrumentAvailability':
-      if (msg.data) {
-        instrumentAvailability.vocals = msg.data.vocals !== false;
-        instrumentAvailability.drums = msg.data.drums !== false;
-        instrumentAvailability.guitar = msg.data.guitar !== false;
-      }
-      // Refresh the instrument picker if it's currently open
-      var pickerOverlay = document.getElementById('option-picker-overlay');
-      if (pickerOverlay && pickerOverlay.style.display === 'flex') {
-        var titleEl = pickerOverlay.querySelector('.option-picker-title');
-        if (titleEl && titleEl.textContent === 'Select Instrument') {
-          openOptionPicker('instrument');
-        }
-      }
-      // Refresh play grid so option tiles show updated state
-      if (playMode !== 'solo') buildPlayGrid();
-      break;
     case 'hostSongSelected':
     case 'hostSetlistUpdated':
       var hostSongs = Array.isArray(msg.data) ? msg.data : (msg.data ? [msg.data] : []);
@@ -13801,26 +13784,6 @@ function buildSocialPage() {
       groupGrid.appendChild(createTile);
       continue;
     }
-    if (gPage[i].temp) {
-      var tempTile = document.createElement('div');
-      tempTile.className = 'space-tile';
-      tempTile.onclick = function() {
-        if (getActiveGroupName() === 'The Picks') {
-          openManageGroup({ name: 'The Picks', file: '', members: '4/4', online: '3/4' });
-        } else {
-          openGroupJoinConfirm('The Picks', '', '3/4');
-        }
-      };
-      var tempPill = (getActiveGroupName() === 'The Picks') ? '<div class="space-here-badge">Active Group</div>' : '';
-      tempTile.innerHTML = tempPill +
-        '<img src="" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;pointer-events:none" alt="">' +
-        '<div class="tile-info" style="pointer-events:none;position:absolute;bottom:0;left:0;right:0;padding:48px 20px 18px;background:linear-gradient(0deg,rgba(0,0,0,0.95) 0%,rgba(0,0,0,0.9) 40%,rgba(0,0,0,0.6) 70%,transparent 100%);display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-end;gap:4px">' +
-          '<div class="tile-hero-title" style="font-size:64px">The Picks</div>' +
-          '<div class="tile-hero-sub">3/4 Members Online</div>' +
-        '</div>';
-      groupGrid.appendChild(tempTile);
-      continue;
-    }
     var g = gPage[i].g;
     var tile = document.createElement('div');
     tile.className = 'space-tile';
@@ -13849,7 +13812,7 @@ function buildSocialPage() {
       '<img src="' + gImg + '" style="position:absolute;top:0;left:0;width:100%;height:100%;' + gFitStyle + ';pointer-events:none" alt="">' +
       '<div class="tile-info" style="pointer-events:none;position:absolute;bottom:0;left:0;right:0;padding:48px 20px 18px;background:linear-gradient(0deg,rgba(0,0,0,0.95) 0%,rgba(0,0,0,0.9) 40%,rgba(0,0,0,0.6) 70%,transparent 100%);display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-end;gap:4px">' +
         '<div class="tile-hero-title" style="font-size:64px">' + g.name + '</div>' +
-        '<div class="tile-hero-sub">' + (g.online || g.members) + ' Members Online</div>' +
+        '<div class="tile-hero-sub">' + groupMembersLabel(g) + '</div>' +
       '</div>';
     groupGrid.appendChild(tile);
   }
@@ -14020,6 +13983,17 @@ function getActiveGroup() {
   var b = getActiveBand();
   if (!b) return null;   // not in a group
   return { id: b.id, name: b.name, file: b.photo || b.file || '', logo: b.logo, online: b.online, members: b.members };
+}
+
+// "N Members" caption for group tiles. Unity's updateGroups sends `members` as a count;
+// local/mock bands carry a members array. There is no online count from the backend, so
+// tiles show membership only (an own, just-created group counts the player: 1 Member).
+function groupMembersLabel(g) {
+  var n = 1;
+  if (g && typeof g.members === 'number') n = g.members;
+  else if (g && g.members && g.members.length) n = g.members.length;
+  if (n < 1) n = 1;
+  return n + (n === 1 ? ' Member' : ' Members');
 }
 
 // One group card (rounded thumbnail + caption + online count) for the swap row.
@@ -15184,7 +15158,6 @@ var hostName = '';
 // which Unity sends on the next bandspace entry where the host's SongHasStarted is
 // false (i.e. between songs or after results).
 var joinedDuringActiveSong = false;
-var instrumentAvailability = { vocals: true, drums: true, guitar: true };
 var songInstruments = {};
 var songDiffs = {};
 var songSpaces = {};
@@ -18198,6 +18171,10 @@ var VIBE_GUITAR_SKINS = [
 var VIBE_DRUM_SKINS = [
   { id: 'Original', label: 'Original', img: 'instruments/drums.png' }
 ];
+// Highway picker is hidden until real highway art is mapped (the images below are
+// vault placeholders). Flip this to bring the section, its Vibe-tile slice and its
+// experience{tab:'highway'} messages back.
+var VIBE_HIGHWAY_ENABLED = false;
 var VIBE_HIGHWAYS = [
   { id: 'Neon',    label: 'Neon',    img: 'vault/018.jpg' },
   { id: 'Rainbow', label: 'Rainbow', img: 'vault/019.jpg' },
@@ -18224,12 +18201,13 @@ function vibeImg(list, id) {
 // Up-to-4 asset images for the Vibe option-tile diagonal slices (same mechanic
 // as the Challenges reward tiles) — one per section, from the live selections.
 function getVibeAssets() {
-  return [
+  var assets = [
     { label: 'Stage',       img: vibeImg(VIBE_STAGES, selectedEnvironment) },
     { label: 'Guitar Skin', img: vibeImg(VIBE_GUITAR_SKINS, selectedGuitarSkin) },
-    { label: 'Drum Skin',   img: vibeImg(VIBE_DRUM_SKINS, selectedDrumSkin) },
-    { label: 'Highway',     img: vibeImg(VIBE_HIGHWAYS, selectedHighway) }
+    { label: 'Drum Skin',   img: vibeImg(VIBE_DRUM_SKINS, selectedDrumSkin) }
   ];
+  if (VIBE_HIGHWAY_ENABLED) assets.push({ label: 'Highway', img: vibeImg(VIBE_HIGHWAYS, selectedHighway) });
+  return assets;
 }
 
 function buildOptionsRow(container) {
@@ -18556,13 +18534,13 @@ function coopGroupTile(band) {
     '<img src="' + gImg + '" style="position:absolute;top:0;left:0;width:100%;height:100%;' + gFit + ';pointer-events:none" alt="">' +
     '<div class="tile-info" style="pointer-events:none;position:absolute;bottom:0;left:0;right:0;padding:40px 16px 14px;background:linear-gradient(0deg,rgba(0,0,0,0.95) 0%,rgba(0,0,0,0.9) 40%,rgba(0,0,0,0.6) 70%,transparent 100%);display:flex;flex-direction:column;align-items:flex-start;gap:2px">' +
       '<div class="tile-hero-title" style="font-size:34px;line-height:1.02">' + band.name + '</div>' +
-      '<div class="tile-hero-sub">' + (band.online || ('1/' + COOP_PLAYERS_MAX)) + ' Members Online</div>' +
+      '<div class="tile-hero-sub">' + groupMembersLabel(band) + '</div>' +
     '</div>';
   return tile;
 }
 
 // Group picker (opened from the Perform group tile). Lists the player's groups
-// plus the Jamsesh + The Picks placeholders. Picking a non-active group → switch
+// plus (desktop demo only) the Jamsesh + The Picks placeholders. Picking a non-active group → switch
 // warning; the active group → Manage Group.
 function openGroupPicker() {
   var grid = document.getElementById('group-picker-grid');
@@ -18570,8 +18548,9 @@ function openGroupPicker() {
   var groups = getBandGroups().slice();
   var names = {};
   for (var i = 0; i < groups.length; i++) names[groups[i].name] = true;
-  if (!names['Jamsesh'])   groups.push({ name: 'Jamsesh',   logo: JAMSESH_DEFAULT_LOGO, photo: JAMSESH_DEFAULT_LOGO, online: '3/4', placeholder: true });
-  if (!names['The Picks']) groups.push({ name: 'The Picks', logo: '',  photo: '',  online: '3/4', placeholder: true });
+  // Placeholder groups are a desktop-demo affordance; never show fake groups on the headset.
+  if (!window.vuplex && !names['Jamsesh'])   groups.push({ name: 'Jamsesh',   logo: JAMSESH_DEFAULT_LOGO, photo: JAMSESH_DEFAULT_LOGO, online: '3/4', placeholder: true });
+  if (!window.vuplex && !names['The Picks']) groups.push({ name: 'The Picks', logo: '',  photo: '',  online: '3/4', placeholder: true });
   for (var g = 0; g < groups.length; g++) grid.appendChild(groupPickerTile(groups[g]));
   document.getElementById('group-picker-overlay').classList.add('active');
 }
@@ -18592,7 +18571,7 @@ function groupPickerTile(grp) {
     '<img src="' + img + '" style="position:absolute;top:0;left:0;width:100%;height:100%;' + fit + ';pointer-events:none" alt="">' +
     '<div class="tile-info" style="pointer-events:none;position:absolute;bottom:0;left:0;right:0;padding:48px 18px 16px;background:linear-gradient(0deg,rgba(0,0,0,0.95) 0%,rgba(0,0,0,0.85) 40%,rgba(0,0,0,0.5) 70%,transparent 100%);display:flex;flex-direction:column;align-items:flex-start;gap:4px">' +
       '<div class="tile-hero-title" style="font-size:40px;line-height:1.02">' + grp.name + '</div>' +
-      '<div class="tile-hero-sub">' + (grp.online || ('1/' + COOP_PLAYERS_MAX)) + ' Members Online</div>' +
+      '<div class="tile-hero-sub">' + groupMembersLabel(grp) + '</div>' +
     '</div>';
   (function(g, active) {
     tile.onclick = function() {
@@ -19812,16 +19791,29 @@ var MISS_MODIFIERS = [
 // is the per-song difficulty cards, 'presets' is the preset browser, and 'mods'
 // tabs render their mods list. Every MISS_MODIFIERS id must appear in exactly one
 // 'mods' tab — checkModifierTabs() warns at init if one is unassigned.
+// internal: true → tab only shown to internal users (isInternalUser, from Unity's
+// setInternalUser). Players see only Difficulty; see modifierTabVisible().
 var MODIFIER_TABS = [
   {id: 'difficulty', label: 'Difficulty', kind: 'difficulty'},
-  {id: 'audio',   kind: 'mods', label: 'Audio',   mods: ['stemDuck', 'stemBoost', 'missSfx']},
-  {id: 'highway', kind: 'mods', label: 'Highway', mods: ['hitFlames', 'ghostMissedNote', 'streakCounter']},
-  {id: 'scoring', kind: 'mods', label: 'Scoring', mods: ['streakBreak', 'multiplierDrop', 'overdriveVoid']},
-  {id: 'failure', kind: 'mods', label: 'Failure', mods: ['rockMeter', 'failSong', 'dangerVignette',
+  {id: 'audio',   kind: 'mods', label: 'Audio',   internal: true, mods: ['stemDuck', 'stemBoost', 'missSfx']},
+  {id: 'highway', kind: 'mods', label: 'Highway', internal: true, mods: ['hitFlames', 'ghostMissedNote', 'streakCounter']},
+  {id: 'scoring', kind: 'mods', label: 'Scoring', internal: true, mods: ['streakBreak', 'multiplierDrop', 'overdriveVoid']},
+  {id: 'failure', kind: 'mods', label: 'Failure', internal: true, mods: ['rockMeter', 'failSong', 'dangerVignette',
                                                          'highwayDesat', 'crowdReacts', 'bandRevive']},
-  {id: 'battle', label: 'Battle', kind: 'mods', mods: ["battleSections", "battleStack", "battleInk", "battleFlip", "battleSpeed", "battleTiny", "battleSpawn", "battleSwap", "battleDebug"]},
-  {id: 'presets', label: 'Presets', kind: 'presets'}
+  {id: 'battle', label: 'Battle', kind: 'mods', internal: true, mods: ["battleSections", "battleStack", "battleInk", "battleFlip", "battleSpeed", "battleTiny", "battleSpawn", "battleSwap", "battleDebug"]},
+  {id: 'presets', label: 'Presets', kind: 'presets', internal: true}
 ];
+
+function modifierTabVisible(def) {
+  return !!def && (!def.internal || isInternalUser);
+}
+
+function modifierTabDef(id) {
+  for (var i = 0; i < MODIFIER_TABS.length; i++) {
+    if (MODIFIER_TABS[i].id === id) return MODIFIER_TABS[i];
+  }
+  return null;
+}
 var modifierTab = 'difficulty';
 
 var modifierEnabled = {};   // modifier id -> bool
@@ -19900,7 +19892,14 @@ function _saveModifiers() {
 }
 
 // Payload shape shared by the 'modifiers' message and the startGame payload.
+// Non-internal players can't see the modifier tabs, so they always play on the
+// defaults — a stale localStorage state from an earlier build must not silently
+// change their game.
 function getModifierPayload() {
+  if (!isInternalUser) {
+    var d = modifierDefaults();
+    return {tier: modifierTier, enabled: d.enabled, values: d.values, preset: ''};
+  }
   return {tier: modifierTier, enabled: modifierEnabled, values: modifierValues,
           preset: activePresetName()};
 }
@@ -20079,7 +20078,7 @@ function setInternalUser(data) {
   isInternalUser = next;
   if (!isInternalUser && playMode === 'battle') setPlayMode('coop');
   else if (typeof buildModeTabs === 'function' && document.getElementById('play-mode-tabs')) buildModeTabs();
-  if (!isInternalUser && modifierTab === 'battle') modifierTab = 'difficulty';
+  if (!modifierTabVisible(modifierTabDef(modifierTab))) modifierTab = 'difficulty';
   var overlay = document.getElementById('option-picker-overlay');
   if (overlay && overlay.style.display === 'flex' && currentPickerType === 'difficulty') {
     openOptionPicker('difficulty');
@@ -20685,11 +20684,8 @@ function renderModifierTab() {
   body.innerHTML = '';
   body.scrollTop = 0;
 
-  var def = null;
-  for (var i = 0; i < MODIFIER_TABS.length; i++) {
-    if (MODIFIER_TABS[i].id === modifierTab) { def = MODIFIER_TABS[i]; break; }
-  }
-  if (!def || (def.id === 'battle' && !isInternalUser)) def = MODIFIER_TABS[0];
+  var def = modifierTabDef(modifierTab);
+  if (!modifierTabVisible(def)) def = MODIFIER_TABS[0];
 
   if (def.kind === 'presets') buildPresetBrowser(body);
   else if (def.kind === 'mods') buildModifierList(body, def.mods);
@@ -20756,14 +20752,10 @@ function openOptionPicker(type) {
     for (var ii = 0; ii < instItems.length; ii++) {
       var inst = instItems[ii];
 
-      // In coop/battle mode, check if this instrument is taken by another player.
-      var isTaken = false;
-      // Battle is guitar vs guitar, so both players may hold Guitar at once.
+      // Battle is guitar vs guitar: every other instrument is locked. Group play
+      // doesn't grey out instruments other players hold.
       var battleLocked = playMode === 'battle' && inst.id !== 'guitar';
-      if (battleLocked) isTaken = true;
-      if (inBandspace && playMode !== 'solo') {
-        if (playMode !== 'battle' && instrumentAvailability[inst.id] === false) isTaken = true;
-      }
+      var isTaken = battleLocked;
       var isSelected = inst.id === selectedInstrument && !isTaken;
 
       var col = document.createElement('div');
@@ -20772,7 +20764,7 @@ function openOptionPicker(type) {
       // Header tile (image + label) — always rendered, identical role in both layouts.
       var header = document.createElement('div');
       header.className = 'instrument-picker__header';
-      var labelText = isTaken ? inst.label + (battleLocked ? ' (Guitar Only)' : ' (Taken)') : inst.label;
+      var labelText = isTaken ? inst.label + ' (Guitar Only)' : inst.label;
       // Surface the Unity-owned tutorial flag on the tile so the state is
       // visible, not just implied by whether the prompt appears.
       var tutHint = '';
@@ -20852,7 +20844,7 @@ function openOptionPicker(type) {
     modTabs.id = 'mod-tabs';
     for (var mt = 0; mt < MODIFIER_TABS.length; mt++) {
       var tabDef = MODIFIER_TABS[mt];
-      if (tabDef.id === 'battle' && !isInternalUser) continue;
+      if (!modifierTabVisible(tabDef)) continue;
       var tabEl = document.createElement('div');
       tabEl.className = 'option-picker-tab' + (tabDef.id === modifierTab ? ' active' : '');
       tabEl.setAttribute('data-mod-tab', tabDef.id);
@@ -20862,6 +20854,8 @@ function openOptionPicker(type) {
       })(tabDef.id);
       modTabs.appendChild(tabEl);
     }
+    // Players only get the Difficulty tab — a one-tab row is just noise.
+    if (modTabs.children.length < 2) modTabs.style.display = 'none';
     panel.appendChild(modTabs);
 
     stdBody.id = 'mod-tab-body';
@@ -20917,7 +20911,9 @@ function openOptionPicker(type) {
     vibeSection('Stage',       vibeAvailable(VIBE_STAGES, ['Colosseum']),      selectedEnvironment, 'environment', function(id){ selectedEnvironment = id; });
     vibeSection('Guitar Skin', vibeAvailable(VIBE_GUITAR_SKINS, ['Original']), selectedGuitarSkin,  'guitarSkin',  function(id){ selectedGuitarSkin = id; });
     vibeSection('Drum Skin',   vibeAvailable(VIBE_DRUM_SKINS, ['Original']),   selectedDrumSkin,    'drumSkin',    function(id){ selectedDrumSkin = id; });
-    vibeSection('Highway',     vibeAvailable(VIBE_HIGHWAYS, ['Neon']),         selectedHighway,     'highway',     function(id){ selectedHighway = id; });
+    if (VIBE_HIGHWAY_ENABLED) {
+      vibeSection('Highway',   vibeAvailable(VIBE_HIGHWAYS, ['Neon']),         selectedHighway,     'highway',     function(id){ selectedHighway = id; });
+    }
 
     // ── Accept (footer) ── X / backdrop tap reverts via closeOptionPicker.
     var stdFooter = document.createElement('div');
@@ -20938,17 +20934,9 @@ function buildSimplePickerChoices(panel, type, items, currentVal) {
     var item = items[i];
     var choice = document.createElement('div');
 
-    // In coop/battle mode, check instrument availability from network state
-    var isTaken = false;
+    // Battle mode locks every instrument except guitar.
     var battleLocked = type === 'instrument' && playMode === 'battle' && item.id !== 'guitar';
-    if (battleLocked) isTaken = true;
-    if (type === 'instrument' && inBandspace && playMode === 'coop') {
-      var avail = instrumentAvailability[item.id];
-      // undefined means no tracking for this instrument (e.g. bass) — treat as available
-      if (avail === false) {
-        isTaken = true;
-      }
-    }
+    var isTaken = battleLocked;
 
     var isSelected = item.id === currentVal && !isTaken;
     choice.className = 'option-picker-choice' + (isSelected ? ' selected' : '');
@@ -20958,7 +20946,7 @@ function buildSimplePickerChoices(panel, type, items, currentVal) {
     }
 
     var descText = item.desc;
-    if (isTaken) descText = battleLocked ? 'Battle is guitar only' : 'Taken by another player';
+    if (isTaken) descText = 'Battle is guitar only';
 
     choice.innerHTML =
       '<div style="flex:1">' +
@@ -21004,7 +20992,7 @@ function closeOptionPicker(accept) {
       sendToUnity('experience', {tab: 'environment', id: selectedEnvironment});
       sendToUnity('experience', {tab: 'guitarSkin',  id: selectedGuitarSkin});
       sendToUnity('experience', {tab: 'drumSkin',    id: selectedDrumSkin});
-      sendToUnity('experience', {tab: 'highway',     id: selectedHighway});
+      if (VIBE_HIGHWAY_ENABLED) sendToUnity('experience', {tab: 'highway', id: selectedHighway});
     }
     sendToUnity('experienceClosed', {});
     buildPlayGrid();

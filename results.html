@@ -435,10 +435,11 @@
   }
   .rewards-title span { color: #e8ff3a; }
 
+  /* 1x2: Picks | XP. (The mock Badges and Grammys Season cells were removed.) */
   .rewards-body {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr;
+    grid-template-rows: 1fr;
     gap: 48px;
     width: 100%;
     flex: 1;
@@ -491,55 +492,6 @@
     font-family: 'Bebas Neue', sans-serif;
     letter-spacing: 0.02em;
     color: #e8ff3a;
-  }
-
-  .rewards-badge-item {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    padding: 20px 24px;
-    background: #1e1b2c;
-    border: 2px solid #ff2e92;
-    border-radius: var(--panel-radius);
-    width: 100%;
-    flex: 1;
-    min-height: 0;
-  }
-  .rewards-badge-icon {
-    width: 72px;
-    height: 72px;
-    border-radius: 50%;
-    background: #282435;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 32px;
-    flex-shrink: 0;
-    position: relative;
-  }
-  .rewards-badge-new {
-    position: absolute;
-    top: -6px; right: -6px;
-    background: #ff2e92;
-    color: #ffffff;
-    font-size: 16px;
-    font-weight: 400;
-    font-family: 'Bebas Neue', sans-serif;
-    letter-spacing: 0.04em;
-    padding: 3px 8px;
-    border-radius: var(--panel-radius);
-  }
-  .rewards-badge-info { flex: 1; }
-  .rewards-badge-name {
-    font-size: 24px;
-    font-weight: 700;
-    font-family: 'Monda', sans-serif;
-    color: #f0ecf8;
-  }
-  .rewards-badge-desc {
-    font-size: 18px;
-    font-family: 'Monda', sans-serif;
-    color: rgba(255,255,255,0.45);
   }
 
   .rewards-level-circle {
@@ -682,32 +634,15 @@
       <div class="rewards-title">Your <span>Rewards</span></div>
       <div class="rewards-body">
 
-        <!-- Top-left: Jamsesh Picks -->
+        <!-- Left: Jamsesh Picks -->
         <div class="rewards-cell">
           <div class="col-title">Jamsesh Picks</div>
-          <div class="rewards-pick-icon"><img src="branding/JamPick.png" alt="Pick"></div>
+          <div class="rewards-pick-icon"><img src="branding/JamPick_hires.png" alt="Pick"></div>
           <div class="rewards-earned-label">Earned</div>
           <div class="rewards-earned-value" id="rewards-picks-earned">+0</div>
         </div>
 
-        <!-- Top-right: Badges -->
-        <div class="rewards-cell" style="justify-content:flex-start">
-          <div class="col-title">Badges</div>
-          <div class="rewards-badge-item">
-            <div class="rewards-badge-icon">&#127908;<div class="rewards-badge-new">NEW</div></div>
-            <div class="rewards-badge-info"><div class="rewards-badge-name">50 Songs Performed</div><div class="rewards-badge-desc">Just unlocked!</div></div>
-          </div>
-          <div class="rewards-badge-item">
-            <div class="rewards-badge-icon">&#127911;</div>
-            <div class="rewards-badge-info"><div class="rewards-badge-name">Level 10 Group</div><div class="rewards-badge-desc">Group milestone</div></div>
-          </div>
-          <div class="rewards-badge-item">
-            <div class="rewards-badge-icon">&#127926;<div class="rewards-badge-new">NEW</div></div>
-            <div class="rewards-badge-info"><div class="rewards-badge-name">Level 20 Vocals</div><div class="rewards-badge-desc">Just unlocked!</div></div>
-          </div>
-        </div>
-
-        <!-- Bottom-left: XP -->
+        <!-- Right: XP -->
         <div class="rewards-cell">
           <div class="col-title" id="rewards-xp-title">XP</div>
           <div class="rewards-level-circle">
@@ -719,21 +654,6 @@
           <div class="rewards-xp-bar-wrap">
             <div class="rewards-xp-bar"><div class="rewards-xp-bar-fill" id="rewards-xp-fill" style="width:0%"></div></div>
             <div class="rewards-xp-labels"><span id="rewards-xp-current">0 XP</span><span id="rewards-xp-max">— XP</span></div>
-          </div>
-        </div>
-
-        <!-- Bottom-right: Grammys Season -->
-        <div class="rewards-cell">
-          <div class="col-title">Grammys Season</div>
-          <div class="rewards-level-circle">
-            <div class="rewards-level-label">Season</div>
-            <div class="rewards-level-num">3</div>
-          </div>
-          <div class="rewards-xp-earned-label">Progress</div>
-          <div class="rewards-xp-earned-value">+2,800</div>
-          <div class="rewards-xp-bar-wrap">
-            <div class="rewards-xp-bar"><div class="rewards-xp-bar-fill" style="width:48%"></div></div>
-            <div class="rewards-xp-labels"><span>4,800 SP</span><span>10,000 SP</span></div>
           </div>
         </div>
 

@@ -45,7 +45,7 @@ pushes it via the Vuplex bridge.
 | `updateIsHost` | `{ isHost: boolean, hostName: string }` | After joining a session. Drives the HOST pill placement and Ready-button behavior. |
 | `lobbyRoster` *(new — recommended)* | `Array<{ name, avatar, instrument, difficulty, status, isSelf? }>` | Push the canonical roster (max 4 — the group member limit) whenever it changes (join, leave, instrument change, ready flip, etc.). The web side renders the list verbatim. `status` ∈ `"choosing" \| "ready"`. |
 | `sessionInProgress` | `boolean` | Toggles the "Late-join Spectate" view if a player joins mid-song. Unchanged from previous spec. |
-| `updateInstrumentAvailability` | `{ guitar, drums, vocals }` | Greys out instruments already claimed in the bandspace picker. Unchanged. |
+| ~~`updateInstrumentAvailability`~~ | — | **Removed 2026-10-31.** Unity never sent it; the page no longer greys out instruments in group play. |
 | `updateGroups` | `Array<group>` | The player's bands (shown on Bandmates ▸ Groups). The **active** band's roster auto-populates the Perform ▸ Group lobby (logo + name header + member list). |
 | `setActiveGroup` | `string` (group `id` or `name`) | Switch the active band. The web side repaints the Bandmates tiles + the Perform group lobby immediately. |
 | `updateFriends` | `Array<{ name, avatar, online, accepted?, meta?, playing?, requested? }>` | The player's friends + Meta-graph contacts (Bandmates ▸ Friends list). The web side derives a status from the flags, **sorts by status priority**, and renders a coloured pill per friend — see *Friends list — statuses, ordering & pills* below. |
