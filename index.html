@@ -1175,97 +1175,6 @@
   /* Panel 2 — Options */
   .play-opt-label { font-size: 34px; font-weight: 800; }
 
-  /* Panel 3 — Leaderboard */
-  .play-leaderboard { flex: 1; }
-
-  .play-lb-list {
-    flex: 1;
-    overflow: hidden;
-    padding: var(--pad);
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .play-lb-row {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    min-height: 0;
-    min-width: 0;
-  }
-
-  .play-lb-pos {
-    font-size: 24px;
-    font-weight: 800;
-    color: #ffffff;
-    width: 48px;
-    text-align: center;
-    flex-shrink: 0;
-  }
-
-  .play-lb-row:nth-child(-n+3) .play-lb-pos { color: #ffffff; }
-
-  .play-lb-tile {
-    flex: 1;
-    min-width: 0;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 0 16px;
-    border-radius: var(--radius-bar);
-    border: 1px solid var(--btn-panel-border);
-    background: var(--btn-panel-hover);
-    height: 100%;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .play-lb-avatar {
-    height: 70%;
-    aspect-ratio: 1;
-    border-radius: var(--panel-radius);
-    background: var(--bg-surface-hover);
-    flex-shrink: 0;
-    object-fit: cover;
-  }
-
-  .play-lb-info { flex: 1; min-width: 0; }
-
-  .play-lb-stars {
-    display: flex;
-    gap: 2px;
-    font-size: 16px;
-    line-height: 1;
-    color: #ffd700;
-  }
-
-  .play-lb-name {
-    font-size: 17px;
-    font-weight: 800;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    line-height: 1.2;
-    color: #ffffff;
-  }
-
-  .play-lb-score {
-    font-size: 17px;
-    font-weight: 700;
-    color: #ffffff;
-    line-height: 1.2;
-  }
-
-  .play-lb-row.lb-you .play-lb-tile {
-    border: 2px solid var(--pink);
-    box-shadow: 0 0 12px var(--pink-40);
-  }
-
-  .play-lb-row.lb-you .play-lb-name { color: var(--pink); }
-  .play-lb-row.lb-you .play-lb-pos  { color: var(--pink); }
-
   /* Shared theme nav underline animation */
   @keyframes navUnderline {
     0%   { width: 0; opacity: 0; }
@@ -12474,7 +12383,6 @@ function handleUnityMessage(msg) {
     case 'avatarSelection': applyAvatarSelection(msg.data); break;
     case 'updateSongs': updateSongsFromBackend(msg.data); break;
     case 'updateSongCharts': updateSongChartsFromBackend(msg.data); break;
-    case 'updateLeaderboard': updateLeaderboardFromBackend(msg.data); break;
     case 'updateFriends': updateFriendsFromBackend(msg.data); break;
     case 'updateGroups': updateGroupsFromBackend(msg.data); break;
     case 'setActiveGroup': applyActiveGroup(msg.data); break;
@@ -12766,28 +12674,6 @@ function updateSongChartsFromBackend(data) {
   if (pickerOverlay && pickerOverlay.style.display === 'flex') {
     var titleEl = pickerOverlay.querySelector('.option-picker-title');
     if (titleEl && titleEl.textContent === 'Select Instrument') openOptionPicker('instrument');
-  }
-}
-
-function updateLeaderboardFromBackend(data) {
-  // data: {song,instrument,difficulty,type,entries:[{pos,name,score,avatar},...]}
-  var list = document.getElementById('play-lb-list');
-  if (!list || !data || !data.entries) return;
-  list.innerHTML = '';
-  for (var i = 0; i < data.entries.length; i++) {
-    var lb = data.entries[i];
-    var row = document.createElement('div');
-    row.className = 'play-lb-row';
-    row.innerHTML =
-      '<span class="play-lb-pos">' + lb.pos + '</span>' +
-      '<div class="play-lb-tile">' +
-        '<img class="play-lb-avatar" src="' + lb.avatar + '" alt="">' +
-        '<div class="play-lb-info">' +
-          '<div class="play-lb-name">' + lb.name + '</div>' +
-          '<div class="play-lb-score">' + lb.score.toLocaleString() + '</div>' +
-        '</div>' +
-      '</div>';
-    list.appendChild(row);
   }
 }
 
@@ -13629,35 +13515,6 @@ function setupPickerGamepad() {
   }
   requestAnimationFrame(poll);
 }
-
-// ── Spaces Grid ─────────────────────────────────────────
-var spaces = [
-  {name:'Neon Stadium',     desc:'80,000 capacity arena',   file:'spaces/001.jpg'},
-  {name:'Desert Festival',  desc:'Open air desert stage',   file:'spaces/002.jpg'},
-  {name:'Underground Club', desc:'Intimate basement venue',  file:'spaces/003.jpg'},
-  {name:'Rooftop Lounge',   desc:'City skyline views',      file:'spaces/004.jpg'},
-  {name:'Jazz Basement',    desc:'Smoky speakeasy vibe',    file:'spaces/005.jpg'},
-  {name:'Beach Stage',      desc:'Sunset oceanfront',       file:'spaces/006.jpg'},
-  {name:'Arena Bowl',       desc:'Championship venue',      file:'spaces/007.jpg'},
-  {name:'Forest Rave',      desc:'Deep woods party',        file:'spaces/008.jpg'},
-  {name:'Vinyl Cafe',       desc:'Cozy record bar',         file:'spaces/009.jpg'},
-  {name:'Warehouse Party',  desc:'Raw industrial space',    file:'spaces/010.jpg'},
-  {name:'Opera House',      desc:'Grand classical hall',    file:'spaces/011.jpg'},
-  {name:'Street Corner',    desc:'Open mic busking spot',   file:'spaces/012.jpg'},
-  {name:'Skyline Terrace',  desc:'Penthouse party deck',    file:'spaces/013.jpg'},
-  {name:'Retro Arcade',     desc:'80s synthwave den',       file:'spaces/014.jpg'},
-  {name:'Ice Palace',       desc:'Frozen crystal stage',    file:'spaces/015.jpg'},
-  {name:'Tropical Resort',  desc:'Poolside paradise',       file:'spaces/016.jpg'},
-  {name:'Gothic Cathedral', desc:'Reverb-soaked stone',     file:'spaces/017.jpg'},
-  {name:'Cyberpunk Alley',  desc:'Neon-lit back street',    file:'spaces/018.jpg'},
-  {name:'Mountain Amp',     desc:'Alpine amphitheater',     file:'spaces/019.jpg'},
-  {name:'Submarine Lounge', desc:'Deep sea listening room', file:'spaces/020.jpg'},
-  {name:'Space Station',    desc:'Zero gravity club',       file:'spaces/021.jpg'},
-  {name:'Pirate Ship',      desc:'High seas shanty deck',   file:'spaces/022.jpg'},
-  {name:'Enchanted Garden', desc:'Fairy-lit grove',         file:'spaces/023.jpg'},
-  {name:'Volcano Stage',    desc:'Molten rock arena',       file:'spaces/024.jpg'},
-  {name:'Crystal Cavern',   desc:'Glowing gem grotto',      file:'spaces/025.jpg'}
-];
 
 function switchSocialTab(tab) {
   var tabs = document.getElementById('social-tabs').children;
@@ -16287,7 +16144,10 @@ function startGame() {
 
 // tutorialInst is set only when this start came from the tutorial prompt; it
 // rides along on the payload so Unity can tell a lesson from a real song.
+var _startGameSentAt = 0;
 function _startGameConfirmed(tutorialInst) {
+  // Headset only: ignore a repeat Start within 3s of the last one (Unity is loading).
+  if (window.vuplex && Date.now() - _startGameSentAt < 3000) return;
   var titles = [];
   for (var i = 0; i < setlist.length; i++) {
     titles.push(setlist[i].title);
@@ -16300,6 +16160,11 @@ function _startGameConfirmed(tutorialInst) {
     modifiers: getModifierPayload(),
     tutorial: tutorialInst || false
   });
+  // The results screens in this page are the desktop demo. On the headset Unity tears
+  // this page down for gameplay and shows real results in results.html, so jumping
+  // here would only flash mock scores/leaderboards. Guard against a double Start tap
+  // while Unity loads instead.
+  if (window.vuplex) { _startGameSentAt = Date.now(); return; }
   showResults1();
 }
 
@@ -17036,162 +16901,7 @@ function togglePreview(idx) {
   buildPlayGrid();
 }
 
-var lbTypes = [
-  {label: 'Worldwide', icon: '\u{1F30D}'},
-  {label: 'Local',     icon: '\u{1F4CD}'},
-  {label: 'Friends',   icon: '\u{1F465}'}
-];
-var currentLbType = 0;
-
 var pickerSelectedSong = null;
-
-var lbNamePool = [
-  'xShredMaster','BeatDropQueen','NeonRiff','AxelStorm','VoxHunter',
-  'FretBoss','SynthWave99','PickSlinger','CrashKid','LoopMachine',
-  'WahPedal','TrebleMaker','RiffRider','BassCanon','TempoTitan',
-  'ChordCrusher','MelodyMaven','GrooveGuru','HarmonyHero','SonicBlaze',
-  'VibeCheck','EchoStrike','PulseRider','WaveBreaker','ToneShifter',
-  'AmpliFire','DropZone','MixMaster','ClefKing','OctaveOwl'
-];
-var lbPlatePool = [np.galaxy, np.bamboo, np.garden, np.flames, np.drums, np.microphone, np.kpop, np.sakura];
-var lbPlateClasses = ['plate-holo', 'plate-radiate'];
-// Mock leaderboard avatars use the real (committed) avatar images — the old
-//  song-cover paths aren't in the repo and 404'd on every build.
-var lbAvatarPool = ['', '', '', '', ''];
-
-function lbHash(str) {
-  var h = 5381;
-  for (var i = 0; i < str.length; i++) h = ((h << 5) + h + str.charCodeAt(i)) | 0;
-  return Math.abs(h);
-}
-
-function generateLeaderboard(songTitle, instId, diffId, lbType) {
-  var seed = lbHash(songTitle + '|' + instId + '|' + diffId + '|' + lbType);
-  function rng() {
-    seed = (seed * 1103515245 + 12345) & 0x7fffffff;
-    return seed / 0x7fffffff;
-  }
-  var names = lbNamePool.slice();
-  for (var i = names.length - 1; i > 0; i--) {
-    var j = Math.floor(rng() * (i + 1));
-    var tmp = names[i]; names[i] = names[j]; names[j] = tmp;
-  }
-  var entries = [];
-  var baseScore = Math.floor(rng() * 200000) + 800000;
-  for (var i = 0; i < 8; i++) {
-    var score = baseScore - Math.floor(rng() * 12000 + 3000) * i;
-    if (score < 100000) score = 100000 + Math.floor(rng() * 50000);
-    var entry = {
-      pos: i + 1,
-      name: names[i],
-      score: score,
-      avatar: ''
-    };
-    if (rng() > 0.7) {
-      entry.plateClass = lbPlateClasses[Math.floor(rng() * lbPlateClasses.length)];
-    } else {
-      entry.plate = lbPlatePool[Math.floor(rng() * lbPlatePool.length)];
-    }
-    entries.push(entry);
-  }
-  entries.sort(function(a, b) { return b.score - a.score; });
-  // Insert Jooleeno at a random position
-  var jooleenoScore = entries.length > 0 ? entries[Math.floor(rng() * entries.length)].score + Math.floor(rng() * 5000) - 2500 : 500000;
-  var jooleenoIdx = Math.floor(rng() * (entries.length + 1));
-  entries.splice(jooleenoIdx, 0, {
-    pos: 0,
-    name: 'Jooleeno',
-    score: jooleenoScore,
-    avatar: ''
-  });
-  // Insert A_Peach at a random position
-  var peachScore = entries.length > 0 ? entries[Math.floor(rng() * entries.length)].score + Math.floor(rng() * 5000) - 2500 : 500000;
-  var peachIdx = Math.floor(rng() * (entries.length + 1));
-  entries.splice(peachIdx, 0, {
-    pos: 0,
-    name: 'A_Peach',
-    score: peachScore,
-    avatar: ''
-  });
-  entries.sort(function(a, b) { return b.score - a.score; });
-  if (lbType === 'Worldwide') {
-    var startPos = Math.floor(rng() * 500) + 1;
-    for (var i = 0; i < entries.length; i++) entries[i].pos = startPos + i;
-  } else {
-    for (var i = 0; i < entries.length; i++) entries[i].pos = i + 1;
-  }
-  return entries;
-}
-
-function rotateLbType() {
-  currentLbType = (currentLbType + 1) % lbTypes.length;
-  var t = lbTypes[currentLbType];
-  document.getElementById('lb-type-btn').innerHTML = '<span>' + t.icon + '</span> ' + t.label;
-  buildLeaderboard();
-  sendToUnity('leaderboardType', t.label);
-}
-
-var pickerInstIdx = 0;
-var pickerDiffIdx = 1; // default Medium
-
-var instIcons = {guitar:'&#127928;', keys:'&#127929;', drums:'&#129345;', vocals:'&#127908;', bass:'&#127928;'};
-var diffIcons = {easy:'&#127922;', medium:'&#127919;', hard:'&#128293;', expert:'&#128128;'};
-
-function rotatePickerInstrument() {
-  // Skip Keys ("Coming Soon") in the leaderboard picker rotation
-  do {
-    pickerInstIdx = (pickerInstIdx + 1) % instruments.length;
-  } while (instruments[pickerInstIdx].id === 'keys');
-  var inst = instruments[pickerInstIdx];
-  selectedInstrument = inst.id;
-  document.getElementById('picker-inst-btn').innerHTML = (instIcons[inst.id] || '') + ' ' + inst.label;
-  buildLeaderboard();
-  sendToUnity('selectInstrument', inst.id);
-}
-
-function rotatePickerDifficulty() {
-  pickerDiffIdx = (pickerDiffIdx + 1) % difficulties.length;
-  var diff = difficulties[pickerDiffIdx];
-  selectedDifficulty = diff.id;
-  document.getElementById('picker-diff-btn').innerHTML = (diffIcons[diff.id] || '') + ' ' + diff.label;
-  buildLeaderboard();
-  sendToUnity('selectDifficulty', diff.id);
-}
-
-function shortPos(n) {
-  if (n >= 1000000) return (n / 1000000).toFixed(1).replace('.0', '') + 'M';
-  if (n >= 1000) return (n / 1000).toFixed(1).replace('.0', '') + 'K';
-  return '' + n;
-}
-
-function buildLeaderboard() {
-  var list = document.getElementById('play-lb-list');
-  if (!list) return;   // leaderboard removed from the picker
-  list.innerHTML = '';
-  var typeName = lbTypes[currentLbType].label;
-  var songTitle = pickerSelectedSong ? pickerSelectedSong.title : 'default';
-  var instId = instruments[pickerInstIdx].id;
-  var diffId = difficulties[pickerDiffIdx].id;
-  var entries = generateLeaderboard(songTitle, instId, diffId, typeName);
-  var starHtml = '<div class="play-lb-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>';
-  for (var i = 0; i < 8 && i < entries.length; i++) {
-    var lb = entries[i];
-    var row = document.createElement('div');
-    row.className = 'play-lb-row';
-    var tile = document.createElement('div');
-    tile.className = 'play-lb-tile';
-    row.innerHTML = '<span class="play-lb-pos">' + shortPos(lb.pos) + '</span>';
-    tile.innerHTML =
-      '<img class="play-lb-avatar" src="' + lb.avatar + '" alt="">' +
-      '<div class="play-lb-info">' +
-        starHtml +
-        '<div class="play-lb-name">' + lb.name + '</div>' +
-        '<div class="play-lb-score">' + lb.score.toLocaleString() + '</div>' +
-      '</div>';
-    row.appendChild(tile);
-    list.appendChild(row);
-  }
-}
 
 function selectPickerSong(song, tileEl) {
   pickerSelectedSong = song;
@@ -17206,7 +16916,6 @@ function selectPickerSong(song, tileEl) {
       tileEl.classList.add('active');
     }
   }
-  buildLeaderboard();
 }
 
 function addSongToSetlist(song) {
@@ -17581,7 +17290,6 @@ function buildPlayPanel(songs) {
   initLobbyPlates();
   buildModeTabs();
   buildPlayGrid();
-  buildLeaderboard();
 
   // Push initial config state so Unity config matches the UI defaults.
   // In bandspace, don't send defaults — instrument should stay Unknown
@@ -21013,35 +20721,6 @@ function closeOptionPicker(accept) {
   }
   currentPickerType = null;
 }
-
-// ── Vault Grid ──────────────────────────────────────────
-var vaultItems = [
-  {name:'Neon Arena',      cat:'Spaces',      file:'vault/001.jpg'},
-  {name:'Desert Stage',    cat:'Spaces',      file:'vault/002.jpg'},
-  {name:'Club Basement',   cat:'Spaces',      file:'vault/003.jpg'},
-  {name:'Beach Party',     cat:'Spaces',      file:'vault/004.jpg'},
-  {name:'Crystal Platform',cat:'Stages',      file:'vault/005.jpg'},
-  {name:'Fire Stage',      cat:'Stages',      file:'vault/006.jpg'},
-  {name:'Ice Rink',        cat:'Stages',      file:'vault/007.jpg'},
-  {name:'Cloud Stage',     cat:'Stages',      file:'vault/008.jpg'},
-  {name:'Avatar',          cat:'Avatar',      file:'vault/009.jpg'},
-  {name:'Electric Guitar', cat:'Instruments', file:'vault/010.jpg'},
-  {name:'Synthesizer',     cat:'Instruments', file:'vault/011.jpg'},
-  {name:'Drum Kit',        cat:'Instruments', file:'vault/012.jpg'},
-  {name:'Gold Mic',        cat:'Instruments', file:'vault/013.jpg'},
-  {name:'Ruby',            cat:'Gem',         file:'vault/014.jpg'},
-  {name:'Sapphire',        cat:'Gem',         file:'vault/015.jpg'},
-  {name:'Emerald',         cat:'Gem',         file:'vault/016.jpg'},
-  {name:'Diamond',         cat:'Gem',         file:'vault/017.jpg'},
-  {name:'Neon Highway',    cat:'Highway',     file:'vault/018.jpg'},
-  {name:'Rainbow Road',    cat:'Highway',     file:'vault/019.jpg'},
-  {name:'Dark Highway',    cat:'Highway',     file:'vault/020.jpg'},
-  {name:'Lava Highway',    cat:'Highway',     file:'vault/021.jpg'},
-  {name:'Sunset',          cat:'Skybox',      file:'vault/022.jpg'},
-  {name:'Galaxy',          cat:'Skybox',      file:'vault/023.jpg'},
-  {name:'Northern Lights', cat:'Skybox',      file:'vault/024.jpg'},
-  {name:'Storm',           cat:'Skybox',      file:'vault/025.jpg'}
-];
 
 // ── Instrument-skin purchase set (Store "Items" tab + My Collection) ─────────
 // SERVER-AUTHORITATIVE: this is populated entirely from the PlayFab Economy v2 catalog,
