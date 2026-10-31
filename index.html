@@ -14363,10 +14363,11 @@ function createGroupPrimaryAction() {
 
 function leaveActiveGroup() {
   var name = document.getElementById('create-group-name').value.trim() || getActiveGroupName();
-  // Groups the player created/leads (isOwn) get a stronger warning: leaving
-  // disbands the group for everyone and it can't be rejoined.
+  // Groups the player created/leads get a stronger warning: leaving disbands the
+  // group for everyone and it can't be rejoined. Real bands carry isAdmin from
+  // Unity's updateGroups (PlayFab admin role); local/mock bands use isOwn.
   var band = getActiveBand();
-  var owned = !!(band && band.isOwn);
+  var owned = !!(band && (band.isOwn || band.isAdmin));
   var label = name || 'this group';
   var msg = owned
     ? 'Leaving disbands ' + label + ' for all members. The group will be deleted and you won’t be able to rejoin.'
@@ -14376,7 +14377,8 @@ function leaveActiveGroup() {
     confirmLabel: owned ? 'Disband Group' : 'Leave Group',
     destructive: true,
     onConfirm: function() {
-      sendToUnity(owned ? 'disbandGroup' : 'leaveGroup', name);
+      // Keyed by the band's PlayFab id; Unity re-pushes updateGroups afterwards.
+      sendToUnity(owned ? 'disbandGroup' : 'leaveGroup', { id: (band && band.id) || '', name: name });
       closeCreateGroup();
       if (owned) {
         // Disband: the group is deleted and disappears from Groups; Perform falls
