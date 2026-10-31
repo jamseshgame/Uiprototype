@@ -21780,10 +21780,14 @@ var storeVaultPage = 0;
 
 // Real-money pick packs pushed by Unity (updateIapPacks). Each: { sku, picks, price, name }.
 // picks comes from PlayFab Title Data; price is the localized string from Meta (may be empty in
-// the editor / before the add-on is published). Empty → fall back to the mock packData below.
+// the editor / before the add-on is published). On the headset (window.vuplex) the mock packData
+// below never shows: an empty or errored list renders an "unavailable" tile instead.
+// iapPacksError is set when Unity reports a fetch failure ({packs:[], error:'...'}).
 var iapPacks = [];
+var iapPacksError = null;
 function updateIapPacksFromBackend(data) {
   iapPacks = (data && data.packs) ? data.packs : [];
+  iapPacksError = (data && data.error) ? data.error : null;
   // Store DOM is static (always present, just hidden), so it's safe to rebuild whenever this lands.
   if (document.getElementById('store-packs-grid')) buildStoreGrid();
 }
@@ -21864,11 +21868,12 @@ function buildStoreGrid() {
   renderPager(document.getElementById('store-songs-pager'), storeSongsPage, songTotal, function(dir) { storeSongsPage += dir; buildStoreGrid(); });
 
   // ── Packs tab ──
-  // Real-money pick packs from Unity (iapPacks) when available; otherwise the mock bundles below
-  // so the desktop demo still renders. Real packs send storeBuyPack {sku}; mock send {name}.
+  // Real-money pick packs from Unity (iapPacks) when available. The mock bundles below are a
+  // desktop-only demo (!window.vuplex); on the headset an empty/errored list shows an
+  // "unavailable" tile. Only packs with a sku are buyable — nothing sends a SKU-less storeBuyPack.
   var packsGrid = document.getElementById('store-packs-grid');
   var packData;
-  if (iapPacks && iapPacks.length) {
+  if (iapPacks && iapPacks.length && !iapPacksError) {
     var PICK_PACK_COLORS = ['#1a3a5c', '#4a1a1a', '#1a4a2a', '#3a1a4a', '#1a2a4a', '#4a3a1a'];
     packData = [];
     for (var ppi = 0; ppi < iapPacks.length; ppi++) {
@@ -21882,10 +21887,12 @@ function buildStoreGrid() {
         isPickPack: true
       });
     }
+  } else if (window.vuplex || iapPacksError) {
+    packData = [{unavailable: true}];
   } else {
-    // Desktop/editor fallback (no Unity push): mock the real pick-pack ladder so the Packs tab reads
-    // identically to production. No sku → buttons send {name} (harmless off-device). Prices here are
-    // placeholders; on device the real localized price comes from Meta via updateIapPacks.
+    // Desktop-only fallback (no Unity bridge): mock the real pick-pack ladder so the Packs tab reads
+    // identically to production. No sku → tapping does nothing. Prices here are placeholders;
+    // on device the real localized price comes from Meta via updateIapPacks.
     packData = [
       {picks:1000,  price:'$5',  color:'#1a3a5c', locked:false, isPickPack:true},
       {picks:2300,  price:'$10', color:'#4a1a1a', locked:false, isPickPack:true},
@@ -21906,13 +21913,22 @@ function buildStoreGrid() {
     tile.style.alignItems = 'flex-start';
     tile.style.justifyContent = 'flex-end';
     tile.style.gap = '8px';
-    if (!p.locked) {
-      tile.style.background = p.color;
-      tile.style.cursor = 'pointer';
+    if (p.unavailable) {
+      tile.style.background = 'var(--bg-surface)';
+      tile.style.alignItems = 'center';
+      tile.style.justifyContent = 'center';
       tile.style.padding = '24px';
-      tile.onclick = (function(pack) {
-        return function() { sendToUnity('storeBuyPack', pack.sku ? {sku: pack.sku} : {name: pack.name}); };
-      })(p);
+      tile.style.textAlign = 'center';
+      tile.innerHTML = '<div class="tile-hero-title">Picks packs unavailable — try again later</div>';
+    } else if (!p.locked) {
+      tile.style.background = p.color;
+      tile.style.padding = '24px';
+      if (p.sku) {
+        tile.style.cursor = 'pointer';
+        tile.onclick = (function(pack) {
+          return function() { sendToUnity('storeBuyPack', {sku: pack.sku}); };
+        })(p);
+      }
       var packInner =
         '<div class="store-price">' + p.price + '</div>' +
         '<div style="line-height:0"><img src="branding/JamPick_hires.png" alt="" style="width:44px;height:44px;object-fit:contain;display:block"></div>';
