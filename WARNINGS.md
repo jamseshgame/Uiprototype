@@ -55,7 +55,7 @@ Renaming or removing any of these **breaks the matching feature**. Grouped by ar
 **Store / economy:** `purchaseItem` · `equipItem` · `storeBuyPack`
 
 **Challenges / referrals:** `challengeCTA` · `challengeRewardClaimed` · `jamCreatorOpened` ·
-`referralsOpened` · `referralCodeEntered` · `claimReferralPicks`
+`linkSocialHandle` · `referralsOpened` · `referralCodeEntered` · `claimReferralPicks`
 
 **Creator (photos / AI art):** `creatorPageOpened` · `creatorOpenCamera` · `creatorCancelCamera` ·
 `creatorGenerateArt` · `creatorDeletePhoto` · `creatorDeleteArt`
@@ -67,49 +67,94 @@ Renaming or removing any of these **breaks the matching feature**. Grouped by ar
 
 **Keyboard:** `requestKeyboard` · `closeKeyboard`
 
-> Messages NOT in this list (e.g. `inviteToSpace`, `createSpace`, `deleteSpace`, `getLobby`,
-> `loadout`, `songSpace`, `selectVaultItem`, theme/banner/frame changes, `layoutChanged`,
-> `storeBuySong`, `updateName`, `leaderboardType`, `creatorPhoto`, `linkSocialHandle`,
-> `onboardStepComplete`, `pauseOpened`/`pauseToggle`, `resumeGame`/`restartGame`/`exitToHome`)
-> are **emitted by the UI but have no Unity handler yet** — they currently do nothing. Don't assume
-> they work; they're tracked separately for wiring.
+> Messages NOT in this list (see "Wiring status" below for the full audited set) are **emitted by
+> the UI but have no Unity handler yet**, so they currently do nothing. Don't assume they work;
+> they're tracked separately for wiring.
 
-## Wiring status — handled vs pending (snapshot 2026-06-24)
+## Wiring status — handled vs pending (snapshot 2026-10-31)
 
 The Unity client only acts on a message if it has a handler; everything else hits the silent
-`default:`. This is the audited status of every message the UI emits. **The "NOT YET WIRED" list is
-the important one: the C# side intends to wire each of those *later, against exactly this name +
-payload*. If you rename one, change its payload, or stop emitting it, FLAG IT** — otherwise the
-eventual handler silently won't match. Re-run the audit (above) after every UI bump and diff against
-this snapshot; if a pending message changed, the wiring plan changed.
+`default:`. This is the audited status of every message the UI emits, from the audit commands above
+run against `production` (Uiprototype) and `main` (game). **The "NOT YET WIRED" list is the important
+one: the C# side intends to wire each of those *later, against exactly this name + payload*. If you
+rename one, change its payload, or stop emitting it, FLAG IT**. Otherwise the eventual handler silently
+won't match. Re-run the audit after every UI bump and diff against this snapshot.
+
+Counts at this snapshot: the UI emits **96** distinct types and the bridge has **77** `case` labels (nested avatar sub-cases included).
+**37** emitted types have no handler on `main`.
 
 ### ✅ WIRED — a handler exists; renaming/reshaping BREAKS a live feature
-Everything in the **Inbound contract** list below is handled. Most recently wired:
-`inviteToGroup`, `acceptGroupInvite`, `declineGroupInvite`, `renameGroup`, plus the `experience`
-skin tabs `guitarSkin`/`drumSkin` (these were silently dropped by a reskin — see cautionary tales).
+Everything in the **Inbound contract** list above is handled, plus:
+- `linkSocialHandle {platform, handle}`: **now wired** (JamCreator socials → `SetSocialHandle`). It was
+  listed as pending in the 2026-06-24 snapshot.
+- `redeemPromoCode {code}`, `requestIapPacks {}` and `enterPrivateSpace`.
+
+### 🔧 WIRED BY OPEN PRs (2026-10-31): keep these names + payloads exactly
+These have handlers on PR branches that aren't merged yet. Until they merge they still hit `default:`.
+- `leaveGroup {id, name}` · `disbandGroup {id, name}`: Manage Group ▸ Leave / Disband, keyed by the
+  band's PlayFab **id**. Server: `LeaveGroup` / `DisbandGroup`. (Branch `claude/band-leave-disband`.)
+- `onboardStepComplete {step, flags}`: saved server-side via `CompleteOnboardStep`. `flags.legal_version`
+  is read for the `legal` step. Unity replies on load with `onboardProgress`.
+  (Branch `claude/tutorial-onboarding-persistence`.)
+- The `startGame` field **`tutorial`** (`"guitar"` | `false`) is now read. A finished tutorial song
+  marks it complete server-side, and Unity sends `tutorialStatus`. (Same branch.)
 
 ### ⏳ NOT YET WIRED — emitted, no handler yet. Keep the name + payload stable or flag the change
 Each is parked pending the backend/feature in *italics*. The payload shown is what the future handler
 will be written against:
 
-- `sendFriendRequest {name}` · `removeFriend {name}` — *no in-app friend graph exists (friends are Meta-only).*
-- `inviteToSpace {name}` · `createSpace {name,type,env,forGroup}` · `deleteSpace {name,forGroup}` — *no "spaces" backend exists.*
-- `songSpace songIdx:catId:optId` · `loadout idx:catId:optId` — per-song env / loadout. *No per-song apply system (per-song settings currently collapse to session-level).*
-- `themeChanged` · `themePurchased` · `bannerChanged` · `bannerPurchased` · `frameChanged` · `framePurchased` `<id>` — *cosmetic persistence + economy; uses a MOCK "Coins" currency (NOT the real Picks/JC), hardcoded unlocks, no persistence.*
-- `storeBuySong {title,artist}` — *song-DLC; needs IAP SKUs + entitlement + content gating. Payload has no SKU/id.*
-- `layoutChanged <index>` · `challengeLayoutChanged <index>` — *home / challenges grid tiling; hidden dev pickers; needs PlayFab user-data persistence.*
-- `updateName <newName>` — *custom display name; `UpdateDisplayName` exists but login re-syncs the Meta name, so it needs persist + override-gate first.*
-- `linkSocialHandle {platform,handle}` · `linkTiktokHandle {handle}` — *creator socials; no persistence backend.*
-- `onboardStepComplete {step,flags}` — *onboarding server-mirror; already in localStorage, server side needs user-data.*
-- `pauseToggle {id,value}` — *in-game settings toggles; needs per-toggle meaning.*
-- `resumeGame {}` · `restartGame {}` · `exitToHome {}` — pause-menu transport. **These map 1:1 onto existing `JamseshEvents.Gameplay.OnGameplayResumed/Restarted/Exited`** (live systems already act on them) — a 3-case wire the moment the pause-menu UI is finalized. **Keep these exact names.**
+- `modifierChanged {modifier, slider?, value?, enabled}` · `modifiers {tier, enabled, values, preset}` ·
+  `modifierPresetSaved {id, name}`: *Difficulty & Modifiers popup. Live tuning isn't consumed yet; the same
+  `modifiers` payload already rides on `startGame` (read only for Battle via
+  `BattleModeSettings.FromModifiers`). The extra tabs are internal-only.*
+- `tutorialPromptAccepted {instrument}` · `tutorialPromptDeclined {instrument}`: *analytics-only intent
+  events (see `TUTORIAL_PROMPT_HANDOVER.md`). Act on `startGame.tutorial`, never on these.*
+- `vinylArtSelected {path}` · `vinylArtPickerClosed {}`: *Creator ▸ vinyl art slot picker; no vinyl-art
+  apply system in Unity yet.*
+- `sendFriendRequest {name}` · `removeFriend {name}`: *no in-app friend graph exists (friends are
+  Meta-only). The Friends-page PR (jamseshquest#22) handles `sendFriendRequest` through Meta's follow
+  request; `removeFriend` stays unwired because Meta has no unfollow API.*
+- `inviteToSpace {name}` · `createSpace {name,type,environment,invited}` · `deleteSpace {name,forGroup}`:
+  *no "spaces" backend exists. **Still an open decision** (31 Oct): Spaces Create/Delete/Invite was not
+  hidden.*
+- `songSpace songIdx:catId:optId` · `loadout idx:catId:optId`: per-song env / loadout. *No per-song apply
+  system (per-song settings collapse to session-level).*
+- `themeChanged` · `themePurchased` · `bannerChanged` · `bannerPurchased` · `frameChanged` ·
+  `framePurchased` `<id>`: *cosmetic persistence + economy. They use a MOCK "Coins" currency (NOT the real
+  Picks), hardcoded unlocks, no persistence. Reachable via `?goto=settings.themes|banners|frames`.
+  **Open decision**: keep or delete themes/banners/frames + the coin wallet.*
+- `storeBuySong {title,artist}`: *song DLC. Needs IAP SKUs + entitlement + content gating. The payload has
+  no SKU/id.*
+- `layoutChanged <index>` · `challengeLayoutChanged <index>`: *home / challenges grid tiling, hidden dev
+  pickers. Needs PlayFab user-data persistence.*
+- `updateName <newName>`: *custom display name. `UpdateDisplayName` exists, but login re-syncs the Meta
+  name, so it needs persist + override-gate first.*
+- `linkTiktokHandle {handle}`: *legacy single-platform form. `linkSocialHandle` is the wired path.*
+- `pauseToggle {id,value}`: *in-game settings toggles; needs a meaning per toggle.*
+- `resumeGame {}` · `restartGame {}` · `exitToHome {}`: pause-menu transport. **These map 1:1 onto
+  existing `JamseshEvents.Gameplay.OnGameplayResumed/Restarted/Exited`** (live systems already act on
+  them), so wiring them is three `case`s once the pause-menu UI is finalized. Unity never sends
+  `openPause` today, so `showPause` is reachable only via `?step=pause-<instrument>`. **Keep these exact
+  names.**
 
 ### 🗑️ STALE / REDUNDANT — do NOT wire; safe to delete from the UI
-- `getLobby` — only a comment, never actually emitted; Unity already pushes `updateLobby` proactively.
-- `selectVaultItem {name,cat}` — fires alongside `openItemPurchase('equip')` → `equipItem`, which already handles the equip; carries no usable id.
-- `leaderboardType <label>` — results scope (Group/Me) switches locally; both datasets already pushed via `gameResultsLeaderboard`.
-- `creatorPhoto {}` — demo stand-in (empty payload); the real capture flow is `creatorOpenCamera` → `creatorPhotos`.
-- `pauseOpened {instrument}` — Unity has already paused before this fires (it's emitted from `showPause`, which Unity triggered via `openPause`); it's a confirmation only.
+- `getLobby`: only a comment, never actually emitted. Unity already pushes `updateLobby` proactively.
+- `selectVaultItem {name,cat}`: fires alongside `openItemPurchase('equip')` → `equipItem`, which already
+  handles the equip. It carries no usable id.
+- `leaderboardType <label>`: results scope (Group/Me) switches locally; both datasets are already pushed
+  via `gameResultsLeaderboard`.
+- `creatorPhoto {}`: demo stand-in (empty payload). The real capture flow is `creatorOpenCamera` →
+  `creatorPhotos`.
+- `pauseOpened {instrument}`: Unity has already paused before this fires (it's emitted from `showPause`).
+  It's a confirmation only.
+
+### 👻 HANDLED BUT NO LONGER EMITTED — the bridge listens, the UI never sends
+The bridge has `case`s for these, but no live `sendToUnity` emits them any more. Either a reskin dropped
+the emitter, or the flow moved elsewhere. If one of these features "stopped working", look here first:
+`selectSong` · `enterBandspace` (renamed `joinGroup`) · `viewGroup` · `referFriend` · `claimReferralPicks`
+(the referral page became read-only) · `creatorCancelCamera` · `avatarLoginRequested` · `requestKeyboard`
+(text entry now uses the in-page keyboard iframe). The avatar-morph sub-cases (`face`, `hair`, `colors`,
+`makeup`, `wear`, `ink`, `*Shape`) are nested `case`s inside the avatar handler, not top-level messages.
 
 ## Outbound contract — `handleUnityMessage` `case 'TYPE':` the UI must keep
 
@@ -122,7 +167,8 @@ The game pushes these to the UI; if the UI drops the matching `case`, the game's
 `updateReferralList` · `gameResults` · `gameResultsGroupScore` · `gameResultsLeaderboard` ·
 `gameResultsProgression` · `creatorPhotos` · `creatorPhotoAdded` · `creatorArt` ·
 `creatorArtGenerated` · `creatorArtError` · `avatarLoginStatus` · `avatarAuthStatus` ·
-`avatarCatalog` · `navigate`
+`avatarCatalog` · `navigate` · `setInternalUser` · `updateIapPacks` · `updateHubs` ·
+`tutorialStatus` · `onboardProgress`
 
 ---
 
