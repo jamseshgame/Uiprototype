@@ -21920,6 +21920,11 @@ function buildStoreGrid() {
       tile.style.padding = '24px';
       tile.style.textAlign = 'center';
       tile.innerHTML = '<div class="tile-hero-title">Picks packs unavailable — try again later</div>';
+      // Tap to retry: Unity re-fetches and replies with a fresh updateIapPacks.
+      if (window.vuplex) {
+        tile.style.cursor = 'pointer';
+        tile.onclick = function() { sendToUnity('requestIapPacks', {}); };
+      }
     } else if (!p.locked) {
       tile.style.background = p.color;
       tile.style.padding = '24px';

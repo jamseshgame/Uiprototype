@@ -152,7 +152,8 @@ Changing these payload shapes breaks the feature even if the message name is unc
   (e.g. `iridescent-guitar`). A mismatch means a purchased item never shows as owned / can't equip.
 - **Ownership-gated tiles**: the Vibe picker only shows skins that are `Original` or in
   `owned_items_v1` (pushed via `updateOwnedItems`). Don't hardcode unowned skins as always-visible.
-- **`updateIapPacks`** is `{ packs:[{sku,picks,price,name}], error? }`. On a fetch failure Unity sends
+- **`updateIapPacks`** is `{ packs:[{sku,picks,price,name}], error? }` (re-requested with
+  `requestIapPacks {}` when the player taps the unavailable tile). On a fetch failure Unity sends
   `{ packs:[], error:"..." }`. On the headset (`window.vuplex`) the Packs tab never falls back to the
   desktop mock: an empty or errored list shows "Picks packs unavailable — try again later". Only a
   tile with a `sku` may send `storeBuyPack {sku}`; never send a SKU-less `storeBuyPack`.
