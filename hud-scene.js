@@ -735,7 +735,7 @@ function originalNotes(scene, palette, res, opts = {}) {
 }
 
 // ---------------------------------------------------------------- AFTER A: polish pass
-function buildPolish(scene, assets, res) {
+function buildPolish(scene, assets, res, mods = {}) {
   // lanes: same highway art but dimmed + lane-tinted, no fade at the neck end so lanes reach the target
   SCREEN.forEach((f, slice) => {
     const fr = LANES[f];
@@ -754,7 +754,8 @@ function buildPolish(scene, assets, res) {
     bk.renderOrder = 0; scene.add(bk);
   }
   const railMat = (op) => new THREE.MeshBasicMaterial({ color: BRAND.lav, transparent: true, opacity: op, depthWrite: false, side: THREE.DoubleSide, toneMapped: false });
-  for (let k = 0; k <= 5; k++) {
+  if (mods.chunkyFrets) chunkyFrets(scene);
+  else for (let k = 0; k <= 5; k++) {
     const outer = k === 0 || k === 5;
     // boundary between screen lanes k-1 and k
     let fr, u;
@@ -769,8 +770,23 @@ function buildPolish(scene, assets, res) {
   originalNotes(scene, PALETTE_AFTER, res, { glow: true });
   // meters with a visible track, rounded, brand colours, single multiplier chip
   const st = sideLane(STAR_START, STAR_END), pw = sideLane(POWER_START, POWER_END);
-  meterFlat(scene, st, BRAND.acid, 0.42, null, 'STREAK', '48');
-  meterFlat(scene, pw, BRAND.magenta, 0.46, [0.2, 0.4, 0.6, 0.8, 1], 'POWER', '×4');
+  if (mods.airMeters) {
+    // Air fretboard's glass posts at either end of the strike line: power left, streak right
+    const L = LANES[4], R = LANES[0];
+    const x = R.at(CROSS_T, 0, 0).sub(L.at(CROSS_T, 0, 0)).normalize();
+    gatePost(scene, L.at(CROSS_T, -LANE_W / 2 - 0.03, GEM_LIFT - 0.006).addScaledVector(x, -0.012), BRAND.magenta, 0.46, '×4', [0.2, 0.4, 0.6, 0.8]);
+    gatePost(scene, R.at(CROSS_T, LANE_W / 2 + 0.03, GEM_LIFT - 0.006).addScaledVector(x, 0.012), BRAND.acid, 0.42, '48', null);
+  } else {
+    meterFlat(scene, st, BRAND.acid, 0.42, null, 'STREAK', '48');
+    meterFlat(scene, pw, BRAND.magenta, 0.46, [0.2, 0.4, 0.6, 0.8, 1], 'POWER', '×4');
+  }
+  if (mods.chunkyScore) {
+    const plaque = scorePlaque3D();
+    facing(plaque, st.at(0.5, 0.27, 0.17), HEAD, 14);
+    plaque.rotateY(PLAQUE_YAW);
+    scene.add(plaque);
+    return;
+  }
   // score card: tilted up toward the player, moved off the gem path to the right of the streak meter
   const pos = st.at(0.36, 0.2, 0.09);
   const card = textPlane(0.30, 0.17, 2600, (ctx, w, h) => {
@@ -807,44 +823,15 @@ function meterFlat(scene, ln, hex, fill, ticks, label, value) {
 }
 
 // ---------------------------------------------------------------- AFTER B/C: chunky 3D track
-function buildTrack(scene, assets, opts = {}) {
-  const margin = 0.03;
-  const patch = trackPatch(margin, 0, 60, 1);
-  const T0 = -0.005, T1 = 1.0;
-  // slab top
-  const topMat = new THREE.MeshStandardMaterial({ color: '#120e26', roughness: 0.6, envMapIntensity: 0.12 });
-  const top = new THREE.Mesh(patch.geometry(T0, T1, 0, 1, 0), topMat);
-  scene.add(top);
-  // lane grooves tinted per lane + highway art very subtly
-  SCREEN.forEach((f, slice) => {
-    const fr = LANES[f];
-    const m = new THREE.Mesh(laneStrip(fr, 0, 1, -LANE_W / 2 + 0.002, LANE_W / 2 - 0.002, 0.0015, 60),
-      laneMaterial(assets.highway, slice, { tint: PALETTE_AFTER[f], tintAmt: isHeld(f) ? 0.42 : 0.24, fadeHitOn: 0 }));
-    CUR && CUR.lanes.push({ mat: m.material, f, tint: [0.24, 0.42] });
-    m.material.uniforms.baseColor.value.set(0.42, 0.40, 0.55, 1.0);
-    m.material.uniforms.fadeStart.value = 2;
-    m.material.uniforms.fadeStartSpawn.value = 0.86;
-    m.renderOrder = 1; scene.add(m);
-  });
+
+// Chunky 3D's raised edge rails, lane dividers and beat lines (reused by the Polish hybrid)
+function chunkyFrets(scene, patch = trackPatch(0.03, 0, 60, 1), T0 = -0.005, T1 = 1.0) {
   // beat lines across the track
   for (let t = 0.17; t < 1; t += 0.095) {
     const a = patch.at(t, 0.04, 0.003), b = patch.at(t, 0.96, 0.003);
     const ln = new THREE.Mesh(new THREE.PlaneGeometry(a.distanceTo(b), 0.005), new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0.16 * (1 - t * 0.6), depthWrite: false, side: THREE.DoubleSide, toneMapped: false }));
     orient(ln, a.clone().add(b).multiplyScalar(0.5), b.clone().sub(a), LANES[2].d);
     ln.renderOrder = 2; scene.add(ln);
-  }
-  // side lips (the "10px lip" of the menu tiles, as a slab edge)
-  const lipMat = new THREE.MeshStandardMaterial({ color: '#4b3f86', roughness: 0.5 });
-  const lipDark = new THREE.MeshStandardMaterial({ color: '#0a0816', roughness: 0.8, side: THREE.DoubleSide });
-  for (const s of [0, 1]) {
-    const A = [], B = [];
-    for (let i = 0; i <= 60; i++) { const t = T0 + (T1 - T0) * i / 60; A.push(patch.at(t, s, 0)); B.push(patch.at(t, s, -0.028)); }
-    scene.add(new THREE.Mesh(ribbon(A, B), lipDark));
-  }
-  {
-    const A = [], B = [];
-    for (let j = 0; j <= 10; j++) { A.push(patch.at(T0, j / 10, 0)); B.push(patch.at(T0, j / 10, -0.028)); }
-    scene.add(new THREE.Mesh(ribbon(A, B), lipMat));
   }
   // chunky rails: rounded bars along both edges + thin raised dividers
   const railMat = new THREE.MeshPhysicalMaterial({ color: BRAND.lav, roughness: 0.3, clearcoat: 1, clearcoatRoughness: 0.1, envMapIntensity: 0.5 });
@@ -874,6 +861,41 @@ function buildTrack(scene, assets, opts = {}) {
       }
     }
   }
+}
+
+function buildTrack(scene, assets, opts = {}) {
+  const margin = 0.03;
+  const patch = trackPatch(margin, 0, 60, 1);
+  const T0 = -0.005, T1 = 1.0;
+  // slab top
+  const topMat = new THREE.MeshStandardMaterial({ color: '#120e26', roughness: 0.6, envMapIntensity: 0.12 });
+  const top = new THREE.Mesh(patch.geometry(T0, T1, 0, 1, 0), topMat);
+  scene.add(top);
+  // lane grooves tinted per lane + highway art very subtly
+  SCREEN.forEach((f, slice) => {
+    const fr = LANES[f];
+    const m = new THREE.Mesh(laneStrip(fr, 0, 1, -LANE_W / 2 + 0.002, LANE_W / 2 - 0.002, 0.0015, 60),
+      laneMaterial(assets.highway, slice, { tint: PALETTE_AFTER[f], tintAmt: isHeld(f) ? 0.42 : 0.24, fadeHitOn: 0 }));
+    CUR && CUR.lanes.push({ mat: m.material, f, tint: [0.24, 0.42] });
+    m.material.uniforms.baseColor.value.set(0.42, 0.40, 0.55, 1.0);
+    m.material.uniforms.fadeStart.value = 2;
+    m.material.uniforms.fadeStartSpawn.value = 0.86;
+    m.renderOrder = 1; scene.add(m);
+  });
+  // side lips (the "10px lip" of the menu tiles, as a slab edge)
+  const lipMat = new THREE.MeshStandardMaterial({ color: '#4b3f86', roughness: 0.5 });
+  const lipDark = new THREE.MeshStandardMaterial({ color: '#0a0816', roughness: 0.8, side: THREE.DoubleSide });
+  for (const s of [0, 1]) {
+    const A = [], B = [];
+    for (let i = 0; i <= 60; i++) { const t = T0 + (T1 - T0) * i / 60; A.push(patch.at(t, s, 0)); B.push(patch.at(t, s, -0.028)); }
+    scene.add(new THREE.Mesh(ribbon(A, B), lipDark));
+  }
+  {
+    const A = [], B = [];
+    for (let j = 0; j <= 10; j++) { A.push(patch.at(T0, j / 10, 0)); B.push(patch.at(T0, j / 10, -0.028)); }
+    scene.add(new THREE.Mesh(ribbon(A, B), lipMat));
+  }
+  chunkyFrets(scene, patch, T0, T1);
   // meter fills lit inside the rails (option C) or troughs (option B)
   return patch;
 }
@@ -1414,6 +1436,8 @@ export function createHudViewer(canvas, assets, opts = {}) {
     const hudStart = scene.children.length;
     if (variant === 'before') buildBefore(scene, assets, res);
     else if (variant === 'polish') buildPolish(scene, assets, res);
+    else if (variant === 'polish_chunky') buildPolish(scene, assets, res, { chunkyFrets: true, chunkyScore: true });
+    else if (variant === 'polish_air') buildPolish(scene, assets, res, { airMeters: true });
     else if (variant === 'air') buildAir(scene, assets, res);
     else buildChunky(scene, assets, res, variant);
     if (opts.handTrack && CUR) {

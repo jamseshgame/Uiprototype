@@ -44,11 +44,13 @@
 <div class="wrap">
   <div class="brand">JAMSESH</div>
   <h1>Guitar HUD in VR</h1>
-  <p>The current in-song guitar HUD and two redesign options, at real size around you. Notes play on a loop and the frets press as each note lands, so you can judge the strike zone and press feedback in the headset.</p>
+  <p>The current in-song guitar HUD, the Polish pass and its two variations, and Chunky 3D, at real size around you. Notes play on a loop and the frets press as each note lands, so you can judge the strike zone and press feedback in the headset.</p>
   <div class="row">
     <div class="seg" role="group" aria-label="Version" id="variants">
       <button type="button" data-v="before" aria-pressed="true">Today</button>
       <button type="button" data-v="polish" aria-pressed="false">Polish pass</button>
+      <button type="button" data-v="polish_chunky" aria-pressed="false">Polish + Chunky</button>
+      <button type="button" data-v="polish_air" aria-pressed="false">Polish + Air</button>
       <button type="button" data-v="chunky" aria-pressed="false">Chunky 3D</button>
     </div>
     <button class="vr" id="enter" type="button" disabled>Enter VR</button>
@@ -59,7 +61,7 @@
   </div>
   <p class="note" id="xr-note">Checking for VR support…</p>
   <ul class="how">
-    <li><b>Trigger</b> (either hand): next version — Today, Polish pass, Chunky 3D.</li>
+    <li><b>Trigger</b> (either hand): next version — Today, Polish pass, Polish + Chunky, Polish + Air, Chunky 3D.</li>
     <li><b>Hold the controllers like a guitar</b>: right hand at the body, left hand up the neck. The guitar and the near end of the highway follow your hands, while the far end stays fixed on the stage, as in the game.</li>
     <li><b>Grip</b>: re-centre the stage so the highway runs straight ahead of you.</li>
     <li>Stand up and face forward before pressing Enter VR.</li>
@@ -69,8 +71,8 @@
 import * as THREE from 'three';
 import { createHudViewer } from './hud-scene.js';
 
-const VARIANTS = ['before', 'polish', 'chunky'];
-const NAMES = { before: 'Today', polish: 'Polish pass', chunky: 'Chunky 3D' };
+const VARIANTS = ['before', 'polish', 'polish_chunky', 'polish_air', 'chunky'];
+const NAMES = { before: 'Today', polish: 'Polish pass', polish_chunky: 'Polish + Chunky', polish_air: 'Polish + Air', chunky: 'Chunky 3D' };
 const canvas = document.getElementById('c');
 const stage = document.getElementById('stage');
 const status = document.getElementById('status');
@@ -103,7 +105,7 @@ function drawPanel(v) {
   ctx.beginPath(); ctx.roundRect(4, 4, w - 8, h - 8, 48); ctx.fillStyle = 'rgba(16,12,31,0.88)'; ctx.fill();
   ctx.lineWidth = 5; ctx.strokeStyle = 'rgba(176,166,223,0.6)'; ctx.stroke();
   ctx.fillStyle = 'rgba(248,248,252,0.6)'; ctx.font = '700 40px Monda'; ctx.fillText('GUITAR HUD  ·  ' + (VARIANTS.indexOf(v) + 1) + ' / ' + VARIANTS.length, 56, 88);
-  ctx.fillStyle = v === 'before' ? '#F4F1FF' : '#E8FF3A'; ctx.font = '170px "Bebas Neue"'; ctx.fillText(NAMES[v].toUpperCase(), 52, 250);
+  ctx.fillStyle = v === 'before' ? '#F4F1FF' : '#E8FF3A'; let fs = 170; ctx.font = `${fs}px "Bebas Neue"`; while (ctx.measureText(NAMES[v].toUpperCase()).width > w - 110 && fs > 80) { fs -= 6; ctx.font = `${fs}px "Bebas Neue"`; } ctx.fillText(NAMES[v].toUpperCase(), 52, 250);
   ctx.fillStyle = 'rgba(248,248,252,0.75)'; ctx.font = '700 36px Monda'; ctx.fillText('Trigger: next version     Grip: re-centre', 56, 350);
   panelTex.needsUpdate = true;
 }
