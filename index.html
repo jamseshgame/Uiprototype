@@ -4463,10 +4463,9 @@
     flex: 1;
     min-height: 0;
   }
-  /* Friends system parked for launch: hide the Bandmates tab bar but keep its row
-     height reserved (so the 4×3 grid + bottom pager bar stay in place). Re-show the
-     Friends/Add Friends tabs by removing this rule. */
-  #social-tabs { visibility: hidden; }
+  /* Bandmates tab bar (Groups | Friends) is live again now that Friends shows real
+     Meta friends. To park it, restore: #social-tabs { visibility: hidden; } —
+     the row height stays reserved either way, so the grid doesn't shift. */
   /* Spaces Public/Private split parked too: all spaces list in one grid; the tab
      bar is hidden but its row height stays reserved. Re-show by removing this rule. */
   #spaces-tabs { visibility: hidden; }
@@ -4587,17 +4586,96 @@
     overflow-x: hidden;   /* clip the friendSlideIn translateX overshoot so it can't flash a horizontal scrollbar */
     align-content: start;
   }
-  /* Bandmates ▸ Friends grid fills the available height: a 2×5 grid of 1fr rows
-     that stretch (no scrollbar), with items filling their cells (avatars sized
-     to the row in JS). */
+  /* Bandmates ▸ Friends: two side-by-side columns — Meta friends who own Jamsesh
+     (left) and people to invite to Jamsesh (right). Each column is a 1×5 grid of
+     1fr rows that stretch (no scrollbar); avatars are sized to the row in JS. */
+  .friends-columns {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    padding: 24px 24px 0;
+  }
+  .friends-col {
+    flex: 1;
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .friends-col + .friends-col { margin-left: 24px; }
+  .friends-col-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 0 16px 16px;
+  }
+  .friends-col-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 48px;
+    letter-spacing: 1px;
+    color: var(--text-primary);
+  }
+  .friends-col-sub {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-secondary);
+  }
   #social-friends-list,
-  #social-addfriends-list {
+  #social-invite-list {
+    grid-template-columns: 1fr;
     grid-template-rows: repeat(5, 1fr);
     align-content: stretch;
     overflow: hidden;
+    padding: 0;
   }
   #social-friends-list .friend-item,
-  #social-addfriends-list .friend-item { height: 100%; }
+  #social-invite-list .friend-item,
+  #social-invite-list .friend-add-btn { height: 100%; }
+  .friends-col .pager { padding-top: 16px; }
+  /* Right-hand "Invite" chip on each invite row (Sending… / Invited once tapped). */
+  .friend-invite-chip {
+    flex-shrink: 0;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 34px;
+    letter-spacing: 1px;
+    padding: 10px 32px;
+    border-radius: 999px;
+    color: #ffffff;
+    background: linear-gradient(135deg, #00E5C7 0%, #6AA0FF 100%);
+    box-shadow: 0 0 14px rgba(0,229,199,0.35);
+  }
+  .friend-invite-chip.is-sending { opacity: 0.6; }
+  .friend-invite-chip.is-sent {
+    background: transparent;
+    color: #FACC15;
+    border: 1px solid currentColor;
+    box-shadow: none;
+  }
+  /* Empty / loading message inside a friends column. */
+  .friends-empty {
+    grid-row: span 4;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 24px 40px;
+    border: 1px dashed rgba(255,255,255,0.18);
+    border-radius: 48px;
+  }
+  #social-friends-list .friends-empty { grid-row: span 5; }
+  .friends-empty-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 44px;
+    letter-spacing: 1px;
+    color: var(--text-primary);
+  }
+  .friends-empty-sub {
+    margin-top: 12px;
+    font-size: 26px;
+    line-height: 1.35;
+    color: var(--text-secondary);
+  }
 
   .friend-item {
     display: flex;
@@ -4746,6 +4824,24 @@
     font-size: 26px;
     letter-spacing: 1px;
     color: #FACC15;
+  }
+  /* Member popup with the extra "Add Friend" button: three buttons share the row
+     instead of each taking the fixed 440px (which overflows the popup). */
+  .std-popup-footer.has-3-btns .std-popup-btn {
+    flex: 1 1 0;
+    width: auto;
+    min-width: 0;
+  }
+  /* Neutral explainer variant (invite-to-Jamsesh popup). */
+  .friend-popup-note.is-info {
+    margin-top: 0;
+    font-family: inherit;
+    font-size: 26px;
+    letter-spacing: 0;
+    line-height: 1.35;
+    text-align: center;
+    max-width: 640px;
+    color: var(--text-secondary);
   }
   .friend-dot {
     display: inline-block;
@@ -11267,11 +11363,24 @@ input, textarea, select {
       <div class="play-mode-tabs" id="social-tabs">
         <div class="play-mode-tab active" onclick="switchSocialTab('groups')">Groups</div>
         <div class="play-mode-tab" onclick="switchSocialTab('friends')">Friends</div>
-        <div class="play-mode-tab" onclick="switchSocialTab('addfriends')">Add Friends</div>
       </div>
       <div id="social-tab-groups" class="spaces-tab-content"><div class="spaces-grid" id="social-grid-groups"></div><div id="social-groups-pager"></div></div>
-      <div id="social-tab-friends" class="spaces-tab-content" style="display:none"><div id="social-friends-list"></div><div id="social-friends-pager"></div></div>
-      <div id="social-tab-addfriends" class="spaces-tab-content" style="display:none"><div id="social-addfriends-list"></div><div id="social-addfriends-pager"></div></div>
+      <!-- Friends: left = Meta friends who own Jamsesh (updateFriends); right = people to
+           invite to Jamsesh (updateInvitableFriends) + Quest's own invite panel. -->
+      <div id="social-tab-friends" class="spaces-tab-content" style="display:none">
+        <div class="friends-columns">
+          <div class="friends-col">
+            <div class="friends-col-head"><span class="friends-col-title">On Jamsesh</span><span class="friends-col-sub" id="friends-col-sub-jamsesh"></span></div>
+            <div id="social-friends-list"></div>
+            <div id="social-friends-pager"></div>
+          </div>
+          <div class="friends-col">
+            <div class="friends-col-head"><span class="friends-col-title">Invite to Jamsesh</span><span class="friends-col-sub">Sends a Quest notification</span></div>
+            <div id="social-invite-list"></div>
+            <div id="social-invite-pager"></div>
+          </div>
+        </div>
+      </div>
     </div>
     <div class="page" id="page-spaces">
       <div class="play-mode-tabs" id="spaces-tabs">
@@ -11833,7 +11942,7 @@ input, textarea, select {
       <div class="friend-popup-note" id="friend-popup-note" style="display:none">Request sent</div>
     </div>
     <div class="std-popup-footer">
-      <button class="std-popup-btn jamsesh-signature" id="friend-popup-btn" onclick="sendFriendInvite()">Send Friend Invite</button>
+      <button class="std-popup-btn jamsesh-signature" id="friend-popup-btn" onclick="closeFriendPopup()">OK</button>
     </div>
   </div>
 </div>
@@ -11874,6 +11983,8 @@ input, textarea, select {
     </div>
     <div class="std-popup-footer">
       <button class="std-popup-btn create-group-leave-btn" onclick="confirmRemoveMember()">Remove Member</button>
+      <!-- Shown for bandmates who aren't Meta friends yet — opens Meta's follow-request flow. -->
+      <button class="std-popup-btn" id="member-popup-follow-btn" style="display:none" onclick="sendFollowRequest()">Add Friend</button>
       <button class="std-popup-btn jamsesh-signature" onclick="closeMemberPopup()">OK</button>
     </div>
   </div>
@@ -12398,6 +12509,15 @@ function handleUnityMessage(msg) {
     case 'updateSongs': updateSongsFromBackend(msg.data); break;
     case 'updateSongCharts': updateSongChartsFromBackend(msg.data); break;
     case 'updateFriends': updateFriendsFromBackend(msg.data); break;
+    case 'updateInvitableFriends': updateInvitableFriendsFromBackend(msg.data); break;
+    case 'appInviteResult': onAppInviteResult(msg.data); break;
+    case 'appInvitePanelResult':
+      if (msg.data && msg.data.ok === false) {
+        if (msg.data.error) console.log('[Friends] invite panel failed: ' + msg.data.error);
+        showConfirmPopup('Quest’s invite list couldn’t open. Check you’re online and try again.', { title: 'Invite List Unavailable', confirmLabel: 'OK' });
+      }
+      break;
+    case 'friendRequestResult': onFriendRequestResult(msg.data); break;
     case 'updateGroups': updateGroupsFromBackend(msg.data); break;
     case 'setActiveGroup': applyActiveGroup(msg.data); break;
     case 'groupInvite': openGroupInvite(msg.data); break;
@@ -12675,10 +12795,20 @@ function updateSongChartsFromBackend(data) {
 }
 
 function updateFriendsFromBackend(data) {
-  // data: [{name,online,avatar}, ...]
+  // data: [{name, oculusId, platformId, online, playing, avatar, accepted:true}, ...]
+  // Meta friends who own Jamsesh. Unity sends this once Meta has answered — an empty
+  // array means "loaded, none yet" (the page then shows its empty state).
   if (!data) return;
-  // Store and rebuild
   window._backendFriends = data;
+  buildSocialPage();
+  updateMemberFollowBtn();
+}
+
+function updateInvitableFriendsFromBackend(data) {
+  // data: [{name, oculusId, platformId, online, avatar}, ...]
+  // People the player can invite to download Jamsesh (Friends ▸ right column).
+  if (!data) return;
+  window._backendInvitables = data;
   buildSocialPage();
 }
 
@@ -13530,8 +13660,9 @@ function setupPickerGamepad() {
 }
 
 function switchSocialTab(tab) {
+  if (tab === 'addfriends') tab = 'friends';   // old deep links — Add Friends folded into Friends
   var tabs = document.getElementById('social-tabs').children;
-  var names = ['groups', 'friends', 'addfriends'];
+  var names = ['groups', 'friends'];
   for (var i = 0; i < tabs.length; i++) {
     tabs[i].className = 'play-mode-tab' + (names[i] === tab ? ' active' : '');
     document.getElementById('social-tab-' + names[i]).style.display = names[i] === tab ? 'flex' : 'none';
@@ -13595,33 +13726,55 @@ function pageCount(len) {
 
 var socialGroupsPage = 0;
 var socialFriendsPage = 0;
-var socialAddFriendsPage = 0;
+var socialInvitePage = 0;
 
-// Shared friends list — Unity-pushed roster when present, mock data otherwise.
-// Used by the Bandmates ▸ Friends tab and the Profile ▸ Referrals page.
+// ── Friends data ──────────────────────────────────────────────────────────
+// Two lists, both pushed by Unity from Meta:
+//   getFriendsData()   — Meta friends who own Jamsesh (updateFriends). Also feeds the
+//                        Create Group / Create Space invite pickers.
+//   getInvitableData() — people to invite to Jamsesh (updateInvitableFriends).
+// On the headset (window.vuplex) there is NO mock fallback: until Unity answers the
+// lists are empty and the Friends page shows "Loading…". The mock rosters below are
+// for desktop-browser previews only.
 var _friendsMock = null;
+var _invitablesMock = null;
 function getFriendsData() {
   if (window._backendFriends) return window._backendFriends;
-  // Memoised so in-app changes (accept/remove) persist across rebuilds in the demo.
-  if (_friendsMock) return _friendsMock;
-  // Friend fields used by friendStatus(): accepted (added friend), meta (Meta/Quest
-  // social-graph friend), online, playing (in a Jamsesh session). Unity pushes these
-  // via updateFriends; the mock below covers every status tier (see friendStatus).
-  _friendsMock = [
-    { name: 'Jooleeno',     online: true,  avatar: '', accepted: true, meta: true,  playing: true  },
-    { name: 'Ted',          online: true,  avatar: '',      accepted: true, meta: true,  playing: false },
-    { name: 'Abbie',        online: true,  avatar: '',    accepted: false, meta: true, requested: true },
-    { name: 'xShadowPick',  online: true,  avatar: '', accepted: false, meta: true, playing: true  },
-    { name: 'FretNinja',    online: true,  avatar: '',    accepted: false, meta: true, playing: false },
-    { name: 'RiffLord420',  online: true,  avatar: '', accepted: false, meta: false, playing: true },
-    { name: 'Arthen',       online: false, avatar: '',   accepted: true, meta: true  },
-    { name: 'GrooveMonkey', online: false, avatar: '',   accepted: true, meta: false },
-    { name: 'MelodyQueen',  online: false, avatar: '', accepted: false, meta: true },
-    { name: 'PickSlinger',  online: false, avatar: '', accepted: false, meta: true },
-    { name: 'BeatDropper99',online: false, avatar: '',      accepted: false, meta: false },
-    { name: 'StarShredder', online: false, avatar: '',      accepted: false, meta: false }
-  ];
+  if (window.vuplex) return [];
+  if (!_friendsMock) {
+    _friendsMock = [
+      { name: 'Jooleeno',     platformId: 'mock-1', online: true,  playing: true,  avatar: '', accepted: true },
+      { name: 'Ted',          platformId: 'mock-2', online: true,  playing: false, avatar: '', accepted: true },
+      { name: 'Arthen',       platformId: 'mock-3', online: false, playing: false, avatar: '', accepted: true },
+      { name: 'GrooveMonkey', platformId: 'mock-4', online: false, playing: false, avatar: '', accepted: true }
+    ];
+  }
   return _friendsMock;
+}
+function getInvitableData() {
+  if (window._backendInvitables) return window._backendInvitables;
+  if (window.vuplex) return [];
+  if (!_invitablesMock) {
+    _invitablesMock = [
+      { name: 'Abbie',         platformId: 'mock-11', avatar: '' },
+      { name: 'xShadowPick',   platformId: 'mock-12', avatar: '' },
+      { name: 'FretNinja',     platformId: 'mock-13', avatar: '' },
+      { name: 'RiffLord420',   platformId: 'mock-14', avatar: '' },
+      { name: 'MelodyQueen',   platformId: 'mock-15', avatar: '' },
+      { name: 'PickSlinger',   platformId: 'mock-16', avatar: '' },
+      { name: 'BeatDropper99', platformId: 'mock-17', avatar: '' }
+    ];
+  }
+  return _invitablesMock;
+}
+// False on the headset until Unity has sent the first friends list.
+function friendsDataReady() { return !!window._backendFriends || !window.vuplex; }
+function invitablesDataReady() { return !!window._backendInvitables || !window.vuplex; }
+function isJamseshFriendId(platformId) {
+  if (!platformId) return false;
+  var list = getFriendsData();
+  for (var i = 0; i < list.length; i++) { if (list[i].platformId === platformId) return true; }
+  return false;
 }
 
 // Resolve a friend's status + sort priority + pill. Priority order (1 = top):
@@ -13705,56 +13858,114 @@ function buildSocialPage() {
   }
   renderPager(document.getElementById('social-groups-pager'), socialGroupsPage, gTotal, function(dir) { socialGroupsPage += dir; buildSocialPage(); });
 
-  // ── Friends (accepted) + Add Friends (not yet added) — split by `accepted`. ──
-  var allFriends = getFriendsData();
-  var accepted = [], pending = [];
-  for (var fi = 0; fi < allFriends.length; fi++) {
-    var ff = allFriends[fi];
-    if (ff.accepted === true || ff.status === 'accepted') accepted.push(ff);
-    else pending.push(ff);
+  // ── Friends: Jamsesh friends (left) + invite to Jamsesh (right). ──
+  renderFriendGrid('social-friends-list', 'social-friends-pager', getFriendsData(), 'friends');
+  renderFriendGrid('social-invite-list', 'social-invite-pager', getInvitableData(), 'invite');
+  var subEl = document.getElementById('friends-col-sub-jamsesh');
+  if (subEl) {
+    var fl = getFriendsData(), onlineN = 0;
+    for (var on = 0; on < fl.length; on++) { if (fl[on].online) onlineN++; }
+    subEl.textContent = friendsDataReady() && fl.length ? (onlineN + ' online') : '';
   }
-  renderFriendGrid('social-friends-list', 'social-friends-pager', accepted, 'friends');
-  renderFriendGrid('social-addfriends-list', 'social-addfriends-pager', pending, 'add');
 }
 
-// Render a friend grid (sorted by status priority, paginated 2×5) into `listId`
-// with its pager. `pageKind` selects which page-state var to drive ('friends'
-// = accepted Friends tab, 'add' = Add Friends tab).
+// Minimal HTML escaping for player-supplied text (Meta display names) put into innerHTML.
+function escapeFriendText(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+// Invite-to-Jamsesh state per person: platformId → 'sending' | 'sent'.
+var _appInvites = {};
+var FRIENDS_PER_PAGE = 5;   // left column: 1×5 rows
+var INVITES_PER_PAGE = 4;   // right column: 4 rows + the "Invite more from Quest" row
+
+// Empty / loading card for a friends column.
+function makeFriendsEmpty(pageKind) {
+  var box = document.createElement('div');
+  box.className = 'friends-empty';
+  var title, sub;
+  if (pageKind === 'invite') {
+    if (!invitablesDataReady()) { title = 'Loading…'; sub = ''; }
+    else {
+      title = 'No one to suggest right now';
+      sub = 'Use Quest’s invite list below, or share your code from Settings ▸ Referrals.';
+    }
+  } else {
+    if (!friendsDataReady()) { title = 'Loading your Meta friends…'; sub = ''; }
+    else {
+      title = 'None of your Meta friends are on Jamsesh yet';
+      sub = 'Invite them from the list on the right.';
+    }
+  }
+  box.innerHTML = '<div class="friends-empty-title">' + title + '</div>' +
+    (sub ? '<div class="friends-empty-sub">' + sub + '</div>' : '');
+  return box;
+}
+
+// Last row of the invite column: opens Meta's own invite panel (followers + recently met).
+function makeQuestInviteRow() {
+  var btn = document.createElement('button');
+  btn.className = 'friend-add-btn';
+  btn.textContent = '+ Invite more from Quest';
+  btn.onclick = function() { sendToUnity('openAppInvitePanel', {}); };
+  return btn;
+}
+
+// Render one friends column into `listId` with its pager.
+//   pageKind 'friends' — Jamsesh friends, sorted by status (playing → online → offline), 5 per page.
+//   pageKind 'invite'  — people to invite (Meta's order), 4 per page + the Quest invite row.
 function renderFriendGrid(listId, pagerId, friends, pageKind) {
   var wrap = document.getElementById(listId);
+  if (!wrap) return;
   wrap.innerHTML = '';
   wrap.className = 'friends-list-wrap';
+  var isInvite = pageKind === 'invite';
   friends = friends.slice();
-  friends.sort(function(a, b) { return friendStatus(a).p - friendStatus(b).p; });
-  var PER = 10;   // 2×5 — rows fill the height, avatars max out, no scrollbar
+  if (!isInvite) friends.sort(function(a, b) { return friendStatus(a).p - friendStatus(b).p; });
+  var PER = isInvite ? INVITES_PER_PAGE : FRIENDS_PER_PAGE;
   var total = Math.max(1, Math.ceil(friends.length / PER));
-  var page = (pageKind === 'add') ? socialAddFriendsPage : socialFriendsPage;
+  var page = isInvite ? socialInvitePage : socialFriendsPage;
   if (page >= total) page = total - 1;
   if (page < 0) page = 0;
-  if (pageKind === 'add') socialAddFriendsPage = page; else socialFriendsPage = page;
+  if (isInvite) socialInvitePage = page; else socialFriendsPage = page;
   var items = friends.slice(page * PER, page * PER + PER);
+  if (!items.length) wrap.appendChild(makeFriendsEmpty(pageKind));
   for (var i = 0; i < items.length; i++) {
     var f = items[i];
-    var st = friendStatus(f);
     var item = document.createElement('div');
-    item.className = 'friend-item' + (f.online ? ' online' : '');
     item.style.setProperty('--friend-delay', (i * 0.06) + 's');
     item.style.cursor = 'pointer';
-    item.innerHTML =
-      '<div class="friend-avatar"><img src="' + f.avatar + '" alt=""></div>' +
-      '<div class="friend-info">' +
-        '<div class="friend-name">' + f.name + '</div>' +
-        '<div class="friend-status' + (f.online ? ' online' : '') + '">' +
-          '<span class="friend-dot' + (f.online ? ' online' : '') + '"></span>' +
-          '<span class="friend-pill ' + st.cls + '">' + st.label + '</span>' +
-        '</div>' +
-      '</div>';
-    item.onclick = (function(friend) { return function() { openFriendPopup(friend); }; })(f);
+    var avatarHtml = '<div class="friend-avatar"><img src="' + escapeFriendText(f.avatar || '') + '" alt=""></div>';
+    var nameHtml = '<div class="friend-name">' + escapeFriendText(f.name) + '</div>';
+    if (isInvite) {
+      var inv = _appInvites[f.platformId];
+      var chipCls = inv === 'sent' ? ' is-sent' : (inv === 'sending' ? ' is-sending' : '');
+      var chipTxt = inv === 'sent' ? 'Invited' : (inv === 'sending' ? 'Sending…' : 'Invite');
+      item.className = 'friend-item';
+      item.innerHTML = avatarHtml +
+        '<div class="friend-info">' + nameHtml + '</div>' +
+        '<div class="friend-invite-chip' + chipCls + '">' + chipTxt + '</div>';
+      item.onclick = (function(person) { return function() { openFriendPopup(person, 'invite'); }; })(f);
+    } else {
+      var st = friendStatus(f);
+      item.className = 'friend-item' + (f.online ? ' online' : '');
+      item.innerHTML = avatarHtml +
+        '<div class="friend-info">' + nameHtml +
+          '<div class="friend-status' + (f.online ? ' online' : '') + '">' +
+            '<span class="friend-dot' + (f.online ? ' online' : '') + '"></span>' +
+            '<span class="friend-pill ' + st.cls + '">' + st.label + '</span>' +
+          '</div>' +
+        '</div>';
+      item.onclick = (function(friend) { return function() { openFriendPopup(friend, 'friend'); }; })(f);
+    }
     wrap.appendChild(item);
   }
+  if (isInvite) wrap.appendChild(makeQuestInviteRow());
   sizeFriendAvatars(wrap);
   renderPager(document.getElementById(pagerId), page, total, function(dir) {
-    if (pageKind === 'add') socialAddFriendsPage += dir; else socialFriendsPage += dir;
+    if (isInvite) socialInvitePage += dir; else socialFriendsPage += dir;
     buildSocialPage();
   });
 }
@@ -13779,12 +13990,15 @@ function sizeFriendAvatars(grid) {
   else { requestAnimationFrame(apply); setTimeout(apply, 100); }
 }
 
-// Friend requests the player has sent (name → true). The Friends list shows a
-// "Friend request sent" pill for these; the popup's button reflects it too.
+// Meta follow requests sent from the member popup: platformId → 'opening' | 'sent'.
+// (friendStatus() also reads it by name for legacy entries.)
 var _friendRequestsSent = {};
 var _friendPopupTarget = null;
 
-function openFriendPopup(friend) {
+// Friend popup. mode 'friend' = a Jamsesh friend (info only — Meta has no
+// unfollow API for apps, so there's no Remove); mode 'invite' = someone to invite
+// to Jamsesh (Send Invite → Quest notification).
+function openFriendPopup(friend, mode) {
   _friendPopupTarget = friend;
   var fimg = document.getElementById('friend-popup-img');
   fimg.style.visibility = '';                 // clear any prior failed-load hide
@@ -13792,35 +14006,39 @@ function openFriendPopup(friend) {
   fimg.src = friend.avatar || '';
   document.getElementById('friend-popup-name').textContent = friend.name;
   var statusEl = document.getElementById('friend-popup-status');
-  statusEl.className = 'friend-popup-status' + (friend.online ? ' online' : '');
-  statusEl.innerHTML = '<span class="friend-dot' + (friend.online ? ' online' : '') + '"></span>' +
-    (friend.online ? 'Online' : 'Offline');
   var btn = document.getElementById('friend-popup-btn');
   var title = document.querySelector('#friend-popup-overlay .std-popup-header h2');
   var note = document.getElementById('friend-popup-note');
   note.style.display = 'none';
-  var isFriend = friend.accepted === true || friend.status === 'accepted';
-  if (isFriend) {
-    // Accepted friend → red "Remove Friend" CTA (opens a confirm).
-    if (title) title.textContent = 'Friend';
-    btn.textContent = 'Remove Friend';
-    btn.className = 'std-popup-btn create-group-leave-btn';
-    btn.disabled = false;
-    btn.onclick = confirmRemoveFriend;
-  } else if (_friendRequestsSent[friend.name] || friend.requested === true || friend.status === 'requested') {
-    // Pending request → "Request sent" note under the status, CTA just dismisses.
-    if (title) title.textContent = 'Add Friend';
+  note.className = 'friend-popup-note';
+  btn.className = 'std-popup-btn jamsesh-signature';
+  btn.disabled = false;
+  btn.onclick = function() { closeFriendPopup(); };
+
+  if (mode === 'invite') {
+    var inv = _appInvites[friend.platformId];
+    if (title) title.textContent = 'Invite to Jamsesh';
+    statusEl.style.display = 'none';
     note.style.display = '';
-    btn.textContent = 'OK';
-    btn.className = 'std-popup-btn jamsesh-signature';
-    btn.disabled = false;
-    btn.onclick = function() { closeFriendPopup(); };
+    if (inv === 'sent') {
+      note.textContent = 'Invite sent';
+      btn.textContent = 'OK';
+    } else if (inv === 'sending') {
+      note.textContent = 'Sending invite…';
+      btn.textContent = 'OK';
+    } else {
+      note.className = 'friend-popup-note is-info';
+      note.textContent = 'They’ll get a Quest notification inviting them to play Jamsesh with you.';
+      btn.textContent = 'Send Invite';
+      btn.onclick = function() { sendAppInvite(friend); };
+    }
   } else {
-    if (title) title.textContent = 'Add Friend';
-    btn.textContent = 'Send Friend Invite';
-    btn.className = 'std-popup-btn jamsesh-signature';
-    btn.disabled = false;
-    btn.onclick = sendFriendInvite;
+    var st = friendStatus(friend);
+    if (title) title.textContent = 'Friend';
+    statusEl.style.display = '';
+    statusEl.className = 'friend-popup-status' + (friend.online ? ' online' : '');
+    statusEl.innerHTML = '<span class="friend-dot' + (friend.online ? ' online' : '') + '"></span>' + st.label;
+    btn.textContent = 'OK';
   }
   document.getElementById('friend-popup-overlay').classList.add('active');
 }
@@ -13830,31 +14048,67 @@ function closeFriendPopup(e) {
   document.getElementById('friend-popup-overlay').classList.remove('active');
 }
 
-function sendFriendInvite() {
-  if (!_friendPopupTarget) return;
-  _friendRequestsSent[_friendPopupTarget.name] = true;
-  sendToUnity('sendFriendRequest', { name: _friendPopupTarget.name });
+// Invite one person to Jamsesh. Unity sends the Meta invite and replies with
+// appInviteResult {platformId, ok, error}; the row shows Sending… → Invited.
+function sendAppInvite(friend) {
+  if (!friend || !friend.platformId) return;
+  var id = friend.platformId;
+  if (_appInvites[id]) return;
+  _appInvites[id] = 'sending';
+  sendToUnity('inviteFriendToApp', { platformId: id, name: friend.name });
   closeFriendPopup();
-  buildSocialPage();   // the "Friend request sent" pill now shows on their row
+  buildSocialPage();
+  // Desktop preview has no Unity to answer — pretend it went through.
+  if (!window.vuplex) setTimeout(function() { onAppInviteResult({ platformId: id, ok: true }); }, 400);
 }
 
-// Remove-friend CTA → standardised destructive confirm → unfriend.
-function confirmRemoveFriend() {
-  var f = _friendPopupTarget;
-  if (!f) return;
-  closeFriendPopup();
-  showConfirmPopup('Remove ' + f.name + ' from your friends? You can send them a new request later.', {
-    title: 'Remove Friend?',
-    confirmLabel: 'Remove Friend',
-    destructive: true,
-    onConfirm: function() {
-      f.accepted = false;
-      if (f.status === 'accepted') f.status = '';
-      delete _friendRequestsSent[f.name];
-      sendToUnity('removeFriend', { name: f.name });
-      buildSocialPage();   // they drop out of Friends → into Add Friends
-    }
-  });
+function onAppInviteResult(data) {
+  if (!data || !data.platformId) return;
+  if (data.ok) {
+    _appInvites[data.platformId] = 'sent';
+  } else {
+    delete _appInvites[data.platformId];
+    if (data.error) console.log('[Friends] invite failed: ' + data.error);
+    showConfirmPopup('That invite didn’t go through. Check you’re online and try again.', { title: 'Invite Not Sent', confirmLabel: 'OK' });
+  }
+  buildSocialPage();
+}
+
+// ── Member popup: "Add Friend" (Meta follow request) for bandmates who aren't
+// Meta friends yet. Needs their platformId (lobby roster entries carry it).
+var _memberPopupTarget = null;
+function updateMemberFollowBtn() {
+  var btn = document.getElementById('member-popup-follow-btn');
+  if (!btn) return;
+  var m = _memberPopupTarget;
+  var me = (typeof getActiveProfile === 'function') ? getActiveProfile() : null;
+  var eligible = !!(m && m.platformId && !m.isSelf && !m.pending &&
+    !(me && m.name === me.name) && !isJamseshFriendId(m.platformId));
+  btn.style.display = eligible ? '' : 'none';
+  if (btn.parentNode) btn.parentNode.classList[eligible ? 'add' : 'remove']('has-3-btns');
+  if (!eligible) return;
+  var st = _friendRequestsSent[m.platformId];
+  btn.disabled = !!st;
+  btn.textContent = st === 'sent' ? 'Request Sent' : (st === 'opening' ? 'Opening…' : 'Add Friend');
+}
+
+function sendFollowRequest() {
+  var m = _memberPopupTarget;
+  if (!m || !m.platformId || _friendRequestsSent[m.platformId]) return;
+  var id = m.platformId;
+  _friendRequestsSent[id] = 'opening';
+  sendToUnity('sendFriendRequest', { platformId: id, name: m.name });
+  updateMemberFollowBtn();
+  if (!window.vuplex) setTimeout(function() { onFriendRequestResult({ platformId: id, sent: true }); }, 400);
+}
+
+// Unity → friendRequestResult {platformId, sent}: sent=false means the player
+// cancelled Meta's dialog (or it failed), so the button resets.
+function onFriendRequestResult(data) {
+  if (!data || !data.platformId) return;
+  if (data.sent) _friendRequestsSent[data.platformId] = 'sent';
+  else delete _friendRequestsSent[data.platformId];
+  updateMemberFollowBtn();
 }
 
 // Active-group name shown in the join-confirmation popup. Unity may push it via
@@ -14649,6 +14903,8 @@ function openMemberPopup(member, idx, removeFn) {
   _memberPopupIdx = idx;
   _memberRemoveFn = removeFn || null;
   _memberPopupName = member.name || 'this member';
+  _memberPopupTarget = member;
+  updateMemberFollowBtn();
   var img = document.getElementById('member-popup-img');
   img.style.visibility = '';
   img.removeAttribute('data-img-failed');
@@ -24248,7 +24504,7 @@ var homeTileDefs = {
   creator: { id: 'creator', title: 'JamCreator', sub: 'Your Creations', detail: 'Build and share content', ext: 'png', action: function() { showJamCreatorSection(); } },
   spaces:  { id: 'spaces',  title: 'Spaces', sub: 'K-Pop Zone', detail: '20/25 Jammers online!', ext: 'jfif', action: function() { navigateTo('spaces'); } },
   news:    { id: 'news',    title: 'News', sub: 'Update v0.25', detail: 'New battle mode added!', ext: 'jfif', action: function() { navigateTo('settings'); } },
-  social:  { id: 'social',  title: 'Bandmates', sub: '8 Friends Online', detail: 'Jump in and jam together', ext: 'webp', action: function() { navigateTo('social', {tab: 'friends'}); } }
+  social:  { id: 'social',  title: 'Bandmates', sub: '', detail: 'Jump in and jam together', ext: 'webp', action: function() { navigateTo('social'); switchSocialTab('friends'); } }
 };
 
 function buildHomeGrid(layoutIndex) {

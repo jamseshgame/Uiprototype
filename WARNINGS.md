@@ -50,7 +50,8 @@ Renaming or removing any of these **breaks the matching feature**. Grouped by ar
 
 **Bands / social:** `enterBandspace` · `joinGroup` · `joinHub` · `viewGroup` · `createGroup` ·
 `inviteToGroup` · `acceptGroupInvite` · `declineGroupInvite` · `renameGroup` · `invitePlayer` ·
-`referFriend`
+`referFriend` · `inviteFriendToApp {platformId,name}` · `openAppInvitePanel` ·
+`sendFriendRequest {platformId,name}`
 
 **Store / economy:** `purchaseItem` · `equipItem` · `storeBuyPack`
 
@@ -111,9 +112,6 @@ will be written against:
   events (see `TUTORIAL_PROMPT_HANDOVER.md`). Act on `startGame.tutorial`, never on these.*
 - `vinylArtSelected {path}` · `vinylArtPickerClosed {}`: *Creator ▸ vinyl art slot picker; no vinyl-art
   apply system in Unity yet.*
-- `sendFriendRequest {name}` · `removeFriend {name}`: *no in-app friend graph exists (friends are
-  Meta-only). The Friends-page PR (jamseshquest#22) handles `sendFriendRequest` through Meta's follow
-  request; `removeFriend` stays unwired because Meta has no unfollow API.*
 - `inviteToSpace {name}` · `createSpace {name,type,environment,invited}` · `deleteSpace {name,forGroup}`:
   *no "spaces" backend exists. **Still an open decision** (31 Oct): Spaces Create/Delete/Invite was not
   hidden.*
@@ -161,7 +159,8 @@ the emitter, or the flow moved elsewhere. If one of these features "stopped work
 The game pushes these to the UI; if the UI drops the matching `case`, the game's update is ignored:
 
 `updateProfile` · `updateProgression` · `updateXp` · `updatePicks` · `updateOwnedItems` ·
-`updateFriends` · `updateGroups` · `updateLobby` · `updateIsHost` · `setInBandspace` ·
+`updateFriends` · `updateInvitableFriends` · `appInviteResult` · `appInvitePanelResult` · `friendRequestResult` ·
+`updateGroups` · `updateLobby` · `updateIsHost` · `setInBandspace` ·
 `sessionInProgress` · `setCurrentSpace` · `groupInvite` · `updateSongs` · `hostSetlistUpdated` ·
 `updateClientInfo` · `updateChallenges` · `updateReferralCode` · `updateReferralCount` ·
 `updateReferralList` · `gameResults` · `gameResultsGroupScore` · `gameResultsLeaderboard` ·
