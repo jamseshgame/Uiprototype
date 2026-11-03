@@ -207,6 +207,9 @@ Changing these payload shapes breaks the feature even if the message name is unc
   `{ packs:[], error:"..." }`. On the headset (`window.vuplex`) the Packs tab never falls back to the
   desktop mock: an empty or errored list shows "Picks packs unavailable — try again later". Only a
   tile with a `sku` may send `storeBuyPack {sku}`; never send a SKU-less `storeBuyPack`.
+- **`updateHubs`** is `[{ name, count, img }]`, where `count` is `"N/8"` from the live open-lobby shard,
+  or `null` when unknown. The page shows "— Jammers" for `null` and on the headset until it arrives.
+  `name` must match a `joinHub` name the bridge honors (`HubNameToEnvironment`, today only "Jamsesh Hub").
 - **Purchases are server-authoritative**: do NOT optimistically deduct Picks or mark owned in JS.
   The balance/ownership update only from `updatePicks` / `updateOwnedItems`.
 
