@@ -12487,6 +12487,7 @@ function handleUnityMessage(msg) {
     case 'updateStoreCatalog': updateStoreCatalogFromBackend(msg.data); break;
     case 'updateIapPacks': updateIapPacksFromBackend(msg.data); break;
     case 'promoRedeemResult': onPromoRedeemResult(msg.data); break;
+    case 'iapRedeemResult': onIapRedeemResult(msg.data); break;
     case 'updateXp': updateXpFromBackend(msg.data); break;
     case 'updateProgression': updateProgression(msg.data); break;
     case 'updateChallenges': updateChallengesFromBackend(msg.data); break;
@@ -15434,6 +15435,11 @@ function buildModeTabs() {
   }
 }
 
+// Battle outside a group = internal solo practice (arena + attacks from your own sections).
+function isBattleSolo() {
+  return playMode === 'battle' && !inBandspace;
+}
+
 function setPlayMode(mode) {
   if (mode === 'battle' && !isInternalUser) mode = 'coop';
   playMode = mode;
@@ -15444,7 +15450,7 @@ function setPlayMode(mode) {
   }
   buildModeTabs();
   buildPlayGrid();
-  sendToUnity('playMode', mode);
+  sendToUnity('playMode', isBattleSolo() ? 'battleSolo' : mode);
   updateDeeplinkUrl('play', mode === 'solo' ? 'solo' : 'group');
 }
 
@@ -16296,7 +16302,7 @@ function _startGameConfirmed(tutorialInst) {
     instrument: selectedInstrument,
     difficulty: selectedDifficulty,
     setlist: titles,
-    playMode: playMode,
+    playMode: isBattleSolo() ? 'battleSolo' : playMode,
     modifiers: getModifierPayload(),
     tutorial: tutorialInst || false
   });
@@ -17622,9 +17628,15 @@ function buildPlayGrid() {
     grid.className = 'play-grid play-grid--solo';
     buildSoloGrid(grid);
   } else if (playMode === 'battle') {
-    // Same lobby as Group; the instrument picker restricts battle to guitar.
-    grid.className = 'play-grid play-grid--coop';
-    buildCoopGrid(grid);
+    // In a group: same lobby as Group. Outside one (internal testing): solo practice in
+    // the battle arena. The instrument picker restricts battle to guitar either way.
+    if (isBattleSolo()) {
+      grid.className = 'play-grid play-grid--solo';
+      buildSoloGrid(grid);
+    } else {
+      grid.className = 'play-grid play-grid--coop';
+      buildCoopGrid(grid);
+    }
   } else {
     grid.className = 'play-grid play-grid--coop';
     buildCoopGrid(grid);
@@ -20574,7 +20586,7 @@ function openJamDialog(opts) {
       opts.onConfirm();
     }
   };
-  actions.appendChild(cancelBtn);
+  if (!opts.hideCancel) actions.appendChild(cancelBtn);   // hideCancel: single-button notice
   actions.appendChild(okBtn);
   panel.appendChild(actions);
 
@@ -21643,6 +21655,9 @@ function openItemPurchase(item, mode) {
   var owned = skinOwned(item);
   var isGrant = item.unlock === 'grant';
 
+  // Analytics only (store_item_viewed) — Unity takes no action on this message.
+  sendToUnity('storeItemViewed', { id: item.id, name: item.name, kind: item.kind, price: price, owned: !!owned, unlock: item.unlock || 'picks', mode: mode || 'store' });
+
   document.getElementById('item-purchase-img').src = item.img || item.file || '';
   document.getElementById('item-purchase-name').textContent = item.name;
   document.getElementById('item-purchase-desc').textContent = item.desc ||
@@ -21802,6 +21817,35 @@ function redeemPromoCode() {
   }
   if (status) { status.style.color = 'var(--text-secondary)'; status.textContent = 'Redeeming…'; }
   sendToUnity('redeemPromoCode', { code: code });
+}
+
+// Result of crediting a PAID pick pack (Unity -> WebView, after Meta checkout succeeded).
+// ok:false means the player was charged but has no picks yet; Unity leaves the purchase
+// unconsumed and retries on next launch, so say that rather than failing silently.
+// reconciled:true is a previously-stuck purchase that has now landed. The balance itself
+// updates separately via updatePicks.
+function onIapRedeemResult(data) {
+  if (!data) return;
+  if (data.ok) {
+    if (data.reconciled && data.picksAdded > 0) {
+      openJamDialog({
+        title: 'Picks Added',
+        body: 'Your earlier purchase went through: ' + data.picksAdded.toLocaleString() + ' Picks have been added to your balance.',
+        confirmLabel: 'Nice!',
+        hideCancel: true,
+        onConfirm: function() {}
+      });
+    }
+    return;
+  }
+  openJamDialog({
+    title: 'Picks Not Added Yet',
+    body: "Your payment went through, but we couldn't add your Picks just now. " +
+          "Don't worry, they're not lost. We'll try again automatically next time you launch Jamsesh.",
+    confirmLabel: 'OK',
+    hideCancel: true,
+    onConfirm: function() {}
+  });
 }
 
 function onPromoRedeemResult(data) {
