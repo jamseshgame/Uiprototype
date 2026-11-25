@@ -1175,97 +1175,6 @@
   /* Panel 2 — Options */
   .play-opt-label { font-size: 34px; font-weight: 800; }
 
-  /* Panel 3 — Leaderboard */
-  .play-leaderboard { flex: 1; }
-
-  .play-lb-list {
-    flex: 1;
-    overflow: hidden;
-    padding: var(--pad);
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .play-lb-row {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    min-height: 0;
-    min-width: 0;
-  }
-
-  .play-lb-pos {
-    font-size: 24px;
-    font-weight: 800;
-    color: #ffffff;
-    width: 48px;
-    text-align: center;
-    flex-shrink: 0;
-  }
-
-  .play-lb-row:nth-child(-n+3) .play-lb-pos { color: #ffffff; }
-
-  .play-lb-tile {
-    flex: 1;
-    min-width: 0;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 0 16px;
-    border-radius: var(--radius-bar);
-    border: 1px solid var(--btn-panel-border);
-    background: var(--btn-panel-hover);
-    height: 100%;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .play-lb-avatar {
-    height: 70%;
-    aspect-ratio: 1;
-    border-radius: var(--panel-radius);
-    background: var(--bg-surface-hover);
-    flex-shrink: 0;
-    object-fit: cover;
-  }
-
-  .play-lb-info { flex: 1; min-width: 0; }
-
-  .play-lb-stars {
-    display: flex;
-    gap: 2px;
-    font-size: 16px;
-    line-height: 1;
-    color: #ffd700;
-  }
-
-  .play-lb-name {
-    font-size: 17px;
-    font-weight: 800;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    line-height: 1.2;
-    color: #ffffff;
-  }
-
-  .play-lb-score {
-    font-size: 17px;
-    font-weight: 700;
-    color: #ffffff;
-    line-height: 1.2;
-  }
-
-  .play-lb-row.lb-you .play-lb-tile {
-    border: 2px solid var(--pink);
-    box-shadow: 0 0 12px var(--pink-40);
-  }
-
-  .play-lb-row.lb-you .play-lb-name { color: var(--pink); }
-  .play-lb-row.lb-you .play-lb-pos  { color: var(--pink); }
-
   /* Shared theme nav underline animation */
   @keyframes navUnderline {
     0%   { width: 0; opacity: 0; }
@@ -4554,10 +4463,9 @@
     flex: 1;
     min-height: 0;
   }
-  /* Friends system parked for launch: hide the Bandmates tab bar but keep its row
-     height reserved (so the 4×3 grid + bottom pager bar stay in place). Re-show the
-     Friends/Add Friends tabs by removing this rule. */
-  #social-tabs { visibility: hidden; }
+  /* Bandmates tab bar (Groups | Friends) is live again now that Friends shows real
+     Meta friends. To park it, restore: #social-tabs { visibility: hidden; } —
+     the row height stays reserved either way, so the grid doesn't shift. */
   /* Spaces Public/Private split parked too: all spaces list in one grid; the tab
      bar is hidden but its row height stays reserved. Re-show by removing this rule. */
   #spaces-tabs { visibility: hidden; }
@@ -4678,17 +4586,96 @@
     overflow-x: hidden;   /* clip the friendSlideIn translateX overshoot so it can't flash a horizontal scrollbar */
     align-content: start;
   }
-  /* Bandmates ▸ Friends grid fills the available height: a 2×5 grid of 1fr rows
-     that stretch (no scrollbar), with items filling their cells (avatars sized
-     to the row in JS). */
+  /* Bandmates ▸ Friends: two side-by-side columns — Meta friends who own Jamsesh
+     (left) and people to invite to Jamsesh (right). Each column is a 1×5 grid of
+     1fr rows that stretch (no scrollbar); avatars are sized to the row in JS. */
+  .friends-columns {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    padding: 24px 24px 0;
+  }
+  .friends-col {
+    flex: 1;
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .friends-col + .friends-col { margin-left: 24px; }
+  .friends-col-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 0 16px 16px;
+  }
+  .friends-col-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 48px;
+    letter-spacing: 1px;
+    color: var(--text-primary);
+  }
+  .friends-col-sub {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-secondary);
+  }
   #social-friends-list,
-  #social-addfriends-list {
+  #social-invite-list {
+    grid-template-columns: 1fr;
     grid-template-rows: repeat(5, 1fr);
     align-content: stretch;
     overflow: hidden;
+    padding: 0;
   }
   #social-friends-list .friend-item,
-  #social-addfriends-list .friend-item { height: 100%; }
+  #social-invite-list .friend-item,
+  #social-invite-list .friend-add-btn { height: 100%; }
+  .friends-col .pager { padding-top: 16px; }
+  /* Right-hand "Invite" chip on each invite row (Sending… / Invited once tapped). */
+  .friend-invite-chip {
+    flex-shrink: 0;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 34px;
+    letter-spacing: 1px;
+    padding: 10px 32px;
+    border-radius: 999px;
+    color: #ffffff;
+    background: linear-gradient(135deg, #00E5C7 0%, #6AA0FF 100%);
+    box-shadow: 0 0 14px rgba(0,229,199,0.35);
+  }
+  .friend-invite-chip.is-sending { opacity: 0.6; }
+  .friend-invite-chip.is-sent {
+    background: transparent;
+    color: #FACC15;
+    border: 1px solid currentColor;
+    box-shadow: none;
+  }
+  /* Empty / loading message inside a friends column. */
+  .friends-empty {
+    grid-row: span 4;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 24px 40px;
+    border: 1px dashed rgba(255,255,255,0.18);
+    border-radius: 48px;
+  }
+  #social-friends-list .friends-empty { grid-row: span 5; }
+  .friends-empty-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 44px;
+    letter-spacing: 1px;
+    color: var(--text-primary);
+  }
+  .friends-empty-sub {
+    margin-top: 12px;
+    font-size: 26px;
+    line-height: 1.35;
+    color: var(--text-secondary);
+  }
 
   .friend-item {
     display: flex;
@@ -4837,6 +4824,24 @@
     font-size: 26px;
     letter-spacing: 1px;
     color: #FACC15;
+  }
+  /* Member popup with the extra "Add Friend" button: three buttons share the row
+     instead of each taking the fixed 440px (which overflows the popup). */
+  .std-popup-footer.has-3-btns .std-popup-btn {
+    flex: 1 1 0;
+    width: auto;
+    min-width: 0;
+  }
+  /* Neutral explainer variant (invite-to-Jamsesh popup). */
+  .friend-popup-note.is-info {
+    margin-top: 0;
+    font-family: inherit;
+    font-size: 26px;
+    letter-spacing: 0;
+    line-height: 1.35;
+    text-align: center;
+    max-width: 640px;
+    color: var(--text-secondary);
   }
   .friend-dot {
     display: inline-block;
@@ -7499,6 +7504,19 @@
     line-height: 1;
     color: #ffffff;
   }
+  /* Shown in place of the code when Unity reports the share code couldn't be fetched. */
+  .referral-code-retry {
+    display: none;
+    font-size: 22px;
+    font-weight: 700;
+    padding: 8px 22px;
+    border: 2px solid rgba(255,255,255,0.6);
+    border-radius: 999px;
+    background: transparent;
+    color: #ffffff;
+    cursor: pointer;
+  }
+  .referral-code-retry.active { display: inline-block; }
   /* Reward summary line: pick asset + Send/Join amounts + help button.
      The full explainer lives in the referral help popup. */
   .referral-rewards-line {
@@ -9239,7 +9257,9 @@
   /* ── Home Grid ──────────────────────────────────────── */
   .home-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    /* 6 half-columns: every 3x3 layout spans 2 per column (see homeGridColumn),
+       which also lets the default layout split its bottom row into two halves. */
+    grid-template-columns: repeat(6, 1fr);
     grid-template-rows: repeat(3, 1fr);
     gap: 52px;
     padding: 28px;
@@ -9433,13 +9453,13 @@
 
   /* Thumbnail cards (padding-top trick for 1:1 — Chromium 91 lacks aspect-ratio) */
   .layout-thumb-wrap       { position:relative; width:100%; padding-top:100%; }
-  .layout-thumb            { position:absolute; top:0;left:0;right:0;bottom:0; display:grid; grid-template-columns:repeat(3,1fr); grid-template-rows:repeat(3,1fr); gap:3px; padding:6px; border-radius:var(--panel-radius); border:2px solid var(--border-subtle); background:var(--bg-panel); cursor:pointer; }
+  .layout-thumb            { position:absolute; top:0;left:0;right:0;bottom:0; display:grid; grid-template-columns:repeat(6,1fr); grid-template-rows:repeat(3,1fr); gap:3px; padding:6px; border-radius:var(--panel-radius); border:2px solid var(--border-subtle); background:var(--bg-panel); cursor:pointer; }
   .layout-thumb:hover      { border-color:var(--pink); }
   .layout-thumb.selected   { border-color:var(--pink); box-shadow:0 0 0 3px var(--pink-30); }
   .layout-thumb-tile       { border-radius:var(--panel-radius); background:var(--bg-surface); }
 
   /* "Layouts" button on home page — square with mini layout grid */
-  .home-layout-btn         { position:absolute; bottom:16px; right:16px; width:80px; height:80px; padding:8px; border-radius:var(--panel-radius); border:2px solid rgba(60,130,255,0.4); background:rgba(30,70,180,0.45); color:var(--text-primary); cursor:pointer; font-family:inherit; z-index:5; display:grid; grid-template-columns:repeat(3,1fr); grid-template-rows:repeat(3,1fr); gap:3px; box-sizing:border-box; overflow:hidden; }
+  .home-layout-btn         { position:absolute; bottom:16px; right:16px; width:80px; height:80px; padding:8px; border-radius:var(--panel-radius); border:2px solid rgba(60,130,255,0.4); background:rgba(30,70,180,0.45); color:var(--text-primary); cursor:pointer; font-family:inherit; z-index:5; display:grid; grid-template-columns:repeat(6,1fr); grid-template-rows:repeat(3,1fr); gap:3px; box-sizing:border-box; overflow:hidden; }
   .home-layout-btn:hover,
   .home-layout-btn:active  { border-color:rgba(80,160,255,0.7); background:rgba(40,90,210,0.55); }
   .home-layout-btn-tile    { border-radius:var(--panel-radius); background:rgba(140,190,255,0.6); }
@@ -11107,6 +11127,77 @@ input, textarea, select {
   }
   .popup-closing > * { animation: popupPanelOut 0.18s ease both; }
 
+  /* ══════════════════════════════════════════════════════════════════
+     BRAND BOOK v1.0 — HOME TILES
+     Last in the cascade on purpose: it supersedes the older cyan/violet
+     hover, glow and tint rules above for the default Hyperpop look only.
+     Cosmetic themes add a theme-* class to .viewport and are left alone.
+     Brand px are web-scale; the 1920 headset panel runs at ~1.5x, so
+     panels 32→48px (unchanged), cards 22→33px, chips 14→21px.
+     ══════════════════════════════════════════════════════════════════ */
+
+  /* Home cards — raised arcade buttons in the card's one brand accent
+     (--tile-rgb, set by buildHomeGrid). Colour: the bright accent pours in from
+     the top-left over a deep, ink-darkened shade of the same hue (no violet),
+     so white labels stay legible. 3D: top bevel, darker
+     bottom lip, a darkened-accent base under the card plus a soft drop shadow
+     (kept inside the grid's 28px padding). Hover brightens; press sinks. */
+  .viewport:not([class*="theme-"]) .home-tile {
+    border-radius: 33px !important;
+    background:
+      radial-gradient(ellipse 130% 170% at 0% 0%, rgba(var(--tile-rgb, 232,255,58), 0.90) 0%, rgba(var(--tile-rgb, 232,255,58), 0.35) 35%, rgba(var(--tile-rgb, 232,255,58), 0) 65%),
+      linear-gradient(135deg, rgba(16,12,31,0.60) 0%, rgba(16,12,31,0.74) 100%),
+      rgb(var(--tile-rgb, 232,255,58)) !important;
+    background-size: 100% 100%, 100% 100%, 100% 100% !important;
+    box-shadow:
+      inset 0 0 0 2px rgba(255,255,255,0.35),
+      inset 0 3px 0 rgba(255,255,255,0.55),
+      inset 0 -10px 0 rgba(0,0,0,0.18),
+      0 10px 0 rgba(0,0,0,0.35),
+      0 10px 0 rgb(var(--tile-rgb, 232,255,58)),
+      0 18px 26px rgba(0,0,0,0.45) !important;
+    transition: box-shadow 0.15s ease, transform 0.15s ease, filter 0.2s ease !important;
+  }
+  /* Hover adds a soft pool of the card's own colour glowing out from under it.
+     The grid gets extra bottom padding so the bottom row's glow isn't clipped. */
+  .viewport:not([class*="theme-"]) .home-grid { padding-bottom: 56px; }
+  .viewport:not([class*="theme-"]) .home-tile-wrap:hover .home-tile {
+    filter: brightness(1.07);
+    box-shadow:
+      inset 0 0 0 4px rgba(255,255,255,0.65),
+      inset 0 3px 0 rgba(255,255,255,0.60),
+      inset 0 -10px 0 rgba(0,0,0,0.18),
+      0 10px 0 rgba(0,0,0,0.30),
+      0 10px 0 rgb(var(--tile-rgb, 232,255,58)),
+      0 18px 36px 0 rgba(var(--tile-rgb, 232,255,58), 0.75),
+      0 10px 60px 6px rgba(var(--tile-rgb, 232,255,58), 0.35) !important;
+  }
+  /* Press: the card sinks onto its base. */
+  .viewport:not([class*="theme-"]) .home-tile-wrap:active { transform: none !important; }
+  .viewport:not([class*="theme-"]) .home-tile-wrap:active .home-tile {
+    transform: translateY(8px) !important;
+    box-shadow:
+      inset 0 0 0 4px rgba(255,255,255,0.65),
+      inset 0 3px 0 rgba(255,255,255,0.40),
+      inset 0 -4px 0 rgba(0,0,0,0.18),
+      0 2px 0 rgba(0,0,0,0.30),
+      0 2px 0 rgb(var(--tile-rgb, 232,255,58)),
+      0 6px 12px rgba(0,0,0,0.45) !important;
+  }
+  /* White label, sitting slightly proud of the card. */
+  .viewport:not([class*="theme-"]) .home-tile .tile-hero-title {
+    text-shadow: 0 4px 0 rgba(16,12,31,0.45), 0 8px 18px rgba(0,0,0,0.45);
+  }
+  /* Shine (replaces the hard cel-shade slash): a glossy upper half that breaks
+     off just past the middle, a soft diagonal specular streak, and the original
+     buttons' hard half shadow across the lower 45%. */
+  .viewport:not([class*="theme-"]) .home-tile::before {
+    background:
+      linear-gradient(115deg, rgba(255,255,255,0) 28%, rgba(255,255,255,0.16) 36%, rgba(255,255,255,0) 44%),
+      linear-gradient(180deg, rgba(255,255,255,0.30) 0%, rgba(255,255,255,0.10) 46%, rgba(255,255,255,0) 52%),
+      linear-gradient(to bottom, transparent 55%, rgba(0,0,0,0.2) 55%, rgba(0,0,0,0.2) 100%);
+  }
+
 </style>
 </head>
 <body>
@@ -11178,7 +11269,7 @@ input, textarea, select {
       </div>
       <div class="profile-info">
         <div class="profile-topline">
-          <div class="profile-name">RAELJAMSESH</div>
+          <div class="profile-name">&mdash;</div>
           <span class="topbar-xp-level" id="topbar-xp-level">LVL 1</span>
         </div>
         <!-- XP bar spans the full width under the name + level; fill driven by Unity via 'updateXp'. -->
@@ -11343,13 +11434,26 @@ input, textarea, select {
     </div>
     <div class="page" id="page-social">
       <div class="play-mode-tabs" id="social-tabs">
-        <div class="play-mode-tab active" onclick="switchSocialTab('groups')">Groups</div>
+        <div class="play-mode-tab active" onclick="switchSocialTab('groups')">Bands</div>
         <div class="play-mode-tab" onclick="switchSocialTab('friends')">Friends</div>
-        <div class="play-mode-tab" onclick="switchSocialTab('addfriends')">Add Friends</div>
       </div>
       <div id="social-tab-groups" class="spaces-tab-content"><div class="spaces-grid" id="social-grid-groups"></div><div id="social-groups-pager"></div></div>
-      <div id="social-tab-friends" class="spaces-tab-content" style="display:none"><div id="social-friends-list"></div><div id="social-friends-pager"></div></div>
-      <div id="social-tab-addfriends" class="spaces-tab-content" style="display:none"><div id="social-addfriends-list"></div><div id="social-addfriends-pager"></div></div>
+      <!-- Friends: left = Meta friends who own Jamsesh (updateFriends); right = people to
+           invite to Jamsesh (updateInvitableFriends) + Quest's own invite panel. -->
+      <div id="social-tab-friends" class="spaces-tab-content" style="display:none">
+        <div class="friends-columns">
+          <div class="friends-col">
+            <div class="friends-col-head"><span class="friends-col-title">On Jamsesh</span><span class="friends-col-sub" id="friends-col-sub-jamsesh"></span></div>
+            <div id="social-friends-list"></div>
+            <div id="social-friends-pager"></div>
+          </div>
+          <div class="friends-col">
+            <div class="friends-col-head"><span class="friends-col-title">Invite to Jamsesh</span><span class="friends-col-sub">Sends a Quest notification</span></div>
+            <div id="social-invite-list"></div>
+            <div id="social-invite-pager"></div>
+          </div>
+        </div>
+      </div>
     </div>
     <div class="page" id="page-spaces">
       <div class="play-mode-tabs" id="spaces-tabs">
@@ -11431,7 +11535,8 @@ input, textarea, select {
         <div class="referral-head">
           <div class="referral-code-chip">
             <span class="referral-code-tag">Your Code</span>
-            <span class="referral-code" id="referral-code">J4M-53SH</span>
+            <span class="referral-code" id="referral-code">&mdash;</span>
+            <button class="referral-code-retry" id="referral-code-retry" onclick="retryReferralCode()">Retry</button>
           </div>
           <button class="referral-enter-code-btn" id="referral-enter-code-btn" onclick="openReferralCodePopup()">Enter a Friend's Code</button>
           <div class="referral-rewards-line">
@@ -11841,7 +11946,7 @@ input, textarea, select {
     </div>
     <div class="nav-item" data-page="social" onclick="navigateTo('social')">
       <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 3-1.34 3-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05C16.19 13.89 17 15.02 17 16.5V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" fill="currentColor"/></svg></span>
-      <span class="nav-label">Groups</span>
+      <span class="nav-label">Bands</span>
     </div>
     <div class="nav-item" data-page="spaces" onclick="navigateTo('spaces')">
       <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" fill="currentColor"/></svg></span>
@@ -11851,13 +11956,13 @@ input, textarea, select {
       <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 4h18v3H3V4zm1 4h3v12H4V8zm13 0h3v12h-3V8zm-9 3h8v9H8v-9z" fill="currentColor"/></svg></span>
       <span class="nav-label">Perform</span>
     </div>
-    <div class="nav-item" data-page="creator" onclick="navigateTo('creator')">
-      <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M7 14c-1.66 0-3 1.34-3 3 0 1.31-1.16 2-2 2 .92 1.22 2.49 2 4 2 2.21 0 4-1.79 4-4 0-1.66-1.34-3-3-3zm13.71-9.37l-1.34-1.34c-.39-.39-1.02-.39-1.41 0L9 12.25 11.75 15l8.96-8.96c.39-.39.39-1.02 0-1.41z" fill="currentColor"/></svg></span>
-      <span class="nav-label">Design</span>
-    </div>
     <div class="nav-item" data-page="store" onclick="navigateTo('store')">
       <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M20 4H4v2h16V4zm1 10v-2l-1-5H4l-1 5v2h1v6h10v-6h4v6h2v-6h1zm-9 4H6v-4h6v4z" fill="currentColor"/></svg></span>
       <span class="nav-label">Store</span>
+    </div>
+    <div class="nav-item" data-page="creator" onclick="navigateTo('creator')">
+      <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M7 14c-1.66 0-3 1.34-3 3 0 1.31-1.16 2-2 2 .92 1.22 2.49 2 4 2 2.21 0 4-1.79 4-4 0-1.66-1.34-3-3-3zm13.71-9.37l-1.34-1.34c-.39-.39-1.02-.39-1.41 0L9 12.25 11.75 15l8.96-8.96c.39-.39.39-1.02 0-1.41z" fill="currentColor"/></svg></span>
+      <span class="nav-label">Design</span>
     </div>
     <div class="nav-item" data-page="season" onclick="navigateTo('season')">
       <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z" fill="currentColor"/></svg></span>
@@ -11910,7 +12015,7 @@ input, textarea, select {
       <div class="friend-popup-note" id="friend-popup-note" style="display:none">Request sent</div>
     </div>
     <div class="std-popup-footer">
-      <button class="std-popup-btn jamsesh-signature" id="friend-popup-btn" onclick="sendFriendInvite()">Send Friend Invite</button>
+      <button class="std-popup-btn jamsesh-signature" id="friend-popup-btn" onclick="closeFriendPopup()">OK</button>
     </div>
   </div>
 </div>
@@ -11919,12 +12024,12 @@ input, textarea, select {
 <div class="purchase-overlay" id="group-created-overlay" style="z-index:1002" onclick="closeGroupCreated(event)">
   <div class="friend-popup std-popup" onclick="event.stopPropagation()">
     <button class="popup-close-btn" onclick="closeGroupCreated()">&#10005;</button>
-    <div class="std-popup-header"><h2 style="font-size:40px;font-weight:800;color:var(--text-primary);margin:0;text-align:center">Group &amp; Space Created!</h2></div>
+    <div class="std-popup-header"><h2 style="font-size:40px;font-weight:800;color:var(--text-primary);margin:0;text-align:center">Band &amp; Space Created!</h2></div>
     <div class="std-popup-body" style="align-items:center;justify-content:center;gap:28px">
       <div class="gc-tiles">
         <div class="gc-tile">
           <img id="gc-group-img" alt="">
-          <div class="gc-tile-info"><div class="gc-tile-eyebrow">Group</div><div class="gc-tile-name" id="gc-group-name"></div></div>
+          <div class="gc-tile-info"><div class="gc-tile-eyebrow">Band</div><div class="gc-tile-name" id="gc-group-name"></div></div>
         </div>
         <div class="gc-tile">
           <img id="gc-space-img" alt="">
@@ -11943,7 +12048,7 @@ input, textarea, select {
 <div class="purchase-overlay" id="member-popup-overlay" style="z-index:1003" onclick="closeMemberPopup(event)">
   <div class="friend-popup std-popup" onclick="event.stopPropagation()">
     <button class="popup-close-btn" onclick="closeMemberPopup()">&#10005;</button>
-    <div class="std-popup-header"><h2 style="font-size:40px;font-weight:800;color:var(--text-primary);margin:0;text-align:center">Group Member</h2></div>
+    <div class="std-popup-header"><h2 style="font-size:40px;font-weight:800;color:var(--text-primary);margin:0;text-align:center">Band Member</h2></div>
     <div class="std-popup-body" style="align-items:center;justify-content:center;gap:28px">
       <div class="friend-popup-avatar"><img id="member-popup-img" src="" alt=""></div>
       <div class="friend-popup-name" id="member-popup-name"></div>
@@ -11951,6 +12056,8 @@ input, textarea, select {
     </div>
     <div class="std-popup-footer">
       <button class="std-popup-btn create-group-leave-btn" onclick="confirmRemoveMember()">Remove Member</button>
+      <!-- Shown for bandmates who aren't Meta friends yet — opens Meta's follow-request flow. -->
+      <button class="std-popup-btn" id="member-popup-follow-btn" style="display:none" onclick="sendFollowRequest()">Add Friend</button>
       <button class="std-popup-btn jamsesh-signature" onclick="closeMemberPopup()">OK</button>
     </div>
   </div>
@@ -11966,7 +12073,7 @@ input, textarea, select {
 <!-- Creator screens -->
 <div class="creator-screen" id="creator-camera-screen">
   <div class="creator-camera-canvas"><div class="creator-camera-box"></div></div>
-  <div class="creator-camera-notice">Take a photo that you want to turn into art or a logo for your solo or group. All photos are only used to generate art and are not stored outside of this headset.</div>
+  <div class="creator-camera-notice">Take a photo that you want to turn into art or a logo for your solo or band. All photos are only used to generate art and are not stored outside of this headset.</div>
   <div class="creator-camera-btns">
     <button class="play-bar-btn" onclick="closeCreatorScreen()"><svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>Cancel</button>
     <button class="play-go-btn" onclick="takeCreatorPhoto()"><svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor"><path d="M12 15.2l3.4-2.8L12 9.6 8.6 12.4z M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/></svg>Capture</button>
@@ -12051,7 +12158,7 @@ input, textarea, select {
     <div class="std-popup-header"><h2>Enter Referral Code</h2></div>
     <div class="std-popup-body" style="justify-content:center">
       <div class="referral-code-popup-sub">Got a code from a friend? Enter it below &mdash; you <b>both</b> earn <b><span id="referral-code-popup-reward">500</span> Picks</b> when you finish your first jam.</div>
-      <input class="save-input" id="referral-code-input" type="text" maxlength="12" placeholder="e.g. J4M-53SH" inputmode="none" onclick="requestKeyboardForInput('referral-code-input')">
+      <input class="save-input" id="referral-code-input" type="text" maxlength="12" placeholder="e.g. ABC123" inputmode="none" onclick="requestKeyboardForInput('referral-code-input')">
       <div class="referral-code-error" id="referral-code-error"></div>
     </div>
     <div class="std-popup-footer">
@@ -12099,7 +12206,7 @@ input, textarea, select {
 <div class="challenge-overlay" id="group-join-overlay" onclick="closeGroupJoinConfirm(event)">
   <div class="std-popup" onclick="event.stopPropagation()" style="background:var(--bg-panel);border:1px solid var(--border-subtle)">
     <button class="popup-close-btn" onclick="closeGroupJoinConfirm()">&#10005;</button>
-    <div class="std-popup-header"><div class="challenge-title" id="group-join-title">Switch Group?</div></div>
+    <div class="std-popup-header"><div class="challenge-title" id="group-join-title">Switch Band?</div></div>
     <div class="std-popup-body" style="align-items:center;justify-content:center;text-align:center;gap:52px">
       <div class="group-swap-row" id="group-swap-row" style="display:flex;align-items:flex-start;justify-content:center;gap:36px"></div>
       <div id="group-join-msg" style="font-size:34px;line-height:1.45;color:var(--text-primary);max-width:820px"></div>
@@ -12147,7 +12254,7 @@ input, textarea, select {
 <div class="challenge-overlay" id="group-picker-overlay" onclick="closeGroupPicker(event)">
   <div class="std-popup std-popup--large" onclick="event.stopPropagation()" style="background:var(--bg-panel);border:1px solid var(--border-subtle)">
     <button class="popup-close-btn" onclick="closeGroupPicker()">&#10005;</button>
-    <div class="std-popup-header"><div class="challenge-title">Your Groups</div></div>
+    <div class="std-popup-header"><div class="challenge-title">Your Bands</div></div>
     <div class="std-popup-body">
       <div class="group-picker-grid" id="group-picker-grid"></div>
     </div>
@@ -12175,13 +12282,13 @@ input, textarea, select {
 <div class="create-group-overlay" id="create-group-overlay" onclick="closeCreateGroup(event)">
   <div class="create-group-popup std-popup std-popup--large" onclick="event.stopPropagation()">
     <button class="popup-close-btn" onclick="closeCreateGroup()">&#10005;</button>
-    <div class="std-popup-header"><h2 id="create-group-title" style="font-size:40px;font-weight:800;color:var(--text-primary);margin:0;text-align:center">Create Group</h2></div>
+    <div class="std-popup-header"><h2 id="create-group-title" style="font-size:40px;font-weight:800;color:var(--text-primary);margin:0;text-align:center">Create Band</h2></div>
     <div class="create-group-header" style="flex-shrink:0">
       <div class="create-group-logo" id="create-group-logo" onclick="openLogoPicker()">
         <span class="logo-plus">+</span>
       </div>
       <div class="create-group-name-wrap" style="flex:1">
-        <input class="save-input" id="create-group-name" type="text" placeholder="Group Name" inputmode="none" onclick="requestKeyboardForInput('create-group-name')" style="flex:1">
+        <input class="save-input" id="create-group-name" type="text" placeholder="Band Name" inputmode="none" onclick="requestKeyboardForInput('create-group-name')" style="flex:1">
         <span class="cg-name-edit"><svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></span>
       </div>
     </div>
@@ -12192,12 +12299,12 @@ input, textarea, select {
           <div id="create-group-available-pager"></div>
         </div>
         <div class="create-group-col" id="create-group-members-col">
-          <div class="create-group-col-title">Group Members</div>
+          <div class="create-group-col-title">Band Members</div>
           <div class="friends-list-wrap create-group-friends create-group-friends--members" id="create-group-members"></div>
           <div id="create-group-members-pager"></div>
         </div>
         <div class="create-group-col" id="create-group-space-col" style="display:none">
-          <div class="create-group-col-title">Group Space</div>
+          <div class="create-group-col-title">Band Space</div>
           <div id="create-group-space-tile" style="padding:0 10px"></div>
         </div>
       </div>
@@ -12243,7 +12350,7 @@ input, textarea, select {
 <div class="create-group-overlay" id="group-invite-overlay" onclick="closeGroupInvite(event)">
   <div class="create-group-popup std-popup std-popup--large" onclick="event.stopPropagation()">
     <button class="popup-close-btn" onclick="closeGroupInvite()">&#10005;</button>
-    <div class="std-popup-header"><h2 style="font-size:40px;font-weight:800;color:var(--text-primary);margin:0;text-align:center">Group Invite</h2></div>
+    <div class="std-popup-header"><h2 style="font-size:40px;font-weight:800;color:var(--text-primary);margin:0;text-align:center">Band Invite</h2></div>
     <div style="flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:14px">
       <div class="create-group-logo" id="group-invite-logo" style="cursor:default;width:300px;height:300px"></div>
       <div id="group-invite-name" style="font-family:'Bebas Neue',sans-serif;font-size:54px;letter-spacing:1px;color:var(--text-primary);line-height:1"></div>
@@ -12251,7 +12358,7 @@ input, textarea, select {
     </div>
     <div class="std-popup-body">
       <div class="create-group-col">
-        <div class="create-group-col-title">Group Members</div>
+        <div class="create-group-col-title">Band Members</div>
         <div class="friends-list-wrap create-group-friends create-group-friends--members" id="group-invite-members"></div>
       </div>
     </div>
@@ -12311,7 +12418,7 @@ input, textarea, select {
       <h1 class="r2-title">RESULTS</h1>
       <div class="r2-tabs" id="score-tabs">
         <div class="r2-tab active" onclick="switchResultsTab('me')">Me</div>
-        <div class="r2-tab" onclick="switchResultsTab('group')">Group</div>
+        <div class="r2-tab" onclick="switchResultsTab('group')">Band</div>
       </div>
     </div>
     <div class="r2-body">
@@ -12474,8 +12581,16 @@ function handleUnityMessage(msg) {
     case 'avatarSelection': applyAvatarSelection(msg.data); break;
     case 'updateSongs': updateSongsFromBackend(msg.data); break;
     case 'updateSongCharts': updateSongChartsFromBackend(msg.data); break;
-    case 'updateLeaderboard': updateLeaderboardFromBackend(msg.data); break;
     case 'updateFriends': updateFriendsFromBackend(msg.data); break;
+    case 'updateInvitableFriends': updateInvitableFriendsFromBackend(msg.data); break;
+    case 'appInviteResult': onAppInviteResult(msg.data); break;
+    case 'appInvitePanelResult':
+      if (msg.data && msg.data.ok === false) {
+        if (msg.data.error) console.log('[Friends] invite panel failed: ' + msg.data.error);
+        showConfirmPopup('Quest’s invite list couldn’t open. Check you’re online and try again.', { title: 'Invite List Unavailable', confirmLabel: 'OK' });
+      }
+      break;
+    case 'friendRequestResult': onFriendRequestResult(msg.data); break;
     case 'updateGroups': updateGroupsFromBackend(msg.data); break;
     case 'setActiveGroup': applyActiveGroup(msg.data); break;
     case 'groupInvite': openGroupInvite(msg.data); break;
@@ -12577,23 +12692,6 @@ function handleUnityMessage(msg) {
     case 'sessionInProgress':
       joinedDuringActiveSong = !!msg.data;
       if (inBandspace && playMode !== 'solo') buildPlayGrid();
-      break;
-    case 'updateInstrumentAvailability':
-      if (msg.data) {
-        instrumentAvailability.vocals = msg.data.vocals !== false;
-        instrumentAvailability.drums = msg.data.drums !== false;
-        instrumentAvailability.guitar = msg.data.guitar !== false;
-      }
-      // Refresh the instrument picker if it's currently open
-      var pickerOverlay = document.getElementById('option-picker-overlay');
-      if (pickerOverlay && pickerOverlay.style.display === 'flex') {
-        var titleEl = pickerOverlay.querySelector('.option-picker-title');
-        if (titleEl && titleEl.textContent === 'Select Instrument') {
-          openOptionPicker('instrument');
-        }
-      }
-      // Refresh play grid so option tiles show updated state
-      if (playMode !== 'solo') buildPlayGrid();
       break;
     case 'hostSongSelected':
     case 'hostSetlistUpdated':
@@ -12770,33 +12868,21 @@ function updateSongChartsFromBackend(data) {
   }
 }
 
-function updateLeaderboardFromBackend(data) {
-  // data: {song,instrument,difficulty,type,entries:[{pos,name,score,avatar},...]}
-  var list = document.getElementById('play-lb-list');
-  if (!list || !data || !data.entries) return;
-  list.innerHTML = '';
-  for (var i = 0; i < data.entries.length; i++) {
-    var lb = data.entries[i];
-    var row = document.createElement('div');
-    row.className = 'play-lb-row';
-    row.innerHTML =
-      '<span class="play-lb-pos">' + lb.pos + '</span>' +
-      '<div class="play-lb-tile">' +
-        '<img class="play-lb-avatar" src="' + lb.avatar + '" alt="">' +
-        '<div class="play-lb-info">' +
-          '<div class="play-lb-name">' + lb.name + '</div>' +
-          '<div class="play-lb-score">' + lb.score.toLocaleString() + '</div>' +
-        '</div>' +
-      '</div>';
-    list.appendChild(row);
-  }
+function updateFriendsFromBackend(data) {
+  // data: [{name, oculusId, platformId, online, playing, avatar, accepted:true}, ...]
+  // Meta friends who own Jamsesh. Unity sends this once Meta has answered — an empty
+  // array means "loaded, none yet" (the page then shows its empty state).
+  if (!data) return;
+  window._backendFriends = data;
+  buildSocialPage();
+  updateMemberFollowBtn();
 }
 
-function updateFriendsFromBackend(data) {
-  // data: [{name,online,avatar}, ...]
+function updateInvitableFriendsFromBackend(data) {
+  // data: [{name, oculusId, platformId, online, avatar}, ...]
+  // People the player can invite to download Jamsesh (Friends ▸ right column).
   if (!data) return;
-  // Store and rebuild
-  window._backendFriends = data;
+  window._backendInvitables = data;
   buildSocialPage();
 }
 
@@ -12884,10 +12970,26 @@ function updateLobbyFromBackend(data) {
 }
 
 function updateHubsFromBackend(data) {
-  // data: [{name,count,img}, ...]
-  if (!data) return;
+  // data: [{name, count:"N/8"|null, img}, ...] — live open-lobby occupancy from Unity.
+  // Backend hubs win: matching spaceHubs entries take the backend count/img (count null →
+  // "—"), unknown hubs are added. Local entries (e.g. a demo-created public space) stay.
+  if (!data || !data.length) return;
   window._backendHubs = data;
+  for (var i = 0; i < data.length; i++) {
+    var bh = data[i];
+    if (!bh || !bh.name) continue;
+    var found = null;
+    for (var j = 0; j < spaceHubs.length; j++) { if (spaceHubs[j].name === bh.name) { found = spaceHubs[j]; break; } }
+    if (!found) { found = { name: bh.name }; spaceHubs.push(found); }
+    found.count = bh.count || null;
+    if (bh.img) found.img = bh.img;
+  }
   buildSpacesGrid();
+}
+
+// "N/8 Jammers" caption for a hub; "— Jammers" until Unity's updateHubs supplies a count.
+function hubCountText(hub) {
+  return (hub && hub.count) ? hub.count : '\u2014';
 }
 
 function updateCoinsFromBackend(data) {
@@ -13631,38 +13733,10 @@ function setupPickerGamepad() {
   requestAnimationFrame(poll);
 }
 
-// ── Spaces Grid ─────────────────────────────────────────
-var spaces = [
-  {name:'Neon Stadium',     desc:'80,000 capacity arena',   file:'spaces/001.jpg'},
-  {name:'Desert Festival',  desc:'Open air desert stage',   file:'spaces/002.jpg'},
-  {name:'Underground Club', desc:'Intimate basement venue',  file:'spaces/003.jpg'},
-  {name:'Rooftop Lounge',   desc:'City skyline views',      file:'spaces/004.jpg'},
-  {name:'Jazz Basement',    desc:'Smoky speakeasy vibe',    file:'spaces/005.jpg'},
-  {name:'Beach Stage',      desc:'Sunset oceanfront',       file:'spaces/006.jpg'},
-  {name:'Arena Bowl',       desc:'Championship venue',      file:'spaces/007.jpg'},
-  {name:'Forest Rave',      desc:'Deep woods party',        file:'spaces/008.jpg'},
-  {name:'Vinyl Cafe',       desc:'Cozy record bar',         file:'spaces/009.jpg'},
-  {name:'Warehouse Party',  desc:'Raw industrial space',    file:'spaces/010.jpg'},
-  {name:'Opera House',      desc:'Grand classical hall',    file:'spaces/011.jpg'},
-  {name:'Street Corner',    desc:'Open mic busking spot',   file:'spaces/012.jpg'},
-  {name:'Skyline Terrace',  desc:'Penthouse party deck',    file:'spaces/013.jpg'},
-  {name:'Retro Arcade',     desc:'80s synthwave den',       file:'spaces/014.jpg'},
-  {name:'Ice Palace',       desc:'Frozen crystal stage',    file:'spaces/015.jpg'},
-  {name:'Tropical Resort',  desc:'Poolside paradise',       file:'spaces/016.jpg'},
-  {name:'Gothic Cathedral', desc:'Reverb-soaked stone',     file:'spaces/017.jpg'},
-  {name:'Cyberpunk Alley',  desc:'Neon-lit back street',    file:'spaces/018.jpg'},
-  {name:'Mountain Amp',     desc:'Alpine amphitheater',     file:'spaces/019.jpg'},
-  {name:'Submarine Lounge', desc:'Deep sea listening room', file:'spaces/020.jpg'},
-  {name:'Space Station',    desc:'Zero gravity club',       file:'spaces/021.jpg'},
-  {name:'Pirate Ship',      desc:'High seas shanty deck',   file:'spaces/022.jpg'},
-  {name:'Enchanted Garden', desc:'Fairy-lit grove',         file:'spaces/023.jpg'},
-  {name:'Volcano Stage',    desc:'Molten rock arena',       file:'spaces/024.jpg'},
-  {name:'Crystal Cavern',   desc:'Glowing gem grotto',      file:'spaces/025.jpg'}
-];
-
 function switchSocialTab(tab) {
+  if (tab === 'addfriends') tab = 'friends';   // old deep links — Add Friends folded into Friends
   var tabs = document.getElementById('social-tabs').children;
-  var names = ['groups', 'friends', 'addfriends'];
+  var names = ['groups', 'friends'];
   for (var i = 0; i < tabs.length; i++) {
     tabs[i].className = 'play-mode-tab' + (names[i] === tab ? ' active' : '');
     document.getElementById('social-tab-' + names[i]).style.display = names[i] === tab ? 'flex' : 'none';
@@ -13726,33 +13800,55 @@ function pageCount(len) {
 
 var socialGroupsPage = 0;
 var socialFriendsPage = 0;
-var socialAddFriendsPage = 0;
+var socialInvitePage = 0;
 
-// Shared friends list — Unity-pushed roster when present, mock data otherwise.
-// Used by the Bandmates ▸ Friends tab and the Profile ▸ Referrals page.
+// ── Friends data ──────────────────────────────────────────────────────────
+// Two lists, both pushed by Unity from Meta:
+//   getFriendsData()   — Meta friends who own Jamsesh (updateFriends). Also feeds the
+//                        Create Group / Create Space invite pickers.
+//   getInvitableData() — people to invite to Jamsesh (updateInvitableFriends).
+// On the headset (window.vuplex) there is NO mock fallback: until Unity answers the
+// lists are empty and the Friends page shows "Loading…". The mock rosters below are
+// for desktop-browser previews only.
 var _friendsMock = null;
+var _invitablesMock = null;
 function getFriendsData() {
   if (window._backendFriends) return window._backendFriends;
-  // Memoised so in-app changes (accept/remove) persist across rebuilds in the demo.
-  if (_friendsMock) return _friendsMock;
-  // Friend fields used by friendStatus(): accepted (added friend), meta (Meta/Quest
-  // social-graph friend), online, playing (in a Jamsesh session). Unity pushes these
-  // via updateFriends; the mock below covers every status tier (see friendStatus).
-  _friendsMock = [
-    { name: 'Jooleeno',     online: true,  avatar: '', accepted: true, meta: true,  playing: true  },
-    { name: 'Ted',          online: true,  avatar: '',      accepted: true, meta: true,  playing: false },
-    { name: 'Abbie',        online: true,  avatar: '',    accepted: false, meta: true, requested: true },
-    { name: 'xShadowPick',  online: true,  avatar: '', accepted: false, meta: true, playing: true  },
-    { name: 'FretNinja',    online: true,  avatar: '',    accepted: false, meta: true, playing: false },
-    { name: 'RiffLord420',  online: true,  avatar: '', accepted: false, meta: false, playing: true },
-    { name: 'Arthen',       online: false, avatar: '',   accepted: true, meta: true  },
-    { name: 'GrooveMonkey', online: false, avatar: '',   accepted: true, meta: false },
-    { name: 'MelodyQueen',  online: false, avatar: '', accepted: false, meta: true },
-    { name: 'PickSlinger',  online: false, avatar: '', accepted: false, meta: true },
-    { name: 'BeatDropper99',online: false, avatar: '',      accepted: false, meta: false },
-    { name: 'StarShredder', online: false, avatar: '',      accepted: false, meta: false }
-  ];
+  if (window.vuplex) return [];
+  if (!_friendsMock) {
+    _friendsMock = [
+      { name: 'Jooleeno',     platformId: 'mock-1', online: true,  playing: true,  avatar: '', accepted: true },
+      { name: 'Ted',          platformId: 'mock-2', online: true,  playing: false, avatar: '', accepted: true },
+      { name: 'Arthen',       platformId: 'mock-3', online: false, playing: false, avatar: '', accepted: true },
+      { name: 'GrooveMonkey', platformId: 'mock-4', online: false, playing: false, avatar: '', accepted: true }
+    ];
+  }
   return _friendsMock;
+}
+function getInvitableData() {
+  if (window._backendInvitables) return window._backendInvitables;
+  if (window.vuplex) return [];
+  if (!_invitablesMock) {
+    _invitablesMock = [
+      { name: 'Abbie',         platformId: 'mock-11', avatar: '' },
+      { name: 'xShadowPick',   platformId: 'mock-12', avatar: '' },
+      { name: 'FretNinja',     platformId: 'mock-13', avatar: '' },
+      { name: 'RiffLord420',   platformId: 'mock-14', avatar: '' },
+      { name: 'MelodyQueen',   platformId: 'mock-15', avatar: '' },
+      { name: 'PickSlinger',   platformId: 'mock-16', avatar: '' },
+      { name: 'BeatDropper99', platformId: 'mock-17', avatar: '' }
+    ];
+  }
+  return _invitablesMock;
+}
+// False on the headset until Unity has sent the first friends list.
+function friendsDataReady() { return !!window._backendFriends || !window.vuplex; }
+function invitablesDataReady() { return !!window._backendInvitables || !window.vuplex; }
+function isJamseshFriendId(platformId) {
+  if (!platformId) return false;
+  var list = getFriendsData();
+  for (var i = 0; i < list.length; i++) { if (list[i].platformId === platformId) return true; }
+  return false;
 }
 
 // Resolve a friend's status + sort priority + pill. Priority order (1 = top):
@@ -13798,28 +13894,8 @@ function buildSocialPage() {
       var createTile = document.createElement('div');
       createTile.className = 'space-tile-create';
       createTile.onclick = function() { openCreateGroup(); };
-      createTile.innerHTML = '<div class="space-tile-create-plus">+</div><div class="space-tile-create-label">Create New Group</div>';
+      createTile.innerHTML = '<div class="space-tile-create-plus">+</div><div class="space-tile-create-label">Create New Band</div>';
       groupGrid.appendChild(createTile);
-      continue;
-    }
-    if (gPage[i].temp) {
-      var tempTile = document.createElement('div');
-      tempTile.className = 'space-tile';
-      tempTile.onclick = function() {
-        if (getActiveGroupName() === 'The Picks') {
-          openManageGroup({ name: 'The Picks', file: '', members: '4/4', online: '3/4' });
-        } else {
-          openGroupJoinConfirm('The Picks', '', '3/4');
-        }
-      };
-      var tempPill = (getActiveGroupName() === 'The Picks') ? '<div class="space-here-badge">Active Group</div>' : '';
-      tempTile.innerHTML = tempPill +
-        '<img src="" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;pointer-events:none" alt="">' +
-        '<div class="tile-info" style="pointer-events:none;position:absolute;bottom:0;left:0;right:0;padding:48px 20px 18px;background:linear-gradient(0deg,rgba(0,0,0,0.95) 0%,rgba(0,0,0,0.9) 40%,rgba(0,0,0,0.6) 70%,transparent 100%);display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-end;gap:4px">' +
-          '<div class="tile-hero-title" style="font-size:64px">The Picks</div>' +
-          '<div class="tile-hero-sub">3/4 Members Online</div>' +
-        '</div>';
-      groupGrid.appendChild(tempTile);
       continue;
     }
     var g = gPage[i].g;
@@ -13839,7 +13915,7 @@ function buildSocialPage() {
     })(g);
     // The player's own personal band (created after leaving a group) is the
     // default Perform context but is NOT a joined "active group", so no pill.
-    var activePill = (g.name === getActiveGroupName() && (!g.isOwn || g.created)) ? '<div class="space-here-badge">Active Group</div>' : '';
+    var activePill = (g.name === getActiveGroupName() && (!g.isOwn || g.created)) ? '<div class="space-here-badge">Active Band</div>' : '';
     var gImg = g.photo || g.file;
     // The default JamPick logo is a graphic, not a photo — scale it to fit (contain
     // + padding) instead of cover-cropping it. Real band photos still fill the tile.
@@ -13850,62 +13926,120 @@ function buildSocialPage() {
       '<img src="' + gImg + '" style="position:absolute;top:0;left:0;width:100%;height:100%;' + gFitStyle + ';pointer-events:none" alt="">' +
       '<div class="tile-info" style="pointer-events:none;position:absolute;bottom:0;left:0;right:0;padding:48px 20px 18px;background:linear-gradient(0deg,rgba(0,0,0,0.95) 0%,rgba(0,0,0,0.9) 40%,rgba(0,0,0,0.6) 70%,transparent 100%);display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-end;gap:4px">' +
         '<div class="tile-hero-title" style="font-size:64px">' + g.name + '</div>' +
-        '<div class="tile-hero-sub">' + (g.online || g.members) + ' Members Online</div>' +
+        '<div class="tile-hero-sub">' + groupMembersLabel(g) + '</div>' +
       '</div>';
     groupGrid.appendChild(tile);
   }
   renderPager(document.getElementById('social-groups-pager'), socialGroupsPage, gTotal, function(dir) { socialGroupsPage += dir; buildSocialPage(); });
 
-  // ── Friends (accepted) + Add Friends (not yet added) — split by `accepted`. ──
-  var allFriends = getFriendsData();
-  var accepted = [], pending = [];
-  for (var fi = 0; fi < allFriends.length; fi++) {
-    var ff = allFriends[fi];
-    if (ff.accepted === true || ff.status === 'accepted') accepted.push(ff);
-    else pending.push(ff);
+  // ── Friends: Jamsesh friends (left) + invite to Jamsesh (right). ──
+  renderFriendGrid('social-friends-list', 'social-friends-pager', getFriendsData(), 'friends');
+  renderFriendGrid('social-invite-list', 'social-invite-pager', getInvitableData(), 'invite');
+  var subEl = document.getElementById('friends-col-sub-jamsesh');
+  if (subEl) {
+    var fl = getFriendsData(), onlineN = 0;
+    for (var on = 0; on < fl.length; on++) { if (fl[on].online) onlineN++; }
+    subEl.textContent = friendsDataReady() && fl.length ? (onlineN + ' online') : '';
   }
-  renderFriendGrid('social-friends-list', 'social-friends-pager', accepted, 'friends');
-  renderFriendGrid('social-addfriends-list', 'social-addfriends-pager', pending, 'add');
 }
 
-// Render a friend grid (sorted by status priority, paginated 2×5) into `listId`
-// with its pager. `pageKind` selects which page-state var to drive ('friends'
-// = accepted Friends tab, 'add' = Add Friends tab).
+// Minimal HTML escaping for player-supplied text (Meta display names) put into innerHTML.
+function escapeFriendText(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+// Invite-to-Jamsesh state per person: platformId → 'sending' | 'sent'.
+var _appInvites = {};
+var FRIENDS_PER_PAGE = 5;   // left column: 1×5 rows
+var INVITES_PER_PAGE = 4;   // right column: 4 rows + the "Invite more from Quest" row
+
+// Empty / loading card for a friends column.
+function makeFriendsEmpty(pageKind) {
+  var box = document.createElement('div');
+  box.className = 'friends-empty';
+  var title, sub;
+  if (pageKind === 'invite') {
+    if (!invitablesDataReady()) { title = 'Loading…'; sub = ''; }
+    else {
+      title = 'No one to suggest right now';
+      sub = 'Use Quest’s invite list below, or share your code from Settings ▸ Referrals.';
+    }
+  } else {
+    if (!friendsDataReady()) { title = 'Loading your Meta friends…'; sub = ''; }
+    else {
+      title = 'None of your Meta friends are on Jamsesh yet';
+      sub = 'Invite them from the list on the right.';
+    }
+  }
+  box.innerHTML = '<div class="friends-empty-title">' + title + '</div>' +
+    (sub ? '<div class="friends-empty-sub">' + sub + '</div>' : '');
+  return box;
+}
+
+// Last row of the invite column: opens Meta's own invite panel (followers + recently met).
+function makeQuestInviteRow() {
+  var btn = document.createElement('button');
+  btn.className = 'friend-add-btn';
+  btn.textContent = '+ Invite more from Quest';
+  btn.onclick = function() { sendToUnity('openAppInvitePanel', {}); };
+  return btn;
+}
+
+// Render one friends column into `listId` with its pager.
+//   pageKind 'friends' — Jamsesh friends, sorted by status (playing → online → offline), 5 per page.
+//   pageKind 'invite'  — people to invite (Meta's order), 4 per page + the Quest invite row.
 function renderFriendGrid(listId, pagerId, friends, pageKind) {
   var wrap = document.getElementById(listId);
+  if (!wrap) return;
   wrap.innerHTML = '';
   wrap.className = 'friends-list-wrap';
+  var isInvite = pageKind === 'invite';
   friends = friends.slice();
-  friends.sort(function(a, b) { return friendStatus(a).p - friendStatus(b).p; });
-  var PER = 10;   // 2×5 — rows fill the height, avatars max out, no scrollbar
+  if (!isInvite) friends.sort(function(a, b) { return friendStatus(a).p - friendStatus(b).p; });
+  var PER = isInvite ? INVITES_PER_PAGE : FRIENDS_PER_PAGE;
   var total = Math.max(1, Math.ceil(friends.length / PER));
-  var page = (pageKind === 'add') ? socialAddFriendsPage : socialFriendsPage;
+  var page = isInvite ? socialInvitePage : socialFriendsPage;
   if (page >= total) page = total - 1;
   if (page < 0) page = 0;
-  if (pageKind === 'add') socialAddFriendsPage = page; else socialFriendsPage = page;
+  if (isInvite) socialInvitePage = page; else socialFriendsPage = page;
   var items = friends.slice(page * PER, page * PER + PER);
+  if (!items.length) wrap.appendChild(makeFriendsEmpty(pageKind));
   for (var i = 0; i < items.length; i++) {
     var f = items[i];
-    var st = friendStatus(f);
     var item = document.createElement('div');
-    item.className = 'friend-item' + (f.online ? ' online' : '');
     item.style.setProperty('--friend-delay', (i * 0.06) + 's');
     item.style.cursor = 'pointer';
-    item.innerHTML =
-      '<div class="friend-avatar"><img src="' + f.avatar + '" alt=""></div>' +
-      '<div class="friend-info">' +
-        '<div class="friend-name">' + f.name + '</div>' +
-        '<div class="friend-status' + (f.online ? ' online' : '') + '">' +
-          '<span class="friend-dot' + (f.online ? ' online' : '') + '"></span>' +
-          '<span class="friend-pill ' + st.cls + '">' + st.label + '</span>' +
-        '</div>' +
-      '</div>';
-    item.onclick = (function(friend) { return function() { openFriendPopup(friend); }; })(f);
+    var avatarHtml = '<div class="friend-avatar"><img src="' + escapeFriendText(f.avatar || '') + '" alt=""></div>';
+    var nameHtml = '<div class="friend-name">' + escapeFriendText(f.name) + '</div>';
+    if (isInvite) {
+      var inv = _appInvites[f.platformId];
+      var chipCls = inv === 'sent' ? ' is-sent' : (inv === 'sending' ? ' is-sending' : '');
+      var chipTxt = inv === 'sent' ? 'Invited' : (inv === 'sending' ? 'Sending…' : 'Invite');
+      item.className = 'friend-item';
+      item.innerHTML = avatarHtml +
+        '<div class="friend-info">' + nameHtml + '</div>' +
+        '<div class="friend-invite-chip' + chipCls + '">' + chipTxt + '</div>';
+      item.onclick = (function(person) { return function() { openFriendPopup(person, 'invite'); }; })(f);
+    } else {
+      var st = friendStatus(f);
+      item.className = 'friend-item' + (f.online ? ' online' : '');
+      item.innerHTML = avatarHtml +
+        '<div class="friend-info">' + nameHtml +
+          '<div class="friend-status' + (f.online ? ' online' : '') + '">' +
+            '<span class="friend-dot' + (f.online ? ' online' : '') + '"></span>' +
+            '<span class="friend-pill ' + st.cls + '">' + st.label + '</span>' +
+          '</div>' +
+        '</div>';
+      item.onclick = (function(friend) { return function() { openFriendPopup(friend, 'friend'); }; })(f);
+    }
     wrap.appendChild(item);
   }
+  if (isInvite) wrap.appendChild(makeQuestInviteRow());
   sizeFriendAvatars(wrap);
   renderPager(document.getElementById(pagerId), page, total, function(dir) {
-    if (pageKind === 'add') socialAddFriendsPage += dir; else socialFriendsPage += dir;
+    if (isInvite) socialInvitePage += dir; else socialFriendsPage += dir;
     buildSocialPage();
   });
 }
@@ -13930,12 +14064,15 @@ function sizeFriendAvatars(grid) {
   else { requestAnimationFrame(apply); setTimeout(apply, 100); }
 }
 
-// Friend requests the player has sent (name → true). The Friends list shows a
-// "Friend request sent" pill for these; the popup's button reflects it too.
+// Meta follow requests sent from the member popup: platformId → 'opening' | 'sent'.
+// (friendStatus() also reads it by name for legacy entries.)
 var _friendRequestsSent = {};
 var _friendPopupTarget = null;
 
-function openFriendPopup(friend) {
+// Friend popup. mode 'friend' = a Jamsesh friend (info only — Meta has no
+// unfollow API for apps, so there's no Remove); mode 'invite' = someone to invite
+// to Jamsesh (Send Invite → Quest notification).
+function openFriendPopup(friend, mode) {
   _friendPopupTarget = friend;
   var fimg = document.getElementById('friend-popup-img');
   fimg.style.visibility = '';                 // clear any prior failed-load hide
@@ -13943,35 +14080,39 @@ function openFriendPopup(friend) {
   fimg.src = friend.avatar || '';
   document.getElementById('friend-popup-name').textContent = friend.name;
   var statusEl = document.getElementById('friend-popup-status');
-  statusEl.className = 'friend-popup-status' + (friend.online ? ' online' : '');
-  statusEl.innerHTML = '<span class="friend-dot' + (friend.online ? ' online' : '') + '"></span>' +
-    (friend.online ? 'Online' : 'Offline');
   var btn = document.getElementById('friend-popup-btn');
   var title = document.querySelector('#friend-popup-overlay .std-popup-header h2');
   var note = document.getElementById('friend-popup-note');
   note.style.display = 'none';
-  var isFriend = friend.accepted === true || friend.status === 'accepted';
-  if (isFriend) {
-    // Accepted friend → red "Remove Friend" CTA (opens a confirm).
-    if (title) title.textContent = 'Friend';
-    btn.textContent = 'Remove Friend';
-    btn.className = 'std-popup-btn create-group-leave-btn';
-    btn.disabled = false;
-    btn.onclick = confirmRemoveFriend;
-  } else if (_friendRequestsSent[friend.name] || friend.requested === true || friend.status === 'requested') {
-    // Pending request → "Request sent" note under the status, CTA just dismisses.
-    if (title) title.textContent = 'Add Friend';
+  note.className = 'friend-popup-note';
+  btn.className = 'std-popup-btn jamsesh-signature';
+  btn.disabled = false;
+  btn.onclick = function() { closeFriendPopup(); };
+
+  if (mode === 'invite') {
+    var inv = _appInvites[friend.platformId];
+    if (title) title.textContent = 'Invite to Jamsesh';
+    statusEl.style.display = 'none';
     note.style.display = '';
-    btn.textContent = 'OK';
-    btn.className = 'std-popup-btn jamsesh-signature';
-    btn.disabled = false;
-    btn.onclick = function() { closeFriendPopup(); };
+    if (inv === 'sent') {
+      note.textContent = 'Invite sent';
+      btn.textContent = 'OK';
+    } else if (inv === 'sending') {
+      note.textContent = 'Sending invite…';
+      btn.textContent = 'OK';
+    } else {
+      note.className = 'friend-popup-note is-info';
+      note.textContent = 'They’ll get a Quest notification inviting them to play Jamsesh with you.';
+      btn.textContent = 'Send Invite';
+      btn.onclick = function() { sendAppInvite(friend); };
+    }
   } else {
-    if (title) title.textContent = 'Add Friend';
-    btn.textContent = 'Send Friend Invite';
-    btn.className = 'std-popup-btn jamsesh-signature';
-    btn.disabled = false;
-    btn.onclick = sendFriendInvite;
+    var st = friendStatus(friend);
+    if (title) title.textContent = 'Friend';
+    statusEl.style.display = '';
+    statusEl.className = 'friend-popup-status' + (friend.online ? ' online' : '');
+    statusEl.innerHTML = '<span class="friend-dot' + (friend.online ? ' online' : '') + '"></span>' + st.label;
+    btn.textContent = 'OK';
   }
   document.getElementById('friend-popup-overlay').classList.add('active');
 }
@@ -13981,31 +14122,67 @@ function closeFriendPopup(e) {
   document.getElementById('friend-popup-overlay').classList.remove('active');
 }
 
-function sendFriendInvite() {
-  if (!_friendPopupTarget) return;
-  _friendRequestsSent[_friendPopupTarget.name] = true;
-  sendToUnity('sendFriendRequest', { name: _friendPopupTarget.name });
+// Invite one person to Jamsesh. Unity sends the Meta invite and replies with
+// appInviteResult {platformId, ok, error}; the row shows Sending… → Invited.
+function sendAppInvite(friend) {
+  if (!friend || !friend.platformId) return;
+  var id = friend.platformId;
+  if (_appInvites[id]) return;
+  _appInvites[id] = 'sending';
+  sendToUnity('inviteFriendToApp', { platformId: id, name: friend.name });
   closeFriendPopup();
-  buildSocialPage();   // the "Friend request sent" pill now shows on their row
+  buildSocialPage();
+  // Desktop preview has no Unity to answer — pretend it went through.
+  if (!window.vuplex) setTimeout(function() { onAppInviteResult({ platformId: id, ok: true }); }, 400);
 }
 
-// Remove-friend CTA → standardised destructive confirm → unfriend.
-function confirmRemoveFriend() {
-  var f = _friendPopupTarget;
-  if (!f) return;
-  closeFriendPopup();
-  showConfirmPopup('Remove ' + f.name + ' from your friends? You can send them a new request later.', {
-    title: 'Remove Friend?',
-    confirmLabel: 'Remove Friend',
-    destructive: true,
-    onConfirm: function() {
-      f.accepted = false;
-      if (f.status === 'accepted') f.status = '';
-      delete _friendRequestsSent[f.name];
-      sendToUnity('removeFriend', { name: f.name });
-      buildSocialPage();   // they drop out of Friends → into Add Friends
-    }
-  });
+function onAppInviteResult(data) {
+  if (!data || !data.platformId) return;
+  if (data.ok) {
+    _appInvites[data.platformId] = 'sent';
+  } else {
+    delete _appInvites[data.platformId];
+    if (data.error) console.log('[Friends] invite failed: ' + data.error);
+    showConfirmPopup('That invite didn’t go through. Check you’re online and try again.', { title: 'Invite Not Sent', confirmLabel: 'OK' });
+  }
+  buildSocialPage();
+}
+
+// ── Member popup: "Add Friend" (Meta follow request) for bandmates who aren't
+// Meta friends yet. Needs their platformId (lobby roster entries carry it).
+var _memberPopupTarget = null;
+function updateMemberFollowBtn() {
+  var btn = document.getElementById('member-popup-follow-btn');
+  if (!btn) return;
+  var m = _memberPopupTarget;
+  var me = (typeof getActiveProfile === 'function') ? getActiveProfile() : null;
+  var eligible = !!(m && m.platformId && !m.isSelf && !m.pending &&
+    !(me && m.name === me.name) && !isJamseshFriendId(m.platformId));
+  btn.style.display = eligible ? '' : 'none';
+  if (btn.parentNode) btn.parentNode.classList[eligible ? 'add' : 'remove']('has-3-btns');
+  if (!eligible) return;
+  var st = _friendRequestsSent[m.platformId];
+  btn.disabled = !!st;
+  btn.textContent = st === 'sent' ? 'Request Sent' : (st === 'opening' ? 'Opening…' : 'Add Friend');
+}
+
+function sendFollowRequest() {
+  var m = _memberPopupTarget;
+  if (!m || !m.platformId || _friendRequestsSent[m.platformId]) return;
+  var id = m.platformId;
+  _friendRequestsSent[id] = 'opening';
+  sendToUnity('sendFriendRequest', { platformId: id, name: m.name });
+  updateMemberFollowBtn();
+  if (!window.vuplex) setTimeout(function() { onFriendRequestResult({ platformId: id, sent: true }); }, 400);
+}
+
+// Unity → friendRequestResult {platformId, sent}: sent=false means the player
+// cancelled Meta's dialog (or it failed), so the button resets.
+function onFriendRequestResult(data) {
+  if (!data || !data.platformId) return;
+  if (data.sent) _friendRequestsSent[data.platformId] = 'sent';
+  else delete _friendRequestsSent[data.platformId];
+  updateMemberFollowBtn();
 }
 
 // Active-group name shown in the join-confirmation popup. Unity may push it via
@@ -14021,6 +14198,17 @@ function getActiveGroup() {
   var b = getActiveBand();
   if (!b) return null;   // not in a group
   return { id: b.id, name: b.name, file: b.photo || b.file || '', logo: b.logo, online: b.online, members: b.members };
+}
+
+// "N Members" caption for group tiles. Unity's updateGroups sends `members` as a count;
+// local/mock bands carry a members array. There is no online count from the backend, so
+// tiles show membership only (an own, just-created group counts the player: 1 Member).
+function groupMembersLabel(g) {
+  var n = 1;
+  if (g && typeof g.members === 'number') n = g.members;
+  else if (g && g.members && g.members.length) n = g.members.length;
+  if (n < 1) n = 1;
+  return n + (n === 1 ? ' Member' : ' Members');
 }
 
 // One group card (rounded thumbnail + caption + online count) for the swap row.
@@ -14063,7 +14251,7 @@ function openGroupJoinConfirm(groupName, groupImg, groupOnline) {
   }
   document.getElementById('group-swap-row').innerHTML =
     swapHtml + groupSwapTile('Joining', 'var(--mint)', newImg, groupName, groupOnline);
-  document.getElementById('group-join-title').textContent = active ? 'Switch Group?' : 'Join Group?';
+  document.getElementById('group-join-title').textContent = active ? 'Switch Band?' : 'Join Band?';
   document.getElementById('group-join-msg').textContent = '';
   document.getElementById('group-join-confirm-btn').textContent = active ? 'Switch' : 'Join';
   document.getElementById('group-join-overlay').classList.add('active');
@@ -14113,10 +14301,10 @@ function openSpaceSwitchConfirm(hub) {
   var joinPersonal = !!(hub.isDefault || hub.tagline);
   document.getElementById('space-swap-row').innerHTML =
     groupSwapTile('Current', 'var(--text-muted)', curImg, currentHub,
-      curPersonal ? 'You only' : (current ? current.count : ''), curPersonal ? '' : 'Jammers') +
+      curPersonal ? 'You only' : (current ? hubCountText(current) : ''), curPersonal ? '' : 'Jammers') +
     '<svg viewBox="0 0 24 24" style="width:72px;height:72px;flex:0 0 auto;fill:var(--mint);margin-top:240px" aria-hidden="true"><path d="M4 11h12.17l-5.59-5.59L12 4l8 8-8 8-1.41-1.41L16.17 13H4z"/></svg>' +
     groupSwapTile('Joining', 'var(--mint)', hub.img, hub.name,
-      joinPersonal ? 'You only' : hub.count, joinPersonal ? '' : 'Jammers');
+      joinPersonal ? 'You only' : hubCountText(hub), joinPersonal ? '' : 'Jammers');
   document.getElementById('space-switch-msg').textContent = '';
   document.getElementById('space-switch-confirm-btn').textContent = 'Switch';
   document.getElementById('space-switch-overlay').classList.add('active');
@@ -14164,8 +14352,10 @@ function ensureDefaultPrivateSpace() {
   privateSpaces.push({ name: (me && me.name ? me.name : 'My') + "'s Private Space", img: hubImg, tagline: 'A space just for you', isDefault: true });
 }
 var _pendingSwitchHub = null;
+// count comes from Unity (updateHubs, the live open-lobby shard). The desktop demo gets a
+// sample value; the headset shows "—" until real data arrives.
 var spaceHubs = [
-  { name: 'Jamsesh Hub', count: '8/25', img: 'spaces/social.png' }
+  { name: 'Jamsesh Hub', count: window.vuplex ? null : '3/8', img: 'spaces/social.png' }
 ];
 
 function buildSpacesGrid() {
@@ -14218,7 +14408,7 @@ function makeSpaceTile(sp) {
   // is set solely by Unity, so an un-honored space can't strand a false badge.
   var here = (!inBandspace && sp.name === currentHub)
     ? '<div class="space-here-badge">You Are Here</div>' : '';
-  var sub = sp.tagline ? sp.tagline : (sp.count + ' Jammers');
+  var sub = sp.tagline ? sp.tagline : (hubCountText(sp) + ' Jammers');
   tile.innerHTML = here +
     '<div class="quest-fade"></div>' +
     '<div class="quest-caption">' +
@@ -14277,7 +14467,7 @@ function openCreateGroup() {
   createGroupLogo = JAMSESH_DEFAULT_LOGO;   // default to the Jamsesh pick
   var me = getActiveProfile();
   // Prefill "<name>'s Group"; for additional groups, suffix " #N" (2nd = #2, etc.).
-  var base = me.name + "'s Group";
+  var base = me.name + "'s Band";
   var groups = getBandGroups();
   var existing = 0;
   for (var gi = 0; gi < groups.length; gi++) {
@@ -14285,7 +14475,7 @@ function openCreateGroup() {
     if (gn === base || gn.indexOf(base + ' #') === 0) existing++;
   }
   document.getElementById('create-group-name').value = existing === 0 ? base : (base + ' #' + (existing + 1));
-  document.getElementById('create-group-title').textContent = 'Create Group';
+  document.getElementById('create-group-title').textContent = 'Create Band';
   cgRenderLogo();
   createGroupAvailPage = 0;
   createGroupMembersPage = 0;
@@ -14364,20 +14554,22 @@ function createGroupPrimaryAction() {
 
 function leaveActiveGroup() {
   var name = document.getElementById('create-group-name').value.trim() || getActiveGroupName();
-  // Groups the player created/leads (isOwn) get a stronger warning: leaving
-  // disbands the group for everyone and it can't be rejoined.
+  // Groups the player created/leads get a stronger warning: leaving disbands the
+  // group for everyone and it can't be rejoined. Real bands carry isAdmin from
+  // Unity's updateGroups (PlayFab admin role); local/mock bands use isOwn.
   var band = getActiveBand();
-  var owned = !!(band && band.isOwn);
-  var label = name || 'this group';
+  var owned = !!(band && (band.isOwn || band.isAdmin));
+  var label = name || 'this band';
   var msg = owned
-    ? 'Leaving disbands ' + label + ' for all members. The group will be deleted and you won’t be able to rejoin.'
+    ? 'Leaving disbands ' + label + ' for all members. The band will be deleted and you won’t be able to rejoin.'
     : 'Leave ' + label + '? You can be invited back later.';
   showConfirmPopup(msg, {
-    title: owned ? 'Disband Group' : 'Leave Group',
-    confirmLabel: owned ? 'Disband Group' : 'Leave Group',
+    title: owned ? 'Disband' : 'Leave Band',
+    confirmLabel: owned ? 'Disband' : 'Leave Band',
     destructive: true,
     onConfirm: function() {
-      sendToUnity(owned ? 'disbandGroup' : 'leaveGroup', name);
+      // Keyed by the band's PlayFab id; Unity re-pushes updateGroups afterwards.
+      sendToUnity(owned ? 'disbandGroup' : 'leaveGroup', { id: (band && band.id) || '', name: name });
       closeCreateGroup();
       if (owned) {
         // Disband: the group is deleted and disappears from Groups; Perform falls
@@ -14399,7 +14591,7 @@ function startFreshOwnBand() {
   var me = getActiveProfile();
   var fresh = {
     id: 'mygroup',
-    name: me.name + "'s Group",
+    name: me.name + "'s Band",
     logo: JAMSESH_DEFAULT_LOGO,
     photo: JAMSESH_DEFAULT_LOGO,
     online: '1/4',
@@ -14579,7 +14771,7 @@ function cgUpdatePrimaryButton() {
     return;
   }
   if (createGroupMode === 'manage') {
-    btn.textContent = 'Leave Group';
+    btn.textContent = 'Leave Band';
     btn.className = 'std-popup-btn create-group-leave-btn';
     btn.disabled = false;
     if (okBtn) { okBtn.style.display = ''; okBtn.textContent = 'OK'; }
@@ -14785,6 +14977,8 @@ function openMemberPopup(member, idx, removeFn) {
   _memberPopupIdx = idx;
   _memberRemoveFn = removeFn || null;
   _memberPopupName = member.name || 'this member';
+  _memberPopupTarget = member;
+  updateMemberFollowBtn();
   var img = document.getElementById('member-popup-img');
   img.style.visibility = '';
   img.removeAttribute('data-img-failed');
@@ -14805,7 +14999,7 @@ function confirmRemoveMember() {
   var fn = _memberRemoveFn;
   var name = _memberPopupName || 'this member';
   closeMemberPopup();
-  showConfirmPopup('Remove ' + name + ' from the group?', {
+  showConfirmPopup('Remove ' + name + ' from the band?', {
     title: 'Remove Member?',
     confirmLabel: 'Remove Member',
     destructive: true,
@@ -15185,7 +15379,6 @@ var hostName = '';
 // which Unity sends on the next bandspace entry where the host's SongHasStarted is
 // false (i.e. between songs or after results).
 var joinedDuringActiveSong = false;
-var instrumentAvailability = { vocals: true, drums: true, guitar: true };
 var songInstruments = {};
 var songDiffs = {};
 var songSpaces = {};
@@ -15283,7 +15476,7 @@ function ensureDefaultGroup() {
   _defaultGroupSeeded = true;
   if (getBandGroups().length) return;   // Unity / an existing group already present
   var me = getActiveProfile();
-  var name = me.name + "'s Group";
+  var name = me.name + "'s Band";
   bandGroups.unshift({
     id: 'grp-' + name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
     name: name,
@@ -15307,7 +15500,7 @@ function getOwnDefaultBand() {
   if (!_ownDefaultBand) {
     var me = getActiveProfile();
     _ownDefaultBand = {
-      id: 'mygroup', name: (me ? me.name : 'My') + "'s Group",
+      id: 'mygroup', name: (me ? me.name : 'My') + "'s Band",
       logo: JAMSESH_DEFAULT_LOGO, photo: JAMSESH_DEFAULT_LOGO, online: '1/4',
       active: false, isOwn: true, members: []
     };
@@ -15414,7 +15607,7 @@ function buildModeTabs() {
   var container = document.getElementById('play-mode-tabs');
   container.innerHTML = '';
   // Battle is internal-only for now (see setInternalUser).
-  var modes = ['Solo', 'Group'];
+  var modes = ['Solo', 'Band'];
   var modeIds = ['solo', 'coop'];
   if (isInternalUser) { modes.push('Battle'); modeIds.push('battle'); }
   for (var i = 0; i < modes.length; i++) {
@@ -16293,7 +16486,10 @@ function startGame() {
 
 // tutorialInst is set only when this start came from the tutorial prompt; it
 // rides along on the payload so Unity can tell a lesson from a real song.
+var _startGameSentAt = 0;
 function _startGameConfirmed(tutorialInst) {
+  // Headset only: ignore a repeat Start within 3s of the last one (Unity is loading).
+  if (window.vuplex && Date.now() - _startGameSentAt < 3000) return;
   var titles = [];
   for (var i = 0; i < setlist.length; i++) {
     titles.push(setlist[i].title);
@@ -16306,6 +16502,11 @@ function _startGameConfirmed(tutorialInst) {
     modifiers: getModifierPayload(),
     tutorial: tutorialInst || false
   });
+  // The results screens in this page are the desktop demo. On the headset Unity tears
+  // this page down for gameplay and shows real results in results.html, so jumping
+  // here would only flash mock scores/leaderboards. Guard against a double Start tap
+  // while Unity loads instead.
+  if (window.vuplex) { _startGameSentAt = Date.now(); return; }
   showResults1();
 }
 
@@ -16339,7 +16540,7 @@ function buildResultsLeaderboard() {
   if (!lbEl) return;
   // Group tab → a band leaderboard instead of the per-player one.
   if (resultsLbTab === 'group') { buildResultsBandLeaderboard(lbEl); return; }
-  var meName = 'RAEL';
+  var meName = 'YOU';
   var meEl = document.querySelector('.profile-name');
   if (meEl && meEl.textContent && /[A-Za-z]/.test(meEl.textContent)) meName = meEl.textContent.toUpperCase();
   var myScore = parseInt((_resultsMeData().score || '0').replace(/[^0-9]/g, ''), 10) || 0;
@@ -16389,7 +16590,7 @@ function buildResultsLeaderboard() {
 // standings later into the same #results-lb container.
 function buildResultsBandLeaderboard(lbEl) {
   var myBand = (typeof getActiveGroupName === 'function' && getActiveGroupName()) || '';
-  if (!myBand) { var me = getActiveProfile(); myBand = (me && me.name ? me.name : 'Your') + "'s Group"; }
+  if (!myBand) { var me = getActiveProfile(); myBand = (me && me.name ? me.name : 'Your') + "'s Band"; }
   myBand = myBand.toUpperCase();
   var diff = (selectedDifficulty || 'hard'); diff = diff.charAt(0).toUpperCase() + diff.slice(1);
   var myScore = parseInt((_resultsGroupData().score || '').replace(/[^0-9]/g, ''), 10) || 0;
@@ -17042,162 +17243,7 @@ function togglePreview(idx) {
   buildPlayGrid();
 }
 
-var lbTypes = [
-  {label: 'Worldwide', icon: '\u{1F30D}'},
-  {label: 'Local',     icon: '\u{1F4CD}'},
-  {label: 'Friends',   icon: '\u{1F465}'}
-];
-var currentLbType = 0;
-
 var pickerSelectedSong = null;
-
-var lbNamePool = [
-  'xShredMaster','BeatDropQueen','NeonRiff','AxelStorm','VoxHunter',
-  'FretBoss','SynthWave99','PickSlinger','CrashKid','LoopMachine',
-  'WahPedal','TrebleMaker','RiffRider','BassCanon','TempoTitan',
-  'ChordCrusher','MelodyMaven','GrooveGuru','HarmonyHero','SonicBlaze',
-  'VibeCheck','EchoStrike','PulseRider','WaveBreaker','ToneShifter',
-  'AmpliFire','DropZone','MixMaster','ClefKing','OctaveOwl'
-];
-var lbPlatePool = [np.galaxy, np.bamboo, np.garden, np.flames, np.drums, np.microphone, np.kpop, np.sakura];
-var lbPlateClasses = ['plate-holo', 'plate-radiate'];
-// Mock leaderboard avatars use the real (committed) avatar images — the old
-//  song-cover paths aren't in the repo and 404'd on every build.
-var lbAvatarPool = ['', '', '', '', ''];
-
-function lbHash(str) {
-  var h = 5381;
-  for (var i = 0; i < str.length; i++) h = ((h << 5) + h + str.charCodeAt(i)) | 0;
-  return Math.abs(h);
-}
-
-function generateLeaderboard(songTitle, instId, diffId, lbType) {
-  var seed = lbHash(songTitle + '|' + instId + '|' + diffId + '|' + lbType);
-  function rng() {
-    seed = (seed * 1103515245 + 12345) & 0x7fffffff;
-    return seed / 0x7fffffff;
-  }
-  var names = lbNamePool.slice();
-  for (var i = names.length - 1; i > 0; i--) {
-    var j = Math.floor(rng() * (i + 1));
-    var tmp = names[i]; names[i] = names[j]; names[j] = tmp;
-  }
-  var entries = [];
-  var baseScore = Math.floor(rng() * 200000) + 800000;
-  for (var i = 0; i < 8; i++) {
-    var score = baseScore - Math.floor(rng() * 12000 + 3000) * i;
-    if (score < 100000) score = 100000 + Math.floor(rng() * 50000);
-    var entry = {
-      pos: i + 1,
-      name: names[i],
-      score: score,
-      avatar: ''
-    };
-    if (rng() > 0.7) {
-      entry.plateClass = lbPlateClasses[Math.floor(rng() * lbPlateClasses.length)];
-    } else {
-      entry.plate = lbPlatePool[Math.floor(rng() * lbPlatePool.length)];
-    }
-    entries.push(entry);
-  }
-  entries.sort(function(a, b) { return b.score - a.score; });
-  // Insert Jooleeno at a random position
-  var jooleenoScore = entries.length > 0 ? entries[Math.floor(rng() * entries.length)].score + Math.floor(rng() * 5000) - 2500 : 500000;
-  var jooleenoIdx = Math.floor(rng() * (entries.length + 1));
-  entries.splice(jooleenoIdx, 0, {
-    pos: 0,
-    name: 'Jooleeno',
-    score: jooleenoScore,
-    avatar: ''
-  });
-  // Insert A_Peach at a random position
-  var peachScore = entries.length > 0 ? entries[Math.floor(rng() * entries.length)].score + Math.floor(rng() * 5000) - 2500 : 500000;
-  var peachIdx = Math.floor(rng() * (entries.length + 1));
-  entries.splice(peachIdx, 0, {
-    pos: 0,
-    name: 'A_Peach',
-    score: peachScore,
-    avatar: ''
-  });
-  entries.sort(function(a, b) { return b.score - a.score; });
-  if (lbType === 'Worldwide') {
-    var startPos = Math.floor(rng() * 500) + 1;
-    for (var i = 0; i < entries.length; i++) entries[i].pos = startPos + i;
-  } else {
-    for (var i = 0; i < entries.length; i++) entries[i].pos = i + 1;
-  }
-  return entries;
-}
-
-function rotateLbType() {
-  currentLbType = (currentLbType + 1) % lbTypes.length;
-  var t = lbTypes[currentLbType];
-  document.getElementById('lb-type-btn').innerHTML = '<span>' + t.icon + '</span> ' + t.label;
-  buildLeaderboard();
-  sendToUnity('leaderboardType', t.label);
-}
-
-var pickerInstIdx = 0;
-var pickerDiffIdx = 1; // default Medium
-
-var instIcons = {guitar:'&#127928;', keys:'&#127929;', drums:'&#129345;', vocals:'&#127908;', bass:'&#127928;'};
-var diffIcons = {easy:'&#127922;', medium:'&#127919;', hard:'&#128293;', expert:'&#128128;'};
-
-function rotatePickerInstrument() {
-  // Skip Keys ("Coming Soon") in the leaderboard picker rotation
-  do {
-    pickerInstIdx = (pickerInstIdx + 1) % instruments.length;
-  } while (instruments[pickerInstIdx].id === 'keys');
-  var inst = instruments[pickerInstIdx];
-  selectedInstrument = inst.id;
-  document.getElementById('picker-inst-btn').innerHTML = (instIcons[inst.id] || '') + ' ' + inst.label;
-  buildLeaderboard();
-  sendToUnity('selectInstrument', inst.id);
-}
-
-function rotatePickerDifficulty() {
-  pickerDiffIdx = (pickerDiffIdx + 1) % difficulties.length;
-  var diff = difficulties[pickerDiffIdx];
-  selectedDifficulty = diff.id;
-  document.getElementById('picker-diff-btn').innerHTML = (diffIcons[diff.id] || '') + ' ' + diff.label;
-  buildLeaderboard();
-  sendToUnity('selectDifficulty', diff.id);
-}
-
-function shortPos(n) {
-  if (n >= 1000000) return (n / 1000000).toFixed(1).replace('.0', '') + 'M';
-  if (n >= 1000) return (n / 1000).toFixed(1).replace('.0', '') + 'K';
-  return '' + n;
-}
-
-function buildLeaderboard() {
-  var list = document.getElementById('play-lb-list');
-  if (!list) return;   // leaderboard removed from the picker
-  list.innerHTML = '';
-  var typeName = lbTypes[currentLbType].label;
-  var songTitle = pickerSelectedSong ? pickerSelectedSong.title : 'default';
-  var instId = instruments[pickerInstIdx].id;
-  var diffId = difficulties[pickerDiffIdx].id;
-  var entries = generateLeaderboard(songTitle, instId, diffId, typeName);
-  var starHtml = '<div class="play-lb-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>';
-  for (var i = 0; i < 8 && i < entries.length; i++) {
-    var lb = entries[i];
-    var row = document.createElement('div');
-    row.className = 'play-lb-row';
-    var tile = document.createElement('div');
-    tile.className = 'play-lb-tile';
-    row.innerHTML = '<span class="play-lb-pos">' + shortPos(lb.pos) + '</span>';
-    tile.innerHTML =
-      '<img class="play-lb-avatar" src="' + lb.avatar + '" alt="">' +
-      '<div class="play-lb-info">' +
-        starHtml +
-        '<div class="play-lb-name">' + lb.name + '</div>' +
-        '<div class="play-lb-score">' + lb.score.toLocaleString() + '</div>' +
-      '</div>';
-    row.appendChild(tile);
-    list.appendChild(row);
-  }
-}
 
 function selectPickerSong(song, tileEl) {
   pickerSelectedSong = song;
@@ -17212,7 +17258,6 @@ function selectPickerSong(song, tileEl) {
       tileEl.classList.add('active');
     }
   }
-  buildLeaderboard();
 }
 
 function addSongToSetlist(song) {
@@ -17587,7 +17632,6 @@ function buildPlayPanel(songs) {
   initLobbyPlates();
   buildModeTabs();
   buildPlayGrid();
-  buildLeaderboard();
 
   // Push initial config state so Unity config matches the UI defaults.
   // In bandspace, don't send defaults — instrument should stay Unknown
@@ -18210,6 +18254,10 @@ var VIBE_GUITAR_SKINS = [
 var VIBE_DRUM_SKINS = [
   { id: 'Original', label: 'Original', img: 'instruments/drums.png' }
 ];
+// Highway picker is hidden until real highway art is mapped (the images below are
+// vault placeholders). Flip this to bring the section, its Vibe-tile slice and its
+// experience{tab:'highway'} messages back.
+var VIBE_HIGHWAY_ENABLED = false;
 var VIBE_HIGHWAYS = [
   { id: 'Neon',    label: 'Neon',    img: 'vault/018.jpg' },
   { id: 'Rainbow', label: 'Rainbow', img: 'vault/019.jpg' },
@@ -18236,12 +18284,13 @@ function vibeImg(list, id) {
 // Up-to-4 asset images for the Vibe option-tile diagonal slices (same mechanic
 // as the Challenges reward tiles) — one per section, from the live selections.
 function getVibeAssets() {
-  return [
+  var assets = [
     { label: 'Stage',       img: vibeImg(VIBE_STAGES, selectedEnvironment) },
     { label: 'Guitar Skin', img: vibeImg(VIBE_GUITAR_SKINS, selectedGuitarSkin) },
-    { label: 'Drum Skin',   img: vibeImg(VIBE_DRUM_SKINS, selectedDrumSkin) },
-    { label: 'Highway',     img: vibeImg(VIBE_HIGHWAYS, selectedHighway) }
+    { label: 'Drum Skin',   img: vibeImg(VIBE_DRUM_SKINS, selectedDrumSkin) }
   ];
+  if (VIBE_HIGHWAY_ENABLED) assets.push({ label: 'Highway', img: vibeImg(VIBE_HIGHWAYS, selectedHighway) });
+  return assets;
 }
 
 function buildOptionsRow(container) {
@@ -18519,7 +18568,7 @@ function coopGroupName() {
   var n = getActiveGroupName();
   if (n) return n;
   var me = getActiveProfile();
-  return (me && me.name ? me.name : 'Your') + "'s Group";
+  return (me && me.name ? me.name : 'Your') + "'s Band";
 }
 // Setlist name for the songs-row header: the saved/Jamsesh name if one is loaded,
 // otherwise prefilled "<group name> Setlist #1".
@@ -18568,13 +18617,13 @@ function coopGroupTile(band) {
     '<img src="' + gImg + '" style="position:absolute;top:0;left:0;width:100%;height:100%;' + gFit + ';pointer-events:none" alt="">' +
     '<div class="tile-info" style="pointer-events:none;position:absolute;bottom:0;left:0;right:0;padding:40px 16px 14px;background:linear-gradient(0deg,rgba(0,0,0,0.95) 0%,rgba(0,0,0,0.9) 40%,rgba(0,0,0,0.6) 70%,transparent 100%);display:flex;flex-direction:column;align-items:flex-start;gap:2px">' +
       '<div class="tile-hero-title" style="font-size:34px;line-height:1.02">' + band.name + '</div>' +
-      '<div class="tile-hero-sub">' + (band.online || ('1/' + COOP_PLAYERS_MAX)) + ' Members Online</div>' +
+      '<div class="tile-hero-sub">' + groupMembersLabel(band) + '</div>' +
     '</div>';
   return tile;
 }
 
 // Group picker (opened from the Perform group tile). Lists the player's groups
-// plus the Jamsesh + The Picks placeholders. Picking a non-active group → switch
+// plus (desktop demo only) the Jamsesh + The Picks placeholders. Picking a non-active group → switch
 // warning; the active group → Manage Group.
 function openGroupPicker() {
   var grid = document.getElementById('group-picker-grid');
@@ -18582,8 +18631,9 @@ function openGroupPicker() {
   var groups = getBandGroups().slice();
   var names = {};
   for (var i = 0; i < groups.length; i++) names[groups[i].name] = true;
-  if (!names['Jamsesh'])   groups.push({ name: 'Jamsesh',   logo: JAMSESH_DEFAULT_LOGO, photo: JAMSESH_DEFAULT_LOGO, online: '3/4', placeholder: true });
-  if (!names['The Picks']) groups.push({ name: 'The Picks', logo: '',  photo: '',  online: '3/4', placeholder: true });
+  // Placeholder groups are a desktop-demo affordance; never show fake groups on the headset.
+  if (!window.vuplex && !names['Jamsesh'])   groups.push({ name: 'Jamsesh',   logo: JAMSESH_DEFAULT_LOGO, photo: JAMSESH_DEFAULT_LOGO, online: '3/4', placeholder: true });
+  if (!window.vuplex && !names['The Picks']) groups.push({ name: 'The Picks', logo: '',  photo: '',  online: '3/4', placeholder: true });
   for (var g = 0; g < groups.length; g++) grid.appendChild(groupPickerTile(groups[g]));
   document.getElementById('group-picker-overlay').classList.add('active');
 }
@@ -18597,14 +18647,14 @@ function groupPickerTile(grp) {
   var isActive = grp.name === getActiveGroupName();
   var tile = document.createElement('div');
   tile.className = 'space-tile group-picker-tile';
-  var pill = isActive ? '<div class="space-here-badge">Active Group</div>' : '';
+  var pill = isActive ? '<div class="space-here-badge">Active Band</div>' : '';
   var img = grp.photo || grp.logo || JAMSESH_DEFAULT_LOGO;
   var fit = (img === JAMSESH_DEFAULT_LOGO) ? 'object-fit:contain;box-sizing:border-box;padding:28px' : 'object-fit:cover';
   tile.innerHTML = pill +
     '<img src="' + img + '" style="position:absolute;top:0;left:0;width:100%;height:100%;' + fit + ';pointer-events:none" alt="">' +
     '<div class="tile-info" style="pointer-events:none;position:absolute;bottom:0;left:0;right:0;padding:48px 18px 16px;background:linear-gradient(0deg,rgba(0,0,0,0.95) 0%,rgba(0,0,0,0.85) 40%,rgba(0,0,0,0.5) 70%,transparent 100%);display:flex;flex-direction:column;align-items:flex-start;gap:4px">' +
       '<div class="tile-hero-title" style="font-size:40px;line-height:1.02">' + grp.name + '</div>' +
-      '<div class="tile-hero-sub">' + (grp.online || ('1/' + COOP_PLAYERS_MAX)) + ' Members Online</div>' +
+      '<div class="tile-hero-sub">' + groupMembersLabel(grp) + '</div>' +
     '</div>';
   (function(g, active) {
     tile.onclick = function() {
@@ -19071,7 +19121,7 @@ function buildCoopPlayersArea(container) {
       // IN PLACE (absolute overlay, stays on Perform — no nav to Bandmates).
       var nameEl = document.createElement('div');
       nameEl.className = 'coop-band-name';
-      nameEl.textContent = band.name || 'Group';
+      nameEl.textContent = band.name || 'Band';
       header.appendChild(nameEl);
       header.style.cursor = 'pointer';
       (function(b) {
@@ -19812,7 +19862,7 @@ var MISS_MODIFIERS = [
   {
     id: 'bandRevive',
     label: 'Bandmate Revive',
-    desc: 'Group only. A player who fails out goes silent and can be revived by a bandmate spending Overdrive.',
+    desc: 'Band only. A player who fails out goes silent and can be revived by a bandmate spending Overdrive.',
     def: true,
     sliders: [
       {id: 'reviveCostPct', label: 'Overdrive Cost', min: 25, max: 100, step: 25, def: 50, fmt: 'pct'}
@@ -19824,16 +19874,29 @@ var MISS_MODIFIERS = [
 // is the per-song difficulty cards, 'presets' is the preset browser, and 'mods'
 // tabs render their mods list. Every MISS_MODIFIERS id must appear in exactly one
 // 'mods' tab — checkModifierTabs() warns at init if one is unassigned.
+// internal: true → tab only shown to internal users (isInternalUser, from Unity's
+// setInternalUser). Players see only Difficulty; see modifierTabVisible().
 var MODIFIER_TABS = [
   {id: 'difficulty', label: 'Difficulty', kind: 'difficulty'},
-  {id: 'audio',   kind: 'mods', label: 'Audio',   mods: ['stemDuck', 'stemBoost', 'missSfx']},
-  {id: 'highway', kind: 'mods', label: 'Highway', mods: ['hitFlames', 'ghostMissedNote', 'streakCounter']},
-  {id: 'scoring', kind: 'mods', label: 'Scoring', mods: ['streakBreak', 'multiplierDrop', 'overdriveVoid']},
-  {id: 'failure', kind: 'mods', label: 'Failure', mods: ['rockMeter', 'failSong', 'dangerVignette',
+  {id: 'audio',   kind: 'mods', label: 'Audio',   internal: true, mods: ['stemDuck', 'stemBoost', 'missSfx']},
+  {id: 'highway', kind: 'mods', label: 'Highway', internal: true, mods: ['hitFlames', 'ghostMissedNote', 'streakCounter']},
+  {id: 'scoring', kind: 'mods', label: 'Scoring', internal: true, mods: ['streakBreak', 'multiplierDrop', 'overdriveVoid']},
+  {id: 'failure', kind: 'mods', label: 'Failure', internal: true, mods: ['rockMeter', 'failSong', 'dangerVignette',
                                                          'highwayDesat', 'crowdReacts', 'bandRevive']},
-  {id: 'battle', label: 'Battle', kind: 'mods', mods: ["battleSections", "battleStack", "battleInk", "battleFlip", "battleSpeed", "battleTiny", "battleSpawn", "battleSwap", "battleDebug"]},
-  {id: 'presets', label: 'Presets', kind: 'presets'}
+  {id: 'battle', label: 'Battle', kind: 'mods', internal: true, mods: ["battleSections", "battleStack", "battleInk", "battleFlip", "battleSpeed", "battleTiny", "battleSpawn", "battleSwap", "battleDebug"]},
+  {id: 'presets', label: 'Presets', kind: 'presets', internal: true}
 ];
+
+function modifierTabVisible(def) {
+  return !!def && (!def.internal || isInternalUser);
+}
+
+function modifierTabDef(id) {
+  for (var i = 0; i < MODIFIER_TABS.length; i++) {
+    if (MODIFIER_TABS[i].id === id) return MODIFIER_TABS[i];
+  }
+  return null;
+}
 var modifierTab = 'difficulty';
 
 var modifierEnabled = {};   // modifier id -> bool
@@ -19912,7 +19975,14 @@ function _saveModifiers() {
 }
 
 // Payload shape shared by the 'modifiers' message and the startGame payload.
+// Non-internal players can't see the modifier tabs, so they always play on the
+// defaults — a stale localStorage state from an earlier build must not silently
+// change their game.
 function getModifierPayload() {
+  if (!isInternalUser) {
+    var d = modifierDefaults();
+    return {tier: modifierTier, enabled: d.enabled, values: d.values, preset: ''};
+  }
   return {tier: modifierTier, enabled: modifierEnabled, values: modifierValues,
           preset: activePresetName()};
 }
@@ -20091,7 +20161,7 @@ function setInternalUser(data) {
   isInternalUser = next;
   if (!isInternalUser && playMode === 'battle') setPlayMode('coop');
   else if (typeof buildModeTabs === 'function' && document.getElementById('play-mode-tabs')) buildModeTabs();
-  if (!isInternalUser && modifierTab === 'battle') modifierTab = 'difficulty';
+  if (!modifierTabVisible(modifierTabDef(modifierTab))) modifierTab = 'difficulty';
   var overlay = document.getElementById('option-picker-overlay');
   if (overlay && overlay.style.display === 'flex' && currentPickerType === 'difficulty') {
     openOptionPicker('difficulty');
@@ -20697,11 +20767,8 @@ function renderModifierTab() {
   body.innerHTML = '';
   body.scrollTop = 0;
 
-  var def = null;
-  for (var i = 0; i < MODIFIER_TABS.length; i++) {
-    if (MODIFIER_TABS[i].id === modifierTab) { def = MODIFIER_TABS[i]; break; }
-  }
-  if (!def || (def.id === 'battle' && !isInternalUser)) def = MODIFIER_TABS[0];
+  var def = modifierTabDef(modifierTab);
+  if (!modifierTabVisible(def)) def = MODIFIER_TABS[0];
 
   if (def.kind === 'presets') buildPresetBrowser(body);
   else if (def.kind === 'mods') buildModifierList(body, def.mods);
@@ -20768,14 +20835,10 @@ function openOptionPicker(type) {
     for (var ii = 0; ii < instItems.length; ii++) {
       var inst = instItems[ii];
 
-      // In coop/battle mode, check if this instrument is taken by another player.
-      var isTaken = false;
-      // Battle is guitar vs guitar, so both players may hold Guitar at once.
+      // Battle is guitar vs guitar: every other instrument is locked. Group play
+      // doesn't grey out instruments other players hold.
       var battleLocked = playMode === 'battle' && inst.id !== 'guitar';
-      if (battleLocked) isTaken = true;
-      if (inBandspace && playMode !== 'solo') {
-        if (playMode !== 'battle' && instrumentAvailability[inst.id] === false) isTaken = true;
-      }
+      var isTaken = battleLocked;
       var isSelected = inst.id === selectedInstrument && !isTaken;
 
       var col = document.createElement('div');
@@ -20784,7 +20847,7 @@ function openOptionPicker(type) {
       // Header tile (image + label) — always rendered, identical role in both layouts.
       var header = document.createElement('div');
       header.className = 'instrument-picker__header';
-      var labelText = isTaken ? inst.label + (battleLocked ? ' (Guitar Only)' : ' (Taken)') : inst.label;
+      var labelText = isTaken ? inst.label + ' (Guitar Only)' : inst.label;
       // Surface the Unity-owned tutorial flag on the tile so the state is
       // visible, not just implied by whether the prompt appears.
       var tutHint = '';
@@ -20864,7 +20927,7 @@ function openOptionPicker(type) {
     modTabs.id = 'mod-tabs';
     for (var mt = 0; mt < MODIFIER_TABS.length; mt++) {
       var tabDef = MODIFIER_TABS[mt];
-      if (tabDef.id === 'battle' && !isInternalUser) continue;
+      if (!modifierTabVisible(tabDef)) continue;
       var tabEl = document.createElement('div');
       tabEl.className = 'option-picker-tab' + (tabDef.id === modifierTab ? ' active' : '');
       tabEl.setAttribute('data-mod-tab', tabDef.id);
@@ -20874,6 +20937,8 @@ function openOptionPicker(type) {
       })(tabDef.id);
       modTabs.appendChild(tabEl);
     }
+    // Players only get the Difficulty tab — a one-tab row is just noise.
+    if (modTabs.children.length < 2) modTabs.style.display = 'none';
     panel.appendChild(modTabs);
 
     stdBody.id = 'mod-tab-body';
@@ -20929,7 +20994,9 @@ function openOptionPicker(type) {
     vibeSection('Stage',       vibeAvailable(VIBE_STAGES, ['Colosseum']),      selectedEnvironment, 'environment', function(id){ selectedEnvironment = id; });
     vibeSection('Guitar Skin', vibeAvailable(VIBE_GUITAR_SKINS, ['Original']), selectedGuitarSkin,  'guitarSkin',  function(id){ selectedGuitarSkin = id; });
     vibeSection('Drum Skin',   vibeAvailable(VIBE_DRUM_SKINS, ['Original']),   selectedDrumSkin,    'drumSkin',    function(id){ selectedDrumSkin = id; });
-    vibeSection('Highway',     vibeAvailable(VIBE_HIGHWAYS, ['Neon']),         selectedHighway,     'highway',     function(id){ selectedHighway = id; });
+    if (VIBE_HIGHWAY_ENABLED) {
+      vibeSection('Highway',   vibeAvailable(VIBE_HIGHWAYS, ['Neon']),         selectedHighway,     'highway',     function(id){ selectedHighway = id; });
+    }
 
     // ── Accept (footer) ── X / backdrop tap reverts via closeOptionPicker.
     var stdFooter = document.createElement('div');
@@ -20950,17 +21017,9 @@ function buildSimplePickerChoices(panel, type, items, currentVal) {
     var item = items[i];
     var choice = document.createElement('div');
 
-    // In coop/battle mode, check instrument availability from network state
-    var isTaken = false;
+    // Battle mode locks every instrument except guitar.
     var battleLocked = type === 'instrument' && playMode === 'battle' && item.id !== 'guitar';
-    if (battleLocked) isTaken = true;
-    if (type === 'instrument' && inBandspace && playMode === 'coop') {
-      var avail = instrumentAvailability[item.id];
-      // undefined means no tracking for this instrument (e.g. bass) — treat as available
-      if (avail === false) {
-        isTaken = true;
-      }
-    }
+    var isTaken = battleLocked;
 
     var isSelected = item.id === currentVal && !isTaken;
     choice.className = 'option-picker-choice' + (isSelected ? ' selected' : '');
@@ -20970,7 +21029,7 @@ function buildSimplePickerChoices(panel, type, items, currentVal) {
     }
 
     var descText = item.desc;
-    if (isTaken) descText = battleLocked ? 'Battle is guitar only' : 'Taken by another player';
+    if (isTaken) descText = 'Battle is guitar only';
 
     choice.innerHTML =
       '<div style="flex:1">' +
@@ -21016,7 +21075,7 @@ function closeOptionPicker(accept) {
       sendToUnity('experience', {tab: 'environment', id: selectedEnvironment});
       sendToUnity('experience', {tab: 'guitarSkin',  id: selectedGuitarSkin});
       sendToUnity('experience', {tab: 'drumSkin',    id: selectedDrumSkin});
-      sendToUnity('experience', {tab: 'highway',     id: selectedHighway});
+      if (VIBE_HIGHWAY_ENABLED) sendToUnity('experience', {tab: 'highway', id: selectedHighway});
     }
     sendToUnity('experienceClosed', {});
     buildPlayGrid();
@@ -21025,35 +21084,6 @@ function closeOptionPicker(accept) {
   }
   currentPickerType = null;
 }
-
-// ── Vault Grid ──────────────────────────────────────────
-var vaultItems = [
-  {name:'Neon Arena',      cat:'Spaces',      file:'vault/001.jpg'},
-  {name:'Desert Stage',    cat:'Spaces',      file:'vault/002.jpg'},
-  {name:'Club Basement',   cat:'Spaces',      file:'vault/003.jpg'},
-  {name:'Beach Party',     cat:'Spaces',      file:'vault/004.jpg'},
-  {name:'Crystal Platform',cat:'Stages',      file:'vault/005.jpg'},
-  {name:'Fire Stage',      cat:'Stages',      file:'vault/006.jpg'},
-  {name:'Ice Rink',        cat:'Stages',      file:'vault/007.jpg'},
-  {name:'Cloud Stage',     cat:'Stages',      file:'vault/008.jpg'},
-  {name:'Avatar',          cat:'Avatar',      file:'vault/009.jpg'},
-  {name:'Electric Guitar', cat:'Instruments', file:'vault/010.jpg'},
-  {name:'Synthesizer',     cat:'Instruments', file:'vault/011.jpg'},
-  {name:'Drum Kit',        cat:'Instruments', file:'vault/012.jpg'},
-  {name:'Gold Mic',        cat:'Instruments', file:'vault/013.jpg'},
-  {name:'Ruby',            cat:'Gem',         file:'vault/014.jpg'},
-  {name:'Sapphire',        cat:'Gem',         file:'vault/015.jpg'},
-  {name:'Emerald',         cat:'Gem',         file:'vault/016.jpg'},
-  {name:'Diamond',         cat:'Gem',         file:'vault/017.jpg'},
-  {name:'Neon Highway',    cat:'Highway',     file:'vault/018.jpg'},
-  {name:'Rainbow Road',    cat:'Highway',     file:'vault/019.jpg'},
-  {name:'Dark Highway',    cat:'Highway',     file:'vault/020.jpg'},
-  {name:'Lava Highway',    cat:'Highway',     file:'vault/021.jpg'},
-  {name:'Sunset',          cat:'Skybox',      file:'vault/022.jpg'},
-  {name:'Galaxy',          cat:'Skybox',      file:'vault/023.jpg'},
-  {name:'Northern Lights', cat:'Skybox',      file:'vault/024.jpg'},
-  {name:'Storm',           cat:'Skybox',      file:'vault/025.jpg'}
-];
 
 // ── Instrument-skin purchase set (Store "Items" tab + My Collection) ─────────
 // SERVER-AUTHORITATIVE: this is populated entirely from the PlayFab Economy v2 catalog,
@@ -21348,7 +21378,7 @@ function openArtConfig(photoSrc, keepInputs) {
   var shapes = [
     {id: 'wide', label: 'Wide', cssClass: 'wide', ratio: '16:9', uses: 'Stage Backdrops, Social Area Frames', gc: '1', gr: '1'},
     {id: 'portrait', label: 'Portrait', cssClass: 'portrait', ratio: '9:16', uses: 'Stage Backdrops, Social Area Frames', gc: '2', gr: '1'},
-    {id: 'square', label: 'Square', cssClass: 'square', ratio: '1:1', uses: 'Album Art, Profile Pics, Group Logos', gc: '1', gr: '2'},
+    {id: 'square', label: 'Square', cssClass: 'square', ratio: '1:1', uses: 'Album Art, Profile Pics, Band Logos', gc: '1', gr: '2'},
     {id: 'circle', label: 'Circle', cssClass: 'circle', ratio: '1:1', uses: 'Avatars, Gems, Profile Frames', gc: '2', gr: '2'},
     {id: 'highway', label: 'Highway', cssClass: 'highway', ratio: '1:2', uses: 'Highways', gc: '3', gr: '1 / span 2'}
   ];
@@ -21408,7 +21438,7 @@ function buildCreatorArtPrompt() {
   var shapeHints = {
     wide: 'Wide banner composition.',
     portrait: 'Portrait (vertical) composition.',
-    square: 'Square composition suitable for an album cover or group logo.',
+    square: 'Square composition suitable for an album cover or band logo.',
     circle: 'Circular, centered composition suitable for an avatar or profile image.'
   };
   if (shapeHints[creatorSelectedShape]) parts.push(shapeHints[creatorSelectedShape]);
@@ -21518,7 +21548,7 @@ function deleteCreatorArt() {
   }
 }
 
-var creatorSelectedName = 'Rael';
+var creatorSelectedName = 'You';   // replaced by the real name on updateProfile
 var creatorNameType = 'solo';
 
 function openCreatorNamePicker() {
@@ -21555,9 +21585,9 @@ function openCreatorNamePicker() {
   grid.style.flex = '1';
   grid.style.minHeight = '0';
 
-  var profileName = 'Rael';
+  var profileName = 'You';
   var profileEl = document.querySelector('.profile-name');
-  if (profileEl) profileName = profileEl.textContent;
+  if (profileEl && /[A-Za-z0-9]/.test(profileEl.textContent)) profileName = profileEl.textContent;
   var profileAvatar = '';
   var profileImg = document.querySelector('.profile-avatar img');
   if (profileImg) profileAvatar = profileImg.src;
@@ -21572,7 +21602,7 @@ function openCreatorNamePicker() {
   var items = [];
   items.push({ name: profileName, type: 'solo', img: profileAvatar, desc: 'Solo' });
   for (var i = 0; i < groups.length; i++) {
-    items.push({ name: groups[i].name, type: 'group', img: groups[i].file, desc: 'Group' });
+    items.push({ name: groups[i].name, type: 'group', img: groups[i].file, desc: 'Band' });
   }
   items.push({ name: 'None', type: 'none', img: '', desc: 'No name overlay' });
 
@@ -21623,7 +21653,7 @@ function updateCreatorNameBtn() {
   if (creatorNameType === 'none') {
     label.textContent = 'No name selected';
   } else if (creatorNameType === 'group') {
-    label.textContent = 'Group - ' + creatorSelectedName;
+    label.textContent = 'Band - ' + creatorSelectedName;
   } else {
     label.textContent = 'Solo - ' + creatorSelectedName;
   }
@@ -21742,6 +21772,8 @@ function buildTiledGrid(container, items, makeTile) {
   container.innerHTML = '';
   if (!allTilings || allTilings.length === 0) return;
   var layoutIdx = currentLayout;
+  // The default home layout uses half columns the 3-col store grid can't show.
+  if (layoutIdx === homeDefaultLayout) layoutIdx = 317;
   if (layoutIdx < 0 || layoutIdx >= allTilings.length) layoutIdx = 0;
   var tiling = allTilings[layoutIdx];
   if (!tiling) return;
@@ -21795,10 +21827,14 @@ var storeVaultPage = 0;
 
 // Real-money pick packs pushed by Unity (updateIapPacks). Each: { sku, picks, price, name }.
 // picks comes from PlayFab Title Data; price is the localized string from Meta (may be empty in
-// the editor / before the add-on is published). Empty → fall back to the mock packData below.
+// the editor / before the add-on is published). On the headset (window.vuplex) the mock packData
+// below never shows: an empty or errored list renders an "unavailable" tile instead.
+// iapPacksError is set when Unity reports a fetch failure ({packs:[], error:'...'}).
 var iapPacks = [];
+var iapPacksError = null;
 function updateIapPacksFromBackend(data) {
   iapPacks = (data && data.packs) ? data.packs : [];
+  iapPacksError = (data && data.error) ? data.error : null;
   // Store DOM is static (always present, just hidden), so it's safe to rebuild whenever this lands.
   if (document.getElementById('store-packs-grid')) buildStoreGrid();
 }
@@ -21908,11 +21944,12 @@ function buildStoreGrid() {
   renderPager(document.getElementById('store-songs-pager'), storeSongsPage, songTotal, function(dir) { storeSongsPage += dir; buildStoreGrid(); });
 
   // ── Packs tab ──
-  // Real-money pick packs from Unity (iapPacks) when available; otherwise the mock bundles below
-  // so the desktop demo still renders. Real packs send storeBuyPack {sku}; mock send {name}.
+  // Real-money pick packs from Unity (iapPacks) when available. The mock bundles below are a
+  // desktop-only demo (!window.vuplex); on the headset an empty/errored list shows an
+  // "unavailable" tile. Only packs with a sku are buyable — nothing sends a SKU-less storeBuyPack.
   var packsGrid = document.getElementById('store-packs-grid');
   var packData;
-  if (iapPacks && iapPacks.length) {
+  if (iapPacks && iapPacks.length && !iapPacksError) {
     var PICK_PACK_COLORS = ['#1a3a5c', '#4a1a1a', '#1a4a2a', '#3a1a4a', '#1a2a4a', '#4a3a1a'];
     packData = [];
     for (var ppi = 0; ppi < iapPacks.length; ppi++) {
@@ -21926,10 +21963,12 @@ function buildStoreGrid() {
         isPickPack: true
       });
     }
+  } else if (window.vuplex || iapPacksError) {
+    packData = [{unavailable: true}];
   } else {
-    // Desktop/editor fallback (no Unity push): mock the real pick-pack ladder so the Packs tab reads
-    // identically to production. No sku → buttons send {name} (harmless off-device). Prices here are
-    // placeholders; on device the real localized price comes from Meta via updateIapPacks.
+    // Desktop-only fallback (no Unity bridge): mock the real pick-pack ladder so the Packs tab reads
+    // identically to production. No sku → tapping does nothing. Prices here are placeholders;
+    // on device the real localized price comes from Meta via updateIapPacks.
     packData = [
       {picks:1000,  price:'$5',  color:'#1a3a5c', locked:false, isPickPack:true},
       {picks:2300,  price:'$10', color:'#4a1a1a', locked:false, isPickPack:true},
@@ -21950,13 +21989,27 @@ function buildStoreGrid() {
     tile.style.alignItems = 'flex-start';
     tile.style.justifyContent = 'flex-end';
     tile.style.gap = '8px';
-    if (!p.locked) {
-      tile.style.background = p.color;
-      tile.style.cursor = 'pointer';
+    if (p.unavailable) {
+      tile.style.background = 'var(--bg-surface)';
+      tile.style.alignItems = 'center';
+      tile.style.justifyContent = 'center';
       tile.style.padding = '24px';
-      tile.onclick = (function(pack) {
-        return function() { sendToUnity('storeBuyPack', pack.sku ? {sku: pack.sku} : {name: pack.name}); };
-      })(p);
+      tile.style.textAlign = 'center';
+      tile.innerHTML = '<div class="tile-hero-title">Picks packs unavailable — try again later</div>';
+      // Tap to retry: Unity re-fetches and replies with a fresh updateIapPacks.
+      if (window.vuplex) {
+        tile.style.cursor = 'pointer';
+        tile.onclick = function() { sendToUnity('requestIapPacks', {}); };
+      }
+    } else if (!p.locked) {
+      tile.style.background = p.color;
+      tile.style.padding = '24px';
+      if (p.sku) {
+        tile.style.cursor = 'pointer';
+        tile.onclick = (function(pack) {
+          return function() { sendToUnity('storeBuyPack', {sku: pack.sku}); };
+        })(p);
+      }
       var packInner =
         '<div class="store-price">' + p.price + '</div>' +
         '<div style="line-height:0"><img src="branding/JamPick_hires.png" alt="" style="width:44px;height:44px;object-fit:contain;display:block"></div>';
@@ -22040,7 +22093,20 @@ var progressionPending = false;
 // they're running independently of the Unity app version.
 var UI_VERSION = 'v1.0.0.0';
 var allTilings = [];
-var currentLayout = 317;
+// Default home layout: Play Now hero over two equal half-width tiles. Not one of
+// the generated 3x3 tilings (those can't halve a row) — init() appends it, so it
+// sits at index 322 and every generated ?layout=0–321 keeps its number. Columns
+// are in 3x3 units; homeGridColumn() maps them onto the grid's 6 half-columns.
+var HOME_TWO_UP_TILING = [
+  { r: 0, c: 0,   w: 3,   h: 2 },
+  { r: 2, c: 0,   w: 1.5, h: 1 },
+  { r: 2, c: 1.5, w: 1.5, h: 1 }
+];
+var homeDefaultLayout = 322;
+var currentLayout = -1;  // -1 = default; ?layout=N overrides
+function homeGridColumn(t) {
+  return (t.c * 2 + 1) + ' / span ' + (t.w * 2);
+}
 // Challenges grid tilings (4x3 → 3164 layouts). 0 = uniform all-1x1 4x3 grid.
 // Override with ?challengeLayout=N; reveal the picker with ?challengeLayoutPicker.
 var questTilings = [];
@@ -22671,16 +22737,26 @@ function showReferralsSection() {
 // track referral counts, not the badge's own unlock condition.
 // Every tier carries a progress object so all tiles share the same layout: a
 // bottom-pinned bar + status label (Completed / X of Y referrals / Not started).
+// earned/progress are derived from myReferralCount (pushed by Unity as updateReferralCount)
+// against each tier's threshold — see deriveReferralTiers().
 var REFERRAL_BADGES = [
-  { name: 'Recruiter',     hint: 'Refer 1 friend who plays Jamsesh',   earned: true,
-    progress: { pct: 100, label: 'Completed' } },
-  { name: 'Band Together', hint: 'Refer 2 friends who play Jamsesh',   earned: false,
-    progress: { pct: 50,  label: '1 of 2 referrals' } },
-  { name: 'Full Lineup',   hint: 'Refer 5 friends who play Jamsesh',   earned: false,
-    progress: { pct: 0,   label: 'Not started' } },
-  { name: 'Top Promoter',  hint: 'Refer 10 friends who play Jamsesh',  earned: false,
-    progress: { pct: 0,   label: 'Not started' } }
+  { name: 'Recruiter',     hint: 'Refer 1 friend who plays Jamsesh',   threshold: 1 },
+  { name: 'Band Together', hint: 'Refer 2 friends who play Jamsesh',   threshold: 2 },
+  { name: 'Full Lineup',   hint: 'Refer 5 friends who play Jamsesh',   threshold: 5 },
+  { name: 'Top Promoter',  hint: 'Refer 10 friends who play Jamsesh',  threshold: 10 }
 ];
+
+function deriveReferralTiers() {
+  var n = myReferralCount || 0;
+  for (var i = 0; i < REFERRAL_BADGES.length; i++) {
+    var tier = REFERRAL_BADGES[i];
+    var have = Math.min(n, tier.threshold);
+    tier.earned = n >= tier.threshold;
+    tier.progress = tier.earned ? { pct: 100, label: 'Completed' }
+      : have > 0 ? { pct: Math.round(have * 100 / tier.threshold), label: have + ' of ' + tier.threshold + ' referrals' }
+      : { pct: 0, label: 'Not started' };
+  }
+}
 
 // ── Referral reward amounts ──
 // Display defaults for desktop testing. PlayFab-tunable: Unity pushes
@@ -22697,15 +22773,37 @@ function updateReferralRewards(data) {
   renderReferralRewards();
 }
 
-// Unity pushes the player's real 6-char share code ({type:'updateReferralCode', data:{code}}),
-// replacing the mock. We store it and stamp the displayed code element if it's on screen.
+// Unity pushes the player's real 6-char share code ({type:'updateReferralCode', data:{code, canRedeem}}).
+// Until it arrives the chip shows "—". If the fetch fails Unity sends {code:null, error} and the
+// chip offers a Retry, which re-sends referralsOpened (Unity re-fetches the code).
 function updateReferralCodeFromBackend(data) {
-  if (!data || !data.code) return;
-  referralCode = data.code;
-  var el = document.getElementById('referral-code');
-  if (el) el.textContent = referralCode;
+  if (!data) return;
+  if (data.code) {
+    referralCode = data.code;
+    referralCodeError = null;
+  } else if (data.error) {
+    referralCodeError = data.error;
+  }
   if (typeof data.canRedeem === 'boolean') myCanRedeemCode = data.canRedeem;
+  renderReferralCode();
   updateReferralCodeBtn();
+}
+
+function renderReferralCode() {
+  var el = document.getElementById('referral-code');
+  var retry = document.getElementById('referral-code-retry');
+  var failed = !referralCode && !!referralCodeError;
+  if (el) {
+    el.textContent = referralCode || '\u2014';
+    el.style.display = failed ? 'none' : '';
+  }
+  if (retry) retry.className = 'referral-code-retry' + (failed ? ' active' : '');
+}
+
+function retryReferralCode() {
+  referralCodeError = null;
+  renderReferralCode();
+  sendToUnity('referralsOpened', {});
 }
 
 // Unity pushes the player's confirmed referral count ({type:'updateReferralCount', data:{count}}).
@@ -22715,6 +22813,7 @@ function updateReferralCountFromBackend(data) {
   myReferralCount = data.count;
   var el = document.getElementById('referral-count');
   if (el) el.textContent = myReferralCount.toLocaleString();
+  buildReferralTiers();
 }
 
 // Unity pushes the list of people who used the player's code / they referred (real referrals).
@@ -22761,7 +22860,8 @@ function closeReferralHelpPopup(e) {
 // 'complete'/'sent' pills — state is driven by the real refer action (and later by backend
 // per-friend status, if/when that's added). Tapping a friend fires referFriend → CreatePendingReferral.
 var referralStates = {};
-var referralCode = 'J4M-53SH';   // mock fallback; Unity pushes the player's real code via updateReferralCode
+var referralCode = '';           // empty ("—") until Unity pushes the player's real code via updateReferralCode
+var referralCodeError = null;    // set when Unity reports the code fetch failed ({code:null, error})
 var myReferralCount = 0;         // confirmed referrals; Unity pushes via updateReferralCount
 var myCanRedeemCode = true;      // Unity pushes this on updateReferralCode: account <=1 day old OR internal user
 var enteredReferralCode = '';    // friend's code this player redeemed (Unity validates for real)
@@ -22784,7 +22884,7 @@ function confirmReferralCode() {
   var code = document.getElementById('referral-code-input').value.replace(/\s+/g, '').toUpperCase();
   var errEl = document.getElementById('referral-code-error');
   if (!code) { errEl.textContent = 'Please enter a code.'; return; }
-  if (code === referralCode.toUpperCase()) { errEl.textContent = 'That\'s your own code — ask a friend for theirs!'; return; }
+  if (referralCode && code === referralCode.toUpperCase()) { errEl.textContent = 'That\'s your own code — ask a friend for theirs!'; return; }
   enteredReferralCode = code;
   sendToUnity('referralCodeEntered', { code: code });
   document.getElementById('referral-code-overlay').className = 'referral-code-overlay';
@@ -22812,10 +22912,11 @@ var referralFriendsPage = 0;
 var REFERRAL_FRIENDS_PER_PAGE = 10;
 
 function buildReferralsSection() {
-  var codeEl = document.getElementById('referral-code');
-  if (codeEl) codeEl.textContent = referralCode;
+  renderReferralCode();
   updateReferralCodeBtn();
   renderReferralRewards();
+  // Tier band first: the empty-list branch below returns early.
+  buildReferralTiers();
 
   // ── Your referrals: people who used your code / you referred (paginated, read-only) ──
   // Populated by Unity via updateReferralList (window._myReferrals). The reward is granted
@@ -22860,9 +22961,13 @@ function buildReferralsSection() {
     referralFriendsPage += dir;
     buildReferralsSection();
   });
+}
 
-  // ── Badge band (Badges screen entries with referral-tier hints) ──
+// ── Badge band (Badges screen entries with referral-tier hints) ──
+function buildReferralTiers() {
   var band = document.getElementById('referral-tiers');
+  if (!band) return;
+  deriveReferralTiers();
   band.innerHTML = '';
   for (var t = 0; t < REFERRAL_BADGES.length; t++) {
     for (var j = 0; j < badgeData.length; j++) {
@@ -23682,12 +23787,12 @@ var seasonData = [
     {name: 'Gold Frame',     xp: 3000, xpEarned: 2200, unlocked: false, img: 'plates/flames.jpg'},
     {name: 'Legend Banner',  xp: 6000, xpEarned: 0,    unlocked: false, img: 'banners/Space 1.png'}
   ]},
-  {label: 'Group', earnTitle: 'Earn Group XP', infoImg: 'journeys/group.jpg',
-   earnSub: 'Group XP is shared progress — jam with your band to level it up.',
+  {label: 'Band', earnTitle: 'Earn Band XP', infoImg: 'journeys/group.jpg',
+   earnSub: 'Band XP is shared progress — jam with your band to level it up.',
    earn: [
-    {icon: XP_ICON_BAND, title: 'Perform in a Band', desc: 'Complete a track in a Group session with your bandmates.',         xp: 75,  unit: 'Group XP'},
-    {icon: XP_ICON_ADD,  title: 'Recruit a Bandmate', desc: 'Invite a friend who joins your band and plays their first show.', xp: 150, unit: 'Group XP'},
-    {icon: XP_ICON_WIN,  title: 'Win a Group Show',   desc: 'Top the leaderboard together at the end of a Group set.',          xp: 100, unit: 'Group XP'}
+    {icon: XP_ICON_BAND, title: 'Perform in a Band', desc: 'Complete a track in a Band session with your bandmates.',         xp: 75,  unit: 'Band XP'},
+    {icon: XP_ICON_ADD,  title: 'Recruit a Bandmate', desc: 'Invite a friend who joins your band and plays their first show.', xp: 150, unit: 'Band XP'},
+    {icon: XP_ICON_WIN,  title: 'Win a Band Show',   desc: 'Top the leaderboard together at the end of a Band set.',          xp: 100, unit: 'Band XP'}
    ],
    rewards: [
     {name: 'Band Banner',    xp: 1000, xpEarned: 1000, unlocked: true,  img: 'banners/Sully.png'},
@@ -24398,7 +24503,7 @@ var badgeData = [
   { name: 'Rising Star',   hint: 'Get 4 stars on 1 track',       img: 'badges/badge_risingstar_4starsin1track.png',    earned: true,  progress: { pct: 100, label: 'Completed' } },
   { name: 'Shooting Star', hint: 'Get 4 stars on 5 tracks',      img: 'badges/badge_shootingstar_4starsin5tracks.png', earned: false, progress: { pct: 20, label: '1 of 5 tracks' } },
   { name: 'Superstar',     hint: 'Get 4 stars on 10 tracks',     img: 'badges/badge_superstar_4starsin10tracks.png',   earned: false, progress: { pct: 10, label: '1 of 10 tracks' } },
-  { name: 'All-Star Band', hint: 'Get 4 stars on a group track', img: 'badges/badge_allstarband_4starsasagroup.png',   earned: false, progress: { pct: 0,  label: 'Not started' } },
+  { name: 'All-Star Band', hint: 'Get 4 stars on a band track', img: 'badges/badge_allstarband_4starsasagroup.png',   earned: false, progress: { pct: 0,  label: 'Not started' } },
   // ── Referral tiers ──
   { name: 'Recruiter',     hint: 'Refer 1 friend who plays Jamsesh',   img: 'badges/badge_recruiter_refer1friend.png',     earned: true,  progress: { pct: 100, label: 'Completed' } },
   { name: 'Band Together', hint: 'Refer 2 friends who play Jamsesh',    img: 'badges/badge_bandtogether_refer2friends.png', earned: false, progress: { pct: 50, label: '1 of 2 referrals' } },
@@ -24514,24 +24619,23 @@ function generateAllTilings(cols, rows) {
 }
 
 // Default tile priority — override via ?tiles=mainstage,store,vault,...
-var homeTilePriority = ['mainstage', 'store', 'vault', 'creator', 'spaces', 'news', 'social'];
+var homeTilePriority = ['mainstage', 'shop', 'store', 'vault', 'creator', 'spaces', 'news', 'social'];
 
 // All tile definitions keyed by ID
 var homeTileDefs = {
-  mainstage: { id: 'mainstage', title: 'Play Now', sub: 'Perform now', detail: '', ext: 'png',
-    glow: {
-      c: 'rgba(0,224,255,0.4)',
-      f: 'drop-shadow(0 0 8px rgba(0,224,255,0.9)) drop-shadow(0 0 22px rgba(168,85,247,0.5))',
-      fh: 'drop-shadow(0 0 14px rgba(0,224,255,1)) drop-shadow(0 0 34px rgba(168,85,247,0.7))'
-    },
+  // rgb = the tile's one brand accent (Brand Book v1.0 colour roles): acid for the
+  // primary action, teal for online/social, magenta for live/share, lavender for
+  // ambient/creator labels, gold flare for value moments.
+  mainstage: { id: 'mainstage', title: 'Play Now', sub: 'Perform now', detail: '', ext: 'png', rgb: '232,255,58',
     action: function() { navigateTo('play'); } },
-  season:  { id: 'season',  title: 'Grammys Progress', sub: '8 Days Left', detail: '40% Complete', ext: 'jpg', action: function() { navigateTo('season'); } },
-  store:   { id: 'store',   title: 'Referrals', sub: 'Invite Friends', detail: 'Earn rewards together', ext: 'png', action: function() { showReferralsSection(); } },
-  vault:   { id: 'vault',   title: 'Design', sub: 'Your Creations', detail: 'Build and share content', ext: 'jpg', action: function() { navigateTo('creator'); } },
-  creator: { id: 'creator', title: 'JamCreator', sub: 'Your Creations', detail: 'Build and share content', ext: 'png', action: function() { showJamCreatorSection(); } },
-  spaces:  { id: 'spaces',  title: 'Spaces', sub: 'K-Pop Zone', detail: '20/25 Jammers online!', ext: 'jfif', action: function() { navigateTo('spaces'); } },
-  news:    { id: 'news',    title: 'News', sub: 'Update v0.25', detail: 'New battle mode added!', ext: 'jfif', action: function() { navigateTo('settings'); } },
-  social:  { id: 'social',  title: 'Bandmates', sub: '8 Friends Online', detail: 'Jump in and jam together', ext: 'webp', action: function() { navigateTo('social', {tab: 'friends'}); } }
+  season:  { id: 'season',  title: 'Grammys Progress', sub: '8 Days Left', detail: '40% Complete', ext: 'jpg', rgb: '255,210,74', action: function() { navigateTo('season'); } },
+  store:   { id: 'store',   title: 'Referrals', sub: 'Invite Friends', detail: 'Earn rewards together', ext: 'png', rgb: '0,229,199', action: function() { showReferralsSection(); } },
+  shop:    { id: 'shop',    title: 'Store', sub: 'Gear & Packs', detail: '', rgb: '255,210,74', action: function() { navigateTo('store'); } },
+  vault:   { id: 'vault',   title: 'Design', sub: 'Your Creations', detail: 'Build and share content', ext: 'jpg', rgb: '176,166,223', action: function() { navigateTo('creator'); } },
+  creator: { id: 'creator', title: 'JamCreator', sub: 'Your Creations', detail: 'Build and share content', ext: 'png', rgb: '255,46,146', action: function() { showJamCreatorSection(); } },
+  spaces:  { id: 'spaces',  title: 'Spaces', sub: 'K-Pop Zone', detail: '20/25 Jammers online!', ext: 'jfif', rgb: '176,166,223', action: function() { navigateTo('spaces'); } },
+  news:    { id: 'news',    title: 'News', sub: 'Update v0.25', detail: 'New battle mode added!', ext: 'jfif', rgb: '255,46,146', action: function() { navigateTo('settings'); } },
+  social:  { id: 'social',  title: 'Bandmates', sub: '', detail: 'Jump in and jam together', ext: 'webp', rgb: '0,229,199', action: function() { navigateTo('social'); switchSocialTab('friends'); } }
 };
 
 function buildHomeGrid(layoutIndex) {
@@ -24575,33 +24679,18 @@ function buildHomeGrid(layoutIndex) {
     slotAssignments[slots[i].idx] = orderedTiles[i % orderedTiles.length];
   }
 
-  function getSizeKey(w, h) {
-    // Size variants were byte-identical placeholders — collapsed to 1x1 only
-    // to keep APK lean. Reintroduce variants if/when art differs per aspect.
-    return '1x1';
-  }
-
-  var glowColors = [
-    { c: 'rgba(255,200,0,0.4)', f: 'drop-shadow(0 0 6px rgba(255,200,0,0.8)) drop-shadow(0 0 20px rgba(255,200,0,0.4))', fh: 'drop-shadow(0 0 10px rgba(255,200,0,1)) drop-shadow(0 0 30px rgba(255,200,0,0.5))' },
-    { c: 'rgba(168,85,247,0.4)', f: 'drop-shadow(0 0 6px rgba(168,85,247,0.8)) drop-shadow(0 0 20px rgba(168,85,247,0.4))', fh: 'drop-shadow(0 0 10px rgba(168,85,247,1)) drop-shadow(0 0 30px rgba(168,85,247,0.5))' },
-    { c: 'rgba(0,255,180,0.4)', f: 'drop-shadow(0 0 6px rgba(0,255,180,0.8)) drop-shadow(0 0 20px rgba(0,255,180,0.4))', fh: 'drop-shadow(0 0 10px rgba(0,255,180,1)) drop-shadow(0 0 30px rgba(0,255,180,0.5))' },
-    { c: 'rgba(255,80,200,0.4)', f: 'drop-shadow(0 0 6px rgba(255,80,200,0.8)) drop-shadow(0 0 20px rgba(255,80,200,0.4))', fh: 'drop-shadow(0 0 10px rgba(255,80,200,1)) drop-shadow(0 0 30px rgba(255,80,200,0.5))' },
-    { c: 'rgba(0,224,255,0.4)', f: 'drop-shadow(0 0 6px rgba(0,224,255,0.8)) drop-shadow(0 0 20px rgba(0,224,255,0.4))', fh: 'drop-shadow(0 0 10px rgba(0,224,255,1)) drop-shadow(0 0 30px rgba(0,224,255,0.5))' },
-    { c: 'rgba(60,130,255,0.4)', f: 'drop-shadow(0 0 6px rgba(60,130,255,0.8)) drop-shadow(0 0 20px rgba(60,130,255,0.4))', fh: 'drop-shadow(0 0 10px rgba(60,130,255,1)) drop-shadow(0 0 30px rgba(60,130,255,0.5))' },
-    { c: 'rgba(255,180,80,0.4)', f: 'drop-shadow(0 0 6px rgba(255,180,80,0.8)) drop-shadow(0 0 20px rgba(255,180,80,0.4))', fh: 'drop-shadow(0 0 10px rgba(255,180,80,1)) drop-shadow(0 0 30px rgba(255,180,80,0.5))' }
-  ];
+  // Fallback accents for tiles without their own rgb — brand palette only.
+  var brandAccents = ['176,166,223', '0,229,199', '255,46,146', '255,210,74'];
 
   for (var i = 0; i < tiling.length; i++) {
     var t = tiling[i];
     var ht = slotAssignments[i];
     if (!ht) continue;
-    var gc = ht.glow || glowColors[i % glowColors.length];
-    var sizeKey = getSizeKey(t.w, t.h);
-    var bgSrc = 'home_tiles/' + ht.id + '_' + sizeKey + '.' + ht.ext;
+    var accent = ht.rgb || brandAccents[i % brandAccents.length];
 
     var wrap = document.createElement('div');
     wrap.className = 'home-tile-wrap';
-    wrap.style.gridColumn = (t.c + 1) + ' / span ' + t.w;
+    wrap.style.gridColumn = homeGridColumn(t);
     wrap.style.gridRow = (t.r + 1) + ' / span ' + t.h;
     // No outer-glow drop-shadow — the tiles read flat like the Badges tiles.
     wrap.style.cursor = 'pointer';
@@ -24613,19 +24702,21 @@ function buildHomeGrid(layoutIndex) {
     tile.style.position = 'relative';
     tile.style.display = 'flex';
     tile.style.flexDirection = 'column';
-    tile.style.justifyContent = 'flex-end';
+    // Plain brand card (no cover art): title dead centre.
+    tile.style.justifyContent = 'center';
+    tile.style.alignItems = 'center';
+    tile.style.textAlign = 'center';
     tile.style.padding = '28px';
     tile.style.gap = '6px';
-    tile.style.setProperty('--glow-color', gc.c);
-
-    var overlayColor = gc.c.replace(/[\d.]+\)$/, '0.25)');
-    var overlayMid = gc.c.replace(/[\d.]+\)$/, '0.4)');
-    // Subtext (sub + detail) removed — home tiles show the hero title only.
-    // The Play Now (mainstage) hero title is double-size for extra attract.
-    var titleStyle = 'position:relative;z-index:3' + (ht.id === 'mainstage' ? ';font-size:200px;line-height:0.92' : '');
+    tile.style.setProperty('--glow-color', 'rgba(' + accent + ',0.4)');
+    tile.style.setProperty('--tile-rgb', accent);
+    // Subtext (sub + detail) removed — home tiles show the title only, sized to
+    // fill the tile: full-width tiles get the hero size, half-width tiles (the
+    // default bottom row) the large size, single-column tiles a size that still
+    // fits the longest title (JamCreator) on one line.
+    var titleSize = t.w >= 3 ? 250 : (t.w >= 1.5 ? 150 : 120);
+    var titleStyle = 'position:relative;z-index:3;font-size:' + titleSize + 'px;line-height:0.92';
     tile.innerHTML =
-      '<img src="' + bgSrc + '" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:0;border-radius:var(--panel-radius)" alt="">' +
-      '<div style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:1;background:linear-gradient(180deg,' + overlayColor + ' 0%,' + overlayMid + ' 40%,rgba(0,0,0,0.7) 100%);border-radius:var(--panel-radius)"></div>' +
       '<div class="tile-hero-title" style="' + titleStyle + '">' + ht.title + '</div>';
 
     wrap.appendChild(tile);
@@ -24653,7 +24744,7 @@ function buildLayoutBrowser() {
       var t = tiling[j];
       var cell = document.createElement('div');
       cell.className = 'layout-thumb-tile';
-      cell.style.gridColumn = (t.c + 1) + ' / span ' + t.w;
+      cell.style.gridColumn = homeGridColumn(t);
       cell.style.gridRow = (t.r + 1) + ' / span ' + t.h;
       thumb.appendChild(cell);
     }
@@ -24677,7 +24768,7 @@ function updateLayoutBtn(layoutIndex) {
     var t = tiling[j];
     var cell = document.createElement('div');
     cell.className = 'home-layout-btn-tile';
-    cell.style.gridColumn = (t.c + 1) + ' / span ' + t.w;
+    cell.style.gridColumn = homeGridColumn(t);
     cell.style.gridRow = (t.r + 1) + ' / span ' + t.h;
     btn.appendChild(cell);
   }
@@ -25070,7 +25161,7 @@ function parseMode() {
     }
   }
 
-  // ?layout=N — override home grid layout (0-321, clamped after tilings generate)
+  // ?layout=N — override home grid layout (0-322, clamped after tilings generate)
   if (map.layout) {
     var layoutNum = parseInt(map.layout, 10);
     if (!isNaN(layoutNum) && layoutNum >= 0) {
@@ -25155,10 +25246,7 @@ function parseMode() {
   // unlocks all cosmetics so locked themes/banners/frames preview as owned.
   if ('unlockAll' in map) {
     for (var _ua = 0; _ua < badgeData.length; _ua++) badgeData[_ua].earned = true;
-    for (var _ur = 0; _ur < REFERRAL_BADGES.length; _ur++) {
-      REFERRAL_BADGES[_ur].earned = true;
-      delete REFERRAL_BADGES[_ur].progress;
-    }
+    myReferralCount = REFERRAL_BADGES[REFERRAL_BADGES.length - 1].threshold;
     for (var _ut = 0; _ut < themes.length; _ut++) unlockedThemes.push(themes[_ut].id);
     for (var _ub = 0; _ub < banners.length; _ub++) unlockedBanners.push(banners[_ub].id);
     for (var _uf = 0; _uf < frames.length; _uf++) unlockedFrames.push(frames[_uf].id);
@@ -25543,7 +25631,9 @@ function init() {
 
   // Tilings must exist before any layout-driven grid builds below
   allTilings = generateAllTilings();
-  if (currentLayout < 0 || currentLayout >= allTilings.length) currentLayout = 317;
+  allTilings.push(HOME_TWO_UP_TILING);
+  homeDefaultLayout = allTilings.length - 1;
+  if (currentLayout < 0 || currentLayout >= allTilings.length) currentLayout = homeDefaultLayout;
   questTilings = generateAllTilings(4, 3);
   if (currentQuestLayout < 0 || currentQuestLayout >= questTilings.length) currentQuestLayout = 0;
 
@@ -25551,6 +25641,13 @@ function init() {
   buildPlayPanel([]);
   buildStoreGrid();
   showPlayLoading(true);
+
+  // Topbar name is "—" in the HTML until Unity's updateProfile lands. The desktop demo
+  // (no Unity bridge) seeds it from the mock active profile instead.
+  if (!window.vuplex) {
+    var demoNameEl = document.querySelector('.profile-name');
+    if (demoNameEl) demoNameEl.textContent = getActiveProfile().name;
+  }
 
   // Fallback: load songs.json when running outside Vuplex (standalone browser)
   if (!window.vuplex) {
@@ -25757,7 +25854,7 @@ function applyReadyDemo() {
     { name: 'FretBoss',      avatar: '',    instrument: 'guitar', difficulty: 'expert', status: 'ready', ready: true, online: true }
   ];
   var grp = {
-    id: 'grp-ready-demo', name: me.name + "'s Group",
+    id: 'grp-ready-demo', name: me.name + "'s Band",
     logo: JAMSESH_DEFAULT_LOGO, photo: JAMSESH_DEFAULT_LOGO,
     online: '4/' + COOP_PLAYERS_MAX, active: true, isOwn: true, created: true,
     members: members

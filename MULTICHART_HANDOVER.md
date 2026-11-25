@@ -119,7 +119,7 @@ You don't need to do anything to choose between them — just send the chart dat
 - **0 charts for one instrument in a multichart song**: that column renders a "No chart" placeholder (visual only; header still selects the instrument with a `null` chartId).
 - **No catalogue at all**: single layout, behaves like before (with Keys removed).
 - **Picker open when `updateSongCharts` arrives**: re-renders live, preserving the user's instrument hover.
-- **Coop/battle mode**: existing `updateInstrumentAvailability` "taken by another player" overlay still works on each column.
+- **Coop/battle mode**: battle locks every column except Guitar. (The `updateInstrumentAvailability` "taken" overlay was removed 2026-10-31; Unity never sent it.)
 - **Per-song memory**: each setlist slot remembers its own chart selection. Switching setlist songs resets to the `active` chart of the new song.
 
 ---
